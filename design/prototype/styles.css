@@ -37,7 +37,8 @@ input[type=checkbox] { accent-color:var(--accent); width:24px; height:24px; marg
 .demo-banner { background:var(--tint); color:var(--text); text-align:center; padding:8px 12px; font-size:.6875rem; letter-spacing:.3px; }
 #screen { padding:24px 24px 28px; min-height:0; outline:none; flex:1; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; }
 #screen>.page { animation:arrive var(--navigation) ease-out; }
-@keyframes arrive { from { opacity:.3; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+/* Text stays opaque throughout motion so contrast never dips during entry. */
+@keyframes arrive { from { transform:translateY(5px); } to { transform:translateY(0); } }
 .app-header { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:28px; }
 .wordmark { font-size:.875rem; font-weight:650; letter-spacing:-.2px; }
 .wordmark .dot { color:var(--accent); margin-inline-end:6px; }

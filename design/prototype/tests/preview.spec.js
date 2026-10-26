@@ -192,6 +192,9 @@ test('automated accessibility · rule form, preview and interruption', async ({p
     await page.getByRole('button', {name:action}).click();
   }
   await page.locator('#preview-prompt').click();
+  // Text must retain contrast while the entrance is in progress, not just
+  // once the 180ms transition has finished. Do not hide a fade with a wait.
+  expect(await page.getByRole('dialog').evaluate(el => getComputedStyle(el).opacity)).toBe('1');
   expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);
 });
 

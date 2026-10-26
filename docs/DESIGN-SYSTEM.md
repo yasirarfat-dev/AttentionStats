@@ -73,7 +73,7 @@ Observations, patterned estimates and dashed forecasts need text legends. The pr
 
 ## Motion and feedback
 
-Targets: feedback 120ms, sheet reveal 180ms, navigation 220ms. Use short ease-out opacity and very small position changes. Avoid overshoot, parallax, loops, roulette counters, confetti and repeated chart drawing. Familiar screens should stay stable. These durations are specifications, not measured frame guarantees.
+Targets: feedback 120ms, sheet reveal 180ms, navigation 220ms. Use short ease-out, very small position changes. Keep text and its background opaque throughout transitions so contrast does not dip during entry. Avoid overshoot, parallax, loops, roulette counters, confetti and repeated chart drawing. Familiar screens should stay stable. These durations are specifications, not measured frame guarantees.
 
 Always honor system reduced motion. In-app reduce can strengthen it, never force more animation. Remove decorative transitions; emergency actions have no animation delay. Haptics/sound start off. Do not announce a timer each second; announce meaningful changes once.
 
