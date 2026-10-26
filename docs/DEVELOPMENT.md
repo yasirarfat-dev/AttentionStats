@@ -1,6 +1,6 @@
 # Local development
 
-**Status:** Documentation workflow runnable; application setup is future work. Updated 2026-10-27.
+**Status:** Documentation and design-study workflows runnable; native application setup future work. Updated 2026-10-27.
 **Responsibility:** Defines local setup, reproducible commands, isolation and debugging.
 **Related specifications:** [Dependencies](DEPENDENCIES.md), [Testing](TESTING.md), [Structure](FILE-STRUCTURE.md), [Agent rules](AGENT-RULES.md).
 **Unresolved feasibility:** F-02–F-04 in [Decisions](DECISIONS.md); no Android application build has run.
@@ -19,6 +19,8 @@ git status --short
 The checker verifies expected documents, metadata, relative links/anchors, capability/scenario/task coverage, dependency-ledger consistency and prohibited public artifacts. It does not prove Android behavior or external link availability. Manually review public text and policy interpretation. The CI job performs the same offline documentation checks without application builds or secrets.
 
 ## Future application setup: AS-004
+
+For the separately authorized AS-033 design continuation, [preview instructions](../design/prototype/README.md) run from `design/prototype` with Node and pnpm. `pnpm run preview` serves loopback-only static assets without installing packages. For browser tests: `pnpm install --frozen-lockfile --ignore-scripts`, `pnpm run browser:install`, `pnpm test`. Its package manifest/lockfile and ignored local browser cache do not create a React Native scaffold or clear F-03. Do not use the study's success as an Android build claim.
 
 1. Complete latest-version compatibility work AS-002 and record F-03 evidence. Review [React Native without a framework](https://reactnative.dev/docs/getting-started-without-a-framework) and its [environment requirements](https://reactnative.dev/docs/set-up-your-environment) at execution time. Do not choose Expo or scaffold during this foundation task.
 2. Isolate Node/pnpm and Android tooling per project/session. Use `pnpm@latest` in an isolated launcher or local tool directory if needed; do not globally update other agents' tools. Inspect the current CLI help for pnpm and skip-install options before generating in a temporary sibling directory. Avoid overwriting this documentation tree.

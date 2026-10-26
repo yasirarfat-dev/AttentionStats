@@ -31,6 +31,9 @@ All IDs are locally generated opaque strings. No hardware/advertising identifier
 | IngestionCursor / DeletionFence | sourceId, highWaterMs, overlapMs, revision / scope, timeRange, generation | Batch/cursor/fence committed atomically; no deleted-event resurrection |
 | BackupJob | id, formatVersion, snapshotRevision, state, stage, transport, byteCount, sanitizedFailure, completedAtMs? | No key/passphrase; transport handles private; status does not assert provider durability |
 | CommandRecord | commandId, operation, payloadDigest, resultRevision, outcome, expiresAtMs | Idempotency record atomically persisted with mutation; no credential payload |
+| LiveOverlayConfiguration | revision, enabled, selectedAppSurfaces, rendererChoice, visibleFields, placementPreset, hideUntilMs? | Off by default; native config; separate from source consent and protection pause; no behavioral counter stored here |
+
+LiveSurfaceSnapshot is a **derived read model**, not a second durable counter. It projects a SurfaceEpisode, committed Exposure records, CoverageIntervals and day bounds from [Live overlay](LIVE-OVERLAY-SPEC.md); [Contracts](NATIVE-CONTRACTS.md) owns its shape. This visit is already part of today; midnight changes daily membership without closing a continuous visit. Generation/revision invalidation follows deletion/restore. Rendering or replayed callbacks never increments an independent value.
 
 ## Time, evidence and precision
 

@@ -9,6 +9,8 @@
 
 Give people a trustworthy account of their digital routines and practical control over what happens next. Attention Stats aims to understand every digital behavior that platforms expose and users choose to track. Completeness is an evolving goal; the app must state what it cannot see.
 
+The experience should support peace of mind, curiosity about personal behavior and help with unwanted impulses. A calm, pleasing interface and considerate language make support approachable. Optimize for voluntary useful engagement and a clear next step outside the app. [Human factors](HUMAN-FACTORS.md) defines this direction; neither the design nor activity history establishes psychological benefit or a diagnosis.
+
 Observe means obtaining explicitly enabled signals. Track means constructing a durable, inspectable history. Categorize means applying editable meaning. Predict means offering an uncertain, explainable forecast. Protect means executing the user's chosen rules. These stages can be used independently: a person may collect app totals without content history or protection.
 
 ## People and needs

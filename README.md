@@ -10,6 +10,8 @@ Start with the [documentation index](docs/INDEX.md), [product scope](docs/PRODUC
 
 Development uses **pnpm** and resolves new direct packages with `package@latest`. Exact dependency candidates are [recorded](docs/DEPENDENCIES.md); no application dependencies are installed in this phase.
 
+An [interactive design study](design/prototype/README.md) now explores the calm, supportive experience with synthetic data: daily clarity, understandable patterns, chosen boundaries, privacy, light/dark themes and reduced motion. It implements no tracking or native protection. [Human factors](docs/HUMAN-FACTORS.md) governs its direction. From `design/prototype`, run `pnpm run preview`, then open `http://127.0.0.1:4179`; previewing needs Node, with no dependency install.
+
 Run documentation checks with Python 3.11 or newer:
 
 ```powershell

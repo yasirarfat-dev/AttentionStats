@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 REQUIRED = (
     "INDEX VISION PRODUCT CAPABILITY-MATRIX TRACKING-SPEC SOCIAL-MEDIA-SPEC "
-    "BEHAVIOR-INTELLIGENCE PROTECTION-SPEC UX-SPEC NAVIGATION DESIGN-SYSTEM "
+    "BEHAVIOR-INTELLIGENCE PROTECTION-SPEC LIVE-OVERLAY-SPEC UX-SPEC HUMAN-FACTORS NAVIGATION DESIGN-SYSTEM "
     "SETTINGS-SPEC ARCHITECTURE FILE-STRUCTURE NATIVE-CONTRACTS DATA-MODELS "
     "STORAGE-AND-RETENTION PRIVACY SECURITY PERMISSIONS BACKUP-RESTORE "
     "CONVENTIONS DEPENDENCIES TESTING DEVELOPMENT RELEASE CONTRIBUTING "
@@ -179,6 +179,28 @@ def main() -> int:
             fail(evidence, "pnpm/date missing from dependency documentation")
     except (OSError, ValueError, KeyError, TypeError) as exc:
         fail(evidence, f"invalid dependency evidence: {exc}")
+
+    # The synthetic study has its own installed test tools; mobile candidates
+    # above remain a historical, uninstalled snapshot. Never conflate them.
+    study = ROOT / "design" / "prototype"
+    try:
+        manifest = json.loads((study / "package.json").read_text(encoding="utf-8"))
+        installed = json.loads((study / "tooling-evidence.json").read_text(encoding="utf-8"))
+        direct = {**manifest.get("dependencies", {}), **manifest.get("devDependencies", {})}
+        manager_name, manager_version = manifest["packageManager"].split("@")
+        direct[manager_name] = manager_version
+        records = {p["package"]: p for p in installed["packages"]}
+        if set(direct) != set(records) or manifest.get("dependencies"):
+            fail(study / "package.json", "study must have only evidenced development tools and pnpm")
+        for name, version in direct.items():
+            record = records[name]
+            if record["version"] != version or record["selector"] != f"{name}@latest" or not record["license"]:
+                fail(study / "tooling-evidence.json", f"tool pin/evidence mismatch: {name}")
+        lock = (study / "pnpm-lock.yaml").read_text(encoding="utf-8")
+        if "packageManagerDependencies:" not in lock or "devDependencies:" not in lock:
+            fail(study / "pnpm-lock.yaml", "pnpm environment and project graphs must both be committed")
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        fail(study / "package.json", f"invalid design-study tooling evidence: {exc}")
 
     if (ROOT / "AGENTS.md").read_text(encoding="utf-8") != (ROOT / "CLAUDE.md").read_text(encoding="utf-8"):
         fail(ROOT / "AGENTS.md", "agent entrypoints must carry identical instructions")

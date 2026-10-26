@@ -1,6 +1,6 @@
 # Dependencies and toolchain
 
-**Status:** Latest registry candidates evaluated, not installed or build verified. Updated 2026-10-27.
+**Status:** Mobile candidates uninstalled/unverified; separate design-study tooling installed and tested. Updated 2026-10-27.
 **Responsibility:** Owns package manager, version policy, licenses, compatibility evidence and exceptions.
 **Related specifications:** [Development](DEVELOPMENT.md), [Architecture](ARCHITECTURE.md), [Security](SECURITY.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-03 and F-04; CLI/RN documented range mismatch, Nitro pairing, TypeScript/tooling and Room encryption need checks.
@@ -54,6 +54,10 @@ Additional template/build/test/format packages are not selected yet. AS-004 must
 - [pnpm installation](https://pnpm.io/installation) identifies pnpm 12 as the current release line. Review its project-local version and build-script approval behavior before enabling native dependency install scripts.
 
 ## Compatibility gate
+
+The independent AS-033 [design study](../design/prototype/README.md) has no runtime dependencies. On 2026-10-27 its new direct **development-only** tools resolved at latest: pnpm 12.15.0 (MIT), @playwright/test 1.64.1 (Apache-2.0, Node ≥20) and @axe-core/playwright 4.14.0 (MPL-2.0, Node ≥22.12, playwright-core peer ≥1). [Registry evidence](../design/prototype/tooling-evidence.json) and the study's committed lockfile record this separate graph; Node v26.12.1 on Windows satisfies the engines. Frozen install with scripts disabled passes. Browser verification uses these tools; no Android dependency/build is thereby verified.
+
+pnpm 12's lockfile contains a manager/environment document followed by the project graph; review both for supply-chain inspection. [Official format](https://github.com/pnpm/pnpm.io/blob/main/docs/lockfile.md). The runtime is original HTML/CSS/JS and Node/browser built-ins, with local system fonts and no remote assets. Tools' upstream notices remain in their installed packages; no third-party source/assets are copied into the app or repository. No global tool configuration was changed. Mobile candidate rows above remain the dated foundation snapshot and must be refreshed by AS-002.
 
 Record exact OS/architecture, Node/pnpm/JDK/SDK/NDK/CMake/Gradle/AGP/Kotlin/KSP versions. Use latest stable tooling compatible with the selected latest RN template; an older generated version is a recorded conflict, not silently accepted. Run clean native debug/release compilation with New Architecture, Codegen round trip, navigation/gestures/theme/list/chart smoke tests, background collection with JS absent, MMKV restart behavior, and Room migration/encryption tests. Document outcomes per dependency and artifact.
 

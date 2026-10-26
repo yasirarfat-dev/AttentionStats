@@ -1,11 +1,15 @@
 # User experience
 
-**Status:** Planned screen and interaction specification; no interface implemented. Updated 2026-10-27.
+**Status:** Native experience planned; AS-033 implements a separate synthetic browser design study. Updated 2026-10-27.
 **Responsibility:** Defines journeys, screen states, permissions, chart semantics and accessible interactions.
-**Related specifications:** [Navigation](NAVIGATION.md), [Design](DESIGN-SYSTEM.md), [Settings](SETTINGS-SPEC.md), [Product](PRODUCT.md), [Privacy](PRIVACY.md).
+**Related specifications:** [Human factors](HUMAN-FACTORS.md), [Navigation](NAVIGATION.md), [Design](DESIGN-SYSTEM.md), [Settings](SETTINGS-SPEC.md), [Product](PRODUCT.md), [Privacy](PRIVACY.md).
 **Unresolved feasibility:** F-01, F-02 and F-06 in [Decisions](DECISIONS.md); native grant routes, detectors and provider flows require device validation.
 
 ## Screen inventory
+
+The experience should provide peace of mind, understandable evidence and user-owned boundaries. [Human factors](HUMAN-FACTORS.md) governs the supportive voice and evaluation. The [interactive study](../design/prototype/README.md) makes that direction reviewable with synthetic states; it does not replace native implementation.
+
+Today opens with covered app time, a coverage explanation, one optional focus action, one finite descriptive pattern and selected app totals. Detail is available on demand. Show an explicit stopping point, not an infinite feed. Avoid repeated permission prompting, streak pressure, composite wellness scores or emotional dependency. Recreation is not automatically a problem. Every reflection can end with no change.
 
 | Screen | Primary content/action | Required states |
 |---|---|---|
@@ -24,6 +28,7 @@
 | Settings hub | Searchable grouped preferences and source/privacy shortcuts | Defaults, changed preferences, pending native save |
 | Permissions and service health | OS grants versus enabled sources, last success, gaps, fix steps | Denied, paused, degraded, unsupported, stale |
 | How tracking works | Adapter/source fields, version, support evidence, data destinations | No adapter, experimental, validated, withdrawn |
+| Optional live awareness counter / detail | Current-visit plus today exposures/time for the same qualified app/surface; source, coverage, hide/position and optional pause | Off, qualified, partial, stale, unknown/removed, hidden; [spec](LIVE-OVERLAY-SPEC.md) |
 | Storage and deletion | Measured bytes/rows, retention, scope preview and delete | Calculating, stale preview, low space, job failure |
 | Backup and recovery | Manual export/import, recovery key, status; automatic backup blocked | No archive, job running, provider failure, incompatible file |
 | Restore preview | Archive scope/version/date, replacement impact, current-data export | Auth failure, corrupt, unsupported, ready, committed |
@@ -56,3 +61,13 @@ Dashboard cards, chart range, chart type, category labels/colors, theme, motion,
 Support 200% text, screen-reader navigation, large touch targets, RTL-ready layouts, reduced motion and predictable back behavior. Recovery tasks cannot depend solely on charts, swipes or color. Keep grants and account identifiers off lock-screen widgets by default. Backup credentials are entered through a secure flow with no accidental screenshot/clipboard exposure. Restore errors preserve the current history and offer a retry or cancel path, not a reset button as the only escape.
 
 Acceptance X-02 and UX review in [Testing](TESTING.md) cover skipped onboarding, partial grants, chart gaps, long text, errors, emergency bypass and recovery. A static design review does not count as real-device accessibility verification.
+
+## Calm, useful engagement and handoff
+
+Primary labels: Today (Home route), History, Patterns (Insights route), Protect and Settings. Preserve predictable navigation while the content scrolls. Use the [palette/type/motion contracts](DESIGN-SYSTEM.md) for a coherent experience across charts, buttons, dialogs and settings. Privacy is directly reachable from each main screen.
+
+Protection prompts state the chosen rule and threshold before offering return, scoped continuation and unconditional emergency access. An ordinary override states which rule it waives, when it expires and which other rules still apply. A completed or ended focus session has a quiet neutral outcome, never a failure badge. Consent refusals have equal-weight controls and remain usable paths.
+
+The browser study covers main views, app detail, evidence, source explanation, rule draft/review, focus timer and interruption. Native permission navigation, saved preferences, background enforcement, secure recovery and complete settings remain AS-018 and related task scope. Never carry prototype in-memory success into a native authoritative-save claim.
+
+X-04–X-07 define humane-copy, evidence, interruption, theme/motion and layout acceptance. Browser automation establishes only its tested subset. Participant review, actual Android typography/insets, TalkBack, switch access, battery and frame pacing remain unverified.

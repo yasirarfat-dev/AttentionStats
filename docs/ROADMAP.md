@@ -11,6 +11,8 @@ AS-001 produces the full linked source-of-truth set, root onboarding/license/age
 
 ## Stage 1: feasibility and architecture proof
 
+The user's design continuation adds AS-033: a synthetic interaction study and [human-factors direction](HUMAN-FACTORS.md) before native UI implementation. This independent design artifact can be reviewed now; it does not clear platform, privacy, latest-stack or enforcement gates. AS-018 later implements native screens with this reference and device evidence.
+
 AS-002 resolves latest package/toolchain compatibility; AS-003 evaluates public Android collection/lifecycle; AS-005 qualifies narrow social detector approaches; AS-006 reviews crypto/database encryption; AS-007 reviews distribution/accessibility strategy. AS-004 scaffolds only after the latest stack is coherent and records exact successful commands. Small isolated throwaway prototypes may establish feasibility, but must not be mistaken for product implementation.
 
 Exit requires a viable latest-version path or explicitly recorded blocked incompatibility, demonstrated consent/source/coverage handling on declared devices, evidence for at least one narrow detector if feasible, and a reviewed encrypted archive design. No downgrade or private/system-only API as an undocumented workaround. Unresolved Drive policy does not block offline MVP or portable archive development.
@@ -20,6 +22,8 @@ Exit requires a viable latest-version path or explicitly recorded blocked incomp
 Deliver C-01–C-07 where supported, C-12/C-13, C-16/C-17/C-20/C-21 and C-23–C-25/C-27/C-28/C-30. Reliable app/device history and social-app summaries are the baseline; short-video support remains declared-scope experimental until qualification. Configurable permissions, source controls, basic local insights, budgets/focus schedules, emergency access and encrypted export/restore are required. Unsupported targets display gaps/unavailable status rather than artificial parity.
 
 Exit: relevant [acceptance](TESTING.md), privacy/restore/emergency gates, latest locked clean build, accessible core journeys, real-device lifecycle evidence, truthful source/detector ranges and maintainer-reviewed signed candidate. Ship limited surface support honestly if wider detection is infeasible; revise supported claims with a decision. Do not silently remove consent, archive recovery or deletion to meet a date.
+
+C-32 optional live awareness is an MVP candidate under AS-034, qualified independently after native detectors/consent/store and policy work. A synthetic visit/today-counter study is included in AS-033. If a safe qualified renderer is unavailable, keep counters in-app and report overlay unavailable; do not bypass system protections or expand grants silently.
 
 ## Stage 3: expansion
 

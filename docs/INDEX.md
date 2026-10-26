@@ -9,7 +9,7 @@
 
 Attention Stats is a local-first, open-source personal digital wellbeing app: **observe → track → categorize → predict → protect**. Android launches first using React Native Community CLI, TypeScript and New Architecture; Kotlin owns collection/rules and Room-backed local SQLite. Future iPhone work uses explicit adapters. Public repository: [yasirarfat-dev/AttentionStats](https://github.com/yasirarfat-dev/AttentionStats). Local root: `C:\home\biobot\projects\AttentionStats`.
 
-**Documentation prepared; application not yet implemented.** Everything describing runtime behavior is a specification. Capability states are planned, experimental, blocked or implemented; none of the app capabilities is implemented. Dependencies are latest registry candidates, not installed pins. No scaffold or binary is included.
+**Documentation prepared; application not yet implemented.** A separate [interactive design study](../design/prototype/README.md) uses synthetic data and implements no tracking or native protection. Application runtime behavior remains a specification. No capability is implemented and no Android scaffold/binary exists. Mobile dependencies remain unverified candidates; the design study has its own latest test tools and pnpm lockfile.
 
 | Reader/task | Reading order |
 |---|---|
@@ -17,7 +17,7 @@ Attention Stats is a local-first, open-source personal digital wellbeing app: **
 | Every human/agent session | Agent rules → State → Tracker → relevant decisions and domain specs |
 | Native tracking | Tracking → Social → Permissions → Models → Native contracts → Testing |
 | Protection | Protection → Permissions → Architecture → Contracts → Testing |
-| Interface work | UX → Navigation → Design system → Settings → Contracts |
+| Interface work | Human factors → UX → Navigation → Design system → Settings → Contracts |
 | Data/privacy/backup | Privacy → Security → Models → Storage → Backup → Testing |
 | Dependency/scaffold | Dependencies → Development → Conventions → Structure → Architecture |
 | Release/iPhone work | Release or iOS guide → Capabilities → current platform evidence → contribution workflow |
@@ -32,9 +32,11 @@ Attention Stats is a local-first, open-source personal digital wellbeing app: **
 | Inventory | [CAPABILITY-MATRIX.md](CAPABILITY-MATRIX.md) | Every capability's source/access/controls/limits/phase/evidence/scenario |
 | Observation | [TRACKING-SPEC.md](TRACKING-SPEC.md) | Sessions, opens, screen/keyguard, notifications, coverage/time |
 | Surfaces | [SOCIAL-MEDIA-SPEC.md](SOCIAL-MEDIA-SPEC.md) | App versus surface detection, exposures, safe optional metadata |
+| In-context awareness | [LIVE-OVERLAY-SPEC.md](LIVE-OVERLAY-SPEC.md) | Optional visit/day counters, native snapshots, renderer safety and permission boundaries |
 | Interpretation | [BEHAVIOR-INTELLIGENCE.md](BEHAVIOR-INTELLIGENCE.md) | Categories, patterns, predictions, optional topics and confidence |
 | Protection | [PROTECTION-SPEC.md](PROTECTION-SPEC.md) | Limits, focus, schedules, conflicts, overrides and safe enforcement |
 | Experience | [UX-SPEC.md](UX-SPEC.md) | Screen inventory, onboarding, charts, errors and accessibility |
+| Human experience | [HUMAN-FACTORS.md](HUMAN-FACTORS.md) | Supportive engagement, psychological rationale, language, trust and review |
 | Routes | [NAVIGATION.md](NAVIGATION.md) | Hierarchy, typed routes, native flows and back behavior |
 | Visuals | [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md) | Proposed tokens/components, themes, charts and motion |
 | Controls | [SETTINGS-SPEC.md](SETTINGS-SPEC.md) | Complete settings catalog, defaults and persistence |

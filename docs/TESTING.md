@@ -1,6 +1,6 @@
 # Verification and acceptance
 
-**Status:** Documentation checks available; all application scenarios specified and not run. Updated 2026-10-27.
+**Status:** Documentation and browser-study checks available; native application scenarios specified and not run. Updated 2026-10-27.
 **Responsibility:** Owns acceptance scenarios, evidence quality and release gates.
 **Related specifications:** [Capabilities](CAPABILITY-MATRIX.md), [Tracking](TRACKING-SPEC.md), [Protection](PROTECTION-SPEC.md), [Backup](BACKUP-RESTORE.md), [Security](SECURITY.md).
 **Unresolved feasibility:** F-01–F-09 in [Decisions](DECISIONS.md); device/API/OEM support is not verified by fixture tests alone.
@@ -21,7 +21,7 @@ Each application evidence record needs commit/build, exact dependency/toolchain 
 | T-04 | Wake locked twice, then keyguard dismissed once | Two wakes if supported, one unlock; no biometric/credential data |
 | T-05 | Move synthetic social app to work category, recategorize selected period | Grouped totals change without source session/time mutation |
 | T-06 | Synthetic short feed/chat/search/story/live/comment structures and unsupported version | Correct distinct surface; unsupported is unknown, no generic scroll classification |
-| T-07 | One stable item emits 50 callbacks, then confirmed next item, redraw, return swipe | Exposure counts 1 then 2; redraw unchanged; return exposure distinguished from unique content; rapid unconfirmed flings not invented |
+| T-07 | One stable item emits 50 callbacks, then confirmed next item, redraw, return swipe, interleaved identified ad and ambiguous eligibility | Exposure counts 1 then 2; redraw unchanged; return exposure distinguished from unique content; ads/nonqualifying media excluded; ambiguous transition withheld with incomplete coverage; rapid unconfirmed flings not invented |
 | T-08 | Notification post, repeated updates, group summary, remove and later repost | Lifecycle dedup; new episode only when justified; removal never labelled read |
 | T-09 | App open 20 seconds after observed post, then repeat during listener gap | First is labelled temporal association; second not asserted; no causation claim |
 | T-10 | Supported public navigation, private/unknown mode, unsupported browser | Only supported allowed metadata; private/unknown/unsupported content omitted with coverage reason |
@@ -86,6 +86,18 @@ Each application evidence record needs commit/build, exact dependency/toolchain 
 | X-01 | Widget/tile while locked, paused, stale and permission revoked | Redacted lock-screen display, accurate native state and last-update time |
 | X-02 | Skip onboarding; partial grants; 200% text; TalkBack; RTL; light/dark; reduced motion; chart alternatives | Core history, settings, emergency and restore journeys remain understandable/reachable |
 | X-03 | Future iOS adapter lacks framework entitlement/API/data | Typed unsupported/degraded behavior, no fabricated Android parity or grants |
+| X-04 | Review welcome, snapshot, reflection, focus end and reminder with synthetic data | Equal refusal, finite summary, optional no-change path, no guilt/streak/diagnosis or unsupported benefit; participant comfort review remains separate |
+| X-05 | Open source/evidence/privacy explanations across covered, unknown and sparse histories | Fact versus estimate, source/coverage and limits understandable; optional provider transfer explained; no fake support/encryption/security audit |
+| X-06 | Draft/discard/save rule, overlapping rules, interruption, ordinary continuation and emergency | Preview before demo save, ordinary scope/expiry explicit, immediate emergency release, no delayed or shaming exit; native engine still needs P-01/P-06 |
+| X-07 | Both themes, live system theme, reduced motion, 320px/200% text, RTL and modal keyboard/back | Contrast, reachable controls, fixed available navigation, no horizontal clipping, focus containment/return and disabled decorative motion; native TalkBack/frame pacing still required |
+| X-08 | Live counter: repeated item callbacks, next settled item, new visit, missing surface, hide, optional pause action | One increment per confirmed exposure; current visit already in today; duplicate adds none; unknown hides counter/no inferred count; hide affects display only; readable, movable without drag, no autonomous rule activation |
+| X-09 | Native overlay: midnight/DST/zone change, process death, dropped snapshots, restore/delete, lock/chat/payment/settings, revoked access, OEM restrictions | Correct half-open day/visit continuity and generation invalidation, stale/partial labels, no reset to fake zero; sensitive/system context removed, no touch interception, safe available settings/emergency, bounded battery cost and declared policy/renderer evidence |
+
+## Design study verification
+
+AS-033's [prototype](../design/prototype/README.md) runs `pnpm test` from `design/prototype`. Browser interactions, axe scans and token arithmetic cover the demonstration subset of X-02/X-04–X-07. The tests also check no automatic external requests/persistence and the loopback server's asset allowlist. These do not establish native privacy, collection, encryption, policy, accessibility or psychological benefit. The preview's static snapshots are synthetic; do not call them phone captures or production data.
+
+Manual visual inspection should cover information hierarchy and theme readability. Consented participant tasks should evaluate understanding, agency and perceived comfort using [Human factors](HUMAN-FACTORS.md), with no hidden telemetry. Native review must separately check actual font metrics, keyboard/switch/TalkBack, insets, lifecycle and frame pacing before AS-018/C-30 implementation claims.
 
 ## Release thresholds and reporting
 

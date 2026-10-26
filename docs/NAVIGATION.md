@@ -1,6 +1,6 @@
 # Navigation
 
-**Status:** Planned navigation model; no routes implemented. Updated 2026-10-27.
+**Status:** Native navigation planned; separate browser study implements demonstration routes only. Updated 2026-10-27.
 **Responsibility:** Defines route ownership, hierarchy, parameters, back behavior and external entrypoints.
 **Related specifications:** [UX](UX-SPEC.md), [Design](DESIGN-SYSTEM.md), [Contracts](NATIVE-CONTRACTS.md), [Settings](SETTINGS-SPEC.md).
 **Unresolved feasibility:** F-03 in [Decisions](DECISIONS.md); latest navigator/native-screen compatibility needs build verification.
@@ -19,9 +19,14 @@ Root
   Shared destinations: SocialSummary → SurfaceDetail → HowTrackingWorks
   Modal flows: AppPicker, DateRangePicker, DeletePreview, ExportScope, RestorePreview
   Native flows: Android settings, document picker, secure credential entry, intervention
+  Native awareness: optional live counter → detail / explicit protection choice / hide
 ```
 
 Five primary tabs reflect distinct user jobs. Social summaries are reachable from Home and History app detail; their backing data is shared. Settings is reachable even when onboarding is skipped or permissions are missing. Native intervention is not dependent on React Navigation or the JS runtime staying alive.
+
+Visible tab labels are **Today**, **History**, **Patterns**, **Protect**, **Settings**. Today maps to HomeStack and Patterns to InsightsStack; internal route names need not imitate the visible labels. Keep tabs available while the screen content scrolls. The browser [design study](../design/prototype/README.md) demonstrates labels, heading focus, modal dismissal and focus return; it is not a React Navigation implementation or a native back-stack test.
+
+Live awareness setup is reached from Settings and supported surface detail; native display is outside React Navigation and independent of JS. Its detail routes to evidence, display controls or an explicit protection choice; it never silently executes an underlying app action. The study's “Preview live counter” is a review route using an original static synthetic surface, not a third-party app or a WebView implementation strategy.
 
 ## Typed route parameters
 

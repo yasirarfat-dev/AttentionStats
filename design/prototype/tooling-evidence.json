@@ -1,0 +1,41 @@
+{
+  "resolvedDate": "2026-10-27",
+  "scope": "Design preview tooling only. Mobile dependency candidates remain unverified.",
+  "packages": [
+    {
+      "package": "pnpm",
+      "selector": "pnpm@latest",
+      "version": "12.15.0",
+      "license": "MIT",
+      "engines": {
+        "node": ">=18"
+      },
+      "peerDependencies": {},
+      "source": "https://registry.npmjs.org/pnpm/latest"
+    },
+    {
+      "package": "@playwright/test",
+      "selector": "@playwright/test@latest",
+      "version": "1.64.1",
+      "license": "Apache-2.0",
+      "engines": {
+        "node": ">=20"
+      },
+      "peerDependencies": {},
+      "source": "https://registry.npmjs.org/@playwright%2ftest/latest"
+    },
+    {
+      "package": "@axe-core/playwright",
+      "selector": "@axe-core/playwright@latest",
+      "version": "4.14.0",
+      "license": "MPL-2.0",
+      "engines": {
+        "node": ">=22.12.0"
+      },
+      "peerDependencies": {
+        "playwright-core": ">= 1.0.0"
+      },
+      "source": "https://registry.npmjs.org/@axe-core%2fplaywright/latest"
+    }
+  ]
+}

@@ -60,8 +60,11 @@ N = native authoritative Room configuration, U = non-sensitive UI preference in 
 | Language / number formatting | System locale, explicit supported locale choice when translations exist | U; no unimplemented translation claim |
 | Accessibility | Follow system scaling/reader; chart tables and meaningful labels always available | U for optional stronger preferences; no toggle disabling baseline access |
 | Widgets / Quick Settings | Off; lock-screen details hidden | N for source pause actions; U for display; expansion |
+| Live awareness overlay | Off; per qualified app/surface, visit/day count/time fields, small top-center HUD default, leading/trailing alternatives, size, hide period and disable | N configuration; separate tracking/protection consent; experimental C-32, renderer/grants/health explicit; [spec](LIVE-OVERLAY-SPEC.md) |
 | About/privacy/source/licenses | Repository, release commit, capability support, licenses and no-data-to-developer explanation | Bundled metadata; external links require user navigation |
 
 ## Acceptance
 
 Settings remain usable without grants and offline. Revocation never flips a product-enabled flag to a misleading successful state. Native validation rejects unsupported fields/rules, stale revisions and invalid dates. Reset and restore must clear relevant UI caches. Verify source toggles during ingestion, separate pause scopes, retention preview conflicts, theme/motion persistence and unsupported backup states with T-16, D-01, B-01–B-07 and X-02 in [Testing](TESTING.md).
+
+The [browser study](../design/prototype/README.md) demonstrates theme, motion and enlarged-text preferences in memory. Reload resets them; that deliberately does not implement the native persistence catalog above. System reduced motion cannot be overridden with more motion. Reminder channels start off; no engagement campaigns or guilt-based reactivation settings are introduced. See [Human factors](HUMAN-FACTORS.md).

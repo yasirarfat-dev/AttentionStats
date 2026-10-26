@@ -37,4 +37,6 @@ Do not spawn/delegate to other agents unless the user or applicable instructions
 
 All tracking and content detail is user-controlled; source grants do not equal consent. No hidden backend/telemetry or autonomous accessibility actions. Predictions are local recommendations and never diagnoses. Never describe unknown coverage as zero, a proposal as a build, a mock test as a device result, or local recording as “no collection.” Marketing uses the precise [privacy promise](PRIVACY.md).
 
+UI work follows [Human factors](HUMAN-FACTORS.md): calm, supportive, accessible and useful by choice. Optimize for clarity, agency and peace of mind; no guilt/streak pressure, infinite engagement loops, invented wellness scores or emotional dependency. The synthetic design study is a reference, not a native implementation or evidence that tracking/enforcement works.
+
 The public repository must exclude private reference material, reference-app names/comparisons/assets, personal phone history, credentials, device identifiers and secrets. Target social services may be named only as candidate observation surfaces; no private implementation is inferred. Use synthetic app identifiers/fixtures. User explicitly authorized this foundation's publication as a public `yasirarfat-dev/AttentionStats` repository; no extra publication approval is required for that scoped work.

@@ -7,6 +7,9 @@ ios/Pods/
 ios/build/
 dist/
 coverage/
+.cache/
+test-results/
+playwright-report/
 __pycache__/
 *.pyc
 # Local configuration and secrets

@@ -38,6 +38,8 @@ States: OUTSIDE → CANDIDATE → ACTIVE(item) → TRANSITION → ACTIVE(next), 
 
 Persist exposure ordinal/event ID, app/surface, UTC and monotonic evidence, detector revision, confidence class, coverage and reason codes. Default counts contain no title, creator, URL or global content identifier. Transient identities expire with the episode; hashing content is still processing content and is not a consent bypass. Persist dedup state transactionally with exposure events, and scope identity to package/window/session so events from different apps cannot merge.
 
+The planned short-video count excludes positively identified advertisements, stories, live streams and photo carousels. Interleaved ads must be part of qualification, not guessed from a swipe. Ambiguous eligibility withholds the transition and marks coverage incomplete; it must not produce a fabricated exact count or a false zero. Any future all-feed/ad metric requires an explicit separate definition. On return from an excluded context, prove continuity/dedup before adding a new item. See [live count semantics](LIVE-OVERLAY-SPEC.md).
+
 ## Time and optional content
 
 Surface time counts known interactive occupancy, even if playback is paused; it is not verified watch time, completion, eye contact or enjoyment. App totals come from app sessions, and surface intervals are a subset. Missing surface evidence cannot subtract app use or turn unclassified time into short-video time.
@@ -47,6 +49,8 @@ Titles, creator labels, domains and URLs are off by default and individually sel
 Optional topic analysis is a separate continuous-evolution capability, using supported consented metadata and a bundled local classifier or editable rules. It can say “estimated gaming-related exposures in covered sessions,” show input provenance and unknown fraction, and accept corrections. It cannot know the actual video without reliable metadata, infer internal addiction, profile sensitive traits, or silently enable capture. No screenshot/OCR/audio inference or external content APIs are part of this scope.
 
 ## Verification and transparency
+
+The proposed [live awareness overlay](LIVE-OVERLAY-SPEC.md) reads the same committed exposures and SurfaceEpisodes as history. It must not maintain a second callback counter. Current visit is already included in the selected app/surface's local-day total; day boundaries, gaps, stale data and unknown surfaces are explicit. Rendering can coalesce updates while preserving the latest committed count. No overlay grant changes detector accuracy or content consent. C-32/AS-034 remain experimental.
 
 Qualification must measure false positives and false negatives separately using consented manual observation and synthetic public fixtures. Include slow/fast swipes, return swipes, pause/resume, re-entry, comments, ads, mixed media, orientation, multiple locales, split-screen, dark mode, app updates and accessibility hierarchy absence. Set a provisional release target of ≥95% precision and ≥90% recall on the declared fixture set; publish sample size and confidence intervals, never generalize to untested versions. A failing adapter remains disabled.
 

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-motion="system">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="color-scheme" content="light dark">
+  <title>Attention Stats · Design preview</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#screen">Skip to app preview</a>
+  <aside class="studio" aria-label="Design review controls">
+    <div class="studio-brand"><span class="brand-mark" aria-hidden="true">a<span>·</span></span><span>Attention Stats<small>INTERACTION STUDY · 01</small></span></div>
+    <div class="studio-intro"><p class="eyebrow">A QUIETER KIND OF TECHNOLOGY</p><h2>Make room<br>for your life.</h2><p>A clear view of your habits.<br>A little support when you need it.<br>The choice always stays with you.</p></div>
+    <fieldset class="review-controls"><legend>Explore the design</legend>
+      <label for="scenario">Experience</label><select id="scenario"><option value="sample">A day with sample history</option><option value="fresh">First visit · nothing tracked</option><option value="gap">Tracking access interrupted</option><option value="empty">Enabled · no observations yet</option></select>
+      <label for="theme">Appearance</label><select id="theme"><option value="light">Warm daylight</option><option value="dark">Quiet evening</option><option value="system">Follow system</option></select>
+      <label class="check"><input type="checkbox" id="reduce-motion"> Reduce motion</label>
+      <label class="check"><input type="checkbox" id="large-text"> Large text · 200%</label>
+      <button class="studio-button" id="preview-prompt">Preview a gentle interruption</button>
+      <button class="studio-button" id="preview-overlay">Explore the live counter</button>
+      <button class="studio-button" id="reset">Reset the demo</button>
+    </fieldset>
+    <p class="studio-note">Synthetic data. No tracking, app blocking, accounts, browser storage, or automatic external requests. Changes reset on reload. External source links open only when selected.</p>
+  </aside>
+  <div class="preview-wrap">
+    <div class="preview-label">DESIGN PREVIEW <span>NOT A WORKING TRACKER</span></div>
+    <div class="device">
+      <div class="demo-banner">Sample experience · no real activity</div>
+      <main id="screen" tabindex="-1" aria-label="App preview"></main>
+      <nav id="navigation" aria-label="Main navigation"></nav>
+    </div>
+    <p class="preview-footnote">Designed to help you leave with clarity.</p>
+  </div>
+  <dialog id="sheet" aria-labelledby="sheet-title"></dialog>
+  <p class="sr-only" id="announcements" role="status" aria-live="polite" aria-atomic="true"></p>
+</body>
+</html>

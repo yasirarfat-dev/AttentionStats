@@ -1,6 +1,6 @@
 # File structure
 
-**Status:** Documentation tree exists; application tree is proposed only. Updated 2026-10-26.
+**Status:** Documentation and separate design study exist; native application tree proposed only. Updated 2026-10-27.
 **Responsibility:** Defines file placement and ownership to avoid duplicate stores or rules.
 **Related specifications:** [Architecture](ARCHITECTURE.md), [Conventions](CONVENTIONS.md), [Development](DEVELOPMENT.md), [Agent rules](AGENT-RULES.md).
 **Unresolved feasibility:** F-03 and F-07 in [Decisions](DECISIONS.md); generated CLI layout must be reconciled after latest-version resolution.
@@ -17,9 +17,10 @@ AttentionStats/
     evidence/              public dependency metadata, not device traces
     IMPLEMENTATION_LOG/    dated work and validation records
   tools/check_docs.py      standard-library documentation verification
+  design/prototype/        synthetic browser study, tokens, tests, isolated manifest/lockfile
 ```
 
-The repository root is `C:\home\biobot\projects\AttentionStats`. Product display name is “Attention Stats”; public repository is `yasirarfat-dev/AttentionStats`. No application, package manifest, lockfile, Gradle wrapper or iOS project exists in the foundation. Their absence is intentional. Do not invent runtime setup success.
+The repository root is `C:\home\biobot\projects\AttentionStats`. Product display name is “Attention Stats”; public repository is `yasirarfat-dev/AttentionStats`. AS-033 adds a separate [design study](../design/prototype/README.md) with a development-only manifest and lockfile. No React Native application manifest, Gradle wrapper or iOS project exists. Do not mistake the study for the native scaffold or runtime support.
 
 ## Proposed implementation tree
 

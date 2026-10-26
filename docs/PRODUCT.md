@@ -11,6 +11,8 @@ Attention Stats is an open-source, Android-first personal digital wellbeing app.
 
 The product covers device and app activity, social-app summaries, supported surfaces and short-video observations, editable categories, local descriptive insights, optional predictions, and user-defined protection. Later capabilities add notification behavior, supported browsing context and content history, richer routines, widgets, Quick Settings, and community-led iPhone support. The [capability matrix](CAPABILITY-MATRIX.md) is the exhaustive capability inventory and admission gate for additions.
 
+Experience quality is part of the product: a trustworthy, calm companion for peace of mind, clear self-understanding and chosen boundaries. [Human factors](HUMAN-FACTORS.md) governs supportive engagement, copy and evaluation. A finite snapshot, honest evidence and optional reversible next steps are preferable to maximizing time in this app. The [interactive design study](../design/prototype/README.md) is synthetic and implements no product collection/enforcement.
+
 All observation sources start off. Users choose sources, tracked applications and categories, exclusions, content detail, retention, and timed pauses. Optional titles and URLs require separate opt-in. Exclusions win over inclusions; password fields and sensitive input surfaces never qualify. Enablement applies from consent time forward: no silent historical import. A later explicit backfill feature would require its own specification and consent.
 
 Users may choose observation only, reminders, immediate override, or voluntarily stricter rules per protection rule. No rule may hide emergency access, obstruct Android permission settings, or automatically escalate based on a prediction. Local history remains until deleted unless the user selects pruning. Export, selective deletion, storage visibility, and an all-data reset are core controls.
@@ -27,6 +29,8 @@ Users may choose observation only, reminders, immediate override, or voluntarily
 ## Delivery and non-goals
 
 MVP includes reliable app/device history, social-app totals, experimentally supported short-video observation, configurable permissions, basic local insights, limits, focus schedules, and encrypted portable export/restore. An unsupported detector must not delay truthful app-level summaries. Each candidate surface needs its own evidence before being enabled.
+
+An optional [live visit/day awareness counter](LIVE-OVERLAY-SPEC.md) is a user-requested MVP candidate (C-32/AS-034), dependent on qualified detectors, a permitted safe renderer and lifecycle evidence. It makes supported counts understandable in context; it is off by default, removable and distinct from blocking. Its feasibility must not delay truthful app totals or make unsupported counts look exact.
 
 Expansion includes notification behavior, optional browsing/content history, richer protection and routines, widgets, and Quick Settings. Continuous evolution adds explainable local predictions and additional platform adapters. Automatic encrypted backup to a selected personal Google account is desired but direct Drive integration is blocked; it is not an MVP dependency.
 

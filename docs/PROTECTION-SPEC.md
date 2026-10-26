@@ -33,6 +33,8 @@ Commitment modes may add a reflection step, bounded wait, or a chosen ordinary o
 
 ## Enforcement boundary
 
+The [awareness overlay](LIVE-OVERLAY-SPEC.md) is optional information, not enforcement. Hiding it does not disable rules or pause observation; those actions are separate and named. Tapping “Take a pause” opens an explicit choice and cannot silently activate a block or navigate the underlying feed. Count/exposure thresholds can trigger only the rule the person previewed and enabled, under the same conflict/emergency/frequency invariants.
+
 Candidate renderers include in-app prompts, permitted notifications, and tested accessibility/overlay mechanisms. Overlay access and accessibility overlays are different mechanisms: select one explicitly after feasibility tests, disclose required grants, and do not request both reflexively. A deterministic user-selected navigation action such as Back may be evaluated only for a validated narrow rule with safe exclusions and distribution review. Never automate clicks, sign-in, content engagement or arbitrary navigation.
 
 Android's public policy permits static, user-defined accessibility automation while prohibiting autonomous planning/execution for general apps; separate in-app disclosure, consent and store declarations are required. This project is not designated an accessibility tool. See [Accessibility policy](https://support.google.com/googleplay/android-developer/answer/10964491?hl=en). Recommendations do not execute actions.

@@ -64,8 +64,16 @@ ID and revision strings are opaque; local-only random installation epoch is not 
 | getBackupConfiguration / setBackupConfiguration | none / Mutation + selected approved transport configuration | Manual mode available when built; automatic Drive returns POLICY_BLOCKED until gate clears |
 | getJob / cancelJob | jobId | queued/running/waiting_user/succeeded/failed/cancelled, stage and progress; cancellation only before commit point |
 | getChangeState | lastSeenRevision | Current generation and invalidated domains; permits recovery from dropped events |
+| getLiveOverlayConfiguration / setLiveOverlayConfiguration | none / Mutation + selected targets, fields, renderer, placement and hideUntil | Explicit off-by-default config; no implied source/protection enablement or new grants |
+| getLiveSurfaceSnapshot | selected app/surface and explicit day zone | Committed LiveSurfaceSnapshot or unsupported/unavailable; renderer does not need JS |
 
 Recovery credentials use a dedicated secure native entry flow or one-use handle; no plaintext credentials in generic command bodies, logs, JS state persistence, crash reports or change events. Permission navigation is distinct from tracking enablement. No method silently grants access or reads beyond declared scope.
+
+## Live awareness read model
+
+Planned LiveSurfaceSnapshot includes generation, revision, capturedAtMs, lastSourceEventAtMs, appId, surfaceId, episodeId?, dayStartMs, dayEndMs, zoneId, countKind, visitExposureCount?, todayExposureCount?, visitKnownSurfaceMs?, todayKnownSurfaceMs?, coverage and reasonCodes. Counts/time are nullable nonnegative values; absence differs from zero. Coverage distinguishes complete/partial/unknown; any displayed lower-bound claim needs explicit evidence that the value is a lower bound, not merely a noisy estimate. Freshness uses the source check/event age, not the renderer's last paint.
+
+A native-only snapshot subscription can update the renderer from committed history; a `liveSurfaceChanged` invalidation hint can refresh an open JS settings/detail view. Coalesce display updates independently of observation ingestion. Recover dropped updates by requerying the latest revision/generation; never add deltas twice. Removal of a qualified surface invalidates display eligibility immediately when observed. No content payload or credentials in snapshots/events. See [overlay semantics](LIVE-OVERLAY-SPEC.md); no method is implemented by the browser prototype.
 
 ## Paging and revisions
 

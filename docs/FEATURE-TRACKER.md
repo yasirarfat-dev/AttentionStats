@@ -1,11 +1,13 @@
 # Feature tracker
 
-**Status:** Documentation foundation implemented and published; all app work unimplemented. Updated 2026-10-27.
+**Status:** Documentation foundation published and separate AS-033 study implemented; native app work unimplemented. Updated 2026-10-27.
 **Responsibility:** Owns stable task IDs, priorities, dependencies, capability mapping and completion evidence.
 **Related specifications:** [Roadmap](ROADMAP.md), [State](STATE.md), [Capabilities](CAPABILITY-MATRIX.md), [Tests](TESTING.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-09 gate relevant tasks; dependencies below are required, not optional recommendations.
 
 Status vocabulary: **planned** = specified future work; **experimental** = feasibility/evidence required; **blocked** = explicit unmet gate; **implemented** = code/artifact and acceptance evidence recorded. Active work is described in State; no app feature is implemented. Priority P0 precedes P1; order within a dependency-ready priority is the listed order. Documentation status does not imply an installable product.
+
+User-directed design continuation prioritizes AS-033 as a separate interaction study under ADR-019/ADR-020. It does not clear native feasibility prerequisites. Resume AS-002 after this reviewable study; AS-018 adopts the direction when its native dependencies are satisfied.
 
 | Task | Priority / stage | Status | Capability coverage | Prerequisites / concrete completion evidence |
 |---|---|---|---|---|
@@ -26,7 +28,7 @@ Status vocabulary: **planned** = specified future work; **experimental** = feasi
 | AS-015 Native budget/schedule/focus engine | P1 / MVP | planned | C-16, C-17 | AS-007/AS-011; deterministic conflicts, time boundaries, native restart; P-01/P-02 |
 | AS-016 Reminders/intervention renderer | P1 / MVP | experimental | C-20 | AS-007/AS-015; truthful unavailable states, duplicate prompt control; P-05/P-08 |
 | AS-017 Overrides, exceptions, emergency access | P1 / MVP | planned | C-21 | AS-015/AS-016; scoped tokens, invariant exclusions, immediate bypass; P-06 |
-| AS-018 Accessible app screens and settings | P1 / MVP | planned | C-30 | AS-008/AS-010/AS-014; onboarding skip, chart tables, native save/conflict flows; X-02 |
+| AS-018 Accessible app screens and settings | P1 / MVP | planned | C-30 | AS-008/AS-010/AS-014; AS-033 visual reference, native consent/save/health flows, human-factors review; X-02/X-04–X-07 and actual Android accessibility/frame pacing |
 | AS-019 Retention, deletion and storage views | P1 / MVP | planned | C-24 | AS-009/AS-014; preview/fences, derivative removal, no resurrection; D-01/S-05 |
 | AS-020 Portable encrypted export/restore | P1 / MVP | planned | C-25, C-27 | AS-006/AS-009/AS-019; verified format, manual SAF provider tests, atomic staged replacement; B-01–B-05/B-07 |
 | AS-021 OS transfer exclusions/privacy audit | P1 / MVP | planned | C-28 | AS-004/AS-009/AS-020; actual merged manifest/device/egress/log/dependency/deletion evidence; S-01–S-06 |
@@ -41,6 +43,8 @@ Status vocabulary: **planned** = specified future work; **experimental** = feasi
 | AS-030 Local forecasts/recommendations | P3 / evolution | experimental | C-14 | AS-014/AS-021; opt-in, local calibration, sufficient data, no autonomous rules; T-14 |
 | AS-031 Optional local content-topic patterns | P3 / evolution | experimental | C-15 | AS-024/AS-030; separate topic consent, unknown fraction/correction, no addiction claim; T-15 |
 | AS-032 Community iOS capability research/adapter | P3 / evolution | experimental | C-31 | F-07; current Apple research/entitlements, platform proposal, unsupported semantics; X-03 |
+| AS-033 Humane design direction and interactive study | P0 / design continuation | implemented | C-30/C-32 design reference only | Original synthetic study; 37 browser tests pass, contrast/axe/320px/200%/RTL/keyboard/motion/visit-day checks, screenshots reviewed, latest pnpm/test tools locked; [dated evidence](IMPLEMENTATION_LOG/2026-10-27.md#continuation--humane-design-and-awareness-study); no native capability |
+| AS-034 Native live surface awareness overlay | P1 / MVP candidate | experimental | C-32 | AS-013/AS-007/AS-009/AS-010; AS-033 design reference; least-privilege renderer, committed visit/day snapshots, unknown/sensitive-context removal, placement/accessibility and lifecycle/battery evidence; X-08/X-09; no native implementation yet |
 
 ## Completion protocol
 
