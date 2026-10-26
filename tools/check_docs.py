@@ -10,6 +10,9 @@ import sys
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+from probe_mobile_stack import review as review_mobile_stack
+from check_mobile import review as review_mobile_scaffold
+
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 REQUIRED = (
@@ -192,6 +195,21 @@ def main() -> int:
     except (OSError, ValueError, KeyError, TypeError) as exc:
         fail(evidence, f"invalid dependency evidence: {exc}")
 
+    # The feasibility probes can fail installation/parity while their recorded
+    # evidence remains valid. Do not turn a consistent report into build support.
+    try:
+        mobile_review = review_mobile_stack()
+        if mobile_review["resolvedDate"] not in dependency_text:
+            fail(DOCS / "DEPENDENCIES.md", "mobile probe review date missing")
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        fail(DOCS / "evidence" / "mobile-stack-probe.json", f"invalid mobile probe evidence: {exc}")
+
+    try:
+        for error in review_mobile_scaffold(ROOT):
+            fail(ROOT / "package.json", error)
+    except (OSError, ValueError, KeyError, IndexError, TypeError) as exc:
+        fail(ROOT / "package.json", f"invalid mobile scaffold evidence: {exc}")
+
     # The synthetic study has its own installed test tools; mobile candidates
     # above remain a historical, uninstalled snapshot. Never conflate them.
     study = ROOT / "design" / "prototype"
@@ -273,10 +291,11 @@ def main() -> int:
     print(
         f"PASS: {len(markdown)} Markdown files; {len(REQUIRED)} core documents; "
         f"{len(capabilities)} capabilities; {len(metrics)} detailed metrics; {len(tasks)} tasks; {len(scenario_ids)} scenarios; "
-        f"{len(ledger['packages'])} latest dependency candidates."
+        f"{len(ledger['packages'])} historical dependency candidates; "
+        f"{len(mobile_review['packages'])} mobile tooling probe records."
     )
     print("Local links/anchors, metadata, ID coverage, ledger and public artifacts checked.")
-    print("Application builds, Android/device behavior and external links were not tested.")
+    print("This checker does not test application builds, Android/device behavior or external links.")
     return 0
 
 

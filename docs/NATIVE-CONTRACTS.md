@@ -1,9 +1,15 @@
 # Native contracts
 
-**Status:** Normative domain interface draft; Codegen syntax and transport implementation pending. Updated 2026-10-27.
+**Status:** Normative domain interface draft; read-only scaffold bootstrap spec/adapter exists, full domain transport pending. Updated 2026-10-27.
 **Responsibility:** Defines typed operations, status, revisioning, events, errors and platform behavior.
 **Related specifications:** [Architecture](ARCHITECTURE.md), [Models](DATA-MODELS.md), [Tracking](TRACKING-SPEC.md), [Backup](BACKUP-RESTORE.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-02–F-04 and F-07 in [Decisions](DECISIONS.md); logical unions must be lowered into supported Codegen primitives without changing meaning.
+
+## Experimental scaffold handshake
+
+AS-004/AS-008 introduces only `NativeBootstrap.getBootstrapStatus(): Promise<{contractVersion: number; sourceState: string}>` for Codegen/build/runtime qualification. Version 1 accepts exactly `{contractVersion: 1, sourceState: 'not_implemented'}`. Android returns this fixed source-unavailable declaration without reading grants/history, scheduling work, changing settings or persisting data. TypeScript strictly validates responses, distinguishes disabled from unsupported/invalid/native-failure, and omits raw native error details. Missing iOS implementation returns unsupported. The shell checks once on mount, ignores results after unmount and retries only by explicit action.
+
+This is a temporary scaffold handshake, not `getCapabilities`, consent/configuration, collection health, history or a claim that Android's public sources are unsupported. The operation catalog remains unimplemented. Nine adapter tests cover version/type/state/extra-field corruption, absent module and sanitized native failure. Codegen/native round-trip and X-10 results are recorded separately; JS tests alone do not accept the bridge or screens.
 
 ## Common types
 

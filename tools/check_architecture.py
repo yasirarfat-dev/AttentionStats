@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check current pure Kotlin package boundaries; not a future app build/lint claim."""
+"""Check pure Kotlin domains and mobile TypeScript feature/public API boundaries."""
 
 from pathlib import Path
 import re
@@ -15,6 +15,46 @@ DEPENDENCIES = {
     "network": {"time"},
     "summary": {"time"},
 }
+
+
+def check_mobile_source(source: Path, errors: list[str]) -> int:
+    paths = sorted([*source.rglob("*.ts"), *source.rglob("*.tsx")])
+    for path in paths:
+        label = path.relative_to(source).as_posix()
+        owner = path.relative_to(source).parts
+        text = path.read_text(encoding="utf-8")
+        imports = re.findall(
+            r"(?:\bfrom\s*|\bimport\s*|\brequire\s*\(\s*|\bimport\s*\(\s*)['\"]([^'\"]+)['\"]",
+            text,
+        )
+        for imported in imports:
+            if not imported.startswith("."):
+                if imported.startswith(("@/", "src/")):
+                    errors.append(f"{label}: undeclared alias bypasses boundary checks")
+                continue
+            base = (path.parent / imported).resolve()
+            if not base.is_relative_to(source.resolve()):
+                errors.append(f"{label}: source import leaves src: {imported}")
+                continue
+            target = next((candidate for candidate in [
+                base.with_suffix(".ts"), base.with_suffix(".tsx"),
+                base / "index.ts", base / "index.tsx",
+            ] if candidate.is_file()), None)
+            if target is None:
+                errors.append(f"{label}: unresolved source import {imported}")
+                continue
+            parts = target.relative_to(source.resolve()).parts
+            if parts[0] == "features" and owner[:2] != parts[:2] and (
+                len(parts) != 3 or parts[2] not in {"index.ts", "index.tsx"}
+            ):
+                errors.append(f"{label}: import feature through its public index: {imported}")
+            if owner[0] == "ui" and parts[0] in {"app", "features", "platform"}:
+                errors.append(f"{label}: shared UI cannot depend on {parts[0]}")
+            if owner[0] == "platform" and parts[0] in {"app", "features", "ui"}:
+                errors.append(f"{label}: platform cannot depend on {parts[0]}")
+            if owner[0] == "features" and parts[0] == "app":
+                errors.append(f"{label}: feature cannot depend on app composition")
+    return len(paths)
 
 
 def main() -> int:
@@ -44,12 +84,14 @@ def main() -> int:
         # Reject qualified bypasses as well as imports for common infrastructure.
         if re.search(r"\b(?:android\.|androidx\.|java\.(?:io|net|sql)\.|com\.facebook\.|kotlinx\.coroutines\.)", text):
             errors.append(f"{label}: platform/storage/side-effect dependency in pure calculations")
+    mobile_count = check_mobile_source(ROOT / "src", errors)
     if errors:
         print("Architecture verification failed:")
         print("\n".join(f"  - {error}" for error in errors))
         return 1
     print(f"PASS: {len(paths)} Kotlin source files; package paths and declared domain import boundaries")
-    print("No TypeScript/mobile UI/Gradle module checks exist yet; those remain AS-004 work.")
+    print(f"PASS: {mobile_count} mobile TypeScript files; relative imports, feature public APIs and layer direction")
+    print("Static checks do not establish native compilation, UI or runtime source support.")
     return 0
 
 

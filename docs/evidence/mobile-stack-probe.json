@@ -1,0 +1,1720 @@
+{
+  "schemaVersion": 1,
+  "resolvedDate": "2026-10-27",
+  "checkedAtUtc": "2026-10-26T21:46:44.709459+00:00",
+  "status": "AS-002 incomplete; isolated probes only; no accepted application graph or native build",
+  "environment": {
+    "os": "Windows",
+    "architecture": "AMD64",
+    "node": "26.12.1",
+    "pnpm": "12.15.0",
+    "jdk": "Temurin 17.0.20.1+1",
+    "sdkInstalled": {
+      "platform": "android-37.0",
+      "buildTools": "36.0.0",
+      "ndk": "absent",
+      "cmake": "absent"
+    }
+  },
+  "packages": [
+    {
+      "package": "pnpm",
+      "selector": "pnpm@latest",
+      "version": "12.15.0",
+      "license": "MIT",
+      "engines": {
+        "node": ">=18"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/pnpm/latest",
+      "tarball": "https://registry.npmjs.org/pnpm/-/pnpm-12.15.0.tgz",
+      "integrity": "sha512-s5UdbW/0qfE9x89WzSjSuOs328ycaOUuHhGRhz6p+CoBcoerULqtxczElPA2xnwOR+sTYIwvo29HcRth6hKOYQ=="
+    },
+    {
+      "package": "react",
+      "selector": "react@latest",
+      "version": "19.3.1",
+      "license": "MIT",
+      "engines": {
+        "node": ">=0.10.0"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react/latest",
+      "tarball": "https://registry.npmjs.org/react/-/react-19.3.1.tgz",
+      "integrity": "sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw=="
+    },
+    {
+      "package": "@types/react",
+      "selector": "@types/react@latest",
+      "version": "19.3.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "csstype": "^3.2.2"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@types/react/latest",
+      "tarball": "https://registry.npmjs.org/@types/react/-/react-19.3.0.tgz",
+      "integrity": "sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg=="
+    },
+    {
+      "package": "react-native",
+      "selector": "react-native@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "peerDependencies": {
+        "react": "^19.3.0",
+        "@types/react": "^19.1.1"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      },
+      "dependencies": {
+        "ws": "^7.5.10",
+        "anser": "^1.4.9",
+        "yargs": "^17.6.2",
+        "semver": "^7.1.3",
+        "promise": "^8.3.0",
+        "base64-js": "^1.5.1",
+        "invariant": "^2.2.4",
+        "scheduler": "0.28.0",
+        "ansi-regex": "^5.0.0",
+        "nullthrows": "^1.1.1",
+        "tinyglobby": "^0.2.15",
+        "flow-parser": "0.327.0",
+        "memoize-one": "^5.0.0",
+        "whatwg-fetch": "^3.0.0",
+        "metro-runtime": "^0.87.1",
+        "pretty-format": "^29.7.0",
+        "react-refresh": "^0.14.0",
+        "hermes-compiler": "260318099.0.4",
+        "metro-source-map": "^0.87.1",
+        "stacktrace-parser": "^0.1.10",
+        "flow-enums-runtime": "^0.0.6",
+        "react-devtools-core": "^6.1.5",
+        "regenerator-runtime": "^0.13.2",
+        "@react-native/codegen": "0.88.0",
+        "@react-native/asset-utils": "0.88.0",
+        "@react-native/gradle-plugin": "0.88.0",
+        "@react-native/normalize-colors": "0.88.0",
+        "@react-native/virtualized-lists": "0.88.0",
+        "@react-native/community-cli-plugin": "0.88.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native/latest",
+      "tarball": "https://registry.npmjs.org/react-native/-/react-native-0.88.0.tgz",
+      "integrity": "sha512-v/wee0nYWcammMYBnSat/e3WY/5iaf9YQOMcBrfKT/wPApPPlHp94hgZovBtwhMuthR01yc/8cGn0FpFTE/C4A=="
+    },
+    {
+      "package": "@react-native-community/cli",
+      "selector": "@react-native-community/cli@latest",
+      "version": "20.2.0",
+      "license": "MIT",
+      "engines": {
+        "node": ">=20.19.4"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "execa": "^5.0.0",
+        "semver": "^7.5.2",
+        "find-up": "^5.0.0",
+        "prompts": "^2.4.2",
+        "fs-extra": "^8.1.0",
+        "commander": "^9.4.1",
+        "deepmerge": "^4.3.0",
+        "picocolors": "^1.1.1",
+        "graceful-fs": "^4.1.3",
+        "@react-native-community/cli-clean": "20.2.0",
+        "@react-native-community/cli-tools": "20.2.0",
+        "@react-native-community/cli-types": "20.2.0",
+        "@react-native-community/cli-config": "20.2.0",
+        "@react-native-community/cli-doctor": "20.2.0",
+        "@react-native-community/cli-server-api": "20.2.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native-community/cli/latest",
+      "tarball": "https://registry.npmjs.org/@react-native-community/cli/-/cli-20.2.0.tgz",
+      "integrity": "sha512-5RZKkBeUFC4hhrzySzxWmRJwXBTc2PE3L6QUgvnJk3QDxNYMY7aGuI8Gr9eZRS1DbiY10IPWqpJfqSIplzVG6A=="
+    },
+    {
+      "package": "typescript",
+      "selector": "typescript@latest",
+      "version": "7.0.2",
+      "license": "Apache-2.0",
+      "engines": {
+        "node": ">=16.20.0"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@typescript/typescript-aix-ppc64": "7.0.2",
+        "@typescript/typescript-linux-arm": "7.0.2",
+        "@typescript/typescript-linux-x64": "7.0.2",
+        "@typescript/typescript-sunos-x64": "7.0.2",
+        "@typescript/typescript-win32-x64": "7.0.2",
+        "@typescript/typescript-darwin-x64": "7.0.2",
+        "@typescript/typescript-netbsd-x64": "7.0.2",
+        "@typescript/typescript-freebsd-x64": "7.0.2",
+        "@typescript/typescript-linux-arm64": "7.0.2",
+        "@typescript/typescript-linux-ppc64": "7.0.2",
+        "@typescript/typescript-linux-s390x": "7.0.2",
+        "@typescript/typescript-openbsd-x64": "7.0.2",
+        "@typescript/typescript-win32-arm64": "7.0.2",
+        "@typescript/typescript-darwin-arm64": "7.0.2",
+        "@typescript/typescript-netbsd-arm64": "7.0.2",
+        "@typescript/typescript-freebsd-arm64": "7.0.2",
+        "@typescript/typescript-linux-loong64": "7.0.2",
+        "@typescript/typescript-linux-riscv64": "7.0.2",
+        "@typescript/typescript-openbsd-arm64": "7.0.2",
+        "@typescript/typescript-linux-mips64el": "7.0.2"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/typescript/latest",
+      "tarball": "https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz",
+      "integrity": "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="
+    },
+    {
+      "package": "@react-navigation/native",
+      "selector": "@react-navigation/native@latest",
+      "version": "7.5.1",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": ">= 18.2.0",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "nanoid": "^3.3.11",
+        "fast-deep-equal": "^3.1.3",
+        "standard-navigation": "^0.0.8",
+        "use-latest-callback": "^0.2.4",
+        "escape-string-regexp": "^4.0.0",
+        "@react-navigation/core": "^7.24.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-navigation/native/latest",
+      "tarball": "https://registry.npmjs.org/@react-navigation/native/-/native-7.5.1.tgz",
+      "integrity": "sha512-p9xOvhG8q8rq0FPAoh0JC22ALbyRZt7U2uH8XrHRDjvqOEFrumME7szM6LaWW2WctolAVeZAfOTV+pUKULI/kQ=="
+    },
+    {
+      "package": "@react-navigation/native-stack",
+      "selector": "@react-navigation/native-stack@latest",
+      "version": "7.21.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": ">= 18.2.0",
+        "react-native": "*",
+        "react-native-screens": ">= 4.0.0",
+        "@react-navigation/native": "^7.5.1",
+        "react-native-safe-area-context": ">= 4.0.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "color": "^4.2.3",
+        "warn-once": "^0.1.1",
+        "sf-symbols-typescript": "^2.1.0",
+        "@react-navigation/elements": "^2.9.45"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-navigation/native-stack/latest",
+      "tarball": "https://registry.npmjs.org/@react-navigation/native-stack/-/native-stack-7.21.0.tgz",
+      "integrity": "sha512-bYrNW87nDtbMXAJsosYwu59xwTqeuaurfCDA+62MQ6hY4+2Iv71+Sik3ulW92fOqg8s2SZinOJosHEWoi9Ayqw=="
+    },
+    {
+      "package": "@react-navigation/bottom-tabs",
+      "selector": "@react-navigation/bottom-tabs@latest",
+      "version": "7.21.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": ">= 18.2.0",
+        "react-native": "*",
+        "react-native-screens": ">= 4.0.0",
+        "@react-navigation/native": "^7.5.1",
+        "react-native-safe-area-context": ">= 4.0.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "color": "^4.2.3",
+        "sf-symbols-typescript": "^2.1.0",
+        "@react-navigation/elements": "^2.9.45"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-navigation/bottom-tabs/latest",
+      "tarball": "https://registry.npmjs.org/@react-navigation/bottom-tabs/-/bottom-tabs-7.21.0.tgz",
+      "integrity": "sha512-G3P88TPiHw9rxGhstwdeVgaBj3YQl8emiF8zLgyfXOF2AIk31myIrtDQeu2Mg5Ad7YWMs4W8zkXuD78xChlTHQ=="
+    },
+    {
+      "package": "react-native-unistyles",
+      "selector": "react-native-unistyles@latest",
+      "version": "3.6.0",
+      "license": "MIT",
+      "engines": {
+        "node": ">= 20.18.0"
+      },
+      "peerDependencies": {
+        "react": "*",
+        "react-native": ">=0.81.0",
+        "react-native-reanimated": "*",
+        "react-native-edge-to-edge": "*",
+        "react-native-nitro-modules": "*",
+        "@react-native/normalize-colors": "*"
+      },
+      "peerDependenciesMeta": {
+        "react-native-reanimated": {
+          "optional": true
+        },
+        "react-native-edge-to-edge": {
+          "optional": true
+        }
+      },
+      "dependencies": {
+        "@babel/types": "7.29.8"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-unistyles/latest",
+      "tarball": "https://registry.npmjs.org/react-native-unistyles/-/react-native-unistyles-3.6.0.tgz",
+      "integrity": "sha512-eYqixPy6auBj6k/ica9fCYIPgFQsLzUwRoxGZ04hX3hkANTNjaz3/LzNfXPfgJbwF/fQrhaK0qII4nhtSqUPfA=="
+    },
+    {
+      "package": "react-native-reanimated",
+      "selector": "react-native-reanimated@latest",
+      "version": "4.7.1",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "0.86 - 0.88",
+        "react-native-worklets": "0.13.x"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "semver": "^7.7.3",
+        "react-native-is-edge-to-edge": "^1.3.1"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-reanimated/latest",
+      "tarball": "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-4.7.1.tgz",
+      "integrity": "sha512-HviDFSZ6V4KTRsrLS6hRbBJ4j63l/L8a5az0EoWdJwaMLYnBNyYISTDxwXpEYkMbAbLzCMCviIdiOxXHYQWcNA=="
+    },
+    {
+      "package": "react-native-gesture-handler",
+      "selector": "react-native-gesture-handler@latest",
+      "version": "3.4.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "invariant": "^2.2.4",
+        "@types/react-test-renderer": "^19.1.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-gesture-handler/latest",
+      "tarball": "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-3.4.0.tgz",
+      "integrity": "sha512-jBg4ZWDvegeaZ4OHq9oxVOS/Qa6pV+LhtsUExothyhWxqzG0Lkg7kl2ztemPj/pnJxkq9j/+6wAw3jZGwdssww=="
+    },
+    {
+      "package": "@shopify/flash-list",
+      "selector": "@shopify/flash-list@latest",
+      "version": "2.3.3",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*",
+        "@babel/runtime": "*"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@shopify/flash-list/latest",
+      "tarball": "https://registry.npmjs.org/@shopify/flash-list/-/flash-list-2.3.3.tgz",
+      "integrity": "sha512-77MXV5YKMo3B3XZtgNXBaELZVQOE0bDcQxH4D/qf0i3o6YkZWBoHeR0CkFXZBdyoZqgvsUe3kkr0qhQE9lVqtg=="
+    },
+    {
+      "package": "react-native-svg",
+      "selector": "react-native-svg@latest",
+      "version": "15.16.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "css-tree": "^1.1.3",
+        "css-select": "^5.1.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-svg/latest",
+      "tarball": "https://registry.npmjs.org/react-native-svg/-/react-native-svg-15.16.0.tgz",
+      "integrity": "sha512-uh8yktufYeRU3W9Omi8+SPyLF9BVN4JmLflSgc9oOcKkSKk/S5JUmmTjKZq/L8GHfQUtCvcu/W6X4xhEfBBAjQ=="
+    },
+    {
+      "package": "react-native-mmkv",
+      "selector": "react-native-mmkv@latest",
+      "version": "4.3.2",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*",
+        "react-native-nitro-modules": "*"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-mmkv/latest",
+      "tarball": "https://registry.npmjs.org/react-native-mmkv/-/react-native-mmkv-4.3.2.tgz",
+      "integrity": "sha512-49OAyfkg0/TMWiWELZN6VuVQPZPhizwL4DTmp8b7B1md3dB/s3LH3mGfC3T+lp9W0y/rqxZMEnotLFTIbOAenQ=="
+    },
+    {
+      "package": "zod",
+      "selector": "zod@latest",
+      "version": "4.6.7",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/zod/latest",
+      "tarball": "https://registry.npmjs.org/zod/-/zod-4.6.7.tgz",
+      "integrity": "sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg=="
+    },
+    {
+      "package": "react-native-screens",
+      "selector": "react-native-screens@latest",
+      "version": "4.30.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "warn-once": "^0.1.0",
+        "react-freeze": "^1.0.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-screens/latest",
+      "tarball": "https://registry.npmjs.org/react-native-screens/-/react-native-screens-4.30.0.tgz",
+      "integrity": "sha512-FrZG/Q5gqoDu0SgP4d2Ly0qdio5DR1KdGPEYImhkz7tmrhpML4C39m6RYLGd5TVLHZwcCh8NPvW9rylevjD0uQ=="
+    },
+    {
+      "package": "react-native-safe-area-context",
+      "selector": "react-native-safe-area-context@latest",
+      "version": "5.10.1",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-safe-area-context/latest",
+      "tarball": "https://registry.npmjs.org/react-native-safe-area-context/-/react-native-safe-area-context-5.10.1.tgz",
+      "integrity": "sha512-ax0T3cAHQIhuAjDQpJ9C1Le96aRiM9PF+Kmgg7Y8+mD7QJMEIx04cG0eG3EGUTdvymgOkCrkakgZFwuOIuNQGw=="
+    },
+    {
+      "package": "react-native-worklets",
+      "selector": "react-native-worklets@latest",
+      "version": "0.13.1",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "@babel/core": "*",
+        "react-native": "0.86 - 0.88",
+        "@react-native/metro-config": "*"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "semver": "^7.7.4",
+        "@babel/types": "^7.27.1",
+        "whatwg-fetch": "^3.6.20",
+        "@babel/traverse": "^7.27.1",
+        "@babel/generator": "^7.27.1",
+        "convert-source-map": "^2.0.0",
+        "@jridgewell/remapping": "^2.3.5",
+        "@babel/preset-typescript": "^7.28.5",
+        "@babel/plugin-transform-classes": "^7.28.6",
+        "@babel/plugin-transform-unicode-regex": "^7.27.1",
+        "@babel/plugin-transform-arrow-functions": "^7.27.1",
+        "@babel/plugin-transform-class-properties": "^7.28.6",
+        "@babel/plugin-transform-optional-chaining": "^7.28.6",
+        "@babel/plugin-transform-template-literals": "^7.27.1",
+        "@babel/plugin-transform-shorthand-properties": "^7.27.1",
+        "@babel/plugin-transform-nullish-coalescing-operator": "^7.28.6"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-worklets/latest",
+      "tarball": "https://registry.npmjs.org/react-native-worklets/-/react-native-worklets-0.13.1.tgz",
+      "integrity": "sha512-sX55Vx89/Y9uJmvAbAGoHXBZvCWXtYPGWPJ9Z9yl0h76mP9A10ULlSrixzGqBFLXeQMBpIpyJEhWpzXP7GG6YA=="
+    },
+    {
+      "package": "react-native-nitro-modules",
+      "selector": "react-native-nitro-modules@latest",
+      "version": "0.37.1",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-nitro-modules/latest",
+      "tarball": "https://registry.npmjs.org/react-native-nitro-modules/-/react-native-nitro-modules-0.37.1.tgz",
+      "integrity": "sha512-KpW6EQVQ/bfegpCGxN9Be+ndvsfj56t4IESEvCASu9gWpJa/NDfHpIeIwCOvZQ3eXmLEj6YD4wCLqcC1FJPr2w=="
+    },
+    {
+      "package": "react-native-edge-to-edge",
+      "selector": "react-native-edge-to-edge@latest",
+      "version": "1.8.2",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": "This package is deprecated. Set edgeToEdgeEnabled=true in android/gradle.properties instead.",
+      "source": "https://registry.npmjs.org/react-native-edge-to-edge/latest",
+      "tarball": "https://registry.npmjs.org/react-native-edge-to-edge/-/react-native-edge-to-edge-1.8.2.tgz",
+      "integrity": "sha512-9yhI/RpaXVkMqFKNHz72A7Vi8KrT6BqDcY8HOdck/so+qH0fq1EkIeNTSLplnoFW84DcLn2D7s9L/xfYSN8gyQ=="
+    },
+    {
+      "package": "@react-native/normalize-colors",
+      "selector": "@react-native/normalize-colors@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/normalize-colors/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/normalize-colors/-/normalize-colors-0.88.0.tgz",
+      "integrity": "sha512-eZCu3tGAQCfvMCPQJVY4dmoMX8ZZYBvqIGHX7lwOYyzNK+Dl8e5ky7ZoXub1Rq75oSrQXNNmSP2CDjNNXXZpFQ=="
+    },
+    {
+      "package": "@react-native-community/template",
+      "selector": "@react-native-community/template@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native-community/template/latest",
+      "tarball": "https://registry.npmjs.org/@react-native-community/template/-/template-0.88.0.tgz",
+      "integrity": "sha512-9MxrxG57kDFFifV+KtgrDUiKvSUHygkaebMmKLjDZNFtkXom2if9fORmcb/ycpyove3Lz4UL+x2dh8MQPxyRNg=="
+    },
+    {
+      "package": "@react-native/gradle-plugin",
+      "selector": "@react-native/gradle-plugin@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/gradle-plugin/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/gradle-plugin/-/gradle-plugin-0.88.0.tgz",
+      "integrity": "sha512-4jPSKslOfJj8NKY/jv9qmWkxZYmqPyamoS3Vs0JOFxw9t4PM6L/ea0fUsjNV0LxC9zJlvWilPJOCTOf7h8wlyw=="
+    },
+    {
+      "package": "@react-native/codegen",
+      "selector": "@react-native/codegen@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "peerDependencies": {
+        "@babel/core": "*"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "yargs": "^17.6.2",
+        "invariant": "^2.2.4",
+        "nullthrows": "^1.1.1",
+        "tinyglobby": "^0.2.15",
+        "@babel/core": "^7.25.2",
+        "flow-parser": "0.327.0",
+        "@babel/parser": "^7.29.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/codegen/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/codegen/-/codegen-0.88.0.tgz",
+      "integrity": "sha512-SAGg+XfzsrPiYTscbKa9bo2/H2ei2TjyxW8RTMq2Ps661kRK3AnmpMGVfrEFshEMr3FGEbuQIvj86X98kaXlRA=="
+    },
+    {
+      "package": "@react-native/babel-preset",
+      "selector": "@react-native/babel-preset@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "peerDependencies": {
+        "@babel/core": "*"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@babel/core": "^7.25.2",
+        "flow-parser": "0.327.0",
+        "react-refresh": "^0.14.0",
+        "@babel/plugin-transform-for-of": "^7.24.7",
+        "@babel/plugin-transform-classes": "^7.25.4",
+        "@babel/plugin-transform-runtime": "^7.24.7",
+        "@babel/plugin-transform-react-jsx": "^7.25.2",
+        "babel-plugin-transform-flow-enums": "^0.0.2",
+        "@babel/plugin-transform-typescript": "^7.25.2",
+        "@react-native/babel-plugin-codegen": "0.88.0",
+        "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+        "@babel/plugin-transform-regenerator": "^7.24.7",
+        "@babel/plugin-transform-block-scoping": "^7.25.0",
+        "@babel/plugin-transform-destructuring": "^7.24.8",
+        "@babel/plugin-transform-unicode-regex": "^7.24.7",
+        "@babel/plugin-syntax-optional-chaining": "^7.8.3",
+        "@babel/plugin-transform-react-jsx-self": "^7.24.7",
+        "@babel/plugin-transform-private-methods": "^7.24.7",
+        "@babel/plugin-syntax-export-default-from": "^7.24.7",
+        "@babel/plugin-transform-class-properties": "^7.25.4",
+        "@babel/plugin-transform-flow-strip-types": "^7.25.2",
+        "@babel/plugin-transform-modules-commonjs": "^7.24.8",
+        "@babel/plugin-transform-react-jsx-source": "^7.24.7",
+        "@babel/plugin-transform-optional-chaining": "^7.24.8",
+        "@babel/plugin-proposal-export-default-from": "^7.24.7",
+        "@babel/plugin-transform-async-to-generator": "^7.24.7",
+        "@babel/plugin-transform-react-display-name": "^7.24.7",
+        "@babel/plugin-transform-optional-catch-binding": "^7.24.7",
+        "@babel/plugin-syntax-nullish-coalescing-operator": "^7.8.3",
+        "@babel/plugin-transform-async-generator-functions": "^7.25.4",
+        "@babel/plugin-transform-private-property-in-object": "^7.24.7",
+        "@babel/plugin-transform-nullish-coalescing-operator": "^7.24.7",
+        "@babel/plugin-transform-named-capturing-groups-regex": "^7.24.7"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/babel-preset/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/babel-preset/-/babel-preset-0.88.0.tgz",
+      "integrity": "sha512-iMfAHhFGNegnReSY6CYaWHncvyDwHq8olRs0zp9nRRApMAoCiLyfo1dwL/f39qt/MreD6xIqUs9SrTPYWobY6g=="
+    },
+    {
+      "package": "@react-native/eslint-config",
+      "selector": "@react-native/eslint-config@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "peerDependencies": {
+        "eslint": "^8.0.0 || ^9.0.0",
+        "prettier": ">=2"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@babel/core": "^7.25.2",
+        "eslint-plugin-jest": "^29.0.1",
+        "eslint-plugin-react": "^7.37.5",
+        "@babel/eslint-parser": "^7.25.1",
+        "eslint-plugin-ft-flow": "^2.0.1",
+        "eslint-config-prettier": "^8.5.0",
+        "@typescript-eslint/parser": "^8.59.2",
+        "eslint-plugin-react-hooks": "^7.0.1",
+        "eslint-plugin-react-native": "^5.0.0",
+        "@react-native/eslint-plugin": "0.88.0",
+        "eslint-plugin-eslint-comments": "^3.2.0",
+        "@typescript-eslint/eslint-plugin": "^8.59.2"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/eslint-config/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/eslint-config/-/eslint-config-0.88.0.tgz",
+      "integrity": "sha512-bymFycPvegqTCcPvIZlg0soClW4jN9I2IcEmzabGAyL6ctnbT3dI7ml6eL5VlqxbHsbKFampNU2a00lvyQaj8g=="
+    },
+    {
+      "package": "@react-native/metro-config",
+      "selector": "@react-native/metro-config@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "metro-config": "^0.87.1",
+        "metro-runtime": "^0.87.1",
+        "@react-native/js-polyfills": "0.88.0",
+        "@react-native/metro-babel-transformer": "0.88.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/metro-config/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/metro-config/-/metro-config-0.88.0.tgz",
+      "integrity": "sha512-iPV2HNXlPs7xQDBJJGIjkH0x2psZwJeRIEpfSqxgqLaO5eEfE2Ccicfz2OBHBcIC5jKGGa4IoI/e26zMNDuTMQ=="
+    },
+    {
+      "package": "@react-native/typescript-config",
+      "selector": "@react-native/typescript-config@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/typescript-config/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/typescript-config/-/typescript-config-0.88.0.tgz",
+      "integrity": "sha512-o8xdzvWQZUlx+WXsAWN3LGKKP+o2QKMd2alERuFSCxgy8mbX/W62+OThRfBVMQaKF4bCxD5P5DM60EbGPcyw+g=="
+    },
+    {
+      "package": "@babel/core",
+      "selector": "@babel/core@latest",
+      "version": "8.0.9",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.18.0 || >=24.11.0"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "obug": "^3.0.0",
+        "json5": "^2.2.3",
+        "verkit": "^0.5.0",
+        "gensync": "^1.0.0-beta.2",
+        "empathic": "^2.0.1",
+        "@babel/types": "^8.0.8",
+        "@babel/parser": "^8.0.8",
+        "@babel/helpers": "^8.0.8",
+        "@types/gensync": "^1.0.5",
+        "@babel/template": "^8.0.0",
+        "@babel/traverse": "^8.0.7",
+        "@babel/generator": "^8.0.6",
+        "@babel/code-frame": "^8.0.6",
+        "convert-source-map": "^2.0.0",
+        "import-meta-resolve": "^4.2.0",
+        "@babel/helper-compilation-targets": "^8.0.7"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@babel/core/latest",
+      "tarball": "https://registry.npmjs.org/@babel/core/-/core-8.0.9.tgz",
+      "integrity": "sha512-wXtyKlpR/pXf/u0vmib+OBakQaIzLglLcRoKpWxCHW/whqq7YfQYPD0IAAl9H/evi40MyLIjYYdvb6N+9DI2yA=="
+    },
+    {
+      "package": "@babel/preset-env",
+      "selector": "@babel/preset-env@latest",
+      "version": "8.0.7",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.18.0 || >=24.11.0"
+      },
+      "peerDependencies": {
+        "@babel/core": "^8.0.0"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "verkit": "^0.5.0",
+        "core-js-compat": "^3.48.0",
+        "@babel/compat-data": "^8.0.5",
+        "@babel/preset-modules": "^0.2.0",
+        "@babel/helper-plugin-utils": "^8.0.1",
+        "babel-plugin-polyfill-corejs3": "^1.0.0",
+        "@babel/helper-validator-option": "^8.0.0",
+        "@babel/plugin-transform-for-of": "^8.0.7",
+        "@babel/plugin-transform-spread": "^8.0.5",
+        "@babel/plugin-transform-classes": "^8.0.5",
+        "@babel/plugin-transform-literals": "^8.0.1",
+        "@babel/helper-compilation-targets": "^8.0.7",
+        "@babel/plugin-transform-new-target": "^8.0.1",
+        "@babel/plugin-transform-parameters": "^8.0.5",
+        "@babel/plugin-transform-modules-amd": "^8.0.1",
+        "@babel/plugin-transform-modules-umd": "^8.0.1",
+        "@babel/plugin-transform-regenerator": "^8.0.6",
+        "@babel/plugin-transform-dotall-regex": "^8.0.1",
+        "@babel/plugin-transform-json-strings": "^8.0.1",
+        "@babel/plugin-transform-object-super": "^8.0.1",
+        "@babel/plugin-transform-sticky-regex": "^8.0.1",
+        "@babel/plugin-transform-block-scoping": "^8.0.7",
+        "@babel/plugin-transform-destructuring": "^8.0.5",
+        "@babel/plugin-transform-function-name": "^8.0.1",
+        "@babel/plugin-transform-typeof-symbol": "^8.0.1",
+        "@babel/plugin-transform-unicode-regex": "^8.0.1",
+        "@babel/plugin-transform-duplicate-keys": "^8.0.1",
+        "@babel/plugin-transform-dynamic-import": "^8.0.1",
+        "@babel/plugin-transform-reserved-words": "^8.0.1",
+        "@babel/plugin-transform-arrow-functions": "^8.0.1",
+        "@babel/plugin-transform-private-methods": "^8.0.1",
+        "@babel/plugin-transform-unicode-escapes": "^8.0.1",
+        "@babel/plugin-transform-class-properties": "^8.0.1",
+        "@babel/plugin-transform-modules-commonjs": "^8.0.1",
+        "@babel/plugin-transform-modules-systemjs": "^8.0.1",
+        "@babel/plugin-transform-regexp-modifiers": "^8.0.1",
+        "@babel/plugin-transform-numeric-separator": "^8.0.1",
+        "@babel/plugin-transform-optional-chaining": "^8.0.5",
+        "@babel/plugin-transform-property-literals": "^8.0.1",
+        "@babel/plugin-transform-template-literals": "^8.0.1",
+        "@babel/plugin-transform-async-to-generator": "^8.0.1",
+        "@babel/plugin-transform-class-static-block": "^8.0.5",
+        "@babel/plugin-transform-object-rest-spread": "^8.0.1",
+        "@babel/plugin-transform-unicode-sets-regex": "^8.0.1",
+        "@babel/plugin-transform-computed-properties": "^8.0.1",
+        "@babel/plugin-transform-shorthand-properties": "^8.0.1",
+        "@babel/plugin-transform-export-namespace-from": "^8.0.1",
+        "@babel/plugin-transform-block-scoped-functions": "^8.0.1",
+        "@babel/plugin-transform-optional-catch-binding": "^8.0.1",
+        "@babel/plugin-transform-unicode-property-regex": "^8.0.1",
+        "@babel/plugin-transform-exponentiation-operator": "^8.0.1",
+        "@babel/plugin-transform-async-generator-functions": "^8.0.6",
+        "@babel/plugin-transform-member-expression-literals": "^8.0.1",
+        "@babel/plugin-transform-private-property-in-object": "^8.0.5",
+        "@babel/plugin-transform-nullish-coalescing-operator": "^8.0.1",
+        "@babel/plugin-transform-explicit-resource-management": "^8.0.5",
+        "@babel/plugin-transform-logical-assignment-operators": "^8.0.1",
+        "@babel/plugin-transform-named-capturing-groups-regex": "^8.0.1",
+        "@babel/plugin-bugfix-firefox-class-in-computed-class-key": "^8.0.1",
+        "@babel/plugin-bugfix-safari-rest-destructuring-rhs-array": "^8.0.6",
+        "@babel/plugin-bugfix-safari-class-field-initializer-scope": "^8.0.1",
+        "@babel/plugin-bugfix-v8-static-class-fields-redefine-readonly": "^8.0.1",
+        "@babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining": "^8.0.1",
+        "@babel/plugin-transform-duplicate-named-capturing-groups-regex": "^8.0.1",
+        "@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression": "^8.0.1"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@babel/preset-env/latest",
+      "tarball": "https://registry.npmjs.org/@babel/preset-env/-/preset-env-8.0.7.tgz",
+      "integrity": "sha512-c4/6ls3f+XPhxE3iT0/Wm7Z3abRS5zH5QmXBT6LPzpxgDKyhPsQk0+xNmChY0Rvh4yotKD87K2Api6f5KSaT8w=="
+    },
+    {
+      "package": "@babel/runtime",
+      "selector": "@babel/runtime@latest",
+      "version": "8.0.8",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@babel/runtime/latest",
+      "tarball": "https://registry.npmjs.org/@babel/runtime/-/runtime-8.0.8.tgz",
+      "integrity": "sha512-dEu8nGlRqjsJsvviUUoSMfcRHpwomCiRlXsc2mPfJ79+ffTpDm+JtfUtTMzUrqCApHQnCsVPD3gT1ZT8RgBRCQ=="
+    },
+    {
+      "package": "@react-native-community/cli-platform-android",
+      "selector": "@react-native-community/cli-platform-android@latest",
+      "version": "20.2.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "execa": "^5.0.0",
+        "logkitty": "^0.7.1",
+        "picocolors": "^1.1.1",
+        "@react-native-community/cli-tools": "20.2.0",
+        "@react-native-community/cli-config-android": "20.2.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native-community/cli-platform-android/latest",
+      "tarball": "https://registry.npmjs.org/@react-native-community/cli-platform-android/-/cli-platform-android-20.2.0.tgz",
+      "integrity": "sha512-fRglzcf/Yq5lnIkqdA8uf1GvlG18x3Dm48Yvo+l7KiWgh/SVtfVhfvalrtX5rmx+KeJkDA534bGoPvi5+ruWjw=="
+    },
+    {
+      "package": "@react-native-community/cli-platform-ios",
+      "selector": "@react-native-community/cli-platform-ios@latest",
+      "version": "20.2.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@react-native-community/cli-platform-apple": "20.2.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native-community/cli-platform-ios/latest",
+      "tarball": "https://registry.npmjs.org/@react-native-community/cli-platform-ios/-/cli-platform-ios-20.2.0.tgz",
+      "integrity": "sha512-bCKlBt2HoD7WTl/HX60+4HFhR1lKY64Y9MPWu7yWQwOCEqYRMi6MkRxLimiONj9M2/lNf0z9BPHDzdDe5HM2ag=="
+    },
+    {
+      "package": "@types/jest",
+      "selector": "@types/jest@latest",
+      "version": "30.0.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "expect": "^30.0.0",
+        "pretty-format": "^30.0.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@types/jest/latest",
+      "tarball": "https://registry.npmjs.org/@types/jest/-/jest-30.0.0.tgz",
+      "integrity": "sha512-XTYugzhuwqWjws0CVz8QpM36+T+Dz5mTEBKhNs/esGLnCIlGdRy+Dq78NRjd7ls7r8BC8ZRMOrKlkO1hU0JOwA=="
+    },
+    {
+      "package": "@types/react-test-renderer",
+      "selector": "@types/react-test-renderer@latest",
+      "version": "19.3.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "@types/react": "*"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@types/react-test-renderer/latest",
+      "tarball": "https://registry.npmjs.org/@types/react-test-renderer/-/react-test-renderer-19.3.0.tgz",
+      "integrity": "sha512-TX4p2D4Z2oigM3SXU7+QyLSUnSR0vR1S1Pfxm/qFL9nHQ3jclgi6ioGoWQmlIr1DeKRVmPJrmNlhgM0JlWlLUg=="
+    },
+    {
+      "package": "eslint",
+      "selector": "eslint@latest",
+      "version": "10.13.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^20.19.0 || ^22.13.0 || >=24"
+      },
+      "peerDependencies": {
+        "jiti": "*"
+      },
+      "peerDependenciesMeta": {
+        "jiti": {
+          "optional": true
+        }
+      },
+      "dependencies": {
+        "ajv": "^6.14.0",
+        "debug": "^4.3.2",
+        "espree": "^11.2.0",
+        "ignore": "^5.2.0",
+        "esquery": "^1.7.0",
+        "esutils": "^2.0.2",
+        "find-up": "^5.0.0",
+        "is-glob": "^4.0.0",
+        "minimatch": "^10.2.5",
+        "optionator": "^0.9.3",
+        "cross-spawn": "^7.0.6",
+        "glob-parent": "^6.0.2",
+        "imurmurhash": "^0.1.4",
+        "@eslint/core": "^1.2.1",
+        "eslint-scope": "^9.1.2",
+        "@humanfs/node": "^0.16.6",
+        "@types/estree": "^1.0.6",
+        "fast-deep-equal": "^3.1.3",
+        "natural-compare": "^1.4.0",
+        "file-entry-cache": "11.1.5 || >11.1.6 <12",
+        "@eslint/plugin-kit": "^0.7.3",
+        "eslint-visitor-keys": "^5.0.1",
+        "@eslint/config-array": "^0.23.5",
+        "@humanwhocodes/retry": "^0.4.2",
+        "escape-string-regexp": "^4.0.0",
+        "@eslint/config-helpers": "^0.7.0",
+        "@eslint-community/regexpp": "^4.12.2",
+        "@eslint-community/eslint-utils": "^4.8.0",
+        "@humanwhocodes/module-importer": "^1.0.1",
+        "json-stable-stringify-without-jsonify": "^1.0.1"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/eslint/latest",
+      "tarball": "https://registry.npmjs.org/eslint/-/eslint-10.13.0.tgz",
+      "integrity": "sha512-UohDjD4zSzEwhf58M3O7vc/ycc8O1I7dNlhtD0WxE8Px8EHNJKtUwzBqrzeGhisRuv2ag4sAYswszCJRgKXYUg=="
+    },
+    {
+      "package": "jest",
+      "selector": "jest@latest",
+      "version": "30.5.2",
+      "license": "MIT",
+      "engines": {
+        "node": "^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0"
+      },
+      "peerDependencies": {
+        "node-notifier": "^8.0.1 || ^9.0.0 || ^10.0.0"
+      },
+      "peerDependenciesMeta": {
+        "node-notifier": {
+          "optional": true
+        }
+      },
+      "dependencies": {
+        "jest-cli": "30.5.2",
+        "@jest/core": "30.5.2",
+        "@jest/types": "30.5.1",
+        "import-local": "^3.2.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/jest/latest",
+      "tarball": "https://registry.npmjs.org/jest/-/jest-30.5.2.tgz",
+      "integrity": "sha512-3gnpdBIza8ijCl3iMV9ChE3hSt1+46865qqod863gQtJr1DixOkAU5DoGbi3u+XlRcw++BhZQMu/y4xBdHBvSQ=="
+    },
+    {
+      "package": "prettier",
+      "selector": "prettier@latest",
+      "version": "3.9.10",
+      "license": "MIT",
+      "engines": {
+        "node": ">=14"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/prettier/latest",
+      "tarball": "https://registry.npmjs.org/prettier/-/prettier-3.9.10.tgz",
+      "integrity": "sha512-skGHTH1Yb9QvaTC4hWnRTzEYtCpApF0UMBPz+t/0ZPzP8ihefo/btKd+QA7pUE0fEwA1SbS/NmhyEcstdXOIdA=="
+    },
+    {
+      "package": "react-test-renderer",
+      "selector": "react-test-renderer@latest",
+      "version": "19.3.1",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "^19.3.1"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "react-is": "^19.3.1",
+        "scheduler": "^0.28.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-test-renderer/latest",
+      "tarball": "https://registry.npmjs.org/react-test-renderer/-/react-test-renderer-19.3.1.tgz",
+      "integrity": "sha512-YcNewwmnZMd0wTb2nkb4hQ58NmX/u1hW2OJsNpen8CnV+jNkmEjYd1R6wJrOMSgb8bIF5HAJv4iL+S3PwNptOA=="
+    },
+    {
+      "package": "nitrogen",
+      "selector": "nitrogen@latest",
+      "version": "0.37.1",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "zod": "^4.4.3",
+        "chalk": "^5.3.0",
+        "yargs": "^18.0.0",
+        "ts-morph": "^28.0.0",
+        "react-native-nitro-modules": "^0.37.1"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/nitrogen/latest",
+      "tarball": "https://registry.npmjs.org/nitrogen/-/nitrogen-0.37.1.tgz",
+      "integrity": "sha512-RMK1n8xV7B38JorfLCFexgPEDp7/4CnM/AR0R3UfikufXo8qB8TecgtY+sW0xjOjZJYwW5bJJI/kyZjusYk4JA=="
+    },
+    {
+      "package": "@react-native/new-app-screen",
+      "selector": "@react-native/new-app-screen@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "peerDependencies": {
+        "react": "*",
+        "@types/react": "^19.1.0",
+        "react-native": "0.88.0"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      },
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/new-app-screen/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/new-app-screen/-/new-app-screen-0.88.0.tgz",
+      "integrity": "sha512-s0N5aV8G+UWfK4l/wzRrybcqbiGL75WngeauGtA121vIQW/HIPL69ag31f+3UFKsGf+3MWNAnsDQnIb2meDs2Q=="
+    },
+    {
+      "package": "@react-native/jest-preset",
+      "selector": "@react-native/jest-preset@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": ">= 22.13.0"
+      },
+      "peerDependencies": {
+        "react": "^19.2.3"
+      },
+      "peerDependenciesMeta": {},
+      "dependencies": {
+        "babel-jest": "^29.7.0",
+        "regenerator-runtime": "^0.13.2",
+        "jest-environment-node": "^29.7.0",
+        "@react-native/js-polyfills": "0.88.0",
+        "@jest/create-cache-key-function": "^29.7.0"
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/jest-preset/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/jest-preset/-/jest-preset-0.88.0.tgz",
+      "integrity": "sha512-dN97NNqBsShAcxGH8/mNSBgYYc7Xk8q+Hez9qG9iockB4GPir5/Aw45e14sn7iLYTu2HkY0Uq2h3WlMY+ekRxw=="
+    },
+    {
+      "package": "oxlint",
+      "selector": "oxlint@latest",
+      "version": "1.89.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^20.19.0 || >=22.12.0"
+      },
+      "peerDependencies": {
+        "vite-plus": "*",
+        "oxlint-tsgolint": ">=7.0.2003"
+      },
+      "peerDependenciesMeta": {
+        "vite-plus": {
+          "optional": true
+        },
+        "oxlint-tsgolint": {
+          "optional": true
+        }
+      },
+      "dependencies": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/oxlint/latest",
+      "tarball": "https://registry.npmjs.org/oxlint/-/oxlint-1.89.0.tgz",
+      "integrity": "sha512-a25hkfo61okGPvJz432fRIPoxlKtNnOVy9w4rzrmGgNm4iVTPwpSQlmdqNWnp6p9QyyPVfAZRgnf5XvSBZFk/A=="
+    }
+  ],
+  "artifacts": [
+    {
+      "package": "@react-native-community/template",
+      "version": "0.88.0",
+      "tarball": "https://registry.npmjs.org/@react-native-community/template/-/template-0.88.0.tgz",
+      "integrity": "sha512-9MxrxG57kDFFifV+KtgrDUiKvSUHygkaebMmKLjDZNFtkXom2if9fORmcb/ycpyove3Lz4UL+x2dh8MQPxyRNg==",
+      "sha256": "896707c75d6b0b47aa97041aa605ed45c3329f9204ad6f67064db352c58de19a",
+      "bytes": 139870
+    },
+    {
+      "package": "@react-native-community/cli",
+      "version": "20.2.0",
+      "tarball": "https://registry.npmjs.org/@react-native-community/cli/-/cli-20.2.0.tgz",
+      "integrity": "sha512-5RZKkBeUFC4hhrzySzxWmRJwXBTc2PE3L6QUgvnJk3QDxNYMY7aGuI8Gr9eZRS1DbiY10IPWqpJfqSIplzVG6A==",
+      "sha256": "a259518eb65baac43750fd0ad942d1ef19f162faddb25ce0c4ea061608e7d4f5",
+      "bytes": 62081
+    },
+    {
+      "package": "@react-native/babel-preset",
+      "version": "0.88.0",
+      "tarball": "https://registry.npmjs.org/@react-native/babel-preset/-/babel-preset-0.88.0.tgz",
+      "integrity": "sha512-iMfAHhFGNegnReSY6CYaWHncvyDwHq8olRs0zp9nRRApMAoCiLyfo1dwL/f39qt/MreD6xIqUs9SrTPYWobY6g==",
+      "sha256": "0eff225dc38969e132aef4e33944cf68968e9fd53e2e3bd5c20045ad33b6b2aa",
+      "bytes": 10853
+    },
+    {
+      "package": "@react-native/eslint-config",
+      "version": "0.88.0",
+      "tarball": "https://registry.npmjs.org/@react-native/eslint-config/-/eslint-config-0.88.0.tgz",
+      "integrity": "sha512-bymFycPvegqTCcPvIZlg0soClW4jN9I2IcEmzabGAyL6ctnbT3dI7ml6eL5VlqxbHsbKFampNU2a00lvyQaj8g==",
+      "sha256": "e7d5e082cfc33c2fc35612720c115ab19ba949fb8acf3ba29eaddd2ee08af678",
+      "bytes": 6016
+    },
+    {
+      "package": "@react-native/typescript-config",
+      "version": "0.88.0",
+      "tarball": "https://registry.npmjs.org/@react-native/typescript-config/-/typescript-config-0.88.0.tgz",
+      "integrity": "sha512-o8xdzvWQZUlx+WXsAWN3LGKKP+o2QKMd2alERuFSCxgy8mbX/W62+OThRfBVMQaKF4bCxD5P5DM60EbGPcyw+g==",
+      "sha256": "7f381eb572480272ae48383a90171b766f846b485cfc2308c4fe82dd3e9220ec",
+      "bytes": 1283
+    },
+    {
+      "package": "@react-native/gradle-plugin",
+      "version": "0.88.0",
+      "tarball": "https://registry.npmjs.org/@react-native/gradle-plugin/-/gradle-plugin-0.88.0.tgz",
+      "integrity": "sha512-4jPSKslOfJj8NKY/jv9qmWkxZYmqPyamoS3Vs0JOFxw9t4PM6L/ea0fUsjNV0LxC9zJlvWilPJOCTOf7h8wlyw==",
+      "sha256": "472aa2062138af0f84ad36fc76bf3f503d92347c79223fd2c92a0f085d810d69",
+      "bytes": 92029
+    },
+    {
+      "package": "react-native-unistyles",
+      "version": "3.6.0",
+      "tarball": "https://registry.npmjs.org/react-native-unistyles/-/react-native-unistyles-3.6.0.tgz",
+      "integrity": "sha512-eYqixPy6auBj6k/ica9fCYIPgFQsLzUwRoxGZ04hX3hkANTNjaz3/LzNfXPfgJbwF/fQrhaK0qII4nhtSqUPfA==",
+      "sha256": "0a9ace6ebc6d01e077d13fe43d8e29569714decd543af7711bf0237d74c70fcd",
+      "bytes": 374305
+    },
+    {
+      "package": "react-native-mmkv",
+      "version": "4.3.2",
+      "tarball": "https://registry.npmjs.org/react-native-mmkv/-/react-native-mmkv-4.3.2.tgz",
+      "integrity": "sha512-49OAyfkg0/TMWiWELZN6VuVQPZPhizwL4DTmp8b7B1md3dB/s3LH3mGfC3T+lp9W0y/rqxZMEnotLFTIbOAenQ==",
+      "sha256": "d8da946c5d6bdf35e649af331c8767ac513bead486bd1a6a94f6c0523d0aac5b",
+      "bytes": 44015
+    },
+    {
+      "package": "react-native-nitro-modules",
+      "version": "0.37.1",
+      "tarball": "https://registry.npmjs.org/react-native-nitro-modules/-/react-native-nitro-modules-0.37.1.tgz",
+      "integrity": "sha512-KpW6EQVQ/bfegpCGxN9Be+ndvsfj56t4IESEvCASu9gWpJa/NDfHpIeIwCOvZQ3eXmLEj6YD4wCLqcC1FJPr2w==",
+      "sha256": "00f5a2a6d8150251384948faf87d2bbb29044a18bd8ba888f37436063740700a",
+      "bytes": 135632
+    },
+    {
+      "package": "react-native-reanimated",
+      "version": "4.7.1",
+      "tarball": "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-4.7.1.tgz",
+      "integrity": "sha512-HviDFSZ6V4KTRsrLS6hRbBJ4j63l/L8a5az0EoWdJwaMLYnBNyYISTDxwXpEYkMbAbLzCMCviIdiOxXHYQWcNA==",
+      "sha256": "fedb57534cd43865d76128ae91b23795b9cecdba511ff056f0fd5a0ea656219b",
+      "bytes": 1092346
+    }
+  ],
+  "profiles": {
+    "template": {
+      "manifest": {
+        "name": "attention-stats-as002-probe",
+        "version": "0.0.0",
+        "private": true,
+        "packageManager": "pnpm@12.15.0",
+        "dependencies": {
+          "react": "latest",
+          "react-native": "latest",
+          "@react-native/new-app-screen": "latest",
+          "react-native-safe-area-context": "latest",
+          "@react-navigation/native": "latest",
+          "@react-navigation/native-stack": "latest",
+          "@react-navigation/bottom-tabs": "latest",
+          "react-native-unistyles": "latest",
+          "react-native-reanimated": "latest",
+          "react-native-gesture-handler": "latest",
+          "@shopify/flash-list": "latest",
+          "react-native-svg": "latest",
+          "react-native-mmkv": "latest",
+          "zod": "latest",
+          "react-native-screens": "latest",
+          "react-native-worklets": "latest",
+          "react-native-nitro-modules": "latest",
+          "@react-native/normalize-colors": "latest"
+        },
+        "devDependencies": {
+          "@babel/core": "latest",
+          "@babel/preset-env": "latest",
+          "@babel/runtime": "latest",
+          "@react-native-community/cli": "latest",
+          "@react-native-community/cli-platform-android": "latest",
+          "@react-native-community/cli-platform-ios": "latest",
+          "@react-native/babel-preset": "latest",
+          "@react-native/eslint-config": "latest",
+          "@react-native/jest-preset": "latest",
+          "@react-native/metro-config": "latest",
+          "@react-native/typescript-config": "latest",
+          "@types/jest": "latest",
+          "@types/react": "latest",
+          "@types/react-test-renderer": "latest",
+          "eslint": "latest",
+          "jest": "latest",
+          "prettier": "latest",
+          "react-test-renderer": "latest",
+          "typescript": "latest"
+        }
+      },
+      "settings": "strictPeerDependencies: true\nautoInstallPeers: false\n",
+      "installed": [
+        {
+          "package": "react",
+          "version": "19.3.1"
+        },
+        {
+          "package": "react-native",
+          "version": "0.88.0"
+        },
+        {
+          "package": "@react-native/new-app-screen",
+          "version": "0.88.0"
+        },
+        {
+          "package": "react-native-safe-area-context",
+          "version": "5.10.1"
+        },
+        {
+          "package": "@react-navigation/native",
+          "version": "7.5.1"
+        },
+        {
+          "package": "@react-navigation/native-stack",
+          "version": "7.21.0"
+        },
+        {
+          "package": "@react-navigation/bottom-tabs",
+          "version": "7.21.0"
+        },
+        {
+          "package": "react-native-unistyles",
+          "version": "3.6.0"
+        },
+        {
+          "package": "react-native-reanimated",
+          "version": "4.7.1"
+        },
+        {
+          "package": "react-native-gesture-handler",
+          "version": "3.4.0"
+        },
+        {
+          "package": "@shopify/flash-list",
+          "version": "2.3.3"
+        },
+        {
+          "package": "react-native-svg",
+          "version": "15.16.0"
+        },
+        {
+          "package": "react-native-mmkv",
+          "version": "4.3.2"
+        },
+        {
+          "package": "zod",
+          "version": "4.6.7"
+        },
+        {
+          "package": "react-native-screens",
+          "version": "4.30.0"
+        },
+        {
+          "package": "react-native-worklets",
+          "version": "0.13.0"
+        },
+        {
+          "package": "react-native-nitro-modules",
+          "version": "0.37.1"
+        },
+        {
+          "package": "@react-native/normalize-colors",
+          "version": "0.88.0"
+        },
+        {
+          "package": "@babel/core",
+          "version": "8.0.9"
+        },
+        {
+          "package": "@babel/preset-env",
+          "version": "8.0.7"
+        },
+        {
+          "package": "@babel/runtime",
+          "version": "8.0.8"
+        },
+        {
+          "package": "@react-native-community/cli",
+          "version": "20.2.0"
+        },
+        {
+          "package": "@react-native-community/cli-platform-android",
+          "version": "20.2.0"
+        },
+        {
+          "package": "@react-native-community/cli-platform-ios",
+          "version": "20.2.0"
+        },
+        {
+          "package": "@react-native/babel-preset",
+          "version": "0.88.0"
+        },
+        {
+          "package": "@react-native/eslint-config",
+          "version": "0.88.0"
+        },
+        {
+          "package": "@react-native/jest-preset",
+          "version": "0.88.0"
+        },
+        {
+          "package": "@react-native/metro-config",
+          "version": "0.88.0"
+        },
+        {
+          "package": "@react-native/typescript-config",
+          "version": "0.88.0"
+        },
+        {
+          "package": "@types/jest",
+          "version": "30.0.0"
+        },
+        {
+          "package": "@types/react",
+          "version": "19.3.0"
+        },
+        {
+          "package": "@types/react-test-renderer",
+          "version": "19.3.0"
+        },
+        {
+          "package": "eslint",
+          "version": "10.13.0"
+        },
+        {
+          "package": "jest",
+          "version": "30.5.2"
+        },
+        {
+          "package": "prettier",
+          "version": "3.9.10"
+        },
+        {
+          "package": "react-test-renderer",
+          "version": "19.3.1"
+        },
+        {
+          "package": "typescript",
+          "version": "7.0.2"
+        }
+      ]
+    },
+    "reduced": {
+      "manifest": {
+        "name": "attention-stats-as002-reduced-probe",
+        "version": "0.0.0",
+        "private": true,
+        "packageManager": "pnpm@12.15.0",
+        "dependencies": {
+          "react": "latest",
+          "react-native": "latest",
+          "@react-native/new-app-screen": "latest",
+          "react-native-safe-area-context": "latest",
+          "@react-navigation/native": "latest",
+          "@react-navigation/native-stack": "latest",
+          "@react-navigation/bottom-tabs": "latest",
+          "react-native-unistyles": "latest",
+          "react-native-reanimated": "latest",
+          "react-native-gesture-handler": "latest",
+          "@shopify/flash-list": "latest",
+          "react-native-svg": "latest",
+          "react-native-mmkv": "latest",
+          "zod": "latest",
+          "react-native-screens": "latest",
+          "react-native-worklets": "latest",
+          "react-native-nitro-modules": "latest",
+          "@react-native/normalize-colors": "latest"
+        },
+        "devDependencies": {
+          "@babel/runtime": "latest",
+          "@react-native-community/cli": "latest",
+          "@react-native-community/cli-platform-android": "latest",
+          "@react-native-community/cli-platform-ios": "latest",
+          "@react-native/babel-preset": "latest",
+          "@react-native/jest-preset": "latest",
+          "@react-native/metro-config": "latest",
+          "@react-native/typescript-config": "latest",
+          "@types/jest": "latest",
+          "@types/react": "latest",
+          "@types/react-test-renderer": "latest",
+          "jest": "latest",
+          "prettier": "latest",
+          "react-test-renderer": "latest",
+          "typescript": "latest",
+          "oxlint": "latest"
+        }
+      },
+      "settings": "strictPeerDependencies: true\nautoInstallPeers: false\n",
+      "installed": [
+        {
+          "package": "react",
+          "version": "19.3.1"
+        },
+        {
+          "package": "react-native",
+          "version": "0.88.0"
+        },
+        {
+          "package": "@react-native/new-app-screen",
+          "version": "0.88.0"
+        },
+        {
+          "package": "react-native-safe-area-context",
+          "version": "5.10.1"
+        },
+        {
+          "package": "@react-navigation/native",
+          "version": "7.5.1"
+        },
+        {
+          "package": "@react-navigation/native-stack",
+          "version": "7.21.0"
+        },
+        {
+          "package": "@react-navigation/bottom-tabs",
+          "version": "7.21.0"
+        },
+        {
+          "package": "react-native-unistyles",
+          "version": "3.6.0"
+        },
+        {
+          "package": "react-native-reanimated",
+          "version": "4.7.1"
+        },
+        {
+          "package": "react-native-gesture-handler",
+          "version": "3.4.0"
+        },
+        {
+          "package": "@shopify/flash-list",
+          "version": "2.3.3"
+        },
+        {
+          "package": "react-native-svg",
+          "version": "15.16.0"
+        },
+        {
+          "package": "react-native-mmkv",
+          "version": "4.3.2"
+        },
+        {
+          "package": "zod",
+          "version": "4.6.7"
+        },
+        {
+          "package": "react-native-screens",
+          "version": "4.30.0"
+        },
+        {
+          "package": "react-native-worklets",
+          "version": "0.13.0"
+        },
+        {
+          "package": "react-native-nitro-modules",
+          "version": "0.37.1"
+        },
+        {
+          "package": "@react-native/normalize-colors",
+          "version": "0.88.0"
+        },
+        {
+          "package": "@babel/runtime",
+          "version": "8.0.8"
+        },
+        {
+          "package": "@react-native-community/cli",
+          "version": "20.2.0"
+        },
+        {
+          "package": "@react-native-community/cli-platform-android",
+          "version": "20.2.0"
+        },
+        {
+          "package": "@react-native-community/cli-platform-ios",
+          "version": "20.2.0"
+        },
+        {
+          "package": "@react-native/babel-preset",
+          "version": "0.88.0"
+        },
+        {
+          "package": "@react-native/jest-preset",
+          "version": "0.88.0"
+        },
+        {
+          "package": "@react-native/metro-config",
+          "version": "0.88.0"
+        },
+        {
+          "package": "@react-native/typescript-config",
+          "version": "0.88.0"
+        },
+        {
+          "package": "@types/jest",
+          "version": "30.0.0"
+        },
+        {
+          "package": "@types/react",
+          "version": "19.3.0"
+        },
+        {
+          "package": "@types/react-test-renderer",
+          "version": "19.3.0"
+        },
+        {
+          "package": "jest",
+          "version": "30.5.2"
+        },
+        {
+          "package": "prettier",
+          "version": "3.9.10"
+        },
+        {
+          "package": "react-test-renderer",
+          "version": "19.3.1"
+        },
+        {
+          "package": "typescript",
+          "version": "7.0.2"
+        },
+        {
+          "package": "oxlint",
+          "version": "1.89.0"
+        }
+      ]
+    },
+    "age": {
+      "manifest": {
+        "name": "attention-stats-as002-age-probe",
+        "version": "0.0.0",
+        "private": true,
+        "packageManager": "pnpm@12.15.0",
+        "dependencies": {
+          "react-native-worklets": "0.13.1"
+        }
+      },
+      "settings": "minimumReleaseAge: 1440\nminimumReleaseAgeStrict: true\nstrictPeerDependencies: true\nautoInstallPeers: false\n",
+      "installed": []
+    }
+  },
+  "checks": [
+    {
+      "profile": "template",
+      "check": "strict-peer-install",
+      "exitCode": 1,
+      "outcome": "failed",
+      "reason": "Babel 7 plugin peers vs core 8; ESLint config peers vs ESLint 10; typescript-eslint peers vs TypeScript 7"
+    },
+    {
+      "profile": "template",
+      "check": "typescript-fixture",
+      "exitCode": 0,
+      "outcome": "passed"
+    },
+    {
+      "profile": "template",
+      "check": "babel8-rn-preset",
+      "outcome": "failed",
+      "reason": "Requires Babel ^7.0.0-0; loaded 8.0.9"
+    },
+    {
+      "profile": "template",
+      "check": "eslint10-rn-flat",
+      "outcome": "failed",
+      "reason": "typescript-eslint does not support TS 7.0"
+    },
+    {
+      "profile": "reduced",
+      "check": "strict-peer-install",
+      "exitCode": 0,
+      "outcome": "passed"
+    },
+    {
+      "profile": "reduced",
+      "check": "typescript-fixture",
+      "exitCode": 0,
+      "outcome": "passed"
+    },
+    {
+      "profile": "reduced",
+      "check": "oxlint-fixture",
+      "exitCode": 0,
+      "outcome": "passed"
+    },
+    {
+      "profile": "reduced",
+      "check": "rn-owned-transformer",
+      "exitCode": 0,
+      "outcome": "passed"
+    },
+    {
+      "profile": "template",
+      "check": "reviewed-latest-parity",
+      "exitCode": 1,
+      "outcome": "failed",
+      "reason": "react-native-worklets installed 0.13.0; reviewed latest 0.13.1"
+    },
+    {
+      "profile": "reduced",
+      "check": "reviewed-latest-parity",
+      "exitCode": 1,
+      "outcome": "failed",
+      "reason": "react-native-worklets installed 0.13.0; reviewed latest 0.13.1"
+    },
+    {
+      "profile": "age",
+      "check": "exact-latest-with-strict-age",
+      "exitCode": 1,
+      "outcome": "failed",
+      "reason": "ERR_PNPM_NO_MATURE_MATCHING_VERSION"
+    }
+  ],
+  "workletsAge": {
+    "source": "https://registry.npmjs.org/react-native-worklets",
+    "latest": "0.13.1",
+    "publishedAt": "2026-10-26T15:24:38.916Z",
+    "checkedAtUtc": "2026-10-26T21:37:10.204930+00:00",
+    "defaultMinimumReleaseAgeMinutes": 1440,
+    "eligibleAtUtc": "2026-10-27T15:24:38.916Z",
+    "eligibleAtAsiaDhaka": "2026-10-27T21:24:38.916+06:00",
+    "interpretation": "Eligibility of this release only, assuming unchanged registry metadata and settings; re-resolve latest before acceptance. No age exception configured."
+  },
+  "nativeTemplate": {
+    "reactNative": "0.88.0",
+    "cli": "20.2.0",
+    "gradle": "9.4.1",
+    "agp": "9.2.1",
+    "kotlin": "2.2.0",
+    "buildTools": "37.0.0",
+    "ndk": "27.1.12297006",
+    "compileSdk": 37,
+    "targetSdk": 36
+  },
+  "nativeLatestReviewed": {
+    "gradle": "9.8.2",
+    "agp": "9.4.1",
+    "kotlin": "2.4.21",
+    "kotlinFullySupportedMaxGradle": "9.7.0",
+    "kotlinFullySupportedMaxAgp": "9.3.1",
+    "agpSource": "https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/maven-metadata.xml",
+    "kotlinSource": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/maven-metadata.xml",
+    "gradleSource": "https://services.gradle.org/versions/current"
+  },
+  "notRun": [
+    "Android debug/release build",
+    "Codegen round trip",
+    "Android lint/instrumentation",
+    "navigation/gesture/theme/list/chart smoke",
+    "MMKV/Nitro native integration",
+    "collection/lifecycle/device tests",
+    "iOS build"
+  ],
+  "sources": [
+    "https://github.com/react-native-community/cli#compatibility",
+    "https://unistyl.es/v3/start/getting-started/",
+    "https://github.com/jpudysz/react-native-unistyles/blob/v3.6.0/README.md",
+    "https://babeljs.io/docs/v8-migration",
+    "https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/",
+    "https://oxc.rs/docs/guide/usage/linter",
+    "https://pnpm.io/settings/dependency-resolution#minimumreleaseage",
+    "https://services.gradle.org/versions/current",
+    "https://developer.android.com/build/releases/agp-9-4-0-release-notes",
+    "https://kotlinlang.org/docs/gradle-configure-project.html",
+    "https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/maven-metadata.xml",
+    "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/maven-metadata.xml"
+  ]
+}

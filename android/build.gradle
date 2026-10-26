@@ -1,0 +1,35 @@
+buildscript {
+    ext {
+        buildToolsVersion = "37.0.0"
+        minSdkVersion = 24
+        compileSdkVersion = 37
+        targetSdkVersion = 37
+        ndkVersion = "30.0.16248370"
+        kotlinVersion = "2.4.21"
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:9.4.1")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+    }
+}
+
+// Apply the reviewed native toolchain to every Android library, including
+// libraries that otherwise inherit AGP's older default NDK/CMake.
+subprojects { subproject ->
+    ["com.android.application", "com.android.library"].each { pluginId ->
+        subproject.pluginManager.withPlugin(pluginId) {
+            subproject.extensions.getByName("android").with {
+                buildToolsVersion = rootProject.ext.buildToolsVersion
+                ndkVersion = rootProject.ext.ndkVersion
+                externalNativeBuild.cmake.version = "4.1.2"
+            }
+        }
+    }
+}
+
+apply plugin: "com.facebook.react.rootproject"

@@ -7,7 +7,9 @@
 
 ## Interpretation
 
-M = MVP, E = expansion, C = continuous evolution. Planned = specified; experimental = requires a feasibility prototype; blocked = cannot advance until the named gate clears; implemented = code and acceptance evidence exist. No row is currently implemented. All rows below have **device verification: none**. Registry/policy research does not change that status.
+M = MVP, E = expansion, C = continuous evolution. Planned = specified; experimental = requires a feasibility prototype; blocked = cannot advance until the named gate clears; implemented = code and acceptance evidence exist. No row is currently implemented. No end-to-end row below has admitted device qualification. The scaffold has separate bootstrap/navigation phone/emulator checks; these do not qualify collection, storage, protection or the full C-23/C-30 capability. Registry/policy research does not change runtime status.
+
+AS-002's [initial probes](DEPENDENCIES.md#as-002-isolated-compatibility-probes) and the experimental AS-004 scaffold do not qualify runtime rows. The scaffold's disabled-state routes and read-only bootstrap handshake are engineering foundations, not accepted C-23/C-30 functionality; F-03 and X-10 still govern acceptance.
 
 Access codes: U = user-granted Android Usage Access; A = separately disclosed and user-enabled Accessibility Service; N = Notification Listener access; P = notification posting permission where required; O = special overlay access if the chosen renderer needs it; S = system document-picker URI grant; D = notification policy access for optional DND; G = future provider authorization, blocked. “Local” means no Android grant beyond normal application storage. See [Permissions](PERMISSIONS.md) for declarations and grant types.
 

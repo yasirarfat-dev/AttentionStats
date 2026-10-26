@@ -1,0 +1,814 @@
+{
+  "schemaVersion": 1,
+  "resolvedDate": "2026-10-27",
+  "checkedAtUtc": "2026-10-26T23:20:41.273195+00:00",
+  "scope": "AS-002/AS-004 mobile scaffold, not runtime source qualification",
+  "releaseAgeOverride": {
+    "minimumReleaseAge": 0,
+    "authorizedBy": "Explicit user instruction on 2026-10-27; repository-local only",
+    "strictPeerDependencies": true,
+    "ignoreScripts": true
+  },
+  "generation": {
+    "cli": "20.2.0",
+    "template": "0.88.0",
+    "method": "Installed CLI/template with pnpm@latest, used unmodified CLI copyTemplate and changePlaceholderInTemplate helpers in an isolated empty directory; no init installer or post-init scripts",
+    "namespace": "com.attentionstats",
+    "debugApplicationId": "com.attentionstats.debug",
+    "templateIntegrity": "sha512-9MxrxG57kDFFifV+KtgrDUiKvSUHygkaebMmKLjDZNFtkXom2if9fORmcb/ycpyove3Lz4UL+x2dh8MQPxyRNg==",
+    "cliIntegrity": "sha512-5RZKkBeUFC4hhrzySzxWmRJwXBTc2PE3L6QUgvnJk3QDxNYMY7aGuI8Gr9eZRS1DbiY10IPWqpJfqSIplzVG6A=="
+  },
+  "packages": [
+    {
+      "package": "react",
+      "group": "dependencies",
+      "selector": "react@latest",
+      "version": "19.3.1",
+      "license": "MIT",
+      "engines": {
+        "node": ">=0.10.0"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react/latest",
+      "tarball": "https://registry.npmjs.org/react/-/react-19.3.1.tgz",
+      "integrity": "sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw=="
+    },
+    {
+      "package": "react-native",
+      "group": "dependencies",
+      "selector": "react-native@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "peerDependencies": {
+        "react": "^19.3.0",
+        "@types/react": "^19.1.1"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native/latest",
+      "tarball": "https://registry.npmjs.org/react-native/-/react-native-0.88.0.tgz",
+      "integrity": "sha512-v/wee0nYWcammMYBnSat/e3WY/5iaf9YQOMcBrfKT/wPApPPlHp94hgZovBtwhMuthR01yc/8cGn0FpFTE/C4A=="
+    },
+    {
+      "package": "react-native-safe-area-context",
+      "group": "dependencies",
+      "selector": "react-native-safe-area-context@latest",
+      "version": "5.10.1",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-safe-area-context/latest",
+      "tarball": "https://registry.npmjs.org/react-native-safe-area-context/-/react-native-safe-area-context-5.10.1.tgz",
+      "integrity": "sha512-ax0T3cAHQIhuAjDQpJ9C1Le96aRiM9PF+Kmgg7Y8+mD7QJMEIx04cG0eG3EGUTdvymgOkCrkakgZFwuOIuNQGw=="
+    },
+    {
+      "package": "@react-navigation/native",
+      "group": "dependencies",
+      "selector": "@react-navigation/native@latest",
+      "version": "7.5.1",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": ">= 18.2.0",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-navigation/native/latest",
+      "tarball": "https://registry.npmjs.org/@react-navigation/native/-/native-7.5.1.tgz",
+      "integrity": "sha512-p9xOvhG8q8rq0FPAoh0JC22ALbyRZt7U2uH8XrHRDjvqOEFrumME7szM6LaWW2WctolAVeZAfOTV+pUKULI/kQ=="
+    },
+    {
+      "package": "@react-navigation/native-stack",
+      "group": "dependencies",
+      "selector": "@react-navigation/native-stack@latest",
+      "version": "7.21.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": ">= 18.2.0",
+        "react-native": "*",
+        "react-native-screens": ">= 4.0.0",
+        "@react-navigation/native": "^7.5.1",
+        "react-native-safe-area-context": ">= 4.0.0"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-navigation/native-stack/latest",
+      "tarball": "https://registry.npmjs.org/@react-navigation/native-stack/-/native-stack-7.21.0.tgz",
+      "integrity": "sha512-bYrNW87nDtbMXAJsosYwu59xwTqeuaurfCDA+62MQ6hY4+2Iv71+Sik3ulW92fOqg8s2SZinOJosHEWoi9Ayqw=="
+    },
+    {
+      "package": "@react-navigation/bottom-tabs",
+      "group": "dependencies",
+      "selector": "@react-navigation/bottom-tabs@latest",
+      "version": "7.21.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": ">= 18.2.0",
+        "react-native": "*",
+        "react-native-screens": ">= 4.0.0",
+        "@react-navigation/native": "^7.5.1",
+        "react-native-safe-area-context": ">= 4.0.0"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-navigation/bottom-tabs/latest",
+      "tarball": "https://registry.npmjs.org/@react-navigation/bottom-tabs/-/bottom-tabs-7.21.0.tgz",
+      "integrity": "sha512-G3P88TPiHw9rxGhstwdeVgaBj3YQl8emiF8zLgyfXOF2AIk31myIrtDQeu2Mg5Ad7YWMs4W8zkXuD78xChlTHQ=="
+    },
+    {
+      "package": "react-native-unistyles",
+      "group": "dependencies",
+      "selector": "react-native-unistyles@latest",
+      "version": "3.6.0",
+      "license": "MIT",
+      "engines": {
+        "node": ">= 20.18.0"
+      },
+      "peerDependencies": {
+        "react": "*",
+        "react-native": ">=0.81.0",
+        "react-native-reanimated": "*",
+        "react-native-edge-to-edge": "*",
+        "react-native-nitro-modules": "*",
+        "@react-native/normalize-colors": "*"
+      },
+      "peerDependenciesMeta": {
+        "react-native-reanimated": {
+          "optional": true
+        },
+        "react-native-edge-to-edge": {
+          "optional": true
+        }
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-unistyles/latest",
+      "tarball": "https://registry.npmjs.org/react-native-unistyles/-/react-native-unistyles-3.6.0.tgz",
+      "integrity": "sha512-eYqixPy6auBj6k/ica9fCYIPgFQsLzUwRoxGZ04hX3hkANTNjaz3/LzNfXPfgJbwF/fQrhaK0qII4nhtSqUPfA=="
+    },
+    {
+      "package": "react-native-reanimated",
+      "group": "dependencies",
+      "selector": "react-native-reanimated@latest",
+      "version": "4.7.1",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "0.86 - 0.88",
+        "react-native-worklets": "0.13.x"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-reanimated/latest",
+      "tarball": "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-4.7.1.tgz",
+      "integrity": "sha512-HviDFSZ6V4KTRsrLS6hRbBJ4j63l/L8a5az0EoWdJwaMLYnBNyYISTDxwXpEYkMbAbLzCMCviIdiOxXHYQWcNA=="
+    },
+    {
+      "package": "react-native-gesture-handler",
+      "group": "dependencies",
+      "selector": "react-native-gesture-handler@latest",
+      "version": "3.4.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-gesture-handler/latest",
+      "tarball": "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-3.4.0.tgz",
+      "integrity": "sha512-jBg4ZWDvegeaZ4OHq9oxVOS/Qa6pV+LhtsUExothyhWxqzG0Lkg7kl2ztemPj/pnJxkq9j/+6wAw3jZGwdssww=="
+    },
+    {
+      "package": "@shopify/flash-list",
+      "group": "dependencies",
+      "selector": "@shopify/flash-list@latest",
+      "version": "2.3.3",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*",
+        "@babel/runtime": "*"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@shopify/flash-list/latest",
+      "tarball": "https://registry.npmjs.org/@shopify/flash-list/-/flash-list-2.3.3.tgz",
+      "integrity": "sha512-77MXV5YKMo3B3XZtgNXBaELZVQOE0bDcQxH4D/qf0i3o6YkZWBoHeR0CkFXZBdyoZqgvsUe3kkr0qhQE9lVqtg=="
+    },
+    {
+      "package": "react-native-svg",
+      "group": "dependencies",
+      "selector": "react-native-svg@latest",
+      "version": "15.16.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-svg/latest",
+      "tarball": "https://registry.npmjs.org/react-native-svg/-/react-native-svg-15.16.0.tgz",
+      "integrity": "sha512-uh8yktufYeRU3W9Omi8+SPyLF9BVN4JmLflSgc9oOcKkSKk/S5JUmmTjKZq/L8GHfQUtCvcu/W6X4xhEfBBAjQ=="
+    },
+    {
+      "package": "react-native-mmkv",
+      "group": "dependencies",
+      "selector": "react-native-mmkv@latest",
+      "version": "4.3.2",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*",
+        "react-native-nitro-modules": "*"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-mmkv/latest",
+      "tarball": "https://registry.npmjs.org/react-native-mmkv/-/react-native-mmkv-4.3.2.tgz",
+      "integrity": "sha512-49OAyfkg0/TMWiWELZN6VuVQPZPhizwL4DTmp8b7B1md3dB/s3LH3mGfC3T+lp9W0y/rqxZMEnotLFTIbOAenQ=="
+    },
+    {
+      "package": "zod",
+      "group": "dependencies",
+      "selector": "zod@latest",
+      "version": "4.6.7",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/zod/latest",
+      "tarball": "https://registry.npmjs.org/zod/-/zod-4.6.7.tgz",
+      "integrity": "sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg=="
+    },
+    {
+      "package": "react-native-screens",
+      "group": "dependencies",
+      "selector": "react-native-screens@latest",
+      "version": "4.30.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-screens/latest",
+      "tarball": "https://registry.npmjs.org/react-native-screens/-/react-native-screens-4.30.0.tgz",
+      "integrity": "sha512-FrZG/Q5gqoDu0SgP4d2Ly0qdio5DR1KdGPEYImhkz7tmrhpML4C39m6RYLGd5TVLHZwcCh8NPvW9rylevjD0uQ=="
+    },
+    {
+      "package": "react-native-worklets",
+      "group": "dependencies",
+      "selector": "react-native-worklets@latest",
+      "version": "0.13.1",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "@babel/core": "*",
+        "react-native": "0.86 - 0.88",
+        "@react-native/metro-config": "*"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-worklets/latest",
+      "tarball": "https://registry.npmjs.org/react-native-worklets/-/react-native-worklets-0.13.1.tgz",
+      "integrity": "sha512-sX55Vx89/Y9uJmvAbAGoHXBZvCWXtYPGWPJ9Z9yl0h76mP9A10ULlSrixzGqBFLXeQMBpIpyJEhWpzXP7GG6YA=="
+    },
+    {
+      "package": "react-native-nitro-modules",
+      "group": "dependencies",
+      "selector": "react-native-nitro-modules@latest",
+      "version": "0.37.1",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/react-native-nitro-modules/latest",
+      "tarball": "https://registry.npmjs.org/react-native-nitro-modules/-/react-native-nitro-modules-0.37.1.tgz",
+      "integrity": "sha512-KpW6EQVQ/bfegpCGxN9Be+ndvsfj56t4IESEvCASu9gWpJa/NDfHpIeIwCOvZQ3eXmLEj6YD4wCLqcC1FJPr2w=="
+    },
+    {
+      "package": "@react-native/normalize-colors",
+      "group": "dependencies",
+      "selector": "@react-native/normalize-colors@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/normalize-colors/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/normalize-colors/-/normalize-colors-0.88.0.tgz",
+      "integrity": "sha512-eZCu3tGAQCfvMCPQJVY4dmoMX8ZZYBvqIGHX7lwOYyzNK+Dl8e5ky7ZoXub1Rq75oSrQXNNmSP2CDjNNXXZpFQ=="
+    },
+    {
+      "package": "@babel/runtime",
+      "group": "devDependencies",
+      "selector": "@babel/runtime@latest",
+      "version": "8.0.8",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@babel/runtime/latest",
+      "tarball": "https://registry.npmjs.org/@babel/runtime/-/runtime-8.0.8.tgz",
+      "integrity": "sha512-dEu8nGlRqjsJsvviUUoSMfcRHpwomCiRlXsc2mPfJ79+ffTpDm+JtfUtTMzUrqCApHQnCsVPD3gT1ZT8RgBRCQ=="
+    },
+    {
+      "package": "@react-native-community/cli",
+      "group": "devDependencies",
+      "selector": "@react-native-community/cli@latest",
+      "version": "20.2.0",
+      "license": "MIT",
+      "engines": {
+        "node": ">=20.19.4"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native-community/cli/latest",
+      "tarball": "https://registry.npmjs.org/@react-native-community/cli/-/cli-20.2.0.tgz",
+      "integrity": "sha512-5RZKkBeUFC4hhrzySzxWmRJwXBTc2PE3L6QUgvnJk3QDxNYMY7aGuI8Gr9eZRS1DbiY10IPWqpJfqSIplzVG6A=="
+    },
+    {
+      "package": "@react-native-community/cli-platform-android",
+      "group": "devDependencies",
+      "selector": "@react-native-community/cli-platform-android@latest",
+      "version": "20.2.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native-community/cli-platform-android/latest",
+      "tarball": "https://registry.npmjs.org/@react-native-community/cli-platform-android/-/cli-platform-android-20.2.0.tgz",
+      "integrity": "sha512-fRglzcf/Yq5lnIkqdA8uf1GvlG18x3Dm48Yvo+l7KiWgh/SVtfVhfvalrtX5rmx+KeJkDA534bGoPvi5+ruWjw=="
+    },
+    {
+      "package": "@react-native-community/cli-platform-ios",
+      "group": "devDependencies",
+      "selector": "@react-native-community/cli-platform-ios@latest",
+      "version": "20.2.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native-community/cli-platform-ios/latest",
+      "tarball": "https://registry.npmjs.org/@react-native-community/cli-platform-ios/-/cli-platform-ios-20.2.0.tgz",
+      "integrity": "sha512-bCKlBt2HoD7WTl/HX60+4HFhR1lKY64Y9MPWu7yWQwOCEqYRMi6MkRxLimiONj9M2/lNf0z9BPHDzdDe5HM2ag=="
+    },
+    {
+      "package": "@react-native/babel-preset",
+      "group": "devDependencies",
+      "selector": "@react-native/babel-preset@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "peerDependencies": {
+        "@babel/core": "*"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/babel-preset/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/babel-preset/-/babel-preset-0.88.0.tgz",
+      "integrity": "sha512-iMfAHhFGNegnReSY6CYaWHncvyDwHq8olRs0zp9nRRApMAoCiLyfo1dwL/f39qt/MreD6xIqUs9SrTPYWobY6g=="
+    },
+    {
+      "package": "@react-native/jest-preset",
+      "group": "devDependencies",
+      "selector": "@react-native/jest-preset@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": ">= 22.13.0"
+      },
+      "peerDependencies": {
+        "react": "^19.2.3"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/jest-preset/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/jest-preset/-/jest-preset-0.88.0.tgz",
+      "integrity": "sha512-dN97NNqBsShAcxGH8/mNSBgYYc7Xk8q+Hez9qG9iockB4GPir5/Aw45e14sn7iLYTu2HkY0Uq2h3WlMY+ekRxw=="
+    },
+    {
+      "package": "@react-native/metro-config",
+      "group": "devDependencies",
+      "selector": "@react-native/metro-config@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/metro-config/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/metro-config/-/metro-config-0.88.0.tgz",
+      "integrity": "sha512-iPV2HNXlPs7xQDBJJGIjkH0x2psZwJeRIEpfSqxgqLaO5eEfE2Ccicfz2OBHBcIC5jKGGa4IoI/e26zMNDuTMQ=="
+    },
+    {
+      "package": "@react-native/typescript-config",
+      "group": "devDependencies",
+      "selector": "@react-native/typescript-config@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/typescript-config/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/typescript-config/-/typescript-config-0.88.0.tgz",
+      "integrity": "sha512-o8xdzvWQZUlx+WXsAWN3LGKKP+o2QKMd2alERuFSCxgy8mbX/W62+OThRfBVMQaKF4bCxD5P5DM60EbGPcyw+g=="
+    },
+    {
+      "package": "@types/jest",
+      "group": "devDependencies",
+      "selector": "@types/jest@latest",
+      "version": "30.0.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@types/jest/latest",
+      "tarball": "https://registry.npmjs.org/@types/jest/-/jest-30.0.0.tgz",
+      "integrity": "sha512-XTYugzhuwqWjws0CVz8QpM36+T+Dz5mTEBKhNs/esGLnCIlGdRy+Dq78NRjd7ls7r8BC8ZRMOrKlkO1hU0JOwA=="
+    },
+    {
+      "package": "@types/react",
+      "group": "devDependencies",
+      "selector": "@types/react@latest",
+      "version": "19.3.0",
+      "license": "MIT",
+      "engines": {},
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@types/react/latest",
+      "tarball": "https://registry.npmjs.org/@types/react/-/react-19.3.0.tgz",
+      "integrity": "sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg=="
+    },
+    {
+      "package": "jest",
+      "group": "devDependencies",
+      "selector": "jest@latest",
+      "version": "30.5.2",
+      "license": "MIT",
+      "engines": {
+        "node": "^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0"
+      },
+      "peerDependencies": {
+        "node-notifier": "^8.0.1 || ^9.0.0 || ^10.0.0"
+      },
+      "peerDependenciesMeta": {
+        "node-notifier": {
+          "optional": true
+        }
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/jest/latest",
+      "tarball": "https://registry.npmjs.org/jest/-/jest-30.5.2.tgz",
+      "integrity": "sha512-3gnpdBIza8ijCl3iMV9ChE3hSt1+46865qqod863gQtJr1DixOkAU5DoGbi3u+XlRcw++BhZQMu/y4xBdHBvSQ=="
+    },
+    {
+      "package": "prettier",
+      "group": "devDependencies",
+      "selector": "prettier@latest",
+      "version": "3.9.10",
+      "license": "MIT",
+      "engines": {
+        "node": ">=14"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/prettier/latest",
+      "tarball": "https://registry.npmjs.org/prettier/-/prettier-3.9.10.tgz",
+      "integrity": "sha512-skGHTH1Yb9QvaTC4hWnRTzEYtCpApF0UMBPz+t/0ZPzP8ihefo/btKd+QA7pUE0fEwA1SbS/NmhyEcstdXOIdA=="
+    },
+    {
+      "package": "typescript",
+      "group": "devDependencies",
+      "selector": "typescript@latest",
+      "version": "7.0.2",
+      "license": "Apache-2.0",
+      "engines": {
+        "node": ">=16.20.0"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/typescript/latest",
+      "tarball": "https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz",
+      "integrity": "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="
+    },
+    {
+      "package": "oxlint",
+      "group": "devDependencies",
+      "selector": "oxlint@latest",
+      "version": "1.89.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^20.19.0 || >=22.12.0"
+      },
+      "peerDependencies": {
+        "vite-plus": "*",
+        "oxlint-tsgolint": ">=7.0.2003"
+      },
+      "peerDependenciesMeta": {
+        "vite-plus": {
+          "optional": true
+        },
+        "oxlint-tsgolint": {
+          "optional": true
+        }
+      },
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/oxlint/latest",
+      "tarball": "https://registry.npmjs.org/oxlint/-/oxlint-1.89.0.tgz",
+      "integrity": "sha512-a25hkfo61okGPvJz432fRIPoxlKtNnOVy9w4rzrmGgNm4iVTPwpSQlmdqNWnp6p9QyyPVfAZRgnf5XvSBZFk/A=="
+    },
+    {
+      "package": "@react-native/gradle-plugin",
+      "group": "devDependencies",
+      "selector": "@react-native/gradle-plugin@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "peerDependencies": {},
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/gradle-plugin/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/gradle-plugin/-/gradle-plugin-0.88.0.tgz",
+      "integrity": "sha512-4jPSKslOfJj8NKY/jv9qmWkxZYmqPyamoS3Vs0JOFxw9t4PM6L/ea0fUsjNV0LxC9zJlvWilPJOCTOf7h8wlyw=="
+    },
+    {
+      "package": "@react-native/codegen",
+      "group": "devDependencies",
+      "selector": "@react-native/codegen@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "peerDependencies": {
+        "@babel/core": "*"
+      },
+      "peerDependenciesMeta": {},
+      "deprecated": null,
+      "source": "https://registry.npmjs.org/@react-native/codegen/latest",
+      "tarball": "https://registry.npmjs.org/@react-native/codegen/-/codegen-0.88.0.tgz",
+      "integrity": "sha512-SAGg+XfzsrPiYTscbKa9bo2/H2ei2TjyxW8RTMq2Ps661kRK3AnmpMGVfrEFshEMr3FGEbuQIvj86X98kaXlRA=="
+    },
+    {
+      "package": "pnpm",
+      "group": "packageManager",
+      "selector": "pnpm@latest",
+      "version": "12.15.0",
+      "license": "MIT",
+      "source": "https://registry.npmjs.org/pnpm/latest",
+      "integrity": "sha512-s5UdbW/0qfE9x89WzSjSuOs328ycaOUuHhGRhz6p+CoBcoerULqtxczElPA2xnwOR+sTYIwvo29HcRth6hKOYQ=="
+    }
+  ],
+  "native": {
+    "gradle": {
+      "version": "9.8.2",
+      "buildTime": "20261019162926+0000",
+      "commitId": "8de7bcf76e785507ad92f0741ab9235a430c95e6",
+      "current": true,
+      "snapshot": false,
+      "nightly": false,
+      "releaseNightly": false,
+      "activeRc": false,
+      "rcFor": "",
+      "milestoneFor": "",
+      "broken": false,
+      "downloadUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip",
+      "checksumUrl": "https://services.gradle.org/distributions/gradle-9.8.2-bin.zip.sha256",
+      "checksum": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+      "wrapperChecksumUrl": "https://services.gradle.org/distributions/gradle-9.8.2-wrapper.jar.sha256",
+      "wrapperChecksum": "3b8a25775a69158b5ad2b1d17a80a88dc7b40a352a73eb27d06c612a7ce68e98",
+      "released": true,
+      "releasedOrActiveRc": true,
+      "publicationSlot": "9.8.2",
+      "final": true,
+      "wrapperSource": "https://raw.githubusercontent.com/gradle/gradle/v9.8.2/gradle/wrapper/gradle-wrapper.jar"
+    },
+    "agp": {
+      "version": "9.4.1",
+      "source": "https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/maven-metadata.xml"
+    },
+    "kotlin": {
+      "version": "2.4.21",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/maven-metadata.xml"
+    },
+    "sdk": {
+      "platforms": {
+        "package": "platforms;android-37.0",
+        "version": [
+          2
+        ],
+        "url": "https://dl.google.com/android/repository/platform-37.0_r02.zip",
+        "size": 67281901,
+        "checksum": "ed8ebf7f8822a4de5686d427f237d2fa30ff7410"
+      },
+      "ndk": {
+        "package": "ndk;30.0.16248370",
+        "version": [
+          30,
+          0,
+          16248370
+        ],
+        "url": "https://dl.google.com/android/repository/android-ndk-r30-windows.zip",
+        "size": 727980788,
+        "checksum": "9bf167a1985fa7d4a036186b78f702eab9179408"
+      },
+      "build-tools": {
+        "package": "build-tools;37.0.0",
+        "version": [
+          37,
+          0,
+          0
+        ],
+        "url": "https://dl.google.com/android/repository/build-tools_r37_windows.zip",
+        "size": 61077164,
+        "checksum": "e9c97e26b5b5678002e9d3fed632c841ae62d99f"
+      },
+      "cmdline-tools": {
+        "package": "cmdline-tools;23.0",
+        "version": [
+          23,
+          0,
+          0
+        ],
+        "url": "https://dl.google.com/android/repository/commandlinetools-win-16111833_latest.zip",
+        "size": 154957218,
+        "checksum": "57d04f2d75eb8e8fffc5000a987e5de4b5a63e9d"
+      },
+      "cmake": {
+        "package": "cmake;4.1.2",
+        "version": [
+          4,
+          1,
+          2
+        ],
+        "url": "https://dl.google.com/android/repository/cmake-4.1.2-windows.zip",
+        "size": 21045753,
+        "checksum": "06bc3fe29aa49297dcc11a2ffe3a999445df05ae"
+      }
+    },
+    "sdkSource": "https://dl.google.com/android/repository/repository2-3.xml",
+    "sdkPlatformMetadata": "SDK-manager package.xml copied into isolated platform after SHA-256 equality checks for source.properties and android.jar against existing matching platform; no shared SDK file changed",
+    "hermesCompiler": {
+      "version": "260318099.0.4",
+      "owner": "react-native@0.88.0 exact transitive dependency; resolved through its package location",
+      "directDependency": false
+    }
+  },
+  "checks": [
+    {
+      "check": "strict-peer latest direct parity",
+      "status": "passed"
+    },
+    {
+      "check": "root frozen install with scripts disabled",
+      "status": "passed"
+    },
+    {
+      "check": "TypeScript strict typecheck",
+      "status": "passed"
+    },
+    {
+      "check": "Oxlint and current module boundaries",
+      "status": "passed"
+    },
+    {
+      "check": "Prettier check",
+      "status": "passed"
+    },
+    {
+      "check": "9 Jest bootstrap response/failure cases",
+      "status": "passed"
+    },
+    {
+      "check": "production Android Metro bundle",
+      "status": "passed"
+    },
+    {
+      "check": "Codegen app/library generation",
+      "status": "passed"
+    },
+    {
+      "check": "37 analytics Gradle checks",
+      "status": "passed"
+    },
+    {
+      "check": "Community CLI x86_64 debug APK",
+      "status": "passed"
+    },
+    {
+      "check": "Community CLI x86_64 unsigned release APK",
+      "status": "passed"
+    },
+    {
+      "check": "Community CLI ARM64 debug APK",
+      "status": "passed"
+    },
+    {
+      "check": "physical API36 ARM64 bootstrap/privacy/Android Back",
+      "status": "passed"
+    },
+    {
+      "check": "API37 x86_64 bootstrap/privacy/Android Back and light/dark visual review",
+      "status": "passed"
+    },
+    {
+      "check": "API37 x86_64 200% text, reachable privacy action/navigation and font-scale Activity recreation after FragmentFactory fix",
+      "status": "passed"
+    },
+    {
+      "check": "debug merged APK Internet/internal-receiver permissions only",
+      "status": "passed"
+    },
+    {
+      "check": "release merged APK internal-receiver permission only",
+      "status": "passed"
+    }
+  ],
+  "limitations": [
+    "No release signing or binary distribution",
+    "No collector, history store, encryption, intervention or export implemented",
+    "No phone settings or source grants changed; app install/launch and adb loopback only",
+    "No private phone captures or identifiers published",
+    "Native CI, ARM64 release, API24/25 java.time desugaring and full library functionality unqualified",
+    "TalkBack, complete RTL/localization, landscape/tablet and frame/battery behavior unqualified",
+    "iOS project generated but untested",
+    "Dedicated emulator had System UI cold-boot ANRs; no smoothness/performance claim"
+  ],
+  "patches": [
+    {
+      "package": "@react-native/gradle-plugin@0.88.0",
+      "path": "patches/@react-native__gradle-plugin@0.88.0.patch",
+      "sha256": "7a2bec8a734f2644e5fe5d185da4ec6cecc2a3296421daa6e47d8124711800be",
+      "change": "Upgrade only the upstream Gradle plugin Kotlin compiler catalog pin from 2.2.0 to latest stable 2.4.21; no metadata check suppression or runtime source changes",
+      "status": "Compiles locally; x86_64 debug/release and ARM64 debug builds pass; native CI unqualified"
+    }
+  ],
+  "artifacts": [
+    {
+      "kind": "arm64-v8a debug APK installed on phone",
+      "sha256": "75bc59d3fea1c19fe569b9cb256c17d6093736da0779821b2beac1274318234a",
+      "size": 71699327,
+      "published": false
+    },
+    {
+      "kind": "x86_64 debug APK",
+      "sha256": "2d4c53356c93821c77d1db63e80d7b0e8f0d589206467d4fd4c2118173f185c7",
+      "size": 69946013,
+      "published": false
+    },
+    {
+      "kind": "x86_64 unsigned release APK",
+      "sha256": "7f21cf4dab58eb4eb4876755de628fd9d2a62e09e3537da3741d3d3159f57e1d",
+      "size": 33230100,
+      "published": false
+    }
+  ]
+}

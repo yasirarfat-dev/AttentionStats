@@ -1,6 +1,6 @@
 # Documentation index
 
-**Status:** Authoritative specifications; native analytics slice exists, mobile application not yet implemented. Updated 2026-10-27.
+**Status:** Authoritative specifications; native analytics and an experimental mobile scaffold exist; runtime capabilities unimplemented. Updated 2026-10-27.
 **Responsibility:** Maps every source-of-truth document, reading order and ownership boundary.
 **Related specifications:** [Current state](STATE.md), [Shared rules](AGENT-RULES.md), [Tracker](FEATURE-TRACKER.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-10 in [Decisions](DECISIONS.md); specifications do not constitute source, policy or application-build verification.
@@ -11,7 +11,7 @@ Attention Stats is a local-first, open-source personal digital wellbeing app: **
 
 **Mobile clients only.** The browser study is a completed, non-shipping design reference, not a website/web-app product. A possible Chrome extension is deferred until mobile work is complete and separately prioritized; there is no active extension implementation (ADR-024).
 
-**Documentation prepared; mobile application not yet implemented.** A separate [interactive design study](../design/prototype/README.md) uses synthetic data and implements no tracking or native protection. End-to-end mobile runtime behavior remains a specification. No application capability is implemented and no Android application scaffold/installable binary exists. Mobile dependencies remain unverified candidates; the design study has its own latest test tools and pnpm lockfile.
+**Experimental mobile scaffold started under AS-004.** A separate [interactive design study](../design/prototype/README.md) uses synthetic data and implements no tracking or native protection. End-to-end mobile runtime behavior remains a specification. No end-to-end application capability is implemented. Root `src/`, Android and iOS template source, a pnpm lockfile and a disabled-state bootstrap adapter now exist. AS-002/AS-004 native build and live-screen acceptance remain explicit gates; [installed package evidence](evidence/mobile-scaffold.json) is separate from the original probes. The design study has its own latest test tools and pnpm lockfile.
 
 AS-035 now supplies a separate [pure Kotlin analytics slice](../native/analytics-core/README.md), with domain packages and synthetic JVM/ART tests. It implements calculations only, not an installable app, collectors or mobile screens. The expanded [diary specification](ANALYTICS-SPEC.md) and [64-metric catalog](METRIC-CATALOG.md) make per-platform surface/detail analytics first-class. [Architecture](ARCHITECTURE.md#domain-oriented-modular-design) specifies feature-owned `src/` folders and live mobile verification for every implemented screen/behavior.
 
@@ -72,6 +72,6 @@ AS-035 now supplies a separate [pure Kotlin analytics slice](../native/analytics
 
 ## Supporting material
 
-[Dependency metadata](evidence/dependency-candidates.json) is public registry evidence, not an installed manifest. [Documentation checker](../tools/check_docs.py) and [CI](../.github/workflows/docs.yml) verify structural consistency. Root [README](../README.md), [license](../LICENSE), [contributor entrypoint](../CONTRIBUTING.md), [security entrypoint](../SECURITY.md), [AGENTS](../AGENTS.md) and [CLAUDE](../CLAUDE.md) provide repository onboarding.
+[Dependency metadata](evidence/dependency-candidates.json) is the historical public registry snapshot, not an installed manifest. [AS-002 evidence](evidence/mobile-stack-probe.json) separately records current tooling review, observed isolated graphs and failures; [probe commands](DEVELOPMENT.md#as-002-compatibility-probe-reproduction) reproduce that scope. [Documentation checker](../tools/check_docs.py) and [CI](../.github/workflows/docs.yml) verify structural consistency. Root [README](../README.md), [license](../LICENSE), [contributor entrypoint](../CONTRIBUTING.md), [security entrypoint](../SECURITY.md), [AGENTS](../AGENTS.md) and [CLAUDE](../CLAUDE.md) provide repository onboarding.
 
 Each authoritative document declares status, responsibility, related specifications and unresolved feasibility. Avoid duplicating normative definitions: contracts own interface shapes, data models own entity meaning, domain specs own behavior, matrix owns capability admission, tracker owns completion and State owns current truth. Update them together when implementation changes the design. Use synthetic examples and maintain public safety.

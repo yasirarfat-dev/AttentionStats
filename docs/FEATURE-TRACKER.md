@@ -1,11 +1,11 @@
 # Feature tracker
 
-**Status:** Foundation, design reference and AS-035 native calculation slice implemented; mobile app/collectors/screens unimplemented. Updated 2026-10-27.
+**Status:** Foundation/reference/calculations implemented; AS-004 experimental mobile scaffold active; collectors and accepted product screens unimplemented. Updated 2026-10-27.
 **Responsibility:** Owns stable task IDs, priorities, dependencies, capability mapping and completion evidence.
 **Related specifications:** [Roadmap](ROADMAP.md), [State](STATE.md), [Capabilities](CAPABILITY-MATRIX.md), [Tests](TESTING.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-10 gate relevant tasks; dependencies below are required, not optional recommendations.
 
-Status vocabulary: **planned** = specified future work; **experimental** = feasibility/evidence required; **blocked** = explicit unmet gate; **implemented** = code/artifact and acceptance evidence recorded. Active work is described in State; no app feature is implemented. Priority P0 precedes P1; order within a dependency-ready priority is the listed order. Documentation status does not imply an installable product.
+Status vocabulary: **planned** = specified future work; **experimental** = feasibility/evidence required; **blocked** = explicit unmet gate; **implemented** = code/artifact and acceptance evidence recorded. Active work is described in State; experimental scaffold source does not establish an accepted app capability. Priority P0 precedes P1; order within a dependency-ready priority is the listed order. Documentation status does not imply an installable product.
 
 User-directed design continuation prioritizes AS-033 as a separate interaction study under ADR-019/ADR-020. It does not clear native feasibility prerequisites. Resume AS-002 after this reviewable study; AS-018 adopts the direction when its native dependencies are satisfied.
 
@@ -17,13 +17,13 @@ ADR-025–ADR-027 authorize the expanded diary and domain-owned architecture. AS
 |---|---|---|---|---|
 | AS-001 Documentation foundation and public repository | P0 / foundation | implemented | All specifications, no runtime capability | 50 reviewed files, passing local checks and GitHub CI; public push/Apache-2.0 verified; [evidence](IMPLEMENTATION_LOG/2026-10-27.md) |
 | AS-042 Git identity correction and author preflight | P0 / tooling correction | implemented | Repository tooling only; no runtime capability | ADR-028; authenticated account and matching effective local/global identity verified, seven metadata-corrected commits preserve trees/messages/dates with private recovery bundle; author/committer preflight, no owner notices; [evidence](IMPLEMENTATION_LOG/2026-10-27.md#git-identity-correction) |
-| AS-002 Latest pnpm/RN/toolchain compatibility | P0 / feasibility | experimental | Architecture prerequisites | AS-001; resolve all direct packages at latest, CLI range mismatch, Nitro pairing, TS/tooling; clean debug/release and exact ledger |
+| AS-002 Latest pnpm/RN/toolchain compatibility | P0 / feasibility | experimental | Architecture prerequisites | AS-001; ADR-029 age override, 33 direct latest pins/manager and frozen graph pass; type/lint/Jest/Metro/Codegen and 37 Gradle calculations pass; patched x86_64 debug/unsigned release and ARM64 debug build, bootstrap/navigation pass on phone/emulator; native CI/minimum-API/full-library qualification remains; [evidence](IMPLEMENTATION_LOG/2026-10-27.md#continuation--as-004-mobile-scaffold) |
 | AS-003 Native collection/lifecycle prototype | P0 / feasibility | experimental | C-01–C-04, C-23 | AS-001; public API event/reboot/background/force-stop/OEM evidence, viable permitted service strategy; F-02/F-09 |
-| AS-004 React Native Community CLI scaffold | P0 / foundation | blocked | C-30 foundation | AS-002; latest-only coherent stack, pnpm lockfile, namespace decision, working commands; no scaffold in AS-001 |
+| AS-004 React Native Community CLI scaffold | P0 / foundation | experimental | C-30 foundation only | ADR-029 explicitly permits experimental scaffolding while AS-002/F-03 remain open; CLI helper materialization, root src/Android/iOS, pnpm lockfile, namespace/debug suffix, disabled-state routes, bootstrap bridge and analytics Gradle module exist; scoped Android builds/bootstrap/navigation, light/dark and 200% text/Activity recreation pass; TalkBack/RTL/expanded platform qualification remains; iOS untested |
 | AS-005 Surface detector feasibility per target | P0 / feasibility | experimental | C-06, C-07 | AS-003 and AS-007; Facebook/YouTube/Instagram/TikTok separately, no invented selectors; T-06/T-07 |
 | AS-006 Encryption and archive design review | P0 / feasibility | experimental | C-24, C-25 | AS-001; crypto suite/KDF/framing, encrypted Room driver, key loss/rotation and resource bounds ADR; F-04 |
 | AS-007 Accessibility/distribution feasibility | P0 / feasibility | experimental | C-06, C-16–C-22 | AS-001; static-rule policy review, disclosures, public API renderers, no system suspension; F-08 |
-| AS-008 Native contracts and platform adapter | P1 / MVP | planned | C-23, C-31 unsupported behavior | AS-004; Codegen, validated types, revision/idempotency/cursor/event recovery; D-03/X-03 |
+| AS-008 Native contracts and platform adapter | P1 / MVP | experimental | Bootstrap handshake only; no C-23 capability | AS-004 acceptance still required; read-only versioned bootstrap spec/Android adapter, 9 strict response/failure tests and real phone/emulator round-trip exist as scaffold qualification; full capability registry, revision/idempotency/cursor/event recovery remain planned; D-03/X-03 |
 | AS-009 Authoritative Room store and migrations | P1 / MVP | planned | C-24 | AS-006, AS-008; schema, encrypted integration, write coordinator, migration/disk/key failure; D-02 |
 | AS-010 Consent, filters and permission health | P1 / MVP | planned | C-23 | AS-003, AS-009; independent source/grant states, exclusions, in-flight fences and gaps; T-16/L-06 |
 | AS-011 App/device session and open reducers | P1 / MVP | planned | C-01, C-02, C-03, C-04 | AS-009/AS-010; T-01–T-04, L-01–L-08 and replay accuracy |

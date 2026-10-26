@@ -1,0 +1,7 @@
+# User-authorized on 2026-10-27: resolve reviewed latest without the age delay.
+minimumReleaseAge: 0
+strictPeerDependencies: true
+autoInstallPeers: false
+ignoreScripts: true
+patchedDependencies:
+  '@react-native/gradle-plugin@0.88.0': patches/@react-native__gradle-plugin@0.88.0.patch

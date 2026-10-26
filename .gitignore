@@ -2,9 +2,14 @@
 node_modules/
 .pnpm-store/
 android/.gradle/
+android/.kotlin/
+android/**/.cxx/
 android/**/build/
 ios/Pods/
 ios/build/
+ios/.xcode.env.local
+ios/**/*.xcuserstate
+ios/**/xcuserdata/
 dist/
 coverage/
 .cache/

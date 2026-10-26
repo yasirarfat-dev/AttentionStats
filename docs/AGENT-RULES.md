@@ -17,13 +17,15 @@ When documents disagree, identify the conflict, resolve against explicit accepte
 2. Select the next eligible AS task by priority/dependencies. Record meaningful progress in State/log; never use invented checkmarks or statuses. User-authorized work proceeds without redundant approval questions.
 3. Check feasibility and latest dependencies before making promises. Keep application work out of the documentation-foundation scope. Complete a reviewable change, run appropriate checks, inspect diffs and public artifacts, then update evidence.
 4. Update domain specs/contracts/models, capability status, Tracker, State and dated implementation log in the same change. Record deliberate deviations and unresolved gates. Do not write implementation code inconsistent with the source of truth.
-5. Report concrete outcome, verification and limitations. Distinguish local commit, remote publication, installed binary and policy approval; they are separate facts.
+5. Report concrete outcome, verification and limitations. Distinguish local commit, remote publication, installed binary and policy approval; they are separate facts. The user explicitly requests a reviewed commit and push to this repository's GitHub remote at the end of each work session (2026-10-27); perform the identity/remote/authentication checks below and record the result. This is not authorization to force-push, publish binaries or deploy.
 
 Allowed feature states are planned, experimental, blocked and implemented. Runtime capability states are separate and defined in [Contracts](NATIVE-CONTRACTS.md). If a task is underway, keep its feature status accurate and record active work in State rather than claiming implementation early. IDs are stable: never renumber AS/C/scenario/ADR/F IDs to fill gaps. New ideas enter Queue and get promoted through a documented decision.
 
 ## Package and machine rules
 
 Use pnpm. Every new direct runtime/development dependency resolves through `package@latest`, with exact date/version/license/compatibility evidence. Pin reviewed resolution in the lockfile; routine builds use frozen-lockfile. Do not silently downgrade, force peers or globally approve scripts. Native dependencies use latest stable releases with explicit pins and evidence.
+
+The user explicitly authorizes overriding package release-age protection for the mobile scaffold (2026-10-27). Root `pnpm-workspace.yaml` sets `minimumReleaseAge: 0` locally; preserve strict peers, integrity checks and disabled install scripts. This exception is not a global pnpm setting or approval of other dependency bypasses. AS-004 may start as an experimental scaffold while the remaining AS-002 native gates are qualified; incomplete builds/screens must stay unaccepted.
 
 The user authorizes installing useful tools/plugins/skills, but other agents share this machine. Prefer repository-local or isolated tool/cache/configuration changes. Do not change machine-wide tool versions, shell profiles, timezone, shared adb state, global Git identity or unrelated repositories without explicit user authorization for that change. Stop only work owned by this task; never kill processes by broad name. No private captures or secrets in Git or public issue content.
 

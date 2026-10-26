@@ -112,6 +112,18 @@ Optional physical/virtual Android execution: `python tools/test_analytics.py --d
 
 AS-035 has 37 passing synthetic checks on host JVM and connected Android ART. They cover only pure subsets of T-17/T-18/T-19/T-20/T-23/D-04 plus time/scale boundaries; they are not full scenario completions. No real source, UI, Room, compaction, encryption, network-collector, consent/lifecycle or backup behavior is established. [Dated log](IMPLEMENTATION_LOG/2026-10-27.md#continuation--detailed-mobile-diary-and-modular-analytics) records exact tools/environment and limitations. All future screens still require X-10, and all source detectors need independent physical-device qualification.
 
+## Mobile toolchain probe verification
+
+AS-002's [probe tool](../tools/probe_mobile_stack.py) validates its [dated evidence](evidence/mobile-stack-probe.json), prepares isolated profiles and audits actual installed direct versions. [Reproduction commands](DEVELOPMENT.md#as-002-compatibility-probe-reproduction) keep strict peers, script protection and release-age checks. The upgraded template is an expected failing diagnostic; the reduced candidate passes only its small syntax/type/transform checks and still fails reviewed-latest parity at the recorded time. Each smoke command records its own exit code; a successful diagnostic harness does not convert its failed transform/parser into a pass.
+
+Guard and evidence-validator exercises check overwrite preservation, cache path bounds, non-latest selectors and artifact metadata mismatches. These are tooling checks, not T/L/P/D/B/S/X application scenario acceptance. No Codegen/native build, collector or X-10 screen evidence results from preparing or installing these profiles.
+
+## Experimental mobile scaffold verification
+
+Root `pnpm install --frozen-lockfile --ignore-scripts`, `python tools/check_mobile.py --installed`, `pnpm run lint`, `pnpm run typecheck`, `pnpm run format:check`, `pnpm test` and `pnpm run bundle:android` verify the pinned graph and actual mobile source. The 9 Jest cases cover the bootstrap response validator and stable failure mapping; they are not mocked screen acceptance or full D-03/X-03 completion. The dependency auditor understands pnpm's separate boot/project documents. The architecture checker enforces current relative-import layers and feature public APIs, alongside pure Kotlin boundaries.
+
+[Android commands](DEVELOPMENT.md#application-setup-as-004) use the committed wrapper, explicit isolated SDK/architecture, latest reviewed native tools and a hashed pnpm compiler patch. Report Codegen, Gradle-domain checks, debug/release compilation, native ABI, installation and live screens as distinct results. Release output is unsigned. No existing ART/browser test result approves this app. AS-004 routes/bridge stay experimental until X-10 live evidence, and full AS-008 contracts, consent/storage/collectors and AS-018 behavior still need their own prerequisites.
+
 ## Design study verification
 
 AS-033's [prototype](../design/prototype/README.md) runs `pnpm test` from `design/prototype`. Browser interactions, axe scans and token arithmetic cover the demonstration subset of X-02/X-04–X-07. The tests also check no automatic external requests/persistence and the loopback server's asset allowlist. These do not establish native privacy, collection, encryption, policy, accessibility or psychological benefit. The preview's static snapshots are synthetic; do not call them phone captures or production data.

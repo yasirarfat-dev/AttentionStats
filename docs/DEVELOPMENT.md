@@ -1,9 +1,9 @@
 # Local development
 
-**Status:** Documentation, native calculation and design-reference checks runnable; mobile application setup pending. Updated 2026-10-27.
+**Status:** Experimental mobile scaffold and tooling commands exist; native build/live acceptance tracked in State. Updated 2026-10-27.
 **Responsibility:** Defines local setup, reproducible commands, isolation and debugging.
 **Related specifications:** [Dependencies](DEPENDENCIES.md), [Testing](TESTING.md), [Structure](FILE-STRUCTURE.md), [Agent rules](AGENT-RULES.md).
-**Unresolved feasibility:** F-02–F-04 in [Decisions](DECISIONS.md); no Android application build has run.
+**Unresolved feasibility:** F-02–F-04 in [Decisions](DECISIONS.md); attempted builds are not accepted binaries; see current evidence.
 
 ## Work on this foundation
 
@@ -34,39 +34,93 @@ From repository root: `python tools/test_analytics.py --offline` repeats the JVM
 
 ## Application setup: AS-004
 
-For the separately authorized AS-033 design continuation, [preview instructions](../design/prototype/README.md) run from `design/prototype` with Node and pnpm. `pnpm run preview` serves loopback-only static assets without installing packages. For browser tests: `pnpm install --frozen-lockfile --ignore-scripts`, `pnpm run browser:install`, `pnpm test`. Its package manifest/lockfile and ignored local browser cache do not create a React Native scaffold or clear F-03. Do not use the study's success as an Android build claim.
+Root is the experimental mobile project, generated from reviewed Community CLI/template 20.2.0/0.88.0 with unmodified copy/rename helpers and pnpm-only installation. Full CLI `init` was not used because its installer does not support pnpm. [ADR-029](DECISIONS.md) records this adaptation, namespace, the explicit age override and the narrow compiler patch. iOS source is generated but untested; do not infer iPhone support.
 
-1. Complete latest-version compatibility work AS-002 and record F-03 evidence. Review [React Native without a framework](https://reactnative.dev/docs/getting-started-without-a-framework) and its [environment requirements](https://reactnative.dev/docs/set-up-your-environment) at execution time. Do not choose Expo or scaffold during this foundation task.
-2. Isolate Node/pnpm and Android tooling per project/session. Use `pnpm@latest` in an isolated launcher or local tool directory if needed; do not globally update other agents' tools. Inspect the current CLI help for pnpm and skip-install options before generating in a temporary sibling directory. Avoid overwriting this documentation tree.
-3. Resolve `@react-native-community/cli@latest`, `react-native@latest`, React/TypeScript and every direct template/tooling package at latest. Candidate one-shot launcher: `pnpm dlx @react-native-community/cli@latest --help`. Generation syntax is intentionally not prescribed until CLI/RN range evidence is resolved.
-4. Review generated files, permanent application ID, native namespace and exact toolchain. Merge the reviewed scaffold into the repository, preserve documentation, remove alternate package-manager artifacts, pin the resolved pnpm version in `packageManager`, and commit `pnpm-lock.yaml`. Do not use `--force` to mask incompatible peers.
-5. Add latest preferred UI libraries with explicit `@latest` selectors; audit scripts/licenses/peers and required native build approvals. Configure only justified project-local pnpm settings. Establish scripts for lint, typecheck, tests and Android builds, then replace proposed commands below with verified ones.
-
-## Routine commands after scaffold
-
-These are **future commands** and do not run in this foundation. AS-004 must supply matching scripts and record first successful execution:
+Use Node 26.12.1+, the pinned pnpm 12.15.0 and Python 3.11+. From root:
 
 ```powershell
-pnpm install --frozen-lockfile
-pnpm exec react-native doctor
+pnpm install --frozen-lockfile --ignore-scripts
+python tools/check_mobile.py --installed
 pnpm run lint
 pnpm run typecheck
-pnpm test -- --runInBand
-pnpm run start
-pnpm run android
+pnpm run format:check
+pnpm test
+pnpm run bundle:android
+pnpm build
 ```
 
-From `android/`, once the Gradle wrapper exists:
+The lockfile contains pnpm's boot/manager document and the project graph. The audit reads the final project document, checks direct pins against the dated registry review and checks reviewed patch hashes. It does not query live latest. Dependency refreshes must repeat metadata/license/peer review. Strict peers, integrity and disabled install scripts remain enabled; root release age is explicitly zero by user request. Nested Kotlin tools and the retained browser reference have independent workspace roots/lockfiles.
+
+`pnpm start`, `pnpm android`, `pnpm build` and `pnpm run android:release` invoke React Native Community CLI directly. pnpm is the package/script runner; CLI invokes the committed Gradle wrapper for native Android compilation. The Python build helper below is optional SDK/cache isolation and deep-task tooling, not the application framework.
+
+For Android, use JDK 17 and a **repository-local SDK** with platform android-37.0, Build Tools 37.0.0, NDK 30.0.16248370 and CMake 4.1.2. [Evidence](evidence/mobile-scaffold.json) records official package URLs and verified download hashes. Install required SDK components into an isolated SDK before invoking Gradle; automatic SDK installation is disabled. Set ignored `android/local.properties` entries `sdk.dir` and `cmake.dir` to your local SDK/CMake directories so direct CLI commands select the intended SDK. The build runner prefers `.cache/as-004/sdk` if present, otherwise `ANDROID_HOME`; explicit `--sdk` is recommended. It supplies task-local environment variables and a repository-local Gradle user home, without changing global configuration.
 
 ```powershell
-.\gradlew.bat testDebugUnitTest
-.\gradlew.bat connectedDebugAndroidTest
-.\gradlew.bat lintDebug
-.\gradlew.bat assembleDebug
-.\gradlew.bat bundleRelease
+$env:GRADLE_USER_HOME = Join-Path $PWD '.cache/gradle-user-home'
+pnpm build --extra-params '-PreactNativeArchitectures=arm64-v8a --max-workers=4 --no-daemon'
+pnpm run android:release --extra-params '-PreactNativeArchitectures=x86_64 --max-workers=4 --no-daemon'
 ```
 
-Release bundling needs local/CI signing configuration owned by release maintainers; never commit keys. No build output or diagnostic upload is automatic. Record actual test/task names if the generated project differs.
+Optional lower-level qualification commands use the same Gradle wrapper:
+
+```powershell
+python tools/android_build.py --sdk .cache/as-004/sdk --arch x86_64 generateCodegenArtifactsFromSchema
+python tools/android_build.py --sdk .cache/as-004/sdk --arch x86_64 :analytics-core:verifyAnalytics
+python tools/android_build.py --sdk .cache/as-004/sdk --arch x86_64 assembleDebug assembleRelease
+```
+
+Before the first debug build, create a task-local key at `.cache/android-debug.keystore` using the JDK's `keytool` (alias `androiddebugkey`, standard Android debug credentials), or use the optional isolation helper once, which creates it. Preserve the existing key and never commit it. Debug ID is `com.attentionstats.debug`; release ID/namespace is `com.attentionstats`, chosen for development, with signing/store registration still a release-maintainer gate. Release artifacts are unsigned; the template's debug release-signing fallback has been removed. Use `--arch arm64-v8a` for an appropriate phone; an x86_64 build is not ARM qualification.
+
+One-time debug key command from repository root (after creating `.cache`):
+
+```powershell
+keytool -genkeypair -keystore .cache/android-debug.keystore -alias androiddebugkey -storepass android -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Android,C=US'
+```
+
+`pnpm run start` binds Metro to loopback. On an authorized debug target, use `adb -s <target> reverse tcp:8081 tcp:8081` and the React Native developer menu’s **Change Bundle Location → localhost:8081** when needed. Android 17 restricts LAN access for target API 37; [official guidance](https://developer.android.com/privacy-and-security/local-network-permission) explains the boundary. This development flow uses loopback and grants no local-network/source access. `pnpm run android` uses the normal CLI, so choose an authorized isolated target explicitly when multiple devices exist. Do not reset adb, change grants or install on another agent's target. Actual build/screen results and remaining blockers are in [State](STATE.md) and the [dated log](IMPLEMENTATION_LOG/2026-10-27.md#continuation--as-004-mobile-scaffold).
+
+The standalone [browser reference](../design/prototype/README.md) is retained for design research only; it has no role in native product acceptance.
+
+## AS-002 compatibility probe reproduction
+
+[Results and blockers](DEPENDENCIES.md#as-002-isolated-compatibility-probes) distinguish the failed upgraded template from a reduced-tooling candidate. The [probe tool](../tools/probe_mobile_stack.py) uses only Python's standard library and prepares synthetic tooling fixtures under ignored `.cache/mobile-stack-probe`. It installs nothing during preparation, refuses to overwrite an existing probe, and restricts audit/smoke paths to this repository's cache. There is no mobile app, permission flow or device access.
+
+From repository root, prepare the profiles once:
+
+```powershell
+python tools/probe_mobile_stack.py
+python tools/probe_mobile_stack.py --prepare template
+python tools/probe_mobile_stack.py --prepare reduced
+python tools/probe_mobile_stack.py --prepare age
+$as002Store = Join-Path $PWD '.cache/mobile-stack-probe/store'
+$as002State = Join-Path $PWD '.cache/mobile-stack-probe/state'
+```
+
+Install the template profile with normal release-age protection and strict peers. Its first reviewed result was **failure**, so do not treat this sequence as a passing setup recipe:
+
+```powershell
+pnpm --dir .cache/mobile-stack-probe/template --store-dir $as002Store --state-dir $as002State install --ignore-scripts
+python tools/probe_mobile_stack.py --audit .cache/mobile-stack-probe/template
+python tools/probe_mobile_stack.py --smoke .cache/mobile-stack-probe/template
+```
+
+The reduced profile removes redundant root Babel core/preset-env declarations and replaces the incompatible template linter with latest Oxlint. It keeps TypeScript latest, React Native's own constrained transitive tooling, strict peers and script protection:
+
+```powershell
+pnpm --dir .cache/mobile-stack-probe/reduced --store-dir $as002Store --state-dir $as002State install --ignore-scripts
+python tools/probe_mobile_stack.py --audit .cache/mobile-stack-probe/reduced
+python tools/probe_mobile_stack.py --smoke .cache/mobile-stack-probe/reduced
+```
+
+Both first observed graphs installed Worklets 0.13.0 while the reviewed latest was 0.13.1; the audit must fail that mismatch even though reduced install/smokes pass. `--audit` compares actual installed direct versions to the **dated committed review**, not live registry latest or native build support. Preparation retains `latest` selectors, so later installs can resolve differently. Before accepting new results, re-resolve every direct dependency from registry latest, review metadata/licenses/peers and update the evidence together; a stale snapshot is not authority for newer packages.
+
+The age profile pins the reviewed latest Worklets and explicitly retains a strict 1,440-minute minimum age. At the recorded time this lockfile-only diagnostic failed with `ERR_PNPM_NO_MATURE_MATCHING_VERSION`:
+
+```powershell
+pnpm --dir .cache/mobile-stack-probe/age --store-dir $as002Store --state-dir $as002State install --lockfile-only --ignore-scripts
+```
+
+These historical profiles retain their original age checks. Do not alter their settings to rewrite past results. The separately authorized root scaffold uses age zero; preserve strict peers, integrity checks and disabled scripts in both contexts. Probe lockfiles, modules and detailed local smoke logs stay ignored. No frozen-lockfile claim is made for a failed/unaccepted app graph; accepted application setup must commit its own reviewed lockfile. The current first-run results are recorded in [dated evidence](IMPLEMENTATION_LOG/2026-10-27.md#continuation--as-002-latest-stack-compatibility-probes).
 
 ## Debugging procedure
 

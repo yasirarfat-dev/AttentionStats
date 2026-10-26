@@ -1,6 +1,6 @@
 # File structure
 
-**Status:** Documentation, design reference and isolated native analytics source exist; mobile application tree proposed only. Updated 2026-10-27.
+**Status:** Experimental mobile tree, pure analytics source, documentation and retained design reference exist; downstream feature folders remain proposed. Updated 2026-10-27.
 **Responsibility:** Defines file placement and ownership to avoid duplicate stores or rules.
 **Related specifications:** [Architecture](ARCHITECTURE.md), [Conventions](CONVENTIONS.md), [Development](DEVELOPMENT.md), [Agent rules](AGENT-RULES.md).
 **Unresolved feasibility:** F-03 and F-07 in [Decisions](DECISIONS.md); generated CLI layout must be reconciled after latest-version resolution.
@@ -19,6 +19,15 @@ AttentionStats/
   tools/check_docs.py      standard-library documentation verification
   tools/test_analytics.py  verified local Kotlin compiler and synthetic JVM/ART tests
   tools/check_architecture.py  current native package/dependency boundary checks
+  tools/probe_mobile_stack.py  AS-002 isolated tooling preparation, parity audit and smoke checks
+  tools/check_mobile.py    root manifest/lock/installed-version and patch audit
+  tools/android_build.py   task-local SDK/Gradle wrapper runner
+  package.json, pnpm-lock.yaml, pnpm-workspace.yaml
+  src/                     experimental mobile composition/features/UI/bootstrap adapter
+  android/                 application and analytics-core Gradle module
+  ios/                     generated, untested future platform project
+  patches/                 reviewed RNGP compiler compatibility patch
+  licenses/, NOTICE        template MIT attribution
   native/analytics-core/   AS-035 pure Kotlin mobile-domain calculation slice
     src/main/kotlin/org/attentionstats/analytics/
       time/ activity/ observation/ network/ summary/
@@ -26,9 +35,9 @@ AttentionStats/
   design/prototype/        synthetic browser study, tokens, tests, isolated manifest/lockfile
 ```
 
-The repository root is `C:\home\biobot\projects\AttentionStats`. Product display name is “Attention Stats”; public repository is `yasirarfat-dev/AttentionStats`. AS-033 adds a separate [design study](../design/prototype/README.md) with a development-only manifest and lockfile. No React Native application manifest, Gradle wrapper or iOS project exists. Do not mistake the study for the native scaffold or runtime support.
+The repository root is `C:\home\biobot\projects\AttentionStats`. Product display name is “Attention Stats”; public repository is `yasirarfat-dev/AttentionStats`. AS-033 adds a separate [design study](../design/prototype/README.md) with a development-only manifest and lockfile. Root `package.json`, two-document pnpm lockfile, Community CLI Android/iOS projects and `src/` now exist under AS-004. Do not mistake the browser study or unaccepted scaffold for runtime capability support.
 
-## Proposed implementation tree
+## Mobile structure and planned expansion
 
 ```text
 src/
@@ -74,7 +83,7 @@ ios/                       future native adapter and platform project
 tests/                     cross-layer scenarios and synthetic history fixtures
 ```
 
-Only the current-tree entries exist; the proposed `src/` and Android/iOS application tree await AS-004. Each feature gains only the subfolders it uses, rather than an empty directory template. AS-004 must review the generated latest CLI template, select a permanent application ID in [Decisions](DECISIONS.md), and update this map to the actual layout. Never use an observation target's package as this application's ID. Native Gradle module boundaries follow [Architecture](ARCHITECTURE.md#domain-oriented-modular-design); the standalone core moves into the domain module at integration.
+Actual mobile source currently contains `src/app/App.tsx`, onboarding/privacy feature public APIs and screens, `src/ui` primitives/tokens and `src/platform` bootstrap adapter/spec/tests. Other feature folders above remain proposed and were not generated empty. `android/app` uses `com.attentionstats`, `.debug` application suffix and the read-only `bridge` package; `android/analytics-core` references existing pure source/test directories. Android XML excludes backup/transfer, debug alone declares Internet for Metro, and release stays unsigned. `ios/` is generated and untested. [ADR-029](DECISIONS.md) records development identity and adaptations; store identity/signing and native acceptance remain gates. No collectors/storage/detector modules exist yet.
 
 ## Placement rules
 

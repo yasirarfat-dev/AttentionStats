@@ -15,7 +15,7 @@ Use clear feature folders, PascalCase components/types, camelCase functions, des
 
 All mobile TypeScript source uses root `src/`, with domain-specific feature APIs and subfolders under [Structure](FILE-STRUCTURE.md). Native modules use `src/main/kotlin` and `src/test/kotlin`, with package paths matching declarations. Use domain vocabulary consistently: exposure is not completed video, observed UI outcome is not server acknowledgement, summary fact is not a disposable cache. [Analytics](ANALYTICS-SPEC.md) owns these invariants.
 
-`python tools/check_architecture.py` enforces current pure Kotlin package/import boundaries, including no Android/Room/React/network dependencies. It is a narrow static check, not a replacement for compiler/Gradle boundaries or a future TypeScript lint rule. AS-004 must add supported latest lint/format/type tooling and enforce feature-public-API imports once actual TypeScript modules exist. Don't claim unavailable lint commands passed.
+`python tools/check_architecture.py` enforces pure Kotlin package/import boundaries and current TypeScript relative-import direction/feature-public-API rules. Oxlint, Prettier and TypeScript supply syntax/format/type checks; the static Python check is deliberately narrow and does not replace compiler/Gradle or runtime verification. New alias/dynamic import mechanisms must extend boundary enforcement before adoption.
 
 ## State and side effects
 

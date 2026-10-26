@@ -1,9 +1,9 @@
 # Dependencies and toolchain
 
-**Status:** Mobile candidates uninstalled/unverified; isolated Kotlin calculation and design-study tooling tested. Updated 2026-10-27.
+**Status:** AS-002 probes retained; AS-004 latest direct packages pinned in an experimental scaffold. Native qualification remains open. Updated 2026-10-27.
 **Responsibility:** Owns package manager, version policy, licenses, compatibility evidence and exceptions.
 **Related specifications:** [Development](DEVELOPMENT.md), [Architecture](ARCHITECTURE.md), [Security](SECURITY.md), [Decisions](DECISIONS.md).
-**Unresolved feasibility:** F-03 and F-04; CLI/RN documented range mismatch, Nitro pairing, TypeScript/tooling and Room encryption need checks.
+**Unresolved feasibility:** F-03 and F-04; release age explicitly overridden by the user, template tooling conflicts remediated in the scaffold, native build/runtime qualification and Room encryption remain open.
 
 ## Required policy
 
@@ -56,13 +56,66 @@ Resolved from public npm registry `latest` endpoints on **2026-10-26**, before t
 | react-native-edge-to-edge | 1.8.2 | MIT | Evaluated, **not selected**; upstream Unistyles guide says deprecated in favor of built-in edge-to-edge |
 | @react-native/normalize-colors | 0.88.0 | MIT | Declared Unistyles peer; installation need and pairing require check |
 
-Additional template/build/test/format packages are not selected yet. AS-004 must resolve them with `@latest`, extend this ledger, review licenses and confirm compatibility before committing the application scaffold. Do not present incomplete tooling as a verified complete stack.
+The table above remains the historical foundation snapshot. AS-002 now reviews the additional template/build/test/format candidates below; no application pins or working complete stack have been accepted. AS-004 must re-resolve current latest and verify the complete graph before accepting a scaffold.
+
+## AS-002 isolated compatibility probes
+
+Reviewed **2026-10-27 Asia/Dhaka** (2026-10-26 UTC). [Structured evidence](evidence/mobile-stack-probe.json) contains 44 latest registry records, peers/engines/licenses, verified inspection-artifact hashes, original template selections, two observed installation graphs and three reproduction profiles. The original 22 candidates were rechecked unchanged. These are development probes in ignored local caches, not an application manifest, product lockfile or installable build.
+
+| Check | Observed result | Consequence |
+|---|---|---|
+| Latest template packages, strict peers, install scripts disabled | Failed: Babel 7 plugins require core 7, RN lint config excludes ESLint 10, typescript-eslint excludes TypeScript 7 | A mechanical template upgrade to latest is not accepted |
+| Babel core 8.0.9 with RN preset 0.88.0 | Transform failed: plugin requires `^7.0.0-0` | Root Babel 8 cannot drive the current preset |
+| ESLint 10.13.0 with RN flat config 0.88.0 | Failed: typescript-eslint does not support TS 7.0 | Changing only the ESLint configuration format does not fix the parser |
+| TypeScript 7.0.2 with RN TypeScript config 0.88.0 | Small pure TypeScript fixture passed | Compiler check only; not full application type coverage |
+| Reduced direct tooling: remove root Babel core/preset-env and RN ESLint config/ESLint; add Oxlint 1.89.0 | Strict peer install, TypeScript fixture, Oxlint fixture and RN-owned Babel transform passed | Candidate remediation without older direct packages; not yet accepted for the app |
+| Installed direct versions against reviewed latest | Both profiles fail: Worklets installed 0.13.0, registry latest is 0.13.1 | Passing installation is insufficient for the latest-only requirement |
+| Exact latest Worklets with explicit 1,440-minute age protection | Failed: `ERR_PNPM_NO_MATURE_MATCHING_VERSION` | Wait for eligibility and re-resolve; no age exception or bypass configured |
+
+The reduced probe removes unnecessary **direct** Babel core/preset-env declarations; React Native's transformer retains its own constrained Babel 7 dependencies. This follows the existing transitive-dependency policy. It does not establish a Babel 8 migration. [TypeScript 7 lacks the legacy compiler API](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0) used by typescript-eslint, so [Oxlint](https://oxc.rs/docs/guide/usage/linter) is evaluated as an alternative; the small syntax-lint result does not establish type-aware or feature-boundary rule coverage. Jest, full Metro bundling, application helpers/runtime imports and all native libraries still need tests.
+
+[pnpm defaults to a 24-hour release age](https://pnpm.io/settings/dependency-resolution#minimumreleaseage). Registry evidence dates Worklets 0.13.1 to `2026-10-26T15:24:38.916Z`; its corresponding eligibility is **2026-10-27 21:24:38.916 Asia/Dhaka**, assuming unchanged metadata/settings. This is not an appointment or guaranteed gate clearance: latest may change before the next attempt. Recheck registry versions and the installed graph; preserve peer, age and script protections. The current 0.13.0 probe graphs cannot be accepted as latest-only and their lockfiles remain ignored.
+
+The inspected Unistyles 3.6.0 release README requires Nitro ≥0.37.1 for Unistyles ≥3.4, and its development manifest pins 0.37.1. This resolves the previous **documented minimum** question. Its package marks edge-to-edge as an optional peer, matching built-in `edgeToEdgeEnabled=true`; the deprecated extra library was omitted. MMKV 4.3.2's development manifest uses Nitro 0.35.9 and its public peer is wildcard; neither this nor the Unistyles minimum establishes MMKV/native ABI compatibility with 0.37.1.
+
+CLI 20.2.0 is selected by the RN 0.88.0 template itself, narrowing the CLI README range mismatch to missing documentation/build evidence rather than a demonstrated generation failure. CLI `init --help` ran; it lists npm/yarn/bun, not pnpm. Inspected CLI source installs the temporary template through its package-manager helper even with `--skip-install`. No CLI generation was attempted using an alternate manager. A pnpm-only materialization path needs verification before AS-004; do not assume `pnpm dlx` makes the generator's internal installs use pnpm.
+
+The template specifies Gradle 9.4.1, Kotlin 2.2.0, SDK Build Tools 37.0.0 and NDK 27.1.12297006; its RN Gradle plugin catalog uses AGP 9.2.1. Reviewed latest stable Gradle/AGP/Kotlin are 9.8.2/9.4.1/2.4.21. AGP's [Maven metadata](https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/maven-metadata.xml) already lists 9.4.1 while its release-notes page describes the 9.4.0 baseline; the registry determines the latest patch candidate. Kotlin lists full support only through Gradle 9.7.0/AGP 9.3.1 and permits newer versions with possible warnings or missing behavior. This is a qualification risk, not a measured build failure. The existing machine has JDK 17.0.20.1, platform android-37.0 and Build Tools 36.0.0, without NDK/CMake. No SDK/tool replacement or native build was attempted while the selection gate is unresolved.
+
+Additional exact latest candidates inspected on this date (all **MIT**; source/engine/peer evidence in the structured report):
+
+| Package | Latest candidate | Scope |
+|---|---|---|
+| @react-native-community/template | 0.88.0 | Inspected generator input |
+| @react-native/gradle-plugin | 0.88.0 | Inspected RN build-plugin catalog |
+| @react-native/codegen | 0.88.0 | Reviewed metadata; no Codegen round trip |
+| @react-native/babel-preset | 0.88.0 | Template/reduced transform probes |
+| @react-native/eslint-config | 0.88.0 | Template probe; rejected with latest tools |
+| @react-native/metro-config | 0.88.0 | RN transformer owner in reduced probe |
+| @react-native/typescript-config | 0.88.0 | TypeScript fixture |
+| @babel/core | 8.0.9 | Template probe; omitted from reduced direct set |
+| @babel/preset-env | 8.0.7 | Template probe; omitted from reduced direct set |
+| @babel/runtime | 8.0.8 | Both probes; full bundled helper use untested |
+| @react-native-community/cli-platform-android | 20.2.0 | Both probes; no native build |
+| @react-native-community/cli-platform-ios | 20.2.0 | Template parity only; no iOS work |
+| @types/jest | 30.0.0 | Both probes; no Jest suite |
+| @types/react-test-renderer | 19.3.0 | Both probes; no renderer test |
+| eslint | 10.13.0 | Template probe; omitted from reduced direct set |
+| jest | 30.5.2 | Both probes; RN preset integration untested |
+| prettier | 3.9.10 | Both probes; no accepted app format setup |
+| react-test-renderer | 19.3.1 | Both probes; no renderer test |
+| nitrogen | 0.37.1 | Metadata only; not added as a direct probe dependency |
+| @react-native/new-app-screen | 0.88.0 | Template parity only; no product screen |
+| @react-native/jest-preset | 0.88.0 | Both probes; its Jest 29 transitives need qualification with Jest 30 |
+| oxlint | 1.89.0 | Reduced probe; syntax lint only |
+
+`python tools/probe_mobile_stack.py` checks evidence consistency, not runtime support. [Development](DEVELOPMENT.md#as-002-compatibility-probe-reproduction) gives isolated preparation/install/audit commands. AS-002 remains blocked by the latest-selection gate and incomplete native qualification; F-03 and AS-004 remain open/blocked respectively. No runtime capability changes status.
 
 ## Primary compatibility evidence
 
 - [Reanimated compatibility](https://docs.swmansion.com/react-native-reanimated/docs/guides/compatibility/) lists 4.7.x with RN 0.86–0.88 and Worklets 0.13.x; this supports the candidate pairing only, not an application build claim.
-- [Unistyles prerequisites](https://unistyl.es/v3/start/getting-started/) require New Architecture, RN ≥0.81 and Nitro; its guide asks for exact Nitro pairing. Registry wildcard peers cannot prove that the newest Nitro works. The guide also prefers built-in edge-to-edge over a deprecated extra library; reconcile the registry peer metadata during the spike.
-- [Community CLI compatibility](https://github.com/react-native-community/cli#compatibility) currently lists CLI 20 with RN versions through 0.85, whereas registry latest RN is 0.88. Treat this documentation mismatch as unresolved evidence, not proof of incompatibility and not permission to downgrade. Review the current template/CLI source and perform isolated build checks.
+- [Unistyles prerequisites](https://unistyl.es/v3/start/getting-started/) require New Architecture, RN ≥0.81 and Nitro. Its [3.6.0 release README](https://github.com/jpudysz/react-native-unistyles/blob/v3.6.0/README.md) documents Nitro ≥0.37.1; the inspected package marks edge-to-edge optional. Native pairing still needs a build and device smoke test.
+- [Community CLI compatibility](https://github.com/react-native-community/cli#compatibility) lists CLI 20 with RN versions through 0.85, whereas registry latest RN is 0.88. The inspected RN 0.88 template selects CLI 20.2.0 itself. Build compatibility and pnpm-only generation remain unverified; this is not permission to downgrade.
 - [FlashList](https://github.com/Shopify/flash-list) and [MMKV](https://github.com/margelo/react-native-mmkv) require native integration review. Inspect the exact installed release and its peers, not generic marketing benchmarks.
 - [Room releases](https://developer.android.com/jetpack/androidx/releases/room) list stable 2.8.5 at review. Room is Apache-2.0; validate artifact POM/license and Kotlin/KSP/SQLite-driver compatibility at introduction. Native dependencies use the latest stable vendor release, explicit Gradle version catalog pins and reproducible resolution; `package@latest` applies to npm packages, not Maven coordinates.
 - [pnpm installation](https://pnpm.io/installation) identifies pnpm 12 as the current release line. Review its project-local version and build-script approval behavior before enabling native dependency install scripts.
@@ -75,4 +128,57 @@ pnpm 12's lockfile contains a manager/environment document followed by the proje
 
 Record exact OS/architecture, Node/pnpm/JDK/SDK/NDK/CMake/Gradle/AGP/Kotlin/KSP versions. Use latest stable tooling compatible with the selected latest RN template; an older generated version is a recorded conflict, not silently accepted. Run clean native debug/release compilation with New Architecture, Codegen round trip, navigation/gestures/theme/list/chart smoke tests, background collection with JS absent, MMKV restart behavior, and Room migration/encryption tests. Document outcomes per dependency and artifact.
 
-Review licenses and notices, native ABI/page-size support, package scripts, transitive network behavior and known vulnerabilities. No broad pnpm hoisting or install-script allowance as a reflex; any needed configuration is minimal, project-local and justified. No application lockfile exists in the documentation foundation because no application packages were installed.
+Review licenses and notices, native ABI/page-size support, package scripts, transitive network behavior and known vulnerabilities. No broad pnpm hoisting or install-script allowance as a reflex; any needed configuration is minimal, project-local and justified. No accepted application lockfile exists; isolated probe lockfiles remain ignored until a coherent stack is accepted.
+
+## AS-004 scaffold dependency review
+
+**Resolved 2026-10-27.** [Installed metadata](evidence/mobile-scaffold.json) records 33 direct application/tool packages and pnpm, their `@latest` selectors, exact versions, licenses, engines, peers and registry integrity. Root manifest pins these results, with both pnpm boot and project graphs in the committed lockfile. Worklets 0.13.1 now installs at reviewed latest under the explicit user-authorized root age-zero exception (ADR-029). The historical age-protected probes above retain their original failures and are not rewritten.
+
+Strict peers and disabled installation scripts remain enabled. No direct Babel 8 core or template ESLint/TypeScript-parser mismatch is introduced. RN owns its constrained transitive Babel 7; latest Oxlint/Prettier/TypeScript provide current tooling. Deprecated transitive glob/inflight warnings remain in upstream graphs and are not silently replaced. The 9-case bootstrap response suite passes with Jest 30; pnpm's isolated paths require the preset transform allowlist to include `.pnpm`. Zod's published CommonJS export is selected with a typed `require`, following [Metro's documented export conditions](https://metrobundler.dev/docs/package-exports/), because its ESM export namespace failed RN's current preset. A production Android Metro bundle passes after that change.
+
+| Direct package | Latest pin | License | Role |
+|---|---|---|---|
+| react | 19.3.1 | MIT | dependencies |
+| react-native | 0.88.0 | MIT | dependencies |
+| react-native-safe-area-context | 5.10.1 | MIT | dependencies |
+| @react-navigation/native | 7.5.1 | MIT | dependencies |
+| @react-navigation/native-stack | 7.21.0 | MIT | dependencies |
+| @react-navigation/bottom-tabs | 7.21.0 | MIT | dependencies |
+| react-native-unistyles | 3.6.0 | MIT | dependencies |
+| react-native-reanimated | 4.7.1 | MIT | dependencies |
+| react-native-gesture-handler | 3.4.0 | MIT | dependencies |
+| @shopify/flash-list | 2.3.3 | MIT | dependencies |
+| react-native-svg | 15.16.0 | MIT | dependencies |
+| react-native-mmkv | 4.3.2 | MIT | dependencies |
+| zod | 4.6.7 | MIT | dependencies |
+| react-native-screens | 4.30.0 | MIT | dependencies |
+| react-native-worklets | 0.13.1 | MIT | dependencies |
+| react-native-nitro-modules | 0.37.1 | MIT | dependencies |
+| @react-native/normalize-colors | 0.88.0 | MIT | dependencies |
+| @babel/runtime | 8.0.8 | MIT | devDependencies |
+| @react-native-community/cli | 20.2.0 | MIT | devDependencies |
+| @react-native-community/cli-platform-android | 20.2.0 | MIT | devDependencies |
+| @react-native-community/cli-platform-ios | 20.2.0 | MIT | devDependencies |
+| @react-native/babel-preset | 0.88.0 | MIT | devDependencies |
+| @react-native/jest-preset | 0.88.0 | MIT | devDependencies |
+| @react-native/metro-config | 0.88.0 | MIT | devDependencies |
+| @react-native/typescript-config | 0.88.0 | MIT | devDependencies |
+| @types/jest | 30.0.0 | MIT | devDependencies |
+| @types/react | 19.3.0 | MIT | devDependencies |
+| jest | 30.5.2 | MIT | devDependencies |
+| prettier | 3.9.10 | MIT | devDependencies |
+| typescript | 7.0.2 | Apache-2.0 | devDependencies |
+| oxlint | 1.89.0 | MIT | devDependencies |
+| @react-native/gradle-plugin | 0.88.0 | MIT | devDependencies |
+| @react-native/codegen | 0.88.0 | MIT | devDependencies |
+| pnpm | 12.15.0 | MIT | packageManager |
+
+The upstream CLI/template were installed at latest with pnpm in an ignored bootstrap directory. CLI's own copy/rename helpers materialized an empty staging directory; reviewed native/config files were then merged without replacing repository documentation. No npm/yarn/bun installer, template post-init script or package lifecycle script ran. Template MIT terms remain in [the license file](../licenses/react-native-template.txt) and [NOTICE](../NOTICE). Full `init` remains unsupported for pnpm; this is an explicit template-materialization adaptation, not a claim that its installer gained support.
+
+Latest stable native selections are Gradle 9.8.2 (verified official distribution SHA-256), AGP 9.4.1 and Kotlin 2.4.21 from official stable-release metadata, NDK r30 / 30.0.16248370, Build Tools 37.0.0 and CMake 4.1.2. The SDK platform is android-37.0, compile/target major API 37. The repository-local Windows archives were checked against official repository XML sizes/SHA-1; these hashes are resolution evidence, not a complete supply-chain audit. SDK metadata also contains newer minor platform releases; compiling against base major 37.0 is an explicit API baseline, not a claim to use every newest minor SDK. AGP/Kotlin latest exceed Kotlin's fully-supported table; actual builds decide compatibility.
+
+A real unmodified-plugin attempt fails because RNGP 0.88.0 compiles with Kotlin 2.2 and cannot read Gradle 9.8's Kotlin 2.4 metadata. The reviewed [pnpm patch](../patches/@react-native__gradle-plugin@0.88.0.patch) upgrades only RNGP's compiler catalog pin to 2.4.21; no metadata suppression, peer forcing, native source replacement or downgrade is used. Its hash is audited and lockfile patch identity committed. The patched RNGP compiles locally; full app/ABI qualification is separate. All Android submodules receive the reviewed NDK/CMake pins so Unistyles cannot silently inherit AGP's older default NDK. Upstream AGP 9 legacy DSL/Kotlin plugin deprecations remain visible; Gradle 10 is unsupported.
+
+`python tools/check_mobile.py --installed` checks the dated review against root direct pins, the final lockfile importer and actual installed versions. It is not a live latest check. Native Codegen/debug/release/live outcomes and remaining gates are recorded in [State](STATE.md), [Testing](TESTING.md) and the [dated log](IMPLEMENTATION_LOG/2026-10-27.md#continuation--as-004-mobile-scaffold). No Room/crypto dependency is installed or qualified by this slice.
+
+The pnpm layout also requires `react.hermesCommand` to resolve `hermes-compiler` through RN's own package dependency. RN 0.88 pins compiler 260318099.0.4; keeping that transitive pairing avoids arbitrary bytecode/compiler replacement. Debug development uses adb loopback and explicitly removes framework-inherited local-network/overlay permissions. Both platform API-37 debug and unsigned release artifacts have been built on x86_64; ARM64 debug builds through Community CLI also pass. Actual round-trip/navigation checks pass on an API-36 ARM64 phone and an API-37 emulator. Full library functionality, ARM64 release, minimum-API behavior, native CI and iOS remain unqualified. The pure module's java.time calls need API-24/25 desugaring qualification before use there.
