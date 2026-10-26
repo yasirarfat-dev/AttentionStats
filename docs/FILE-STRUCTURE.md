@@ -54,7 +54,13 @@ src/
 android/
   app/src/main/java/<application-namespace>/
     collection/            per-source collectors and lifecycle coordinator
-    detectors/             reviewed versioned surface adapters
+    detectors/             registry and shared minimized structural evidence
+      social/
+        facebook/          independently qualified surface/item/action adapters
+        instagram/         independently qualified surface/item/action adapters
+        youtube/           independently qualified Shorts/long-video adapters
+        tiktok/            independently qualified media/region variants
+      browsers/            separately consented safe navigation adapters
     domain/                reducers, aggregates, rule engine and insights
     storage/               Room schema, DAOs, migrations and write coordinator
     bridge/                Codegen module, conversion and invalidation events
@@ -73,5 +79,7 @@ Only the current-tree entries exist; the proposed `src/` and Android/iOS applica
 ## Placement rules
 
 Feature folders own screens and view adapters, not a parallel history database. Shared UI primitives cannot request permissions or write rules. Native collectors cannot call React components or depend on JS startup. Data mutations pass through native services; DAOs are internal. Pure rule evaluation belongs under native domain and is separately testable with a supplied clock.
+
+Platform-specific observation adapters live in dedicated service-specific native subpackages, with their own synthetic fixtures/support records and a narrow registry interface. A Facebook detector must not reach into Instagram implementation details or share assumed selectors. Common normalized evidence/reducer contracts are reusable; per-platform feasibility, version/locale support and consent remain independent. These folders are proposed, not validated or generated detector implementations.
 
 Put contract changes in the contract spec and shared adapter types; generated Codegen output is not manually edited. Keep sensitive runtime data, captures, backups, keys and personal diagnostics outside the repository. Only synthetic fixtures belong under tests. Keep public evidence narrowly scoped to package metadata, verified compatibility reports, and anonymized aggregate test outcomes with no user histories.

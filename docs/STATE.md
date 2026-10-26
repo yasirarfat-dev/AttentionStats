@@ -50,6 +50,8 @@ See [dated log](IMPLEMENTATION_LOG/2026-10-27.md#continuation--detailed-mobile-d
 
 Local final checks passed: documentation/public-artifact consistency (50 Markdown files, 38 core documents, 38 capability families, 64 metrics, 41 tasks, 68 scenarios, 22 historical mobile package candidates), native architecture boundaries, frozen pnpm install and whitespace review. An isolated architecture-check exercise accepted clean code and rejected platform imports, a reverse domain dependency and a wrong package path. Native CI is now configured; remote outcomes are distinct from these local results and appear in the [workflow history](https://github.com/yasirarfat-dev/AttentionStats/actions).
 
+Published native/domain and expanded specifications as [c601425](https://github.com/yasirarfat-dev/AttentionStats/commit/c601425cdbdad463c6dab146490445b75a098d43); local and remote main matched after push. Its [CI run](https://github.com/yasirarfat-dev/AttentionStats/actions/runs/40393133458) passed documentation/boundary and native-domain jobs. The retained browser-reference job was still installing system dependencies when these outcomes were recorded; no full-workflow success is asserted here. Further documentation-only commits have independent run outcomes.
+
 ## Remaining app gates
 
 No observation, intervention, encryption, restore or privacy behavior has runtime evidence. F-01 surface fidelity and F-02 lifecycle need real-device work. F-03 latest dependency pairing must be reconciled before AS-004 scaffold. F-04 crypto/storage needs a reviewed suite and driver. F-05 direct automatic Drive backup is blocked pending policy clarification; manual encrypted export remains an independent MVP plan. No iOS capability or store approval is established.
