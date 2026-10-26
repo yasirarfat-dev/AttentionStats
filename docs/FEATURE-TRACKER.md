@@ -1,6 +1,6 @@
 # Feature tracker
 
-**Status:** Documentation task awaiting final verification/publication; all app work unimplemented. Updated 2026-10-27.
+**Status:** Documentation foundation implemented and published; all app work unimplemented. Updated 2026-10-27.
 **Responsibility:** Owns stable task IDs, priorities, dependencies, capability mapping and completion evidence.
 **Related specifications:** [Roadmap](ROADMAP.md), [State](STATE.md), [Capabilities](CAPABILITY-MATRIX.md), [Tests](TESTING.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-09 gate relevant tasks; dependencies below are required, not optional recommendations.
@@ -9,7 +9,7 @@ Status vocabulary: **planned** = specified future work; **experimental** = feasi
 
 | Task | Priority / stage | Status | Capability coverage | Prerequisites / concrete completion evidence |
 |---|---|---|---|---|
-| AS-001 Documentation foundation and public repository | P0 / foundation | planned | All specifications, no runtime capability | Complete files, links/coverage/public safety checks and verified public push; log evidence |
+| AS-001 Documentation foundation and public repository | P0 / foundation | implemented | All specifications, no runtime capability | 50 reviewed files, passing local checks and GitHub CI; public push/Apache-2.0 verified; [evidence](IMPLEMENTATION_LOG/2026-10-27.md) |
 | AS-002 Latest pnpm/RN/toolchain compatibility | P0 / feasibility | experimental | Architecture prerequisites | AS-001; resolve all direct packages at latest, CLI range mismatch, Nitro pairing, TS/tooling; clean debug/release and exact ledger |
 | AS-003 Native collection/lifecycle prototype | P0 / feasibility | experimental | C-01–C-04, C-23 | AS-001; public API event/reboot/background/force-stop/OEM evidence, viable permitted service strategy; F-02/F-09 |
 | AS-004 React Native Community CLI scaffold | P0 / foundation | blocked | C-30 foundation | AS-002; latest-only coherent stack, pnpm lockfile, namespace decision, working commands; no scaffold in AS-001 |

@@ -1,6 +1,6 @@
 # Current state
 
-**Status:** Documentation prepared; application not yet implemented. Local verification passed; public publication pending. Updated 2026-10-27.
+**Status:** Documentation prepared; application not yet implemented. AS-001 verified and publicly published. Updated 2026-10-27.
 **Responsibility:** Records current artifacts, completed evidence, blockers and next action.
 **Related specifications:** [Index](INDEX.md), [Tracker](FEATURE-TRACKER.md), [Decisions](DECISIONS.md), [Implementation log](IMPLEMENTATION_LOG/README.md).
 **Unresolved feasibility:** F-01–F-09 are open; F-05 is explicitly blocked. No device tests or application builds have run.
@@ -23,7 +23,9 @@ Exact dependency candidates were resolved from registry latest endpoints on 2026
 
 `python tools/check_docs.py` passed: 44 Markdown files, 34 core documents, 31 capability records, 32 task records, 51 acceptance scenarios and 22 latest dependency candidates. Relative links/anchors, document metadata, identifier coverage, ledger consistency and public-artifact checks passed. An isolated checker exercise passed a clean copy and correctly rejected four intentionally introduced faults: missing file, missing heading, undefined scenario and dependency-ledger drift. `git diff --cached --check` passed, and the 50-file staged tree was reviewed for public contents.
 
-Local commit and public publication are pending; AS-001 is not complete until remote evidence is recorded. No Android build, device test, runtime privacy check or cryptographic implementation was run. The 51 application scenarios are specifications, not passing application tests.
+Published the reviewed 50-file foundation as commit [0188b95](https://github.com/yasirarfat-dev/AttentionStats/commit/0188b951692c15387e3f649088b376853fb6b0fb) to the **public** [AttentionStats repository](https://github.com/yasirarfat-dev/AttentionStats), branch `main`. Remote branch SHA matched the local commit; GitHub recognized Apache-2.0 and private vulnerability reporting was enabled and verified. The [documentation CI run](https://github.com/yasirarfat-dev/AttentionStats/actions/runs/40376830006) completed successfully with documentation/public-artifact and whitespace checks. AS-001 is implemented for this documentation scope only.
+
+No Android build, device test, runtime privacy check or cryptographic implementation was run. The 51 application scenarios are specifications, not passing application tests. No application feature is marked implemented.
 
 ## Known blockers and limitations
 
@@ -31,4 +33,4 @@ No observation, intervention, encryption, restore or privacy behavior has runtim
 
 ## Next action
 
-Finish and verify AS-001, publish to the designated public repository and record the remote evidence. Then begin AS-002 latest-stack compatibility and AS-003 native source/lifecycle research, with AS-006 archive/encryption design and AS-007 policy assessment before risky implementation. AS-004 remains blocked on AS-002. Follow [Tracker](FEATURE-TRACKER.md) rather than starting attractive unsequenced UI work.
+Begin AS-002 latest-stack compatibility and AS-003 native source/lifecycle research, with AS-006 archive/encryption design and AS-007 policy assessment before risky implementation. This foundation delivery ends before application development. AS-004 remains blocked on AS-002. Follow [Tracker](FEATURE-TRACKER.md) rather than starting attractive unsequenced UI work.
