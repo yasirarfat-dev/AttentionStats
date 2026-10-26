@@ -35,6 +35,8 @@ pnpm is required. Resolve all new direct runtime/development dependencies from `
 
 Use standard formatting/linting and maintain native schema/contract generations from their source. Do not hand-edit generated output. Keep commits coherent with task IDs when helpful; describe behavior and validation in review text. Add meaningful tests for reducers, data loss, consent and rule boundaries; do not add tests that merely mirror constant strings or trivial presentational edits.
 
+Check effective author/committer identities before each commit under [Agent rules](AGENT-RULES.md#package-and-machine-rules). Repository-local settings override machine-global defaults. Never infer authorship from the active GitHub login alone. Prefer the intended account's no-reply address for email privacy and preserve genuine community authorship.
+
 ## Definition of done
 
 Implementation, appropriate passing verification, accurate capability/tracker status, matching domain specs/contracts/models, state update, dated log and any decision/evidence changes. Every implemented mobile screen, state and behavior needs live debug-phone or dedicated-emulator verification, including navigation, loading/empty/partial/error and accessibility states relevant to it. Native source/lifecycle behavior additionally needs physical-device evidence. Record not-run/blocked honestly and keep the affected task incomplete. A passing mock or headless calculation test does not establish live-screen or source support. A security-sensitive feature is not done until its failure and privacy gates pass. Changes must preserve other contributors' uncommitted work and avoid unrelated refactors.

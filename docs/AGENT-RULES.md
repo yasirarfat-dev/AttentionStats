@@ -25,7 +25,9 @@ Allowed feature states are planned, experimental, blocked and implemented. Runti
 
 Use pnpm. Every new direct runtime/development dependency resolves through `package@latest`, with exact date/version/license/compatibility evidence. Pin reviewed resolution in the lockfile; routine builds use frozen-lockfile. Do not silently downgrade, force peers or globally approve scripts. Native dependencies use latest stable releases with explicit pins and evidence.
 
-The user authorizes installing useful tools/plugins/skills, but other agents share this machine. Prefer repository-local or isolated tool/cache/configuration changes. Do not change machine-wide tool versions, shell profiles, timezone, shared adb state, global Git identity, or unrelated repositories. Stop only work owned by this task; never kill processes by broad name. No private captures or secrets in Git or public issue content.
+The user authorizes installing useful tools/plugins/skills, but other agents share this machine. Prefer repository-local or isolated tool/cache/configuration changes. Do not change machine-wide tool versions, shell profiles, timezone, shared adb state, global Git identity or unrelated repositories without explicit user authorization for that change. Stop only work owned by this task; never kill processes by broad name. No private captures or secrets in Git or public issue content.
+
+Before committing, inspect `git var GIT_AUTHOR_IDENT` and `git var GIT_COMMITTER_IDENT` and verify they match the intended contributor account. Local Git settings override global defaults. Before publishing, verify the intended remote and authenticated GitHub login separately; authentication does not determine commit authorship. Prefer the intended account's GitHub no-reply address to exposing personal email. Preserve genuine community authorship. A global-identity change requires explicit user authorization; the user authorized correcting this machine's global default in ADR-028. Do not add creator/owner notices or special credit requirements beyond normal open-source attribution.
 
 ## Agent continuity
 

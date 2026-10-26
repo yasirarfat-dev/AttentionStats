@@ -22,6 +22,7 @@ Promotion requires a decision, domain-spec/matrix update and AS task/dependencie
 | Q-007 / 2026-10-27 | Optional current-visit plus today stats over supported short-video surfaces | Promoted: ADR-021, [Live overlay](LIVE-OVERLAY-SPEC.md), C-32/AS-034; AS-033 synthetic demo; grants scoped by role, no real detector/renderer or permanent-background claim |
 | Q-009 / 2026-10-27 | Maximum detailed user-owned per-app diary, Reels/activity/action counts, network bytes, flexible long-term summaries and personal time comparisons | Promoted with feasibility/consent limits: ADR-025/ADR-026, [Analytics](ANALYTICS-SPEC.md), [64-metric catalog](METRIC-CATALOG.md), C-33–C-38, AS-035–AS-041; pure calculations implemented, actual collectors/screens/store unimplemented |
 | Q-010 / 2026-10-27 | Enterprise-style domain modularity, feature-specific root src folders, every screen/behavior verified live on phone/emulator | Accepted ADR-027; Architecture/Structure/Conventions and X-10; current Kotlin package/import boundaries executable, mobile TS/Gradle enforcement and screen evidence required at implementation |
+| Q-011 / 2026-10-27 | Correct commit attribution and machine-wide Git defaults to the intended account | Accepted ADR-028/AS-042: correct initial commit metadata, set explicitly authorized global/local Git identity and verify author preflight. User withdraws creator/owner notice request; normal contributor attribution retained. No organization transfer requested |
 
 ## Unscheduled evaluation questions
 
