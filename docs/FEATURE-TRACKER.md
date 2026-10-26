@@ -1,15 +1,17 @@
 # Feature tracker
 
-**Status:** Documentation foundation published and separate AS-033 study implemented; native app work unimplemented. Updated 2026-10-27.
+**Status:** Foundation, design reference and AS-035 native calculation slice implemented; mobile app/collectors/screens unimplemented. Updated 2026-10-27.
 **Responsibility:** Owns stable task IDs, priorities, dependencies, capability mapping and completion evidence.
 **Related specifications:** [Roadmap](ROADMAP.md), [State](STATE.md), [Capabilities](CAPABILITY-MATRIX.md), [Tests](TESTING.md), [Decisions](DECISIONS.md).
-**Unresolved feasibility:** F-01–F-09 gate relevant tasks; dependencies below are required, not optional recommendations.
+**Unresolved feasibility:** F-01–F-10 gate relevant tasks; dependencies below are required, not optional recommendations.
 
 Status vocabulary: **planned** = specified future work; **experimental** = feasibility/evidence required; **blocked** = explicit unmet gate; **implemented** = code/artifact and acceptance evidence recorded. Active work is described in State; no app feature is implemented. Priority P0 precedes P1; order within a dependency-ready priority is the listed order. Documentation status does not imply an installable product.
 
 User-directed design continuation prioritizes AS-033 as a separate interaction study under ADR-019/ADR-020. It does not clear native feasibility prerequisites. Resume AS-002 after this reviewable study; AS-018 adopts the direction when its native dependencies are satisfied.
 
 ADR-024 confirms mobile-only delivery. AS-033 is complete and retained as a non-shipping design reference; it does not establish a continuing web-app workstream. No Chrome-extension task is scheduled. Next implementation is native Android feasibility/scaffolding and its dependent mobile tasks.
+
+ADR-025–ADR-027 authorize the expanded diary and domain-owned architecture. AS-035 is a completed standalone native calculation slice before AS-004; it does not implement any end-to-end mobile capability or clear source/store/toolchain gates. Root mobile `src/features` and native domain module boundaries must be enforced as the app arrives; all implemented mobile routes/behaviors need X-10 live verification. Richer metrics have independent AS-036–AS-041 dependencies.
 
 | Task | Priority / stage | Status | Capability coverage | Prerequisites / concrete completion evidence |
 |---|---|---|---|---|
@@ -47,6 +49,13 @@ ADR-024 confirms mobile-only delivery. AS-033 is complete and retained as a non-
 | AS-032 Community iOS capability research/adapter | P3 / evolution | experimental | C-31 | F-07; current Apple research/entitlements, platform proposal, unsupported semantics; X-03 |
 | AS-033 Humane design direction and interactive study | P0 / design continuation | implemented | C-30/C-32 design reference only | Original synthetic study; 37 browser tests pass, contrast/axe/320px/200%/RTL/keyboard/motion/visit-day checks, screenshots reviewed, latest pnpm/test tools locked; [dated evidence](IMPLEMENTATION_LOG/2026-10-27.md#continuation--humane-design-and-awareness-study); no native capability |
 | AS-034 Native live surface awareness overlay | P1 / MVP candidate | experimental | C-32 | AS-013/AS-007/AS-009/AS-010; AS-033 design reference; least-privilege renderer, committed visit/day snapshots, unknown/sensitive-context removal, placement/accessibility and lifecycle/battery evidence; X-08/X-09; no native implementation yet |
+| AS-035 Detailed metric semantics and pure Kotlin calculations | P0 / native domain continuation | implemented | Calculation slice only for C-06/C-07/C-24/C-33–C-35/C-37; no runtime capability | ADR-025/ADR-027; 64-metric research catalog; isolated domain-owned Kotlin source, 37 synthetic checks pass on host JVM and Android ART, latest verified tools and boundary check; [evidence](IMPLEMENTATION_LOG/2026-10-27.md#continuation--detailed-mobile-diary-and-modular-analytics); no collector/UI/store |
+| AS-036 Native network-statistics collector and attribution | P2 / expansion | experimental | C-34 | AS-003/AS-009/AS-010; F-10, T-20; native canonical queries, independent consent, UID epochs, delayed coverage, resources/threading/reinstall/VPN/device evidence |
+| AS-037 Detailed mobile diary and metric explorer | P1 core / P2 richer | planned | C-36, C-05–C-07, C-33/C-34 views | AS-018/AS-014; AS-013 for qualified short-video values, AS-041/AS-036 for respective later metrics; use unavailable rows otherwise; prominent Reels time/counts, activity conservation, typed bounded queries, T-17/T-23/X-10 live screen evidence |
+| AS-038 Durable multi-resolution retention and archive scope | P2 / expansion | planned | C-35, C-24/C-25 | AS-019/AS-020/AS-035; D-04–D-06, policy/loss preview, atomic facts/authority replacement, coverage and summary resolution/deletion/archive failure tests |
+| AS-039 Supported personal activity archive import | P2 / expansion | experimental | C-38 | AS-020/AS-024; actual public schema/terms/security research, T-22, bounded native parsing and preview; no provider OAuth/token collection or blind observed/imported merge |
+| AS-040 Optional personal time-equivalent reflection | P2 / expansion | planned | C-37 | AS-014/AS-037; AS-035 arithmetic reference; explicit opt-in/user-defined assumptions, T-23/X-10, no productivity/health/addiction claim |
+| AS-041 Per-platform activity and interaction qualification | P2 / expansion | experimental | C-33 | AS-005/AS-007/AS-010; separate post/story/ad/context/action metric qualification with current version/locale evidence, T-17–T-19/T-21, no message/input capture; no inherited support from Reels detector |
 
 ## Completion protocol
 

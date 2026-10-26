@@ -20,12 +20,14 @@ Promotion requires a decision, domain-spec/matrix update and AS task/dependencie
 | Q-003 / 2026-10-26 | Open-source and no-developer-data positioning | Promoted: ADR-013 and Privacy; local recording and optional transfers described honestly |
 | Q-006 / 2026-10-27 | Thoughtful, pleasing wellbeing companion centered on peace of mind and chosen behavior change | Promoted: ADR-019/ADR-020, Human factors, AS-033; native adoption AS-018; useful voluntary engagement, no compulsive app-engagement loops |
 | Q-007 / 2026-10-27 | Optional current-visit plus today stats over supported short-video surfaces | Promoted: ADR-021, [Live overlay](LIVE-OVERLAY-SPEC.md), C-32/AS-034; AS-033 synthetic demo; grants scoped by role, no real detector/renderer or permanent-background claim |
+| Q-009 / 2026-10-27 | Maximum detailed user-owned per-app diary, Reels/activity/action counts, network bytes, flexible long-term summaries and personal time comparisons | Promoted with feasibility/consent limits: ADR-025/ADR-026, [Analytics](ANALYTICS-SPEC.md), [64-metric catalog](METRIC-CATALOG.md), C-33–C-38, AS-035–AS-041; pure calculations implemented, actual collectors/screens/store unimplemented |
+| Q-010 / 2026-10-27 | Enterprise-style domain modularity, feature-specific root src folders, every screen/behavior verified live on phone/emulator | Accepted ADR-027; Architecture/Structure/Conventions and X-10; current Kotlin package/import boundaries executable, mobile TS/Gradle enforcement and screen evidence required at implementation |
 
 ## Unscheduled evaluation questions
 
 | ID / date | Question | Current treatment |
 |---|---|---|
-| Q-004 / 2026-10-27 | Would aggregate-only archive export meet users' portability needs while reducing detail? | Defer product evaluation to AS-020; must preserve clear scope/omission labels |
+| Q-004 / 2026-10-27 | Would aggregate-only archive export meet users' portability needs while reducing detail? | Promoted by explicit user request under ADR-026/AS-038; summary-only scope with loss/resolution manifest, distinct from local compaction; base archive AS-020 still a prerequisite |
 | Q-005 / 2026-10-27 | Which additional locales or regional/lite target variants should be qualified first? | Defer to AS-005 evidence and contributor capacity; no assumed shared selectors |
 | Q-008 / 2026-10-27 | Possible Chrome extension after mobile delivery | Deferred by ADR-024 until mobile work is complete and the user separately prioritizes it. No extension task, manifest, implementation or website/web-app product is authorized now |
 

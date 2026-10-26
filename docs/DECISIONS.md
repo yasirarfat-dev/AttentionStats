@@ -3,7 +3,7 @@
 **Status:** Accepted foundation decisions; feasibility gates open. Updated 2026-10-27.
 **Responsibility:** Owns deliberate architectural/product choices, evidence and unresolved gates.
 **Related specifications:** [Product](PRODUCT.md), [Architecture](ARCHITECTURE.md), [Dependencies](DEPENDENCIES.md), [Backup](BACKUP-RESTORE.md), [Tracker](FEATURE-TRACKER.md).
-**Unresolved feasibility:** F-01–F-09 below; none has application/device verification yet.
+**Unresolved feasibility:** F-01–F-10 below; none is cleared by pure calculation tests, including synthetic physical-Android execution.
 
 ## Accepted decisions
 
@@ -33,6 +33,9 @@
 | ADR-022 / 2026-10-27 | Small top-center HUD is the live-counter default | Explicit user placement preference; visit/day text and detail on tap, safe insets, no decorative mascot, alternate presets if needed; no private phone data or reference assets in public artifacts |
 | ADR-023 / 2026-10-27 | Short-video counts exclude positively identified ads and other non-qualifying media contexts | Clarifies ADR-011 eligibility: a finger swipe is not a qualifying video exposure; ambiguous transitions are withheld with incomplete coverage; returning from excluded contexts needs continuity/dedup evidence; a future all-feed/ad count would be separately specified |
 | ADR-024 / 2026-10-27 | Mobile clients only; Android first, iOS later; potential Chrome extension deferred | Explicit user clarification: no website/web app/PWA/desktop client or extension in current delivery. AS-033 is a completed non-shipping design reference, not an ongoing web track or embedded runtime. Next implementation follows native feasibility/scaffold tasks. Any Chrome extension waits until mobile work is complete and is separately prioritized |
+| ADR-025 / 2026-10-27 | Detailed mobile diary and maximum useful consented metrics, with explicit feasibility | [Analytics](ANALYTICS-SPEC.md), [64-metric catalog](METRIC-CATALOG.md), C-33–C-38 and AS-035–AS-041 expand activity/interaction/network/summary scope. No universal recording, server-action truth, privacy bypass or competitive supremacy claim. AS-035 may implement pure Kotlin calculations before AS-004 without clearing source/toolchain/store gates |
+| ADR-026 / 2026-10-27 | Optional custom multi-resolution history and summary-only archives | Preserve detail by default; explicit irreversible-loss preview and atomic validated compaction. Retained summaries become authoritative for their non-overlapping partitions; caches remain rebuildable. Fixed zone/semantic/taxonomy metadata, no detail reconstruction or fractional deletion. Local compaction and archive scope independent |
+| ADR-027 / 2026-10-27 | Enterprise-style organization through domain-owned modules and live mobile acceptance | [Architecture](ARCHITECTURE.md#domain-oriented-modular-design) and [Structure](FILE-STRUCTURE.md): root mobile `src/features`, feature public APIs, pure native domains and infrastructure ports, no global business-logic dump or competing stores. Every implemented screen/behavior needs debug-phone/emulator evidence; API-sensitive behavior also physical-device tests. No browser substitution. AS-035 domain import checks are executable; future TS/Gradle boundaries await actual modules |
 
 No decision here establishes a permanent Android application ID, signing identity, cloud authorization scope or a reviewed cryptographic suite. Those require tracked implementation evidence. Supersede decisions by adding a new dated record and linking the predecessor; do not silently erase rationale.
 
@@ -49,6 +52,7 @@ No decision here establishes a permanent Android application ID, signing identit
 | F-07 iOS capabilities | Open; AS-032 | Current Apple public API/entitlement/distribution review, native design and physical-device evidence | Typed unsupported adapter; no parity or dates promised |
 | F-08 Accessibility/distribution | Open; AS-007 | Current store policy, narrow deterministic rules, in-app separate consent, declaration/review and safe emergency routes | No autonomous action; no accessibility-tool claim; blocked release of unapproved scope |
 | F-09 Metric quality | Open; AS-003/AS-011/AS-014 | App opens/multi-window/keyguard semantics, missing events, coverage denominators and calibrated insight thresholds | Distinguish observations/estimates; withhold unsupported inference |
+| F-10 Network accounting and attribution | Open; AS-036 | Public NetworkStatsManager mode/permissions, coarse/freshness/retention behavior, canonical dimension partition, shared/reused UID/profile/reinstall/VPN/OEM tests and independent source consent | No network collector/support claim; no bytes-per-Reel/endpoint/content/billing inference; app mapping unavailable when ambiguous |
 
 ## Sources and review discipline
 

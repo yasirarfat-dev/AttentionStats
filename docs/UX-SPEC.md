@@ -20,6 +20,9 @@ Today opens with covered app time, a coverage explanation, one optional focus ac
 | History | Calendar/range, sessions, opens, device activity, filters and provenance | Loading, empty-known, unknown gaps, paginated, storage failure |
 | App detail | Duration/opens, sessions, surface summary, category, rule shortcut | Untracked/excluded, removed app, unsupported surface |
 | Social summary / surface detail | App totals versus confirmed surface time/exposures; count explanation | Experimental disabled, supported range, unknown item count |
+| Reels & short videos | Prominent Home entry; per-platform time/exposures/visit/day, shared date range and evidence | No enabled source, supported subset, unsupported target, partial/stale; never generic app time labelled Reels |
+| Detailed activity diary / metric explorer | Activity composition, chronology, qualified interactions/attempts, data-usage tab, chosen metric comparisons | Sparse/summary-only, incompatible revisions, unknown metric, bounded paging, source controls |
+| Summary policy / preview | Custom per-source/app/detail tiers; day/week/month/year, zone, lost detail and storage estimates | Preserve default, invalid overlap, stale preview, interrupted transaction, unsupported regrouping |
 | Insights / insight detail | Descriptive patterns, explanation, data window and correction | Insufficient data, low confidence, deleted evidence, prediction off |
 | Protect overview | Rules, active sessions, enforcement health and emergency bypass | Observation only, enabled, conflict, unavailable enforcement |
 | Rule editor / preview | Targets, trigger, action, schedule/zone, exceptions and overrides | Invalid, changed category, permissions missing, conflict preview |
@@ -43,6 +46,8 @@ Select source → select apps/exclusions → explain retained fields → separat
 Source pausing offers a duration and visible resume time. Protection pause is a separate action. Turning off a source offers optional prior-data deletion; retaining history is a valid choice. Content capture remains off when uncertain context safety prevents reliable exclusion.
 
 ## Charts and interpretation
+
+[Analytics](ANALYTICS-SPEC.md) defines the deeper mobile screen structure and [Metric catalog](METRIC-CATALOG.md) defines available data points. The dashboard must make per-platform short-video time/counts discoverable, with progressive disclosure for advanced detail. Do not expand the completed browser study. Root `src/features` owns mobile screens by domain; every implemented route/state/behavior requires live debug-phone or emulator verification under X-10.
 
 Duration axes use explicit units and zone-labelled dates. Distinguish device interactive union from app totals that can overlap. Never combine exposure counts and minutes into an unexplained score. Unknown intervals are patterned gaps; an empty chart with disabled access says “Not tracked,” while a fully covered zero uses “No observed activity.” Provide table/list alternatives and TalkBack summaries. Do not rely on color alone.
 

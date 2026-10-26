@@ -1,6 +1,6 @@
 # Local development
 
-**Status:** Documentation and design-study workflows runnable; native application setup future work. Updated 2026-10-27.
+**Status:** Documentation, native calculation and design-reference checks runnable; mobile application setup pending. Updated 2026-10-27.
 **Responsibility:** Defines local setup, reproducible commands, isolation and debugging.
 **Related specifications:** [Dependencies](DEPENDENCIES.md), [Testing](TESTING.md), [Structure](FILE-STRUCTURE.md), [Agent rules](AGENT-RULES.md).
 **Unresolved feasibility:** F-02–F-04 in [Decisions](DECISIONS.md); no Android application build has run.
@@ -18,7 +18,21 @@ git status --short
 
 The checker verifies expected documents, metadata, relative links/anchors, capability/scenario/task coverage, dependency-ledger consistency and prohibited public artifacts. It does not prove Android behavior or external link availability. Manually review public text and policy interpretation. The CI job performs the same offline documentation checks without application builds or secrets.
 
-## Future application setup: AS-004
+## Native analytics slice: AS-035
+
+This domain implementation is at [native/analytics-core](../native/analytics-core/README.md), using `src/main/kotlin` and `src/test/kotlin`. It has no Android application or JS runtime. Existing JDK 17+, Python 3.11+ and pnpm are sufficient. First execution downloads reviewed latest-stable compiler tools into ignored local caches, validating pinned hashes; routine offline repetition is supported.
+
+```powershell
+python tools/check_architecture.py
+Set-Location native/analytics-core
+pnpm install --frozen-lockfile --ignore-scripts
+pnpm test
+pnpm run example
+```
+
+From repository root: `python tools/test_analytics.py --offline` repeats the JVM checks. Optional synthetic ART execution on an existing authorized debug target: `python tools/test_analytics.py --device --sdk C:\opt\Android\SDK`. Requires exactly one target, uses isolated latest stable D8, copies/runs/removes one task-owned file and installs no app or permissions. It is not live-source/UI/lifecycle verification. See [Testing](TESTING.md#kotlin-analytics-calculation-verification) for limitations. No global SDK/Java/adb configuration changes are required.
+
+## Application setup: AS-004
 
 For the separately authorized AS-033 design continuation, [preview instructions](../design/prototype/README.md) run from `design/prototype` with Node and pnpm. `pnpm run preview` serves loopback-only static assets without installing packages. For browser tests: `pnpm install --frozen-lockfile --ignore-scripts`, `pnpm run browser:install`, `pnpm test`. Its package manifest/lockfile and ignored local browser cache do not create a React Native scaffold or clear F-03. Do not use the study's success as an Android build claim.
 

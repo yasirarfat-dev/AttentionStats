@@ -1,11 +1,13 @@
 # Tracking specification
 
-**Status:** Normative design; no collectors implemented. Updated 2026-10-26.
+**Status:** Normative design; no collectors implemented. Updated 2026-10-27.
 **Responsibility:** Defines event meaning, collection lifecycle, session accounting, and coverage.
 **Related specifications:** [Capabilities](CAPABILITY-MATRIX.md), [Social](SOCIAL-MEDIA-SPEC.md), [Models](DATA-MODELS.md), [Permissions](PERMISSIONS.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-02 and F-09 in [Decisions](DECISIONS.md); polling cadence, public event retention, and OEM coverage need measurement.
 
 ## Sources and consent
+
+Detailed per-app activity composition, short-video analytics, qualified interaction evidence and network-byte accounting follow [Analytics](ANALYTICS-SPEC.md) and the [Metric catalog](METRIC-CATALOG.md). They extend the diary without changing source consent, unknown/gap semantics or the prohibition on input/message capture. Network-statistics consent is independent of existing Usage Access enablement; activity-specific fields require individually qualified adapters.
 
 Use Android public UsageStatsManager queries for app/activity history and available screen/keyguard events. UsageEvents are retained by the system for a limited interval; the collector must persist allowed observations while available rather than promise arbitrary retrospective recovery. On Android R and later queries can return null before user unlock. See [UsageStatsManager](https://developer.android.com/reference/android/app/usage/UsageStatsManager). These constraints require a native collection spike, not an always-running JavaScript timer.
 

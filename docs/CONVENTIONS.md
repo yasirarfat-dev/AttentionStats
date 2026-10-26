@@ -1,6 +1,6 @@
 # Engineering conventions
 
-**Status:** Accepted implementation standards; no application code yet. Updated 2026-10-27.
+**Status:** Active implementation standards; AS-035 Kotlin source exists, mobile application pending. Updated 2026-10-27.
 **Responsibility:** Defines coding, state ownership, errors, dependency practice and review expectations.
 **Related specifications:** [Agent rules](AGENT-RULES.md), [Structure](FILE-STRUCTURE.md), [Contracts](NATIVE-CONTRACTS.md), [Dependencies](DEPENDENCIES.md), [Testing](TESTING.md).
 **Unresolved feasibility:** F-03 in [Decisions](DECISIONS.md); exact formatter/linter/test tool versions resolved at scaffold time.
@@ -12,6 +12,10 @@ TypeScript strict mode; prefer explicit domain types and exhaustive tagged state
 Kotlin uses immutable domain values, structured coroutines, injected clock/source/dispatcher, cancellation and bounded queues. No disk/network work on UI/service callback main threads. Pure reducers/rule evaluation are deterministic for a supplied snapshot. Android Context and Room DAOs stay out of pure domain logic. No JavaScript background timers as collectors, no native dependency on React UI startup, no MMKV behavioral history.
 
 Use clear feature folders, PascalCase components/types, camelCase functions, descriptive Kotlin classes, and one-way dependency flow from UI through contracts to native services. Avoid a generic global utility folder for unrelated business rules. Shared primitives remain source-agnostic and do not request permissions.
+
+All mobile TypeScript source uses root `src/`, with domain-specific feature APIs and subfolders under [Structure](FILE-STRUCTURE.md). Native modules use `src/main/kotlin` and `src/test/kotlin`, with package paths matching declarations. Use domain vocabulary consistently: exposure is not completed video, observed UI outcome is not server acknowledgement, summary fact is not a disposable cache. [Analytics](ANALYTICS-SPEC.md) owns these invariants.
+
+`python tools/check_architecture.py` enforces current pure Kotlin package/import boundaries, including no Android/Room/React/network dependencies. It is a narrow static check, not a replacement for compiler/Gradle boundaries or a future TypeScript lint rule. AS-004 must add supported latest lint/format/type tooling and enforce feature-public-API imports once actual TypeScript modules exist. Don't claim unavailable lint commands passed.
 
 ## State and side effects
 
@@ -33,4 +37,4 @@ Use standard formatting/linting and maintain native schema/contract generations 
 
 ## Definition of done
 
-Implementation, appropriate passing verification, accurate capability/tracker status, matching domain specs/contracts/models, state update, dated log and any decision/evidence changes. A passing mock test does not establish real-device capability support. A security-sensitive feature is not done until its failure and privacy gates pass. Changes must preserve other contributors' uncommitted work and avoid unrelated refactors.
+Implementation, appropriate passing verification, accurate capability/tracker status, matching domain specs/contracts/models, state update, dated log and any decision/evidence changes. Every implemented mobile screen, state and behavior needs live debug-phone or dedicated-emulator verification, including navigation, loading/empty/partial/error and accessibility states relevant to it. Native source/lifecycle behavior additionally needs physical-device evidence. Record not-run/blocked honestly and keep the affected task incomplete. A passing mock or headless calculation test does not establish live-screen or source support. A security-sensitive feature is not done until its failure and privacy gates pass. Changes must preserve other contributors' uncommitted work and avoid unrelated refactors.

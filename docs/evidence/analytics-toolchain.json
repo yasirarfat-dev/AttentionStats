@@ -1,0 +1,34 @@
+{
+  "resolvedDate": "2026-10-27",
+  "scope": "AS-035 standalone Kotlin/JVM analytics core; not an Android application toolchain",
+  "pnpm": {
+    "selector": "pnpm@latest",
+    "version": "12.15.0",
+    "license": "MIT",
+    "source": "https://registry.npmjs.org/pnpm/latest"
+  },
+  "kotlin": {
+    "selection": "latest stable native compiler release",
+    "version": "2.4.21",
+    "license": "Apache-2.0",
+    "source": "https://api.github.com/repos/JetBrains/kotlin/releases/latest",
+    "release": "https://github.com/JetBrains/kotlin/releases/tag/v2.4.21",
+    "url": "https://github.com/JetBrains/kotlin/releases/download/v2.4.21/kotlin-compiler-2.4.21.zip",
+    "sha256": "7cc140e76daf416a0424a5557f99afd7ca89ebd463ea1101261e3e01c33e75cd",
+    "size": 89733618
+  },
+  "r8": {
+    "selection": "latest stable native tool in Google Maven metadata; prereleases excluded",
+    "version": "9.5.28",
+    "license": "BSD-3-Clause",
+    "source": "https://dl.google.com/dl/android/maven2/com/android/tools/r8/maven-metadata.xml",
+    "url": "https://dl.google.com/dl/android/maven2/com/android/tools/r8/9.5.28/r8-9.5.28.jar",
+    "sha256": "38a9ffaaebbd17d1514e3ecbff5a85b989bb13c551b9e224c7409514eea84ff5",
+    "size": 21188744
+  },
+  "compatibility": {
+    "target": "JVM 17 bytecode; Kotlin standard library bundled by the same compiler",
+    "gradle": "Not introduced. Latest Gradle 9.8.2 exceeds Kotlin 2.4.21's documented fully supported range through 9.7.0; no downgrade or plugin compatibility claim.",
+    "android": "37 synthetic calculation checks passed on connected physical Android 16/API 36 ART using isolated latest stable D8 9.5.28 and existing SDK platform android-37.0. No app, Android API collector, storage, permissions, UI, lifecycle, Gradle integration, release shrinker or native bridge tested. F-03 remains open."
+  }
+}

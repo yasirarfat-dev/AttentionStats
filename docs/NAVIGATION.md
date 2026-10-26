@@ -16,13 +16,17 @@ Root
     InsightsStack: Insights → InsightDetail → CategoryEditor
     ProtectStack: Protect → RuleEditor → RulePreview / FocusSession
     SettingsStack: Settings → Sources / Health / Storage / Backup / Appearance / About
-  Shared destinations: SocialSummary → SurfaceDetail → HowTrackingWorks
+  Shared destinations: SocialActivity → PlatformDetail → SurfaceDetail → HowTrackingWorks
+  Diary destinations: AppActivity → ActivityTimeline / InteractionDetail / NetworkUsage / MetricExplorer
+  Storage destinations: SummaryPolicy → CompactionPreview / ArchiveScope
   Modal flows: AppPicker, DateRangePicker, DeletePreview, ExportScope, RestorePreview
   Native flows: Android settings, document picker, secure credential entry, intervention
   Native awareness: optional live counter → detail / explicit protection choice / hide
 ```
 
 Five primary tabs reflect distinct user jobs. Social summaries are reachable from Home and History app detail; their backing data is shared. Settings is reachable even when onboarding is skipped or permissions are missing. Native intervention is not dependent on React Navigation or the JS runtime staying alive.
+
+Home has a visible “Reels & short videos” entry to SocialActivity; each platform detail distinguishes app totals, primary activities, short-video time/counts and coverage. AppActivity/MetricExplorer expose advanced details without adding competing tab bars. Domain-specific feature APIs own these mobile routes under root `src/`; navigation carries metric/support IDs and filters, not recorded content. All implemented routes/states are verified live on an authorized debug phone or dedicated emulator (X-10).
 
 Visible tab labels are **Today**, **History**, **Patterns**, **Protect**, **Settings**. Today maps to HomeStack and Patterns to InsightsStack; internal route names need not imitate the visible labels. Keep tabs available while the screen content scrolls. The browser [design study](../design/prototype/README.md) demonstrates labels, heading focus, modal dismissal and focus return; it is not a React Navigation implementation or a native back-stack test.
 

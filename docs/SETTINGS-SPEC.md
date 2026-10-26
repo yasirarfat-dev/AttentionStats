@@ -19,6 +19,10 @@ N = native authoritative Room configuration, U = non-sensitive UI preference in 
 | Exclusions | Sensitive contexts always excluded; user app/category/time exclusions configurable | N; exclusions win; preview scope change |
 | Source detail | Basic metadata only for enabled basic source; titles/URLs/topics off | N; independent affirmative detail consent |
 | Supported surface adapters | Off individually; registry shows unverified/experimental/supported | N; no generic silent fallback |
+| Detailed activity families | Off individually; primary contexts/feed/story/ad exposures where qualified | N; per-app/adapter/metric selection; separate coarse messaging-context choice, no private message data |
+| Interaction evidence | Off; choose reaction/comment/share/save/follow families per qualified adapter | N; attempts versus UI outcomes separate; no typed text or server-success claim |
+| Network byte statistics | Off; selected apps/transports and visible source bucket/freshness | N; separate consent despite existing Usage Access; no VPN, SIM ID or bytes-per-Reel inference |
+| Advanced diary / metric explorer | Per-platform short-video entry visible; chosen available metrics/cards/dimensions/range/table | U; cannot hide missing coverage or turn unavailable into zero |
 | Short-video count display | Exposures with available confidence; never “videos completed” | U for presentation; N for versioned algorithm configuration |
 | App-open grouping | Proposed two-second short-gap grouping; adjustable with explanation | N; revisioned reduction/rebuild, no raw-event rewrite |
 | Notification scope | Off; selected packages; metadata-only | N; no notification body capture setting |
@@ -42,6 +46,10 @@ N = native authoritative Room configuration, U = non-sensitive UI preference in 
 | Prompts and cooldowns | Disabled until chosen; frequency cap, text, duration | N; neutral text, no credential/health content |
 | Reminder notifications | Off until selected; channel settings link and optional haptics/sound | N for consent/rules; platform for channels |
 | Retention per source/detail | Preserve until deleted; 30/90/365 days or custom | N; shortening previews deletion and summary-only choice |
+| Multi-resolution summary tiers | Off; preserve detail default; custom per-source/app/detail ages, daily/weekly/monthly/yearly summaries | N; fixed zone/week start/statistics, full loss preview, explicit confirmation before irreversible compaction |
+| Summary-only archive | Off; explicit selected source/range/statistics/tier | N job; scope manifest and recovery behavior; never silently compacts local history |
+| Optional time equivalents | Off; user-defined label/session length and selected covered duration | U/N as relevant; arithmetic explanation, hide/reset, no guaranteed life outcome |
+| Supported activity archive import | Unavailable until parser/schema/terms/security evidence | N; explicit selected file/fields/range/preview; imported/live source lanes separate |
 | Storage visibility | Measured DB/WAL/cache/staging bytes and row counts | Native query; no automatic purge setting enabled by default |
 | Selective deletion | App/source/date/detail and optional config scope preview | N job; derivative/model invalidation and ingestion fences |
 | Full reset | Explicit all-data operation | N/K/U; clears keys, jobs, grants held by app, history/config; external copies explained |

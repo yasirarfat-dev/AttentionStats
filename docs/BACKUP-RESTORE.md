@@ -1,6 +1,6 @@
 # Backup and restore
 
-**Status:** Portable encrypted archives planned; direct automatic Drive integration blocked. Updated 2026-10-26.
+**Status:** Portable encrypted archives planned; direct automatic Drive integration blocked. Updated 2026-10-27.
 **Responsibility:** Defines backup experience, format requirements, transports, recovery and failure atomicity.
 **Related specifications:** [Security](SECURITY.md), [Privacy](PRIVACY.md), [Storage](STORAGE-AND-RETENTION.md), [Contracts](NATIVE-CONTRACTS.md), [Testing](TESTING.md).
 **Unresolved feasibility:** F-04–F-06 in [Decisions](DECISIONS.md); crypto format, provider durability and automatic-backup policy must be resolved independently.
@@ -15,7 +15,13 @@ A generated recovery key or reviewed passphrase flow is user-held. Show recovery
 
 Export stages: preflight capacity → snapshot → bounded serialization → encryption → native staging → selected transport write → completion confirmation. Staging is private/no-backup and encrypted, cleaned on success/cancel and after crash. A provider accepting bytes does not necessarily mean remote durability; show the strongest confirmed state and uncertainty. Never overwrite the only known-good external archive before the new file is complete; provider-specific atomicity needs a capability check.
 
-## Desired automatic Google-account experience
+## Optional summary-only scope
+
+Under [Retention](STORAGE-AND-RETENTION.md#user-configurable-summary-tiers), a person may choose detail or selected day/week/month/year facts independently from local pruning. A summary-only archive manifest declares metric/semantic/taxonomy revisions, units, dimensions, fixed zone/week start, covered/eligible/unknown partitions, retained sufficient statistics and omitted detail/resolution. It contains no fabricated chronology, purged content or implied source enablement. A summary export does not compact the local store.
+
+Restore validates partition authority/non-overlap and sufficient-statistic bounds before replacing live history. Do not double count included detail and its summaries or expand yearly facts into monthly detail. Preview lost drill-down and coarse-deletion limits. Format versions explicitly support or reject these entities; no fallback can silently discard them. D-06 applies alongside all B-01–B-07 failures. This extension remains planned after the reviewed base encrypted archive implementation; AS-035's pure rollup preview is not backup/crypto code.
+
+## Automatic Google-account experience
 
 The desired future experience is automatic encrypted backup into the person's selected personal Google account: opt in, choose account, choose scope, save/test recovery credentials, choose schedule (initial proposal daily, configurable), Wi-Fi/metered and charging constraints, and inspect last attempted/completed backup, byte size, revision and next eligible attempt. Android scheduling is best effort, never an exact nightly promise. Switching accounts confirms future destination and explains that earlier copies remain in the old account; disconnect cancels jobs, revokes local authorization and retains local history.
 

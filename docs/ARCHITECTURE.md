@@ -1,6 +1,6 @@
 # Architecture
 
-**Status:** Accepted mobile-client boundaries; implementation pending. Updated 2026-10-27.
+**Status:** Mobile architecture accepted; standalone Kotlin analytics slice implemented; application integration pending. Updated 2026-10-27.
 **Responsibility:** Owns subsystem boundaries, runtime lifecycle, data flow and future adapters.
 **Related specifications:** [Contracts](NATIVE-CONTRACTS.md), [Models](DATA-MODELS.md), [Structure](FILE-STRUCTURE.md), [Dependencies](DEPENDENCIES.md), [Security](SECURITY.md).
 **Unresolved feasibility:** F-02–F-04, F-07 and F-08 in [Decisions](DECISIONS.md); service strategy, toolchain and encryption are not build-verified.
@@ -20,6 +20,24 @@ Supported product targets are mobile: Android first, future iOS through native a
 | MMKV | Small non-sensitive interface preferences such as theme and chart layout | Rules, consent, history, recovery keys or provider tokens |
 
 Room is a SQLite abstraction, not encryption by itself. At-rest encrypted database integration needs a maintained compatible driver and audit under AS-006. Device storage protections alone must not be advertised as app-level database encryption. See [Room documentation](https://developer.android.com/jetpack/androidx/releases/room).
+
+## Domain-oriented modular design
+
+Use a **modular monolith on the device** with domain-driven boundaries. The enterprise-style requirement means clear ownership, stable interfaces, testability and disciplined change; it does not require a backend, microservices or a distributed system. Domain language and invariants live with their domain. Do not scatter business rules through screens or create one global services/utils folder.
+
+Mobile TypeScript application source belongs in root `src/`: `app/` is the composition/navigation root; `features/` contains onboarding, usage, social, interactions, network, diary, insights, protection, privacy, backup and settings; `platform/` owns typed native adapters; `ui/` owns source-agnostic design primitives; `shared/` contains only small genuinely shared types/formatting. Each substantial feature exposes a deliberate `index.ts` public API and gains `screens/`, `components/`, `application/`, `domain/`, `data/`, `hooks/` and tests when needed. Do not generate empty folders or wrappers merely to imitate a template. Feature screens cannot import another feature's private internals.
+
+Native bounded contexts: source collection and detector adapters; consent/coverage; usage/session reduction; social exposures; interaction evidence; network statistics; diary/query/aggregation; retention/deletion; protection; backup/crypto; and health. Pure domain calculations depend on immutable values and supplied time, not Android Context, React, Room, permission requests or service lifecycle. Repository/source/clock/dispatcher ports are domain-specific; implementations live in infrastructure. Constructor injection at the native composition root keeps dependencies explicit; choose a DI framework only if demonstrated need justifies a latest dependency. Do not duplicate rule/counter logic across native, JS and HUD.
+
+After AS-004, Gradle modules should enforce useful boundaries: application/composition and bridge; pure analytics domain; storage infrastructure; collectors/detectors; protection; backup. Exact module names/build layout are decided from the tested latest Android toolchain. Avoid a separate module per class. Room DAOs/schema stay internal to storage, which implements narrow repository ports; one physical authoritative history/configuration store remains. Collectors submit normalized writes through the coordinator, not feature-specific databases.
+
+Current [Kotlin slice](../native/analytics-core/README.md) is organized under `native/analytics-core/src/main/kotlin/org/attentionstats/analytics/` with time, activity, observation, network and summary packages. Tests use `src/test/kotlin`. It has no store, Android component or JS coupling. This is source organization for AS-035, not a second app or a permanent alternative build system. Integration moves it into the native domain module once F-03 clears, preserving its package boundaries and tested semantics.
+
+Dependency direction: app composition → feature application/presentation → domain/ports; infrastructure implements ports; bridge maps typed requests/read models to services. Feature presentation may share `ui` primitives, not native internals. Source-specific code cannot call UI, predictions cannot command protection, and backup transports cannot reach live DAOs. Future iOS implements the platform contract with its own permitted sources and storage, with honest unsupported states.
+
+Boundary checks, strict types, native compilation, unit/property/scenario tests, schema/contract checks, immutable revisions, migrations, cancellation/backpressure, bounded queries, error taxonomies, least-privilege controls and reproducible locked builds are required. [Conventions](CONVENTIONS.md) and [Testing](TESTING.md) define executable checks and completion evidence. A pattern is adopted to solve an actual problem; speculative abstractions must not obscure the data path.
+
+Every implemented screen and behavior must be exercised on this machine's authorized debug phone or a dedicated emulator before it is accepted. Desktop/browser screenshots do not meet that condition. Record build/commit, route/state, test environment, steps, outcome and remaining gaps; API-sensitive collectors also need real physical-device evidence. AS-035's synthetic ART execution, if passing, validates calculations only and cannot approve UI, sensors, accessibility or lifecycle behavior.
 
 ## Data flow
 

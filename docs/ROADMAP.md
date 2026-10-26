@@ -15,6 +15,8 @@ The user's design continuation adds AS-033: a synthetic interaction study and [h
 
 AS-002 resolves latest package/toolchain compatibility; AS-003 evaluates public Android collection/lifecycle; AS-005 qualifies narrow social detector approaches; AS-006 reviews crypto/database encryption; AS-007 reviews distribution/accessibility strategy. AS-004 scaffolds only after the latest stack is coherent and records exact successful commands. Small isolated throwaway prototypes may establish feasibility, but must not be mistaken for product implementation.
 
+ADR-025/ADR-027 add AS-035: a domain-organized pure Kotlin calculation slice for the expanded [diary and metric catalog](ANALYTICS-SPEC.md), with host and physical-Android synthetic checks. It builds independently before the mobile scaffold and does not clear Android collector/toolchain/store gates. All future mobile TypeScript source uses domain-owned root `src/features`; every implemented screen/behavior requires live phone/emulator evidence, never a browser-study substitute.
+
 Exit requires a viable latest-version path or explicitly recorded blocked incompatibility, demonstrated consent/source/coverage handling on declared devices, evidence for at least one narrow detector if feasible, and a reviewed encrypted archive design. No downgrade or private/system-only API as an undocumented workaround. Unresolved Drive policy does not block offline MVP or portable archive development.
 
 ## Stage 2: MVP
@@ -28,6 +30,8 @@ C-32 optional live awareness is an MVP candidate under AS-034, qualified indepen
 ## Stage 3: expansion
 
 Notification metadata and associations, safe supported browsing/title/URL detail, selective surface protection, bedtime/DND routines, richer cooldowns/commitment controls, widgets and Quick Settings. Expand detector variants only with independent evidence. Manual picker transport gains provider-specific reliability evidence; scheduled picker use is evaluated separately.
+
+The detailed diary adds independently qualified post/story/ad/activity/action metrics, per-app network statistics, custom day/week/month/year retention and summary archives, supported personal activity-file imports and optional user-defined time equivalents (AS-036–AS-041). The core per-platform Reels time/count entry and app/surface diary are part of AS-037's MVP screen scope; unavailable richer metrics remain visibly unavailable. Exact metrics, consent, limits and acceptance are in [Metric catalog](METRIC-CATALOG.md).
 
 Desired automatic encrypted personal-Google-account backup remains blocked under F-05. It advances only after authoritative policy clarification and an approved transport design; no invented equivalence with Android OS backup or picker export. Every source/detail expansion needs an updated disclosure, settings, tests and capability record.
 

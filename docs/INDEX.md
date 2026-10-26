@@ -1,9 +1,9 @@
 # Documentation index
 
-**Status:** Authoritative documentation foundation; application not yet implemented. Updated 2026-10-27.
+**Status:** Authoritative specifications; native analytics slice exists, mobile application not yet implemented. Updated 2026-10-27.
 **Responsibility:** Maps every source-of-truth document, reading order and ownership boundary.
 **Related specifications:** [Current state](STATE.md), [Shared rules](AGENT-RULES.md), [Tracker](FEATURE-TRACKER.md), [Decisions](DECISIONS.md).
-**Unresolved feasibility:** F-01–F-09 in [Decisions](DECISIONS.md); specifications do not constitute device, policy or build verification.
+**Unresolved feasibility:** F-01–F-10 in [Decisions](DECISIONS.md); specifications do not constitute source, policy or application-build verification.
 
 ## Read first
 
@@ -11,7 +11,9 @@ Attention Stats is a local-first, open-source personal digital wellbeing app: **
 
 **Mobile clients only.** The browser study is a completed, non-shipping design reference, not a website/web-app product. A possible Chrome extension is deferred until mobile work is complete and separately prioritized; there is no active extension implementation (ADR-024).
 
-**Documentation prepared; application not yet implemented.** A separate [interactive design study](../design/prototype/README.md) uses synthetic data and implements no tracking or native protection. Application runtime behavior remains a specification. No capability is implemented and no Android scaffold/binary exists. Mobile dependencies remain unverified candidates; the design study has its own latest test tools and pnpm lockfile.
+**Documentation prepared; mobile application not yet implemented.** A separate [interactive design study](../design/prototype/README.md) uses synthetic data and implements no tracking or native protection. End-to-end mobile runtime behavior remains a specification. No application capability is implemented and no Android application scaffold/installable binary exists. Mobile dependencies remain unverified candidates; the design study has its own latest test tools and pnpm lockfile.
+
+AS-035 now supplies a separate [pure Kotlin analytics slice](../native/analytics-core/README.md), with domain packages and synthetic JVM/ART tests. It implements calculations only, not an installable app, collectors or mobile screens. The expanded [diary specification](ANALYTICS-SPEC.md) and [64-metric catalog](METRIC-CATALOG.md) make per-platform surface/detail analytics first-class. [Architecture](ARCHITECTURE.md#domain-oriented-modular-design) specifies feature-owned `src/` folders and live mobile verification for every implemented screen/behavior.
 
 | Reader/task | Reading order |
 |---|---|
@@ -32,6 +34,8 @@ Attention Stats is a local-first, open-source personal digital wellbeing app: **
 | Direction | [VISION.md](VISION.md) | Mission, audience and principles |
 | Product | [PRODUCT.md](PRODUCT.md) | Scope, journeys, non-goals, acceptance |
 | Inventory | [CAPABILITY-MATRIX.md](CAPABILITY-MATRIX.md) | Every capability's source/access/controls/limits/phase/evidence/scenario |
+| Detailed diary | [ANALYTICS-SPEC.md](ANALYTICS-SPEC.md) | Duration conservation, interactions, network accounting, exploration and summaries |
+| Metric inventory | [METRIC-CATALOG.md](METRIC-CATALOG.md) | Individual metric definitions and platform-by-platform qualification research |
 | Observation | [TRACKING-SPEC.md](TRACKING-SPEC.md) | Sessions, opens, screen/keyguard, notifications, coverage/time |
 | Surfaces | [SOCIAL-MEDIA-SPEC.md](SOCIAL-MEDIA-SPEC.md) | App versus surface detection, exposures, safe optional metadata |
 | In-context awareness | [LIVE-OVERLAY-SPEC.md](LIVE-OVERLAY-SPEC.md) | Optional visit/day counters, native snapshots, renderer safety and permission boundaries |

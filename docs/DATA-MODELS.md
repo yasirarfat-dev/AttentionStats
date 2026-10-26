@@ -1,6 +1,6 @@
 # Data models
 
-**Status:** Logical schema accepted; SQL/Room implementation and migrations pending. Updated 2026-10-26.
+**Status:** Logical schema accepted; SQL/Room implementation and migrations pending. Updated 2026-10-27.
 **Responsibility:** Defines entities, invariants, time, provenance and schema evolution.
 **Related specifications:** [Storage](STORAGE-AND-RETENTION.md), [Contracts](NATIVE-CONTRACTS.md), [Tracking](TRACKING-SPEC.md), [Backup](BACKUP-RESTORE.md).
 **Unresolved feasibility:** F-03 and F-04 in [Decisions](DECISIONS.md); encrypted Room driver and serialization remain unselected.
@@ -32,6 +32,14 @@ All IDs are locally generated opaque strings. No hardware/advertising identifier
 | BackupJob | id, formatVersion, snapshotRevision, state, stage, transport, byteCount, sanitizedFailure, completedAtMs? | No key/passphrase; transport handles private; status does not assert provider durability |
 | CommandRecord | commandId, operation, payloadDigest, resultRevision, outcome, expiresAtMs | Idempotency record atomically persisted with mutation; no credential payload |
 | LiveOverlayConfiguration | revision, enabled, selectedAppSurfaces, rendererChoice, visibleFields, placementPreset, hideUntilMs? | Off by default; native config; separate from source consent and protection pause; no behavioral counter stored here |
+| ActivityFacetInterval | id, appId, sessionId?, primarySurfaceId?, facetId, startMs, endMs, detectorRevision, quality | Secondary context within primary time; never additive to app-duration stack; no private content |
+| InteractionObservation | id, appId, episodeId?, actionType, occurredAtMs, evidenceKind, outcomeReason, detectorRevision, consentRevision, dedupKey | Intent versus observed UI outcome distinct; no text/account/post identity; server success not implied |
+| NetworkIdentityEpoch | id, appId?, profileScope, validFromMs, validUntilMs?, attributionState | OS UID mapping native-internal and time-bounded; shared/reused/unknown maps do not become unique-app history |
+| NetworkUsageBucket | id, identityEpochId, transport, startMs, endMs, state, metered, roaming, defaultNetwork, rxBytes, txBytes, queryRevision, checkedAtMs | Canonical untagged partition; no subscriber ID/endpoint/payload; snapshot replacement, not additive replay |
+| MetricDefinition | metricId, semanticRevision, unit, evidenceKind, allowedDimensions, sourceRequirements, aggregateKind, supportRange | Registry metadata, not a successful grant; incompatible semantics never silently merged |
+| RetentionPolicy / CompactionJob | id, revision, scopes, orderedAgeTiers, granularity, zoneId, weekStart, selectedStatistics / id, previewRevision, state, range, validationDigest | Preserve default; preview lost detail; atomic replacement/fences, no implicit purge |
+| RetainedSummaryFact | id, metricId, semanticRevision, dimensions, unit, evidenceKind, range, fixedZoneId, weekStart?, values, knownMs, eligibleMs, unknownPartitionCount, partitionProvenance, detailResolution, compactionGeneration | Durable retained evidence after explicit loss, not a disposable AggregateBucket cache; no overlapping source/summary authority |
+| ImportedActivityRecord | id, parser/schemaRevision, archiveLocalDigest, sourceLane, originalRecordKey?, appId?, occurredAtMs?, range?, fields, coverage | Future allowlisted file import only; never raw archive/text dump; imported versus live totals separate until identity reconciliation proven |
 
 LiveSurfaceSnapshot is a **derived read model**, not a second durable counter. It projects a SurfaceEpisode, committed Exposure records, CoverageIntervals and day bounds from [Live overlay](LIVE-OVERLAY-SPEC.md); [Contracts](NATIVE-CONTRACTS.md) owns its shape. This visit is already part of today; midnight changes daily membership without closing a continuous visit. Generation/revision invalidation follows deletion/restore. Rendering or replayed callbacks never increments an independent value.
 
@@ -43,11 +51,17 @@ Every measure identifies source observation IDs or a bounded query provenance de
 
 ## Relationships and deletion
 
+[Analytics](ANALYTICS-SPEC.md) and [Metric catalog](METRIC-CATALOG.md) own detailed metric semantics. Base counts/durations/bytes are nonnegative. An explicitly derived net interaction delta is signed and labelled, with matching source/coverage; never cast it to a nonnegative base count. Ratios retain numerator/denominator and undefined reasons. The pure Kotlin SummaryFact supports additive nonnegative bases only; signed/ratio views and these Room entities remain unimplemented.
+
+RetainedSummaryFact becomes authoritative for its exact metric/dimension/time partition only after a validated compaction transaction removes the detailed representation. AggregateBucket stays a rebuildable cache over surviving detailed/retained facts. Queries choose one representation per partition; never add raw detail to its summary or overlap daily/monthly authority. The query layer must supply explicit unknown partitions for missing eligible history; the calculation helper cannot infer them.
+
 Source events may produce sessions, surface episodes and derived insights. Keep referential deletion rules explicit: deleting app/time/source history removes or clips intersecting episodes, content, notifications, aggregates and model state. Where an event supports a boundary outside the deletion range, rebuild affected sessions and remove evidence references that no longer exist. Do not leave titles or topic labels in cached explanations after deleting their source.
 
 Rules are configuration, not history: selective history deletion retains rules unless the preview explicitly includes them. All-data reset removes configuration, consent, keys, jobs, tokens and UI preferences as well as history. Consent audit retained after a selective deletion contains only minimal consent metadata, never deleted behavioral payloads; full reset removes it.
 
 ## Migrations and schema versioning
+
+Summary-only deletion operates at retained resolution. For a date/app/topic request finer than retained dimensions, offer deleting the whole affected summary or cancellation; never prorate counts or claim exact redaction. Deletion removes summaries/caches/models and installs fences even when original observations are gone. Titles/URLs/input text cannot survive in summary explanations/provenance. Summary archives carry these same resolution/deletion limits.
 
 Use monotonically increasing Room schema versions, committed exported schemas, explicit transactional migrations, and fixtures for every supported upgrade path. No destructive fallback migration for user history. Migration failure leaves the original store recoverable and collection paused. Test database/WAL handling, storage exhaustion and interruption before changing a release's schema.
 

@@ -1,6 +1,6 @@
 # Dependencies and toolchain
 
-**Status:** Mobile candidates uninstalled/unverified; separate design-study tooling installed and tested. Updated 2026-10-27.
+**Status:** Mobile candidates uninstalled/unverified; isolated Kotlin calculation and design-study tooling tested. Updated 2026-10-27.
 **Responsibility:** Owns package manager, version policy, licenses, compatibility evidence and exceptions.
 **Related specifications:** [Development](DEVELOPMENT.md), [Architecture](ARCHITECTURE.md), [Security](SECURITY.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-03 and F-04; CLI/RN documented range mismatch, Nitro pairing, TypeScript/tooling and Room encryption need checks.
@@ -13,7 +13,21 @@ Do not silently use older versions, force peer resolution, disable security chec
 
 Commit `pnpm-lock.yaml` and the exact resolved pnpm `packageManager` value once there is an app manifest. Routine builds use `pnpm install --frozen-lockfile`; they do not re-resolve latest on every invocation. Refresh through a dedicated reviewed task with `pnpm update --latest` plus explicit audit of all direct packages. Transitive dependencies follow upstream constraints and the lockfile; do not force all transitives to their own latest against library constraints. If the user requests a stricter transitive policy, surface incompatibilities rather than overriding silently.
 
-## Candidate ledger
+## AS-035 native calculation tools
+
+Resolved **2026-10-27**; [machine-readable evidence](evidence/analytics-toolchain.json) pins artifact URLs/sizes/SHA-256, selection sources and compatibility scope. No JS runtime/development dependency is added to the Kotlin slice; its small private pnpm manifest supplies test/example commands and a frozen manager lock.
+
+| Tool | Selected latest stable | License | Actual compatibility evidence |
+|---|---|---|---|
+| pnpm | 12.15.0 via `pnpm@latest` | MIT | Existing isolated project manager and frozen lock; no alternate package manager |
+| Kotlin standalone compiler / matching bundled stdlib | 2.4.21 | Apache-2.0 | Official latest stable release and verified compiler archive; JVM-17 compilation with warnings as errors; 37 calculation checks on local JDK 17 and Android 16 ART |
+| R8/D8 standalone development tool | 9.5.28 | BSD-3-Clause | Latest stable numeric Google Maven version, prereleases excluded; upstream SHA-1 checked at resolution and SHA-256 pinned; synthetic DEX compilation with no D8 warnings and 37 physical-device checks |
+
+Use official [Kotlin CLI distribution](https://kotlinlang.org/docs/command-line.html) and [Google Maven D8 instructions](https://r8.googlesource.com/r8/+/refs/heads/main/README.md); tool downloads are development bootstrap, not app network behavior. R8 is not bundled into the product. The machine's older SDK D8 produced Kotlin-metadata warnings; it was left untouched and replaced only for this task by the isolated latest tool. [R8 license](https://r8.googlesource.com/r8/+/refs/heads/main/LICENSE) applies to that tool.
+
+Latest Gradle was 9.8.2 while [Kotlin's fully supported Gradle range](https://kotlinlang.org/docs/gradle-configure-project.html) for 2.4.21 ended at 9.7.0. No Gradle/plugin pairing, older workaround, React Native stack, Android release build, shrinker behavior or application support is established by the standalone calculation tests. F-03 remains open. Registry latest RN 0.88.0 and CLI 20.2.0 were rechecked unchanged on 2026-10-27; that does not resolve their build compatibility.
+
+## Mobile candidate ledger
 
 Resolved from public npm registry `latest` endpoints on **2026-10-26**, before the session crossed into 2026-10-27. Machine-readable peer/engine/source evidence: [dependency-candidates.json](evidence/dependency-candidates.json). These are snapshots, not application pins; re-resolve at implementation time. All rows have install/build status **not run**.
 

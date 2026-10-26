@@ -1,6 +1,6 @@
 # Privacy specification
 
-**Status:** Product privacy commitments accepted; implementation unverified. Updated 2026-10-26.
+**Status:** Product privacy commitments accepted; implementation unverified. Updated 2026-10-27.
 **Responsibility:** Owns data inventory, consent, local processing, external transfers and public claims.
 **Related specifications:** [Permissions](PERMISSIONS.md), [Security](SECURITY.md), [Storage](STORAGE-AND-RETENTION.md), [Backup](BACKUP-RESTORE.md), [Release](RELEASE.md).
 **Unresolved feasibility:** F-01, F-04–F-06 and F-08 in [Decisions](DECISIONS.md); implementation and policy review must prove these commitments before release.
@@ -20,6 +20,10 @@ No application backend, mandatory product account, advertising SDK, remote analy
 | App/package metadata and usage episodes | History; disabled until usage opt-in | Local authoritative DB; no developer recipient | App/source filters, exclusions, pause, retention, selective delete |
 | Screen/keyguard activity | Device summary; separate source choices, off | Local; no identity or unlock credential | Independent toggle, gaps and delete |
 | Surface/exposure events | Selected short-video observation, off | Local counts/revisions; no video content by default | Per adapter, consent and coverage |
+| Coarse primary activities and item/interaction evidence | Optional detailed diary, off per family | Local minimized contexts, exposure/action type/time/evidence; no message/typed content or other-person identity | Per adapter/activity/action opt-in, exclusion, pause, retention/delete |
+| Per-app network byte statistics | Optional OS RX/TX history, separately off | Local app/install-epoch/transport/bucket bytes; no SIM ID, endpoints, packets or content | Independent source/app/transport scope, coverage, pause, retention/delete |
+| Retained multi-resolution summaries | Only after explicit compaction choice | Local summary facts/coverage/provenance after chosen detail removal; no reconstructed content | Tier/zone/loss preview, selective deletion at retained resolution, summary export scope |
+| Future user-selected activity archive imports | Unimplemented optional supported-file research | Native allowlisted parsing only; imported provenance separate, no raw archive in app history | Explicit file/field/date preview, cancel/delete; no account/token scraping |
 | Notification metadata | Behavior associations, off | Local package/times/lifecycle; no body/title content | Listener opt-in, app filter, revoke/delete |
 | Supported titles/domains/URLs | Optional history, off | Separate local table; sanitized and excluded on sensitive contexts | Separate title/URL consent, detail, shorter retention, delete |
 | Categories, insights, topics and predictions | Local interpretation; topics/predictions separately off | Local derived records; no training upload | Correct mapping, disable/reset, source deletion cascades |
@@ -34,6 +38,8 @@ No application backend, mandatory product account, advertising SDK, remote analy
 Disclose each source in context before opening Android grant settings. Explain what is inspected, what is retained, purpose, limitations, optional transfer and how to revoke. Accessibility gets its own affirmative disclosure, not a checkbox bundled with onboarding or a privacy-policy link. A system grant does not activate tracking. New fields/purposes require a new notice revision and explicit consent; updates cannot expand collection silently.
 
 Titles, URLs and topic processing require separate choices. No credential fields, typed text, private messages, OTPs, payment/authentication surfaces, screenshots, audio, clipboard or whole accessibility trees. An unknown sensitive/private context fails closed for content capture. Consent/filter checks apply before reading optional payloads and again before persistence.
+
+“Maximum detail” under [Analytics](ANALYTICS-SPEC.md) expands the selectable metric catalog, not these exclusions. A source/grant cannot silently enable interaction monitoring, coarse messaging-context detection, network statistics or topics. Each new family explains inspected versus retained fields. Safe structural context duration is different from message capture and is unavailable if the adapter cannot prove the distinction. Open-source distribution never substitutes for consent or validates a hidden collection technique.
 
 The permission dashboard shows enabled sources, fields, applications, detail levels, coverage, last successful observation and active transfers. Revocation stops new collection, discards in-flight payloads and opens a gap; it does not automatically delete old history. Offer deletion separately. A timed pause expires visibly; automatic resume is disclosed when the pause is created.
 

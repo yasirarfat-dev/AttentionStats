@@ -1,6 +1,6 @@
 # File structure
 
-**Status:** Documentation and separate design study exist; native application tree proposed only. Updated 2026-10-27.
+**Status:** Documentation, design reference and isolated native analytics source exist; mobile application tree proposed only. Updated 2026-10-27.
 **Responsibility:** Defines file placement and ownership to avoid duplicate stores or rules.
 **Related specifications:** [Architecture](ARCHITECTURE.md), [Conventions](CONVENTIONS.md), [Development](DEVELOPMENT.md), [Agent rules](AGENT-RULES.md).
 **Unresolved feasibility:** F-03 and F-07 in [Decisions](DECISIONS.md); generated CLI layout must be reconciled after latest-version resolution.
@@ -17,6 +17,12 @@ AttentionStats/
     evidence/              public dependency metadata, not device traces
     IMPLEMENTATION_LOG/    dated work and validation records
   tools/check_docs.py      standard-library documentation verification
+  tools/test_analytics.py  verified local Kotlin compiler and synthetic JVM/ART tests
+  tools/check_architecture.py  current native package/dependency boundary checks
+  native/analytics-core/   AS-035 pure Kotlin mobile-domain calculation slice
+    src/main/kotlin/org/attentionstats/analytics/
+      time/ activity/ observation/ network/ summary/
+    src/test/kotlin/       synthetic deterministic test program
   design/prototype/        synthetic browser study, tokens, tests, isolated manifest/lockfile
 ```
 
@@ -28,8 +34,17 @@ The repository root is `C:\home\biobot\projects\AttentionStats`. Product display
 src/
   app/                     navigation, composition and startup
   features/
-    onboarding/ dashboard/ history/ social/ insights/ protect/ settings/
-  domain/                  shared types, pure formatting and view semantics
+    onboarding/ usage/ social/ interactions/ network/ diary/
+    insights/ protection/ privacy/ backup/ settings/
+      index.ts             intentional public feature API
+      screens/             mobile route views
+      components/          feature-specific accessible components
+      application/         query/mutation orchestration and view models
+      domain/              feature view semantics, types and pure transforms
+      data/                typed platform mapping, never a history database
+      hooks/               feature-level UI integration
+      __tests__/           domain/interaction tests where useful
+  shared/                  small shared types/formatting, no unrelated business rules
   platform/
     contracts/             typed request/result schemas and capability IDs
     android/               generated native adapter wrapper
@@ -53,7 +68,7 @@ ios/                       future native adapter and platform project
 tests/                     cross-layer scenarios and synthetic history fixtures
 ```
 
-These directories are not scaffolding instructions for this phase. AS-004 must review the generated latest CLI template, select a permanent application ID in [Decisions](DECISIONS.md), and update this map to the actual layout. Never use an observation target's package as this application's ID.
+Only the current-tree entries exist; the proposed `src/` and Android/iOS application tree await AS-004. Each feature gains only the subfolders it uses, rather than an empty directory template. AS-004 must review the generated latest CLI template, select a permanent application ID in [Decisions](DECISIONS.md), and update this map to the actual layout. Never use an observation target's package as this application's ID. Native Gradle module boundaries follow [Architecture](ARCHITECTURE.md#domain-oriented-modular-design); the standalone core moves into the domain module at integration.
 
 ## Placement rules
 

@@ -1,6 +1,6 @@
 # Native contracts
 
-**Status:** Normative domain interface draft; Codegen syntax and transport implementation pending. Updated 2026-10-26.
+**Status:** Normative domain interface draft; Codegen syntax and transport implementation pending. Updated 2026-10-27.
 **Responsibility:** Defines typed operations, status, revisioning, events, errors and platform behavior.
 **Related specifications:** [Architecture](ARCHITECTURE.md), [Models](DATA-MODELS.md), [Tracking](TRACKING-SPEC.md), [Backup](BACKUP-RESTORE.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-02–F-04 and F-07 in [Decisions](DECISIONS.md); logical unions must be lowered into supported Codegen primitives without changing meaning.
@@ -66,10 +66,19 @@ ID and revision strings are opaque; local-only random installation epoch is not 
 | getChangeState | lastSeenRevision | Current generation and invalidated domains; permits recovery from dropped events |
 | getLiveOverlayConfiguration / setLiveOverlayConfiguration | none / Mutation + selected targets, fields, renderer, placement and hideUntil | Explicit off-by-default config; no implied source/protection enablement or new grants |
 | getLiveSurfaceSnapshot | selected app/surface and explicit day zone | Committed LiveSurfaceSnapshot or unsupported/unavailable; renderer does not need JS |
+| getMetricCatalog | optional app/platform filters | Metric definitions, units/revisions, inspected/retained fields, source requirements and per-target availability; no source enablement |
+| queryActivityDiary | bounded PageRequest + primary surfaces/facets/action families | Covered episodes and separately labelled UI outcomes/attempts, provenance and retained resolution; no private input/message fields |
+| queryMetricSeries | metric IDs, bounded range, granularity/zone, dimensions | Nullable values or decimal strings, evidence/revision/freshness/coverage; compatible base numerator/denominator; split incompatible definitions |
+| queryNetworkUsage | app/transport/range and supported bucket mode | OS RX/TX bytes, actual bucket scope, freshness and attribution/gap reasons; shared/unknown UID app mapping unavailable |
+| previewRetentionPolicy / commitRetentionPolicy | proposed scoped tiers/statistics/zone / Mutation + validated preview | Lost detail/dimensions, estimated bytes, current revision / config and staged compaction job; no pruning at preview |
+| queryRetainedResolution | metric/dimension/range | Detailed/summary partitions, fixed zones/versions and deletion/regrouping limits; no fabricated drill-down |
+| inspectActivityArchive / importActivityArchive | native picker handle + allowed scope / Mutation + validated preview | Future bounded parser/schema/source preview / staged import; distinct from app restore, no blind merging with observed data |
 
 Recovery credentials use a dedicated secure native entry flow or one-use handle; no plaintext credentials in generic command bodies, logs, JS state persistence, crash reports or change events. Permission navigation is distinct from tracking enablement. No method silently grants access or reads beyond declared scope.
 
 ## Live awareness read model
+
+Detailed metric responses follow [Analytics](ANALYTICS-SPEC.md) and [Metric catalog](METRIC-CATALOG.md). Signed net-interaction deltas are explicitly derived values, not nonnegative base counts. Rates carry source numerator/denominator and undefined reasons. Retained summaries expose available resolution/zone, never pretend raw paging is possible. New contract operations are specifications only; AS-035 implements pure calculations, not this bridge.
 
 Planned LiveSurfaceSnapshot includes generation, revision, capturedAtMs, lastSourceEventAtMs, appId, surfaceId, episodeId?, dayStartMs, dayEndMs, zoneId, countKind, visitExposureCount?, todayExposureCount?, visitKnownSurfaceMs?, todayKnownSurfaceMs?, coverage and reasonCodes. Counts/time are nullable nonnegative values; absence differs from zero. Coverage distinguishes complete/partial/unknown; any displayed lower-bound claim needs explicit evidence that the value is a lower bound, not merely a noisy estimate. Freshness uses the source check/event age, not the renderer's last paint.
 

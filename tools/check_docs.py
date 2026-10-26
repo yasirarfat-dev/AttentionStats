@@ -13,7 +13,7 @@ from urllib.parse import unquote, urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 REQUIRED = (
-    "INDEX VISION PRODUCT CAPABILITY-MATRIX TRACKING-SPEC SOCIAL-MEDIA-SPEC "
+    "INDEX VISION PRODUCT CAPABILITY-MATRIX ANALYTICS-SPEC METRIC-CATALOG TRACKING-SPEC SOCIAL-MEDIA-SPEC "
     "BEHAVIOR-INTELLIGENCE PROTECTION-SPEC LIVE-OVERLAY-SPEC UX-SPEC HUMAN-FACTORS NAVIGATION DESIGN-SYSTEM "
     "SETTINGS-SPEC ARCHITECTURE FILE-STRUCTURE NATIVE-CONTRACTS DATA-MODELS "
     "STORAGE-AND-RETENTION PRIVACY SECURITY PERMISSIONS BACKUP-RESTORE "
@@ -141,6 +141,18 @@ def main() -> int:
         if not references(row, "T|P|D|B|S|X"):
             fail(matrix_path, f"capability missing acceptance scenario: {row[:35]}")
 
+    catalog_path = DOCS / "METRIC-CATALOG.md"
+    catalog = markdown.get(catalog_path, "")
+    metrics = re.findall(r"^\| (M-\d{3})\b", catalog, re.M)
+    if len(metrics) != len(set(metrics)) or not {f"M-{n:03d}" for n in range(1, 65)}.issubset(metrics):
+        fail(catalog_path, "duplicate or missing expanded-diary metric ID")
+    for row in re.findall(r"^\| M-\d{3}\b.*$", catalog, re.M):
+        cells = row.split("|")[1:-1]
+        if len(cells) != 6 or any(not cell.strip() for cell in cells):
+            fail(catalog_path, f"metric requires definition/source, controls, limits, phase/status and scenario: {row[:30]}")
+        if not re.search(r"/ (planned|experimental|blocked|implemented)\b", row) or not references(row, "T|L|D|X"):
+            fail(catalog_path, f"metric missing explicit status/scenario: {row[:30]}")
+
     scenario_ids = re.findall(r"^\| ((?:T|L|P|D|B|S|X)-\d{2})\b", testing, re.M)
     if len(scenario_ids) != len(set(scenario_ids)):
         fail(testing_path, "duplicate scenario ID")
@@ -202,6 +214,28 @@ def main() -> int:
     except (OSError, ValueError, KeyError, TypeError) as exc:
         fail(study / "package.json", f"invalid design-study tooling evidence: {exc}")
 
+    core = ROOT / "native" / "analytics-core"
+    native_evidence = DOCS / "evidence" / "analytics-toolchain.json"
+    try:
+        manifest = json.loads((core / "package.json").read_text(encoding="utf-8"))
+        native_tools = json.loads(native_evidence.read_text(encoding="utf-8"))
+        if manifest.get("dependencies") or manifest.get("devDependencies"):
+            fail(core / "package.json", "Kotlin calculation slice has no JavaScript dependencies")
+        if manifest["packageManager"] != f"pnpm@{native_tools['pnpm']['version']}" or native_tools["pnpm"]["selector"] != "pnpm@latest":
+            fail(core / "package.json", "pnpm resolution must match native tool evidence")
+        for name in ("kotlin", "r8"):
+            tool = native_tools[name]
+            if not re.fullmatch(r"[0-9a-f]{64}", tool["sha256"]) or tool["size"] <= 0 or not tool["license"]:
+                fail(native_evidence, f"missing verified artifact/size/license: {name}")
+            if tool["version"] not in tool["url"] or not tool["url"].startswith("https://"):
+                fail(native_evidence, f"native tool needs pinned HTTPS release artifact: {name}")
+        if native_tools["resolvedDate"] not in markdown.get(DOCS / "DEPENDENCIES.md", ""):
+            fail(native_evidence, "native resolution date missing from dependency documentation")
+        if "packageManagerDependencies:" not in (core / "pnpm-lock.yaml").read_text(encoding="utf-8"):
+            fail(core / "pnpm-lock.yaml", "pnpm environment lock must be committed")
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        fail(native_evidence, f"invalid native analytics tool evidence: {exc}")
+
     if (ROOT / "AGENTS.md").read_text(encoding="utf-8") != (ROOT / "CLAUDE.md").read_text(encoding="utf-8"):
         fail(ROOT / "AGENTS.md", "agent entrypoints must carry identical instructions")
     license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
@@ -238,7 +272,7 @@ def main() -> int:
         return 1
     print(
         f"PASS: {len(markdown)} Markdown files; {len(REQUIRED)} core documents; "
-        f"{len(capabilities)} capabilities; {len(tasks)} tasks; {len(scenario_ids)} scenarios; "
+        f"{len(capabilities)} capabilities; {len(metrics)} detailed metrics; {len(tasks)} tasks; {len(scenario_ids)} scenarios; "
         f"{len(ledger['packages'])} latest dependency candidates."
     )
     print("Local links/anchors, metadata, ID coverage, ledger and public artifacts checked.")

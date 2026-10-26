@@ -1,6 +1,6 @@
 # Permissions and capability access
 
-**Status:** Access model specified; no manifest or permission flow implemented. Updated 2026-10-26.
+**Status:** Access model specified; no manifest or permission flow implemented. Updated 2026-10-27.
 **Responsibility:** Defines Android declarations, user grants, disclosures, revocation and safe degradation.
 **Related specifications:** [Capabilities](CAPABILITY-MATRIX.md), [UX](UX-SPEC.md), [Privacy](PRIVACY.md), [Architecture](ARCHITECTURE.md).
 **Unresolved feasibility:** F-02, F-08 and F-09 in [Decisions](DECISIONS.md); final manifest depends on target SDK and tested service strategy.
@@ -10,6 +10,7 @@
 | Code / access | Android mechanism | Purpose and in-app disclosure | Denial/revocation behavior |
 |---|---|---|---|
 | U Usage Access | `PACKAGE_USAGE_STATS` declaration plus user special-access settings/AppOps | Enabled app/device usage sources; not runtime permission dialog | Stop relevant queries, close coverage, keep prior history visible |
+| Network statistics source | Same Usage Access grant, separate product consent | Per-app OS RX/TX buckets via NetworkStatsManager; no SIM ID, VPN, packet capture or content inspection | Stop network queries on revocation; shared/reused UID app attribution unavailable; F-10 |
 | A Accessibility | Service protected by `BIND_ACCESSIBILITY_SERVICE`, metadata and user-enabled service | Selected surface detection and explicit deterministic protection; separate affirmative disclosure | Surface counts unavailable; release selective blocking and discard in-flight payloads |
 | N Notification Listener | Service binding permission `BIND_NOTIFICATION_LISTENER_SERVICE`, user notification-access settings | Metadata lifecycle only, no message body | Notification gaps; no fabricated historical catch-up |
 | P Post notifications | `POST_NOTIFICATIONS` runtime grant on applicable Android versions | User-selected reminders and eligible visible service status | Show unavailable reminders; never infer foreground-service legality solely from grant |

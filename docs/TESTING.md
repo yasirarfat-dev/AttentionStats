@@ -1,9 +1,9 @@
 # Verification and acceptance
 
-**Status:** Documentation and browser-study checks available; native application scenarios specified and not run. Updated 2026-10-27.
+**Status:** Documentation/browser checks and pure Kotlin calculation tests available; full native application scenarios not run. Updated 2026-10-27.
 **Responsibility:** Owns acceptance scenarios, evidence quality and release gates.
 **Related specifications:** [Capabilities](CAPABILITY-MATRIX.md), [Tracking](TRACKING-SPEC.md), [Protection](PROTECTION-SPEC.md), [Backup](BACKUP-RESTORE.md), [Security](SECURITY.md).
-**Unresolved feasibility:** F-01–F-09 in [Decisions](DECISIONS.md); device/API/OEM support is not verified by fixture tests alone.
+**Unresolved feasibility:** F-01–F-10 in [Decisions](DECISIONS.md); source/API/OEM support is not verified by calculation tests alone.
 
 ## Verification levels
 
@@ -31,6 +31,13 @@ Each application evidence record needs commit/build, exact dependency/toolchain 
 | T-14 | Less than prediction floor, model drift, deleted source history | insufficient_data or reset; no invented probability or autonomous intervention |
 | T-15 | Topic consent off, then consented synthetic title, unknown title and user correction | No topic reading before consent; local classification with unknown fraction; no addiction/sensitive-trait inference |
 | T-16 | Disable/pause/exclude source while batch pending; re-enable later | Revision fence drops prohibited writes, pause gap visible, no silent backfill |
+| T-17 | Five-hour app interval, four-hour short-video interval, duplicate/overlapping primary intervals, facet overlays and gaps | App union conserved; disjoint surfaces plus unclassified equal app duration; conflicting evidence unclassified; facets never added to app time; per-app filters isolated |
+| T-18 | Replayed transitions, settled revisits, ads/stories/posts, unsupported detector, contradictory identity and midnight | Count only qualified metric-specific exposures; duplicates unchanged, nonqualifying excluded, ambiguity/coverage explicit, unknown support null; half-open day assigns event once |
+| T-19 | Click without outcome, reaction toggle/unlike, composer open, submit attempt/acknowledgement, share open/handoff and public post tally | Attempts distinct from observed UI outcomes; no server/delivery assertion or text inspection; exact replay dedup, conflicts withheld; signed net derived only from matching scope |
+| T-20 | Network RX/TX snapshots repeated/revised/overlapping, ALL plus fine partitions, partial buckets, shared/reused UID, reinstall, VPN, offline/revocation | Canonical source mode and identity/transport attribution; no duplicate totals, proportional bytes or video attribution; coarse/freshness/coverage visible; missing data not zero; close resources/off-main-thread |
+| T-21 | Safe primary contexts versus editable/message/password/payment/private/unknown fields across per-target versions | Coarse context only if safely qualified; no private text/input/recipient read or persistence; unsafe context unclassified and affected detector disabled |
+| T-22 | Future supported user archive, duplicate import, unsupported schema, large/nested/malicious payload and private fields | Native bounded allowlisted parser, source/date/field preview; reject safely without live-store mutation; imported versus observed lanes distinct unless reconciliation proven |
+| T-23 | Compatible/incompatible periods, zero/unknown denominator, signed net, coarse history and chosen time-equivalent | Split incompatible definitions/evidence, preserve unknown fractions; no invented zero/rate/drill-down; four covered hours is eight chosen 30-minute sessions, no life-outcome promise |
 
 ## Lifecycle, time and scale
 
@@ -65,6 +72,9 @@ Each application evidence record needs commit/build, exact dependency/toolchain 
 | D-01 | Delete app/time/content rows, change retention, then replay Android overlap | Delete derivatives/caches/models; history cannot resurrect; rules retained unless included; archive marked stale |
 | D-02 | Crash during batch/migration, disk full, corrupt DB or invalidated device key | Committed data preserved; cursor not advanced before commit; no destructive fallback reset |
 | D-03 | Concurrent query/mutation, stale cursor/revision, duplicate command and lost event | Consistent tagged error/idempotent outcome; re-query restores current generation |
+| D-04 | Raw→day/week/month/year facts, custom zone/week, duplicate facts, unknown partitions, mixed semantic revisions and DST | Conservation of additive bases/coverage, no overlapping authority or averaging averages; incomplete bins explicit; boundary-crossing facts split/rejected, not prorated; preview irreversible losses |
+| D-05 | Cancel/crash/disk full/consent or deletion revision change at each durable compaction stage | Before commit preserve detail; atomic validated representation replacement; idempotent cleanup, stale preview rejected; no implicit purge or source resurrection |
+| D-06 | Summary-only export/restore and deletion finer than retained app/time/topic dimensions | Archive manifest/resolution truthful; failed restore preserves data; whole-bucket deletion or cancel, never fractional fake redaction; no reconstructed detail or reactivated sources |
 | B-01 | Wrong recovery credential on existing populated installation | Authentication failure; live store unchanged; no plaintext in logs/temp/UI state |
 | B-02 | Altered tag/header/payload, malformed counts, path traversal, decompression/KDF bomb | Bounded rejection; no partial import or resource-exhaustion loop |
 | B-03 | Kill/cancel/export/provider timeout/import interruption at every stage | Before commit preserve live DB; after commit report committed generation; partial external file not “good backup” |
@@ -92,6 +102,15 @@ Each application evidence record needs commit/build, exact dependency/toolchain 
 | X-07 | Both themes, live system theme, reduced motion, 320px/200% text, RTL and modal keyboard/back | Contrast, reachable controls, fixed available navigation, no horizontal clipping, focus containment/return and disabled decorative motion; native TalkBack/frame pacing still required |
 | X-08 | Live counter: repeated item callbacks, next settled item, new visit, missing surface, hide, optional pause action | One increment per confirmed exposure; current visit already in today; duplicate adds none; unknown hides counter/no inferred count; hide affects display only; readable, movable without drag, no autonomous rule activation |
 | X-09 | Native overlay: midnight/DST/zone change, process death, dropped snapshots, restore/delete, lock/chat/payment/settings, revoked access, OEM restrictions | Correct half-open day/visit continuity and generation invalidation, stale/partial labels, no reset to fake zero; sensitive/system context removed, no touch interception, safe available settings/emergency, bounded battery cost and declared policy/renderer evidence |
+| X-10 | Each implemented mobile screen/route/state and behavior on authorized debug phone or dedicated emulator | Build/commit/environment/route/steps/outcome recorded; verify real navigation/back, loading/empty/partial/error, permissions, dark/light, text scale/TalkBack/RTL/motion where applicable; native source/lifecycle behavior additionally on physical device; no desktop-preview substitution |
+
+## Kotlin analytics calculation verification
+
+From `native/analytics-core`, use `pnpm test` or `pnpm run example`; the Python runner bootstraps verified latest-stable Kotlin tools in ignored repository-local caches. From root, `python tools/test_analytics.py --offline` uses cached tools. `python tools/check_architecture.py` verifies current domain package/import boundaries. CI runs these JVM checks independently of the browser reference.
+
+Optional physical/virtual Android execution: `python tools/test_analytics.py --device --sdk <existing-sdk-path>` converts only synthetic bytecode with verified isolated latest-stable D8, requires exactly one authorized target, copies one uniquely named task-owned file, verifies its hash, runs it under ART and removes that exact file in a finally block. It installs no app, changes no grant or settings, reads no phone history and never prints/stores a device serial. Offline repetition is available after tool bootstrap. Do not reset adb or disrupt another agent's emulator; ambiguity requires an explicitly selected isolated target before extending the runner.
+
+AS-035 has 37 passing synthetic checks on host JVM and connected Android ART. They cover only pure subsets of T-17/T-18/T-19/T-20/T-23/D-04 plus time/scale boundaries; they are not full scenario completions. No real source, UI, Room, compaction, encryption, network-collector, consent/lifecycle or backup behavior is established. [Dated log](IMPLEMENTATION_LOG/2026-10-27.md#continuation--detailed-mobile-diary-and-modular-analytics) records exact tools/environment and limitations. All future screens still require X-10, and all source detectors need independent physical-device qualification.
 
 ## Design study verification
 

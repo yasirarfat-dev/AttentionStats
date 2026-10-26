@@ -1,6 +1,6 @@
 # Social surfaces and optional context
 
-**Status:** Experimental detector design; no app/version/locale verified. Updated 2026-10-26.
+**Status:** Expanded experimental detector design; no app/version/locale qualified. Updated 2026-10-27.
 **Responsibility:** Defines transparent app/surface identification, short-video counts, optional metadata and detector qualification.
 **Related specifications:** [Tracking](TRACKING-SPEC.md), [Intelligence](BEHAVIOR-INTELLIGENCE.md), [Privacy](PRIVACY.md), [Protection](PROTECTION-SPEC.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-01 and F-08 in [Decisions](DECISIONS.md). No private implementation or universal detector is assumed.
@@ -41,6 +41,8 @@ Persist exposure ordinal/event ID, app/surface, UTC and monotonic evidence, dete
 The planned short-video count excludes positively identified advertisements, stories, live streams and photo carousels. Interleaved ads must be part of qualification, not guessed from a swipe. Ambiguous eligibility withholds the transition and marks coverage incomplete; it must not produce a fabricated exact count or a false zero. Any future all-feed/ad metric requires an explicit separate definition. On return from an excluded context, prove continuity/dedup before adding a new item. See [live count semantics](LIVE-OVERLAY-SPEC.md).
 
 ## Time and optional content
+
+The expanded diary adds separately opted-in feed-post/story/ad exposures, primary activity contexts and interaction evidence. [Analytics](ANALYTICS-SPEC.md) owns disjoint time accounting and intent/outcome semantics; [Metric catalog](METRIC-CATALOG.md) owns all candidate platforms/data points. A safe coarse messaging-context label may be evaluated separately without reading message nodes or retaining recipients/text; otherwise that time remains unclassified. This does not authorize chat/message content capture. Reaction/submit/share control inspection must exclude editable content and public engagement tallies. Current short-video adapters gain no implied support for those independent metrics.
 
 Surface time counts known interactive occupancy, even if playback is paused; it is not verified watch time, completion, eye contact or enjoyment. App totals come from app sessions, and surface intervals are a subset. Missing surface evidence cannot subtract app use or turn unclassified time into short-video time.
 

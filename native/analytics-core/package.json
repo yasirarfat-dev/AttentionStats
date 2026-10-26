@@ -1,0 +1,11 @@
+{
+  "name": "@attention-stats/analytics-core",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Standalone Kotlin calculations for the future mobile diary; no web runtime",
+  "packageManager": "pnpm@12.15.0",
+  "scripts": {
+    "test": "python ../../tools/test_analytics.py",
+    "example": "python ../../tools/test_analytics.py --example"
+  }
+}

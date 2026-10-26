@@ -1,15 +1,17 @@
 # Capability matrix
 
-**Status:** Authoritative planned inventory; no application capability implemented. Updated 2026-10-26.
+**Status:** Authoritative expanded planned inventory; no end-to-end application capability implemented. Updated 2026-10-27.
 **Responsibility:** Maps every capability to source, access, controls, limitations, phase, evidence, and an acceptance scenario.
 **Related specifications:** [Tracking](TRACKING-SPEC.md), [Social](SOCIAL-MEDIA-SPEC.md), [Protection](PROTECTION-SPEC.md), [Tests](TESTING.md), [Tracker](FEATURE-TRACKER.md).
-**Unresolved feasibility:** F-01–F-09 in [Decisions](DECISIONS.md). Public API availability is not device verification.
+**Unresolved feasibility:** F-01–F-10 in [Decisions](DECISIONS.md). Public API availability is not device verification.
 
 ## Interpretation
 
 M = MVP, E = expansion, C = continuous evolution. Planned = specified; experimental = requires a feasibility prototype; blocked = cannot advance until the named gate clears; implemented = code and acceptance evidence exist. No row is currently implemented. All rows below have **device verification: none**. Registry/policy research does not change that status.
 
 Access codes: U = user-granted Android Usage Access; A = separately disclosed and user-enabled Accessibility Service; N = Notification Listener access; P = notification posting permission where required; O = special overlay access if the chosen renderer needs it; S = system document-picker URI grant; D = notification policy access for optional DND; G = future provider authorization, blocked. “Local” means no Android grant beyond normal application storage. See [Permissions](PERMISSIONS.md) for declarations and grant types.
+
+Individual data points, including short-video time/counts, post/story/ad exposure estimates, action evidence, byte statistics and summary tiers, are enumerated in [Metric catalog](METRIC-CATALOG.md). Source/control/limit/scenario definitions there complement these capability families. “Maximum detail” remains a user-selected, disclosed supported subset; [Analytics](ANALYTICS-SPEC.md) owns accounting semantics.
 
 Control codes specify minimum controls, not optional refinements: T = off by default, source/app/category inclusion, exclusions, detail, pause, retention and delete; H = T plus separate supported-title/URL consent; R = disabled until explicit activation, per-rule behavior, targets, schedule, exceptions, override and emergency access; V = editable display/output controls and data-scope awareness; B = opt-in destination, scope, credentials, status, cancellation and deletion guidance. Exclusions apply before persistence. iOS is unimplemented for every row; it must report unsupported until a separate adapter proves availability.
 
@@ -55,6 +57,17 @@ Control codes specify minimum controls, not optional refinements: T = off by def
 | C-31 Future iPhone adapter | Public Apple frameworks to evaluate / future entitlements and user grants | T/R/V/B where supported | No Android accessibility equivalence or feature parity promised | C / experimental / F-07 | X-03: missing entitlement returns unsupported; UI never displays a successful fake grant |
 | C-32 Optional live surface awareness overlay | Qualified C-06/C-07 exposures, SurfaceEpisode, local-day aggregates and native renderer / A plus O only if selected renderer needs it | Off; app/surface/fields, position, hide, disable; tracking/protection separate | Unknown/stale/partial explicit; no callback-as-video count, guaranteed background life or obscured sensitive controls; prototype only | M candidate / experimental / F-01, F-02, F-08, F-09 | X-08/X-09: current visit and today update once, gaps/midnight respected, display removable and safe; native tests required |
 
-## Admission and evidence
+## Expanded diary capability families
+
+| ID / capability | Source / access | User controls | Accuracy and platform limits | Phase / status / gate | Acceptance scenario |
+|---|---|---|---|---|---|
+| C-33 Detailed activities and interaction evidence | Qualified per-target structural/context/control predicates / A, U attribution | T; separate coarse context and action-family consent, no typed/message content | Candidate post/story/ad/context metrics and UI outcomes versus attempts; no universal action or server-success claim | E / experimental / F-01, F-08, F-09 | T-17/T-18/T-19/T-21: conserved activity time, distinct exposures/actions, fail-closed sensitive contexts |
+| C-34 Per-app network statistics | NetworkStatsManager canonical UID/transport buckets / U plus separate source consent | T; app/transport/range, scope/freshness visibility | Coarse/delayed OS RX/TX, shared/reused UID and VPN limits; not bytes per video, packet capture or billing | E / experimental / F-10 | T-20: replay/overlap/ALL partitions/partial buckets/shared UID/reinstall/revocation never inflate or invent totals |
+| C-35 User-configured multi-resolution history | Consented detailed facts and retained summaries in Room / Local | V; preserve default, custom per-source/app/detail age, day/week/month/year tiers and explicit loss preview | Coarsened detail irrecoverable; fixed zone/revision and additive sufficient statistics; summary authority distinct from cache | E / planned / F-04, F-09 | D-04/D-05/D-06: conserve counts/coverage, atomic interruption safety, no duplicate raw/summary overlap or deletion resurrection |
+| C-36 Rich mobile diary and metric explorer | Typed covered history/surface/action/network/summary queries / Local | V; cards/metrics/dimensions/date/chart/table; no extra collection | Availability/evidence always visible; native screens not browser study; each state verified on debug phone/emulator | M core, E richer / planned / F-03, F-09 | T-17/T-23/X-10: per-platform Reels time/counts prominent, compatible comparisons, live mobile route/state/accessibility evidence |
+| C-37 Optional personal time equivalents | Covered selected duration and user-defined session length / Local | Explicit opt-in, label/session/range, hide/reset | Arithmetic only; no guaranteed skill/health/money outcome or value judgment | E / planned | T-23: four hours equals eight chosen 30-minute sessions; unknown stays unknown |
+| C-38 Optional supported personal archive import | Future allowlisted provider-export schema / S | B/T/H as applicable; selected file/fields/range, preview/cancel/delete | Delayed/source-specific; schema/terms unverified, imported and live-observed lanes not blindly merged; no account token harvesting | E / experimental / F-04, F-09 | T-22: unsupported/large/malicious archive rejected; private fields excluded, source/coverage/dedup explicit |
+
+## Admission procedure
 
 Add new rows before implementation, including an acceptance ID in [Testing](TESTING.md) and a task mapping in [Feature tracker](FEATURE-TRACKER.md). A supported detector record must include application version range, Android build/API, locale, surface, evidence fields, fixtures, precision/recall procedure, known exclusions, and date. Do not publish real account traces. Changed versions invalidate untested claims; unsupported versions return unknown rather than using a generic scroll counter.
