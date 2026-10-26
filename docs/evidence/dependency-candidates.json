@@ -1,0 +1,276 @@
+{
+  "resolvedDate": "2026-10-26",
+  "status": "metadata evaluated; not installed or build verified",
+  "packages": [
+    {
+      "package": "pnpm",
+      "selector": "pnpm@latest",
+      "version": "12.15.0",
+      "license": "MIT",
+      "peerDependencies": {},
+      "engines": {
+        "node": ">=18"
+      },
+      "source": "https://registry.npmjs.org/pnpm/latest"
+    },
+    {
+      "package": "react",
+      "selector": "react@latest",
+      "version": "19.3.1",
+      "license": "MIT",
+      "peerDependencies": {},
+      "engines": {
+        "node": ">=0.10.0"
+      },
+      "source": "https://registry.npmjs.org/react/latest"
+    },
+    {
+      "package": "@types/react",
+      "selector": "@types/react@latest",
+      "version": "19.3.0",
+      "license": "MIT",
+      "peerDependencies": {},
+      "engines": {},
+      "source": "https://registry.npmjs.org/@types/react/latest"
+    },
+    {
+      "package": "react-native",
+      "selector": "react-native@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "^19.3.0",
+        "@types/react": "^19.1.1"
+      },
+      "engines": {
+        "node": "^22.13.0 || ^24.3.0 || >= 26.0.0"
+      },
+      "source": "https://registry.npmjs.org/react-native/latest"
+    },
+    {
+      "package": "@react-native-community/cli",
+      "selector": "@react-native-community/cli@latest",
+      "version": "20.2.0",
+      "license": "MIT",
+      "peerDependencies": {},
+      "engines": {
+        "node": ">=20.19.4"
+      },
+      "source": "https://registry.npmjs.org/@react-native-community/cli/latest"
+    },
+    {
+      "package": "typescript",
+      "selector": "typescript@latest",
+      "version": "7.0.2",
+      "license": "Apache-2.0",
+      "peerDependencies": {},
+      "engines": {
+        "node": ">=16.20.0"
+      },
+      "source": "https://registry.npmjs.org/typescript/latest"
+    },
+    {
+      "package": "@react-navigation/native",
+      "selector": "@react-navigation/native@latest",
+      "version": "7.5.1",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": ">= 18.2.0",
+        "react-native": "*"
+      },
+      "engines": {},
+      "source": "https://registry.npmjs.org/@react-navigation/native/latest"
+    },
+    {
+      "package": "@react-navigation/native-stack",
+      "selector": "@react-navigation/native-stack@latest",
+      "version": "7.21.0",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": ">= 18.2.0",
+        "react-native": "*",
+        "react-native-screens": ">= 4.0.0",
+        "@react-navigation/native": "^7.5.1",
+        "react-native-safe-area-context": ">= 4.0.0"
+      },
+      "engines": {},
+      "source": "https://registry.npmjs.org/@react-navigation/native-stack/latest"
+    },
+    {
+      "package": "@react-navigation/bottom-tabs",
+      "selector": "@react-navigation/bottom-tabs@latest",
+      "version": "7.21.0",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": ">= 18.2.0",
+        "react-native": "*",
+        "react-native-screens": ">= 4.0.0",
+        "@react-navigation/native": "^7.5.1",
+        "react-native-safe-area-context": ">= 4.0.0"
+      },
+      "engines": {},
+      "source": "https://registry.npmjs.org/@react-navigation/bottom-tabs/latest"
+    },
+    {
+      "package": "react-native-unistyles",
+      "selector": "react-native-unistyles@latest",
+      "version": "3.6.0",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "*",
+        "react-native": ">=0.81.0",
+        "react-native-reanimated": "*",
+        "react-native-edge-to-edge": "*",
+        "react-native-nitro-modules": "*",
+        "@react-native/normalize-colors": "*"
+      },
+      "engines": {
+        "node": ">= 20.18.0"
+      },
+      "source": "https://registry.npmjs.org/react-native-unistyles/latest"
+    },
+    {
+      "package": "react-native-reanimated",
+      "selector": "react-native-reanimated@latest",
+      "version": "4.7.1",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "0.86 - 0.88",
+        "react-native-worklets": "0.13.x"
+      },
+      "engines": {},
+      "source": "https://registry.npmjs.org/react-native-reanimated/latest"
+    },
+    {
+      "package": "react-native-gesture-handler",
+      "selector": "react-native-gesture-handler@latest",
+      "version": "3.4.0",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "engines": {},
+      "source": "https://registry.npmjs.org/react-native-gesture-handler/latest"
+    },
+    {
+      "package": "@shopify/flash-list",
+      "selector": "@shopify/flash-list@latest",
+      "version": "2.3.3",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*",
+        "@babel/runtime": "*"
+      },
+      "engines": {},
+      "source": "https://registry.npmjs.org/@shopify/flash-list/latest"
+    },
+    {
+      "package": "react-native-svg",
+      "selector": "react-native-svg@latest",
+      "version": "15.16.0",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "engines": {},
+      "source": "https://registry.npmjs.org/react-native-svg/latest"
+    },
+    {
+      "package": "react-native-mmkv",
+      "selector": "react-native-mmkv@latest",
+      "version": "4.3.2",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*",
+        "react-native-nitro-modules": "*"
+      },
+      "engines": {},
+      "source": "https://registry.npmjs.org/react-native-mmkv/latest"
+    },
+    {
+      "package": "zod",
+      "selector": "zod@latest",
+      "version": "4.6.7",
+      "license": "MIT",
+      "peerDependencies": {},
+      "engines": {},
+      "source": "https://registry.npmjs.org/zod/latest"
+    },
+    {
+      "package": "react-native-screens",
+      "selector": "react-native-screens@latest",
+      "version": "4.30.0",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "engines": {},
+      "source": "https://registry.npmjs.org/react-native-screens/latest"
+    },
+    {
+      "package": "react-native-safe-area-context",
+      "selector": "react-native-safe-area-context@latest",
+      "version": "5.10.1",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "engines": {},
+      "source": "https://registry.npmjs.org/react-native-safe-area-context/latest"
+    },
+    {
+      "package": "react-native-worklets",
+      "selector": "react-native-worklets@latest",
+      "version": "0.13.1",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "*",
+        "@babel/core": "*",
+        "react-native": "0.86 - 0.88",
+        "@react-native/metro-config": "*"
+      },
+      "engines": {},
+      "source": "https://registry.npmjs.org/react-native-worklets/latest"
+    },
+    {
+      "package": "react-native-nitro-modules",
+      "selector": "react-native-nitro-modules@latest",
+      "version": "0.37.1",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "engines": {},
+      "source": "https://registry.npmjs.org/react-native-nitro-modules/latest"
+    },
+    {
+      "package": "react-native-edge-to-edge",
+      "selector": "react-native-edge-to-edge@latest",
+      "version": "1.8.2",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*"
+      },
+      "engines": {},
+      "source": "https://registry.npmjs.org/react-native-edge-to-edge/latest"
+    },
+    {
+      "package": "@react-native/normalize-colors",
+      "selector": "@react-native/normalize-colors@latest",
+      "version": "0.88.0",
+      "license": "MIT",
+      "peerDependencies": {},
+      "engines": {},
+      "source": "https://registry.npmjs.org/@react-native/normalize-colors/latest"
+    }
+  ]
+}
