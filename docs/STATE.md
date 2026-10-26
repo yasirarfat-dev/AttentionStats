@@ -90,3 +90,5 @@ Continue AS-002/F-03 qualification for ARM64 release, minimum API/desugaring, na
 ## Session verification
 
 Resumed after the user's compaction pause using the saved checkpoint, without repeating completed native builds or phone tests. Frozen install, lint/boundaries, strict types, formatting, nine Jest cases, mobile dependency/patch/wrapper audit and Python syntax checks pass. Final documentation/public review and publication are recorded in the dated log; remote CI is separate from local results. No manual compaction action is claimed.
+
+Published the reviewed scaffold as [2d84650](https://github.com/yasirarfat-dev/AttentionStats/commit/2d846508f15b90fa3b828100878caf57e8cf8e30). Effective author/committer and authenticated login matched `yasirarfat-dev`; the intended remote and local/remote main SHA were verified. Documentation/mobile audit and staged whitespace checks pass; no private caches, keys, binaries or phone captures were published. Its [CI run](https://github.com/yasirarfat-dev/AttentionStats/actions/runs/40419666338) was queued at publication; no remote success is claimed.
