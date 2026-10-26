@@ -1,5 +1,7 @@
 # Attention Stats interaction study
 
+**Completed, non-shipping mobile-design reference only.** Attention Stats ships mobile clients: Android first, iOS later. This browser study is not a website/web-app product, PWA, extension, WebView runtime or continuing web-development track. Native implementation follows the [mobile tracker](../../docs/FEATURE-TRACKER.md); a possible Chrome extension is deferred beyond mobile completion under [ADR-024](../../docs/DECISIONS.md).
+
 A working **design prototype** with original synthetic examples. This is not the React Native application: no Android permissions, collectors, blocking, history database, encryption, export or cloud backup are implemented here.
 
 Read the authoritative [human factors](../../docs/HUMAN-FACTORS.md), [design system](../../docs/DESIGN-SYSTEM.md) and [UX](../../docs/UX-SPEC.md) specifications.

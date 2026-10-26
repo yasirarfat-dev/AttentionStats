@@ -37,4 +37,6 @@ Explainable local predictions, optional content-topic patterns and personalized 
 
 ## Sequencing rules
 
+ADR-024 limits product delivery to mobile clients: Android first, iOS later. The completed browser design study remains reference material only. No website, web app, PWA, desktop client or Chrome extension is an active delivery stage. A potential extension is deferred until mobile work is complete and separately prioritized; additional platform-adapter wording above does not authorize web/extension work.
+
 Privacy/ownership and data reliability precede attractive charts or sophisticated forecasts. Priorities and task dependencies live in [Tracker](FEATURE-TRACKER.md); State identifies current work. A stage advances by evidence, not elapsed time. Newly reported ideas are reviewed through Queue and may adjust future scope without rewriting completed history. Keep each stage independently useful and honest about unavailable coverage.

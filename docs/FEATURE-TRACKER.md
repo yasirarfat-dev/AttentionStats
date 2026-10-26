@@ -9,6 +9,8 @@ Status vocabulary: **planned** = specified future work; **experimental** = feasi
 
 User-directed design continuation prioritizes AS-033 as a separate interaction study under ADR-019/ADR-020. It does not clear native feasibility prerequisites. Resume AS-002 after this reviewable study; AS-018 adopts the direction when its native dependencies are satisfied.
 
+ADR-024 confirms mobile-only delivery. AS-033 is complete and retained as a non-shipping design reference; it does not establish a continuing web-app workstream. No Chrome-extension task is scheduled. Next implementation is native Android feasibility/scaffolding and its dependent mobile tasks.
+
 | Task | Priority / stage | Status | Capability coverage | Prerequisites / concrete completion evidence |
 |---|---|---|---|---|
 | AS-001 Documentation foundation and public repository | P0 / foundation | implemented | All specifications, no runtime capability | 50 reviewed files, passing local checks and GitHub CI; public push/Apache-2.0 verified; [evidence](IMPLEMENTATION_LOG/2026-10-27.md) |

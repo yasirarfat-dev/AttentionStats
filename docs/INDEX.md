@@ -9,6 +9,8 @@
 
 Attention Stats is a local-first, open-source personal digital wellbeing app: **observe → track → categorize → predict → protect**. Android launches first using React Native Community CLI, TypeScript and New Architecture; Kotlin owns collection/rules and Room-backed local SQLite. Future iPhone work uses explicit adapters. Public repository: [yasirarfat-dev/AttentionStats](https://github.com/yasirarfat-dev/AttentionStats). Local root: `C:\home\biobot\projects\AttentionStats`.
 
+**Mobile clients only.** The browser study is a completed, non-shipping design reference, not a website/web-app product. A possible Chrome extension is deferred until mobile work is complete and separately prioritized; there is no active extension implementation (ADR-024).
+
 **Documentation prepared; application not yet implemented.** A separate [interactive design study](../design/prototype/README.md) uses synthetic data and implements no tracking or native protection. Application runtime behavior remains a specification. No capability is implemented and no Android scaffold/binary exists. Mobile dependencies remain unverified candidates; the design study has its own latest test tools and pnpm lockfile.
 
 | Reader/task | Reading order |

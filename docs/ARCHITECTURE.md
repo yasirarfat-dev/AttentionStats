@@ -1,11 +1,13 @@
 # Architecture
 
-**Status:** Accepted boundaries; implementation pending. Updated 2026-10-26.
+**Status:** Accepted mobile-client boundaries; implementation pending. Updated 2026-10-27.
 **Responsibility:** Owns subsystem boundaries, runtime lifecycle, data flow and future adapters.
 **Related specifications:** [Contracts](NATIVE-CONTRACTS.md), [Models](DATA-MODELS.md), [Structure](FILE-STRUCTURE.md), [Dependencies](DEPENDENCIES.md), [Security](SECURITY.md).
 **Unresolved feasibility:** F-02–F-04, F-07 and F-08 in [Decisions](DECISIONS.md); service strategy, toolchain and encryption are not build-verified.
 
 ## Runtime boundaries
+
+Supported product targets are mobile: Android first, future iOS through native adapters. React Native renders mobile components; do not introduce React Native Web, a website/PWA/desktop runtime, an embedded copy of the browser study, or browser-extension scaffolding. AS-033 is a completed non-shipping design reference. A potential Chrome extension is deferred beyond mobile completion and would require a separate design/task decision (ADR-024).
 
 | Layer | Responsibility | Forbidden ownership |
 |---|---|---|

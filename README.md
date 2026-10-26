@@ -2,6 +2,8 @@
 
 An open-source personal digital wellbeing application built around **observe → track → categorize → predict → protect**.
 
+**Mobile clients only: Android first, iOS later.** The product is not a website, web app, PWA or desktop app. A possible Chrome extension is deferred until mobile work is complete and separately authorized; no extension is being developed.
+
 **Documentation prepared; application not yet implemented.** There is no installable app, application scaffold, or verified device support yet. Android will launch first with React Native Community CLI, TypeScript, and the New Architecture. Future iPhone contributions will use explicit platform adapters.
 
 The goal is to help you understand the digital behavior your device exposes and you choose to track, then act on that knowledge. Observation-only use is welcome. History stays on your device; limits and interventions are your choice. Predictions will be local and explainable. The project will not claim to measure dopamine, diagnose addiction, or read your attention state.
@@ -10,7 +12,7 @@ Start with the [documentation index](docs/INDEX.md), [product scope](docs/PRODUC
 
 Development uses **pnpm** and resolves new direct packages with `package@latest`. Exact dependency candidates are [recorded](docs/DEPENDENCIES.md); no application dependencies are installed in this phase.
 
-An [interactive design study](design/prototype/README.md) now explores the calm, supportive experience with synthetic data: daily clarity, understandable patterns, chosen boundaries, privacy, light/dark themes and reduced motion. It implements no tracking or native protection. [Human factors](docs/HUMAN-FACTORS.md) governs its direction. From `design/prototype`, run `pnpm run preview`, then open `http://127.0.0.1:4179`; previewing needs Node, with no dependency install.
+A completed [interaction study](design/prototype/README.md) is retained solely as a non-shipping mobile-design reference. Its browser preview is not the product or a web implementation track. Mobile screens will use React Native components and native platform adapters. [Human factors](docs/HUMAN-FACTORS.md) governs the experience; next development follows the native tasks in the [tracker](docs/FEATURE-TRACKER.md).
 
 Run documentation checks with Python 3.11 or newer:
 

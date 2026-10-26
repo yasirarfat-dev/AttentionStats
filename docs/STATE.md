@@ -8,6 +8,7 @@
 ## Identity and scope
 
 - Product: **Attention Stats**. Public repository target: `yasirarfat-dev/AttentionStats`.
+- Delivery targets: **mobile clients only**, Android first and iOS later. No website/web app/PWA/desktop client or extension is being developed. AS-033 is a completed non-shipping design reference; potential Chrome extension work is deferred beyond mobile completion and needs separate prioritization (ADR-024).
 - Local root: `C:\home\biobot\projects\AttentionStats`. This is the final corrected location.
 - License: Apache-2.0. Android first, React Native Community CLI, TypeScript, New Architecture, Kotlin/Room native ownership; future iPhone adapter.
 - Package manager: pnpm; new direct runtime/development packages must be latest. Routine builds will use committed lockfile after scaffolding.

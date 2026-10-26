@@ -27,5 +27,6 @@ Promotion requires a decision, domain-spec/matrix update and AS task/dependencie
 |---|---|---|
 | Q-004 / 2026-10-27 | Would aggregate-only archive export meet users' portability needs while reducing detail? | Defer product evaluation to AS-020; must preserve clear scope/omission labels |
 | Q-005 / 2026-10-27 | Which additional locales or regional/lite target variants should be qualified first? | Defer to AS-005 evidence and contributor capacity; no assumed shared selectors |
+| Q-008 / 2026-10-27 | Possible Chrome extension after mobile delivery | Deferred by ADR-024 until mobile work is complete and the user separately prioritizes it. No extension task, manifest, implementation or website/web-app product is authorized now |
 
 These are design questions, not requests waiting on the current user. Proceed with the accepted foundation and tracker. Record new user corrections directly in decisions/state rather than leaving them as unresolved queue entries.

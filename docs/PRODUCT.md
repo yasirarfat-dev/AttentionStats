@@ -1,6 +1,6 @@
 # Product specification
 
-**Status:** Accepted scope; all application capabilities planned, experimental, or blocked. Updated 2026-10-26.
+**Status:** Accepted mobile-only scope; all application capabilities planned, experimental, or blocked. Updated 2026-10-27.
 **Responsibility:** Defines product behavior, journeys, delivery scope, and success criteria.
 **Related specifications:** [Vision](VISION.md), [Capabilities](CAPABILITY-MATRIX.md), [UX](UX-SPEC.md), [Roadmap](ROADMAP.md).
 **Unresolved feasibility:** F-01 through F-09 in [Decisions](DECISIONS.md); no universal observation or enforcement guarantee.
@@ -8,6 +8,8 @@
 ## Scope
 
 Attention Stats is an open-source, Android-first personal digital wellbeing app. React Native Community CLI provides the interface; Kotlin owns collection, deterministic protection, and Room-backed SQLite. The intended public home is `yasirarfat-dev/AttentionStats`, licensed Apache-2.0. The initial repository contains documentation and review tooling only.
+
+**Product delivery is mobile clients only: Android first, iOS later.** No website, web app, PWA, desktop client or Chrome extension is in current scope. A possible Chrome extension is deferred until mobile work is complete and separately prioritized. The completed AS-033 browser study is a non-shipping design reference; it is not a product platform or permission to continue web development. Mobile screens use React Native components and platform adapters, not a WebView hosting that study. See ADR-024 in [Decisions](DECISIONS.md).
 
 The product covers device and app activity, social-app summaries, supported surfaces and short-video observations, editable categories, local descriptive insights, optional predictions, and user-defined protection. Later capabilities add notification behavior, supported browsing context and content history, richer routines, widgets, Quick Settings, and community-led iPhone support. The [capability matrix](CAPABILITY-MATRIX.md) is the exhaustive capability inventory and admission gate for additions.
 

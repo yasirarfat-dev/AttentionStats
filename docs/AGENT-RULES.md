@@ -35,6 +35,8 @@ Do not spawn/delegate to other agents unless the user or applicable instructions
 
 ## Hard boundaries
 
+**Product targets are mobile clients only: Android first, iOS later.** Do not build a website, web app, PWA, desktop client or Chrome extension as part of current delivery. The completed AS-033 browser study is a non-shipping design reference, not a product platform, WebView implementation or ongoing web-development track. Next implementation follows native AS-002/AS-003/AS-004 and dependent tasks. A possible Chrome extension stays deferred until mobile work is complete and the user explicitly prioritizes it separately.
+
 All tracking and content detail is user-controlled; source grants do not equal consent. No hidden backend/telemetry or autonomous accessibility actions. Predictions are local recommendations and never diagnoses. Never describe unknown coverage as zero, a proposal as a build, a mock test as a device result, or local recording as “no collection.” Marketing uses the precise [privacy promise](PRIVACY.md).
 
 UI work follows [Human factors](HUMAN-FACTORS.md): calm, supportive, accessible and useful by choice. Optimize for clarity, agency and peace of mind; no guilt/streak pressure, infinite engagement loops, invented wellness scores or emotional dependency. The synthetic design study is a reference, not a native implementation or evidence that tracking/enforcement works.
