@@ -95,6 +95,8 @@ Packaging source published as [58695ac](https://github.com/yasirarfat-dev/Attent
 
 ## Next action
 
+Session continuity follows the user's **pause → checkpoint → compact → continue** cycle at reported **100k–150k context tokens**. Preserve the checkpoint and resume the same objective after compaction; unavailable counters/controls must not be represented as measured or invoked.
+
 Continue AS-002/F-03 physical minimum-API/full-library/expanded-ABI qualification; ARM64 unsigned release and current-phone packaged calculations now pass. iOS remains untested. Continue dependency-ready AS-003 source/lifecycle research, AS-006 archive/encryption review and AS-007 policy feasibility. Full AS-008 capability/revision/event contracts precede AS-010/AS-018 product flows; scaffold routes do not bypass consent/storage dependencies. TalkBack and broader screen qualification remain required. Use the connected debug phone for runtime checks and request connection if absent. Resolve concrete latest-stack failures without hidden downgrades, forced peers or metadata suppression.
 
 ## Session verification
