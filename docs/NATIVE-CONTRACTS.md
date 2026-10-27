@@ -11,7 +11,7 @@ AS-004/AS-008 introduces only `NativeBootstrap.getBootstrapStatus(): Promise<{co
 
 This is a temporary scaffold handshake, not `getCapabilities`, consent/configuration, collection health, history or a claim that Android's public sources are unsupported. The operation catalog remains unimplemented. Nine adapter tests cover version/type/state/extra-field corruption, absent module and sanitized native failure. Codegen/native round-trip and X-10 results are recorded separately; JS tests alone do not accept the bridge or screens.
 
-AS-003's separate JVM reconciliation prototype has injected source/clock/commit ports for synthetic experiments only. These are not native bridge operations or production consent/storage interfaces. Its fixed stop reasons and unresolved replay correspondence provide feasibility evidence; no public operation, capability registry or transport shape changes.
+AS-003's separate JVM reconciliation prototype has injected source/clock/commit ports and serial planning/retry decisions for synthetic experiments only. These are not native bridge operations or production consent/storage interfaces. Planner pagination never means processed history; unresolved intervals and fixed stop reasons preserve failure distinctions. Only caller-qualified source failures can request bounded backoff, with no permission retry loop. No public operation, capability registry or transport shape changes; durable progress/exclusion and retry recovery contracts remain future work.
 
 ## Common types
 

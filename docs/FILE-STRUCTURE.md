@@ -38,8 +38,8 @@ AttentionStats/
       time/ activity/ observation/ network/ summary/
     src/test/kotlin/       synthetic deterministic test program
   native/collection-prototype/  AS-003 pure experiment, no application dependency
-    src/main/kotlin/org/attentionstats/collection/reconciliation/  slice/replay experiment and ports
-    src/test/kotlin/       synthetic source, in-memory coordinator and failure/race fixtures
+    src/main/kotlin/org/attentionstats/collection/reconciliation/  slice/replay ports, bounded planner/retry decisions
+    src/test/kotlin/       synthetic source/coordinator, interval-oracle and density/failure fixtures
   design/prototype/        synthetic browser study, tokens, tests, isolated manifest/lockfile
 ```
 

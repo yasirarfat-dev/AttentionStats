@@ -347,5 +347,81 @@ fun main() {
         val port = FakePort(); port.positionMs = 200
         committed(run(port)); equal(200L, port.positionMs)
     }
-    println("PASS: $passed synthetic reconciliation checks; no Android source, storage or coverage admission")
+    test("dense slice splitting reconciles half-open children without partial parent facts") {
+        val port = FakePort()
+        val values = listOf(event(10), event(30), event(50), event(90), event(100))
+        val queried = mutableListOf<Window>()
+        val source = Source { window ->
+            queried += window
+            FixtureSource(values.filter { window.contains(it.atMs) }).query(window)
+        }
+        val ledger = SliceRun(SLICE, SCOPE, RetryLimits(), 1000)
+        var decision = ledger.next(port.currentScope, 1000)
+        while (decision is NextSlice.Attempt) {
+            val outcome = run(port, source, decision.window, budget = Budget(maxEvents = 2))
+            if (outcome is Outcome.Stopped) untouched(port)
+            ledger.complete(decision, outcome, 1000)
+            decision = ledger.next(port.currentScope, 1000)
+        }
+        equal(NextSlice.Done, decision)
+        equal(listOf(SLICE, Window(0, 50), Window(50, 100)), queried)
+        equal(values.dropLast(1).toSet(), port.rows.map { it.signature }.toSet())
+        equal(100L, port.positionMs); equal(2L, port.revision)
+    }
+    test("unsplittable equal-time density retains all unresolved time and no partial commit") {
+        val port = FakePort()
+        val ledger = SliceRun(Window(0, 8), SCOPE, RetryLimits(), 0)
+        var decision = ledger.next(SCOPE, 0)
+        var queries = 0
+        while (decision is NextSlice.Attempt) {
+            queries++
+            val result = run(port, FixtureSource(List(4) { event(0) }), decision.window, budget = Budget(maxEvents = 2))
+            stopped(Stop.TRUNCATED, result); untouched(port)
+            ledger.complete(decision, result, 0)
+            decision = ledger.next(SCOPE, 0)
+        }
+        val halt = decision as NextSlice.Halted
+        equal(RetryStop.DENSE_LIMIT, halt.reason); equal(4, queries)
+        equal(listOf(Window(0, 1), Window(1, 2), Window(2, 4), Window(4, 8)), halt.unresolved)
+    }
+    test("attempt exhaustion preserves earlier child commits and never jumps an unresolved sibling") {
+        val port = FakePort()
+        val values = listOf(event(10)) + List(4) { event(75) }
+        val source = Source { window -> FixtureSource(values.filter { window.contains(it.atMs) }).query(window) }
+        val ledger = SliceRun(SLICE, SCOPE, RetryLimits(maxAttempts = 4), 0)
+        var decision = ledger.next(SCOPE, 0)
+        while (decision is NextSlice.Attempt) {
+            ledger.complete(decision, run(port, source, decision.window, budget = Budget(maxEvents = 2)), 0)
+            decision = ledger.next(SCOPE, 0)
+        }
+        val halt = decision as NextSlice.Halted
+        equal(RetryStop.ATTEMPT_LIMIT, halt.reason); equal(listOf(Window(75, 100)), halt.unresolved)
+        equal(setOf(Occurrence(event(10), 0)), port.rows); equal(75L, port.positionMs); equal(2L, port.revision)
+    }
+    test("planned exclusions cannot authorize jumping the single-slice history cursor") {
+        val scope = SCOPE.copy(fences = listOf(Window(20, 30)))
+        val port = FakePort(scope)
+        val plan = planSlices(scope, SLICE) as PlanResult.Page
+        equal(listOf(PlanStep.Slice(Window(0, 20)), PlanStep.Excluded(Window(20, 30), Exclusion.FENCED),
+            PlanStep.Slice(Window(30, 100))), plan.steps)
+        committed(run(port, window = Window(0, 20)))
+        val laterSource = FixtureSource()
+        stopped(Stop.INVALID_STATE, run(port, laterSource, Window(30, 100)))
+        equal(0, laterSource.queryCount); equal(20L, port.positionMs); equal(1L, port.revision)
+        // A future coordinator needs per-range progress/exclusion evidence; pagination cannot impersonate it.
+    }
+    test("scope change between committed children stops dispatch before another query") {
+        val port = FakePort()
+        val ledger = SliceRun(SLICE, SCOPE, RetryLimits(), 0)
+        val first = ledger.next(SCOPE, 0) as NextSlice.Attempt
+        ledger.complete(first, Outcome.Stopped(Stop.TRUNCATED), 0)
+        val left = ledger.next(SCOPE, 0) as NextSlice.Attempt
+        ledger.complete(left, run(port, window = left.window), 0)
+        port.currentScope = SCOPE.copy(consentRevision = 2, enabled = false)
+        val stop = ledger.next(port.currentScope, 0) as NextSlice.Halted
+        equal(RetryStop.SCOPE_CHANGED, stop.reason); equal(listOf(Window(50, 100)), stop.unresolved)
+        equal(50L, port.positionMs); equal(1L, port.revision)
+    }
+    passed += planningChecks()
+    println("PASS: $passed synthetic reconciliation/planning checks; no Android source, storage or coverage admission")
 }

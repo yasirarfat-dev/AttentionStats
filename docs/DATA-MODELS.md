@@ -51,6 +51,8 @@ UTC epoch milliseconds are the transport/storage instant. Store event-time zone 
 
 The AS-003 pure prototype's `Signature`/`Occurrence` and `Batch` are experimental values scoped by its injected source/installation/generation snapshot, not SourceEvent entities or a persisted schema. Local ordinals preserve maximum observed group multiplicity; overlap correspondence remains unresolved and decreases are flagged. A batch contains query completion/position without metric coverage. Do not copy these values into the durable contract as proven identity or complete coverage.
 
+Its `PlanStep.Excluded` and `nextPlanningAtMs` describe proposal partitioning, not durable CoverageInterval records or processed-history cursors. `SliceRun` holds bounded in-memory pending work/attempts only; unresolved intervals remain explicit when density or retry limits stop a run. It neither persists job state nor authorizes advancing across an exclusion. Per-range progress, exclusion receipts and crash/restart schema remain undecided under AS-009/AS-010.
+
 Every measure identifies source observation IDs or a bounded query provenance descriptor, reducer/model version, configuration revision, coverage interval, and kind (observed/estimate/classification/prediction). A confidence class is not a measured probability. Unknown metrics use null and reasons. Synthetic example: `com.example.social` has a covered episode from 2026-10-20T10:00:00Z to 10:10:00Z, 600000 ms; an unknown period afterward has no inferred duration.
 
 ## Relationships and deletion
