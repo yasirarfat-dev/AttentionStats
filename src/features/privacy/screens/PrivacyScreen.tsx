@@ -6,19 +6,29 @@ export function PrivacyScreen() {
     <Screen>
       <Heading>Your choices come first.</Heading>
       <Paragraph>
-        This build does not request tracking access or record your app activity.
-        Enabling a source is not available yet.
+        This preview can observe Reels only for apps you explicitly enable.
+        Accessibility access and the optional live display are separate choices.
+        You can keep observation off and use the app without granting access.
       </Paragraph>
       <Paragraph>
-        The planned app keeps history on your device by default, with no
-        developer account or telemetry. Each source will have its own
-        explanation and choice before it can collect anything.
+        Reels counts and observation times stay in an encrypted local database,
+        protected with an installation-specific Android Keystore key. There is
+        no developer account, telemetry or automatic upload. Screen text,
+        messages, titles, creators, photos and video are not read by the
+        counter.
       </Paragraph>
       <Paragraph>
-        History storage, encryption, protection rules and encrypted export are
-        still being developed. They are not active in this build.
+        A separately chosen, temporary developer structure check saves only
+        layout identifiers and numeric scroll positions for enabled apps. It
+        stops after ten minutes and removes its private diagnostic file when
+        stopped. It does not upload anything automatically.
       </Paragraph>
-      <Paragraph>You can return and leave the app at any time.</Paragraph>
+      <Paragraph>
+        Pause stops new observations and removes the live display. Deleting
+        Reels history disables observation and removes saved counts for both
+        apps. Export, restore, protection and broader history remain
+        unavailable.
+      </Paragraph>
     </Screen>
   );
 }

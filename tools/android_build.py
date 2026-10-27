@@ -16,14 +16,17 @@ def main() -> int:
     parser.add_argument("tasks", nargs="+", choices=[
         "assembleDebug", "assembleRelease", "bundleRelease", "lintDebug",
         ":app:assembleDebug", ":app:assembleRelease", ":app:assembleDebugAndroidTest", ":app:lintDebug",
+        ":app:assemblePreview", ":app:lintPreview",
         "testDebugUnitTest", ":analytics-core:verifyAnalytics", "generateCodegenArtifactsFromSchema",
         ":collection-prototype:verifyReconciliation",
+        ":reels-core:verifyReels",
         "help", "dependencies",
     ])
     local_sdk = ROOT / ".cache/as-004/sdk"
     default_sdk = local_sdk if local_sdk.is_dir() else os.environ.get("ANDROID_HOME", local_sdk)
     parser.add_argument("--sdk", type=Path, default=Path(default_sdk))
     parser.add_argument("--arch", default="arm64-v8a", choices=["arm64-v8a", "x86_64", "armeabi-v7a", "x86"])
+    parser.add_argument("--write-locks", action="store_true", help="only for reviewed native dependency introduction/refresh")
     args = parser.parse_args()
     sdk = args.sdk.resolve()
     if not (sdk / "platforms").is_dir():
@@ -35,7 +38,7 @@ def main() -> int:
         java = shutil.which("java")
         if java:
             env["JAVA_HOME"] = str(Path(java).resolve().parents[1])
-    if any(task in args.tasks for task in ["assembleDebug", ":app:assembleDebug", ":app:assembleDebugAndroidTest"]):
+    if any(task in args.tasks for task in ["assembleDebug", ":app:assembleDebug", ":app:assembleDebugAndroidTest", ":app:assemblePreview"]):
         debug_key = ROOT / ".cache/android-debug.keystore"
         if not debug_key.exists():
             debug_key.parent.mkdir(parents=True, exist_ok=True)
@@ -49,7 +52,7 @@ def main() -> int:
     wrapper = ROOT / "android" / ("gradlew.bat" if os.name == "nt" else "gradlew")
     return subprocess.run([str(wrapper), *args.tasks, "--no-daemon", "--console=plain",
                            "--max-workers=4", "-Pandroid.builder.sdkDownload=false",
-                           f"-PreactNativeArchitectures={args.arch}"],
+                           f"-PreactNativeArchitectures={args.arch}", *(["--write-locks"] if args.write_locks else [])],
                           cwd=ROOT / "android", env=env).returncode
 
 

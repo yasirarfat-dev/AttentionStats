@@ -15,6 +15,8 @@ Configure service package filters to minimize callbacks, then recheck the packag
 
 ## Candidate adapter registry
 
+AS-043 maps the canonical installed candidates `com.instagram.android` and `com.facebook.katana` to independent preview sources. Mapping package identity does not qualify a Reels surface. The native `DetectorRegistry` currently has **no admitted definitions**; both versions remain unavailable until independently consented structural/manual trials establish surface, page transition and ad/comment/feed/private-context exclusions. The bounded passive adapter and 500 ms pure reducer are implemented experimental infrastructure. They never infer Reels from a generic scroll event; synthetic reducer checks are not per-app detector evidence. Optional ten-minute local structural qualification reads no node text/descriptions or target screenshots and requires separate consent. Both applications remain unaccepted as working counters.
+
 | Adapter key | Intended surface | Must distinguish | Current status |
 |---|---|---|---|
 | facebook.short_video | Facebook Reels | normal feed, stories, chat, ads, live, comments | Experimental; no selectors or package mapping validated |

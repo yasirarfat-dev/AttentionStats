@@ -15,6 +15,8 @@ No application backend, mandatory product account, advertising SDK, remote analy
 
 ## Data inventory
 
+AS-043's installed-preview inventory is narrower than the planned catalog: per-app source choices, disclosure decisions, pause/HUD configuration, exposure counts/timestamps, visits and coverage in encrypted local storage. Its passive accessibility adapter reads only bounded selected-package resource IDs, class/role and numeric page/scroll positions; it never reads node text/descriptions, images, messages, input values or content fingerprints. No content/topic control is implemented. An independent affirmative developer-only choice temporarily retains a bounded flat structural diagnostic in private no-backup storage, for up to ten minutes; stopping, expiry, deletion or a fresh process removes it. The developer may read this one file during the local qualification; no automatic upload. User consent and a verified detector are required separately before real counts can be admitted. See [permissions](PERMISSIONS.md) and [current status](STATE.md).
+
 | Data class | Why / default | Storage and recipients | Control |
 |---|---|---|---|
 | App/package metadata and usage episodes | History; disabled until usage opt-in | Local authoritative DB; no developer recipient | App/source filters, exclusions, pause, retention, selective delete |

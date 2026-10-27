@@ -101,6 +101,27 @@ def main() -> int:
         if re.search(r"\b(?:android\.|androidx\.|java\.(?:io|net|sql)\.|com\.facebook\.|kotlinx\.coroutines\.)", text):
             errors.append(f"{label}: platform/storage/side-effect dependency in prototype")
     # The experimental JVM module is deliberately absent from application dependencies.
+    reels = ROOT / "native/reels-core/src/main/kotlin"
+    reels_paths = sorted(reels.rglob("*.kt"))
+    if not reels_paths:
+        errors.append("No Reels domain source found")
+    for path in reels_paths:
+        source_text = path.read_text(encoding="utf-8")
+        expected = ".".join(path.parent.relative_to(reels).parts)
+        if not re.search(rf"^package {re.escape(expected)}$", source_text, re.M) or expected != "org.attentionstats.reels":
+            errors.append(f"{path.relative_to(ROOT)}: invalid Reels domain package")
+        for imported in re.findall(r"^import ([\w.*]+)$", source_text, re.M):
+            if not imported.startswith(("kotlin.", "org.attentionstats.reels.")):
+                errors.append(f"{path.relative_to(ROOT)}: infrastructure import in Reels domain")
+        if re.search(r"\b(?:android\.|androidx\.|java\.(?:io|net|sql|security)\.|com\.facebook\.react\.|kotlinx\.|javax\.crypto\.)", source_text):
+            errors.append(f"{path.relative_to(ROOT)}: side effect dependency in Reels domain")
+    counter_source = ROOT / "android/app/src/main/java/com/attentionstats/reels"
+    for path in counter_source.rglob("*.kt"):
+        source_text = path.read_text(encoding="utf-8")
+        if re.search(r"\b(?:node|root|source|event)\s*\??\.\s*(?:text|contentDescription|beforeText|getText|getContentDescription|getBeforeText)\b", source_text):
+            errors.append(f"{path.relative_to(ROOT)}: counter must not read captured text/descriptions")
+        if re.search(r"\b(?:performGlobalAction|performAction|dispatchGesture)\s*\(", source_text):
+            errors.append(f"{path.relative_to(ROOT)}: counter must remain passive")
     app_build = (ROOT / "android/app/build.gradle").read_text(encoding="utf-8")
     if "collection-prototype" in app_build:
         errors.append("Application must not depend on the collection prototype")
@@ -120,6 +141,7 @@ def main() -> int:
         return 1
     print(f"PASS: {len(paths)} Kotlin source files; package paths and declared domain import boundaries")
     print(f"PASS: {len(prototype_paths)} collection prototype source files; pure boundary and no app dependency")
+    print(f"PASS: {len(reels_paths)} Reels domain source files; pure boundary and passive metadata-only source guard")
     print("PASS: standalone storage/archive qualification excluded from product settings/dependencies/source")
     print(f"PASS: {mobile_count} mobile TypeScript files; relative imports, feature public APIs and layer direction")
     print("Static checks do not establish native compilation, UI or runtime source support.")

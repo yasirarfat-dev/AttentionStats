@@ -1,0 +1,455 @@
+{
+  "reviewedDate": "2026-10-27",
+  "recordedAtUtc": "2026-10-27T16:23:50.749227+00:00",
+  "task": "AS-043",
+  "status": "experimental",
+  "scope": "Installed main React Native Android developer preview; synthetic native storage and own-window UI qualified; real target counting not admitted.",
+  "nativeStableResolutions": [
+    {
+      "coordinate": "androidx.room3:room3-runtime",
+      "version": "3.0.3",
+      "metadataUrl": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-runtime/maven-metadata.xml",
+      "metadataSha256": "83631698f90bba59be70a58c2f381e297a19173ad54214fa897b2b5934c4a427",
+      "pom": {
+        "url": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-runtime/3.0.3/room3-runtime-3.0.3.pom",
+        "sha256": "0cb1b4a7600426506ffa200486b39f4f92ba584620cd33123552ca2b225fea73",
+        "licenses": [
+          {
+            "name": "The Apache Software License, Version 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+          }
+        ]
+      }
+    },
+    {
+      "coordinate": "androidx.room3:room3-compiler",
+      "version": "3.0.3",
+      "metadataUrl": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-compiler/maven-metadata.xml",
+      "metadataSha256": "d3ee08cf9806a39646d33f7a04ea820ee8ccd2773427137d5a0f0105aa1905dc",
+      "pom": {
+        "url": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-compiler/3.0.3/room3-compiler-3.0.3.pom",
+        "sha256": "7384e139f728d7353a2c56f53aa590a23f49f1b7cfd679b83c01e1bf6992a7c2",
+        "licenses": [
+          {
+            "name": "The Apache Software License, Version 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+          }
+        ]
+      }
+    },
+    {
+      "coordinate": "androidx.sqlite:sqlite",
+      "version": "2.7.1",
+      "metadataUrl": "https://dl.google.com/dl/android/maven2/androidx/sqlite/sqlite/maven-metadata.xml",
+      "metadataSha256": "7a066da7dc679357feb589e7539d96476034e60b28064b46736153062410e19c",
+      "pom": {
+        "url": "https://dl.google.com/dl/android/maven2/androidx/sqlite/sqlite/2.7.1/sqlite-2.7.1.pom",
+        "sha256": "67945c1ed0bb9531c634287592c6a3bf4449635e60bb3ed3a3453fc612ad3065",
+        "licenses": [
+          {
+            "name": "The Apache Software License, Version 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+          }
+        ]
+      }
+    },
+    {
+      "coordinate": "net.zetetic:sqlcipher-android",
+      "version": "4.20.0",
+      "metadataUrl": "https://repo.maven.apache.org/maven2/net/zetetic/sqlcipher-android/maven-metadata.xml",
+      "metadataSha256": "289d88d846acfc3221b4e0edaf38340b0975f2002a0013ffcd3cdce75a7b2299",
+      "pom": {
+        "url": "https://repo.maven.apache.org/maven2/net/zetetic/sqlcipher-android/4.20.0/sqlcipher-android-4.20.0.pom",
+        "sha256": "9d882f462c6fb4063b1c3bfb3df913c5929bf8cf73d7f6787f341672f23c1549",
+        "licenses": [
+          {
+            "url": "https://www.zetetic.net/sqlcipher/license/"
+          }
+        ]
+      }
+    },
+    {
+      "coordinate": "com.google.devtools.ksp:symbol-processing-gradle-plugin",
+      "version": "2.3.12",
+      "metadataUrl": "https://repo.maven.apache.org/maven2/com/google/devtools/ksp/symbol-processing-gradle-plugin/maven-metadata.xml",
+      "metadataSha256": "1c10eb930a68957dd52952557667db6266ba7e32121e6b980fbb54ad83e0324f",
+      "pom": {
+        "url": "https://repo.maven.apache.org/maven2/com/google/devtools/ksp/symbol-processing-gradle-plugin/2.3.12/symbol-processing-gradle-plugin-2.3.12.pom",
+        "sha256": "a8e7a3444dadba0b5c54a3dc09a0ebdb293ec338d8fc673f7d84e39c0b926251",
+        "licenses": [
+          {
+            "name": "The Apache License, Version 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+          }
+        ]
+      }
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+      "version": "1.11.0",
+      "metadataUrl": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core/maven-metadata.xml",
+      "metadataSha256": "290a31ac895edac9a1f092e8dd31e2d13dbf092bbc06bed6907ffa2ff825fe59",
+      "pom": {
+        "url": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core/1.11.0/kotlinx-coroutines-core-1.11.0.pom",
+        "sha256": "41b6e78c1b0d11bc99de795390df9e4ece64dc113f482d6e308f1b7a421c1d30",
+        "licenses": [
+          {
+            "name": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+          }
+        ]
+      }
+    }
+  ],
+  "sourceHashes": [
+    {
+      "path": "android/app/build.gradle",
+      "sha256Lf": "f09bed3fa6e149c5a448916a9c14c6cc68253bea76043f9e354fd820180e2f76"
+    },
+    {
+      "path": "android/app/gradle.lockfile",
+      "sha256Lf": "749697cca0b30b8c9ce6cfec9eb3a7442ce206adeaf72be06cdbe931890e88fd"
+    },
+    {
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/1.json",
+      "sha256Lf": "3712cc2c547fee43b898fe96e5f5d8bd805a083bbf36225acd82bd2f85b9333e"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt",
+      "sha256Lf": "f19147e73ddd96a30c6e89a4d9ef1c40da05f517a0cf8619b80f773addaded87"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/attentionstats/qualification/ReelsStorageProbe.kt",
+      "sha256Lf": "68fc85760d8cdaa766fbbd72dbc42eb9d83355fc8774df794a33e82e8c75b2ea"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/attentionstats/qualification/ReelsUiProbe.kt",
+      "sha256Lf": "5b4e23112904cad2a3c65089a197d0c4a9291004867951eff10daa30d82cbacf"
+    },
+    {
+      "path": "android/app/src/main/AndroidManifest.xml",
+      "sha256Lf": "a6a9049ab92ebd19b9922d1725235df8b20ec04b24c1d20301515ea1e712471c"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/MainApplication.kt",
+      "sha256Lf": "af05d26746c2352982a296d45908b144c716bcaad6da9adf324408e06cfd174c"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/bridge/BootstrapPackage.kt",
+      "sha256Lf": "815d2713c2bd64053e4cbba03e71d5f117755aa65c1225fae02bf9cd8ba25661"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/bridge/ReelsModule.kt",
+      "sha256Lf": "d01889ff79139e09e625f9be206b79355ba61c312454b7a497581ad5dc229f20"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/reels/DetectorRegistry.kt",
+      "sha256Lf": "d0504162a769c64e2a409e7fa92d5f4e7f8ae64d7e00e6e0ccb6d25a37831fa2"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/reels/ReelsAccessibilityService.kt",
+      "sha256Lf": "745053b98c248288547754157f44cb57544d67ffb971c98e52cd91fafe3bc579"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/reels/ReelsCoordinator.kt",
+      "sha256Lf": "e5303673cac5ad0ed8d9d0689be69fb5a7e5a1dda66a75707e8b2e4f27dd98a6"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/storage/AttentionDatabase.kt",
+      "sha256Lf": "988abadbc8d36a875ea7e58f389467442a34175c132a85ab40a2a0b2d58652f9"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/storage/HistoryStore.kt",
+      "sha256Lf": "40ac4e9292620d21d9083ac5ca51717ca0e06e63de71ff742fbe5bce120cc194"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/storage/LocalKeyEnvelope.kt",
+      "sha256Lf": "32643400510adad31d7594eaacc5deb8af0823e9daa0b3fa19f19022221d38d8"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/storage/OwnedCipherDriver.kt",
+      "sha256Lf": "046940cee0c24244844d2fb19dec62354981e1b86d210d1b70be587ac72e26ff"
+    },
+    {
+      "path": "android/app/src/main/res/values/strings.xml",
+      "sha256Lf": "757854a9383ded78ea3806f49c844d372474fbd81f4c0fed82c8a5acee8db53e"
+    },
+    {
+      "path": "android/app/src/main/res/xml/reels_accessibility_service.xml",
+      "sha256Lf": "32d2659b2f7e37eaa4641f5be80fa9ef1aa498b3b912e9f62df93b07bea41a34"
+    },
+    {
+      "path": "android/app/src/preview/AndroidManifest.xml",
+      "sha256Lf": "5c2997be4cc19b5c292d0a3590d464a6911d32e72fcaa4083b3111d98f397984"
+    },
+    {
+      "path": "android/build.gradle",
+      "sha256Lf": "b2b30255b78ae49e8df6b846842b844408c83b729a9c24de5d4447b2e260738b"
+    },
+    {
+      "path": "android/gradle/libs.versions.toml",
+      "sha256Lf": "f27cff196e13ffb4ee1691f0ea66d47835ad62a29574772f9d100834867d7549"
+    },
+    {
+      "path": "android/reels-core/build.gradle.kts",
+      "sha256Lf": "0b5d8dc867a717da11026efbc370350492362f9934900875f4d8beeabd847aa3"
+    },
+    {
+      "path": "android/settings-gradle.lockfile",
+      "sha256Lf": "e58bb2ed80db9f829601a658d7c33b9802eb7d2191c31e79c28e01f14c225926"
+    },
+    {
+      "path": "android/settings.gradle",
+      "sha256Lf": "5da7d727b7d6a1a1a7a6874f0a5c2c3b2f48584fd6a07afd69ee295c04ad2a0a"
+    },
+    {
+      "path": "native/reels-core/README.md",
+      "sha256Lf": "2dbcc4745c40005916880bd53c7653fac51aaa464870daae7b7cd7deaddc9e18"
+    },
+    {
+      "path": "native/reels-core/src/main/kotlin/org/attentionstats/reels/CounterReducer.kt",
+      "sha256Lf": "0d018ca4dc512cca835b9524620e11282bb6f9d214ed432acf0471cf283f2161"
+    },
+    {
+      "path": "native/reels-core/src/test/kotlin/org/attentionstats/reels/ReelsTests.kt",
+      "sha256Lf": "0b89c67c63f757f97ee2bd0099d29a1a38343cf9a99a8f3746ce9e8ed54b07d3"
+    },
+    {
+      "path": "src/app/App.tsx",
+      "sha256Lf": "ab1ed6505a71d519272c84a4e15e5936a595d84661f84ed0104b1b4a91478c42"
+    },
+    {
+      "path": "src/features/onboarding/screens/WelcomeScreen.tsx",
+      "sha256Lf": "2b7af8b8074048a795cbba402131af08de7a693c89242309dd20bbc150437a22"
+    },
+    {
+      "path": "src/features/privacy/screens/PrivacyScreen.tsx",
+      "sha256Lf": "130beb846003ad92f840720c05d48337ad17890f484dca6a11c2bdaac386506e"
+    },
+    {
+      "path": "src/features/reels/index.ts",
+      "sha256Lf": "f4b8306d948f1fa06e04d57ecaad3a6b70309a91280af638248ae7d94f4576fb"
+    },
+    {
+      "path": "src/features/reels/screens/ReelsScreen.tsx",
+      "sha256Lf": "cec12b219ade9d505dd8db65efacd4ad5499e943fcd08b4b0cdb97a1792dd8ad"
+    },
+    {
+      "path": "src/platform/__tests__/reelsStatus.test.ts",
+      "sha256Lf": "4833a22bc9913c14764a361ce2bf7853334dd172fabfb74cec5a17aa977973b4"
+    },
+    {
+      "path": "src/platform/index.ts",
+      "sha256Lf": "8988f6cf868ea2f5029a5528267b19b356246dafccc99fe648cbb436132db566"
+    },
+    {
+      "path": "src/platform/reelsStatus.ts",
+      "sha256Lf": "87085071c7af54897aecaffbf96e6230238bb8a1eb7e461b4b6128135e8c389f"
+    },
+    {
+      "path": "src/platform/specs/NativeReels.ts",
+      "sha256Lf": "9b081e8b96d5d15212a382f4163cce886d3f8a1b6ddd02586c36ad7691d11047"
+    },
+    {
+      "path": "src/ui/Action.tsx",
+      "sha256Lf": "f4e61cefbae77bea74cefde2975a00f63ff406e772d65900cd7bb158aec6b74c"
+    },
+    {
+      "path": "src/ui/Reading.tsx",
+      "sha256Lf": "3752bd3ccb7adb7f0c86bbdcaa8e670b7df55f8fb606c1bdee33e6d3dee0b869"
+    },
+    {
+      "path": "src/ui/theme.ts",
+      "sha256Lf": "e50bd4f5975b1f7667bffeb17a1e60527bca2a82653efea92a3792bdb2a479d5"
+    },
+    {
+      "path": "tools/android_build.py",
+      "sha256Lf": "62502763ce54c0a60ef9747d7b8bf76cd5dba593baa129f383552ce992f2753c"
+    },
+    {
+      "path": "tools/check_architecture.py",
+      "sha256Lf": "88561695c15636a38c8ceaa77b471521afeebf2a1f6eae255af84d8e95762143"
+    },
+    {
+      "path": "tools/reels_phone.py",
+      "sha256Lf": "548672eebc9acfe93c616fe680b1b7ec71bc8c239740711c9b8c54d5381ebdbf"
+    },
+    {
+      "path": "tools/tests/test_reels_phone.py",
+      "sha256Lf": "fdf6401455e0c98c1a1ba58e343472a79efcf1f7832b369b5f1acb33e2d70a92"
+    }
+  ],
+  "sourceHashNormalization": "UTF-8 tracked text normalized to LF; excludes generated build/cache/binary/phone captures.",
+  "installedPreview": {
+    "sha256": "94b8ea0cd3ae73db1588408735198e8a463e8e5b5e0979611e92cb57aaaf7692",
+    "size": 82408749
+  },
+  "bundledJavaScript": {
+    "name": "assets/index.android.bundle",
+    "sha256": "1a679e9ce253814bd5858ade560a0c3bb818edf517e8016b6b36b95ac5e21515"
+  },
+  "phoneChecks": {
+    "physical": true,
+    "api": 36,
+    "abi": "arm64-v8a",
+    "storage": {
+      "aggregates": {
+        "storage_checks": 38,
+        "key_rejections": 3,
+        "sentinel_files": 3,
+        "fixture_removed": 1
+      },
+      "reducerArtChecks": 31,
+      "previewArtifact": {
+        "sha256": "326282d65ae99c35f05cc4b3775b4c9ef7cd210882a998bdee63055b6c4d724b",
+        "size": 80228804
+      },
+      "testArtifact": {
+        "sha256": "404c3a1c4cd8432769bac98b97e12d78d62a1535847cdf8981ddde9ee2127a50",
+        "size": 137474
+      },
+      "testPackageRemoved": true
+    },
+    "dashboard": {
+      "aggregates": {
+        "ui_checks": 13
+      },
+      "testArtifact": {
+        "sha256": "2e38518d81af0a6a52840565ad5633a002ff6bb8cf8752a2c805d57c91c70e8f",
+        "size": 139819
+      },
+      "testPackageRemoved": true
+    },
+    "lifecycle": "Post-instrumentation replacement of the same preview reconnects an already selected service without editing settings/grants."
+  },
+  "localChecks": {
+    "reducerJvmChecks": 31,
+    "jestCases": 19,
+    "hostOwnershipAndSanitizerCases": 8,
+    "textContrastPairs": 22,
+    "minimumTextContrast": 5.03,
+    "typecheck": true,
+    "lintAndArchitecture": true,
+    "format": true,
+    "previewLintErrors": 0,
+    "previewLintWarnings": 13
+  },
+  "packaging": {
+    "arm64Only": true,
+    "bundledHermes": true,
+    "metroRequired": false,
+    "developmentSigned": true,
+    "signatureAndIdentityVerified": true,
+    "backupAllowed": false,
+    "internetLocalNetworkDrawOverAppsPermissions": false,
+    "alignment": {
+      "zipAligned16KiB": true,
+      "nativeLibraries": [
+        {
+          "name": "lib/arm64-v8a/libNitroMmkv.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libNitroModules.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libappmodules.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libc++_shared.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libfbjni.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libgesturehandler.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libhermestooling.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libhermesvm.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libimagepipeline.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libjsi.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libmmkv.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libnative-filters.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libnative-imagetranscoder.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libreact_codegen_rngesturehandler_codegen.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libreact_codegen_rnscreens.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libreact_codegen_rnsvg.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libreact_codegen_safeareacontext.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libreactnative.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libreanimated.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/librnscreens.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libunistyles.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libworklets.so",
+          "minLoadAlignment": 16384
+        },
+        {
+          "name": "lib/arm64-v8a/libsqlcipher.so",
+          "minLoadAlignment": 16384
+        }
+      ],
+      "allLoadSegments16KiB": true
+    }
+  },
+  "detectors": {
+    "instagram": "not admitted; pager/comment structural signals observed; ad/mixed-context qualification pending",
+    "facebook": "not admitted; inspected screens lack IDs/collection positions; confirmed full-screen sample pending"
+  },
+  "limits": [
+    "No working two-app Reels counter or full MVP acceptance. No generic swipe-to-Reel conversion.",
+    "Synthetic store uses unique fixture directory and Keystore alias, never live history. No migration, rotation, disk-full/crash, pool stress or independent security audit.",
+    "Only our Activity windows captured. No target screenshots/text/descriptions/messages/video, personal counts, identifiers, raw phone output or diagnostic traces published.",
+    "No minimum-API or 16-KiB-page-device runtime claim; full controls/HUD/accessibility/lifecycle/accuracy/distribution gates remain open.",
+    "No archive/export/protection implementation or Play approval. No CI run or binary publication."
+  ]
+}

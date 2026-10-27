@@ -7,6 +7,8 @@
 
 ## Hierarchy
 
+AS-043's installed-preview default is the **Reels daily dashboard**, with a Privacy route and native-stack back navigation. The earlier Welcome route remains informational. Main screens remain React Native. Reels contains source disclosures, manual settings/app launches, saved-state/health, pause/HUD/delete and optional diagnostics. The HUD opens the same app activity; a cold launch now starts at Reels. Full navigation/HUD lifecycle qualification remains open. Explicit user-authorized adb launches/taps/swipes qualify the two target apps; production accessibility remains passive and never navigates them. This subset does not implement the complete hierarchy below.
+
 ```text
 Root
   OnboardingStack: Welcome → Sources → Disclosure → PermissionReturn

@@ -13,7 +13,7 @@ class MainApplication : Application(), ReactApplication {
   override val reactHost: ReactHost by lazy {
     getDefaultReactHost(
       context = applicationContext,
-      useDevSupport = BuildConfig.DEBUG,
+      useDevSupport = BuildConfig.DEBUG && BuildConfig.BUILD_TYPE != "preview",
       packageList =
         PackageList(this).packages.apply {
           add(BootstrapPackage())

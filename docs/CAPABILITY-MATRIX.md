@@ -7,6 +7,8 @@
 
 ## Interpretation
 
+AS-043 now integrates experimental native encrypted storage, source/privacy controls, metadata-only adapter infrastructure and a dormant optional HUD into the main React Native Android preview. This is a narrow implementation slice, not admission of complete C-06/C-07/C-23/C-24/C-30/C-32. Both target detector definitions remain unqualified; no working-counter or full-MVP status follows from a build, synthetic storage check or navigation screenshot. See [current integrated priority](STATE.md#active-priority-installed-reels-counter).
+
 M = MVP, E = expansion, C = continuous evolution. Planned = specified; experimental = requires a feasibility prototype; blocked = cannot advance until the named gate clears; implemented = code and acceptance evidence exist. No row is currently implemented. No end-to-end row below has admitted device qualification. The scaffold has separate bootstrap/navigation phone/emulator checks; these do not qualify collection, storage, protection or the full C-23/C-30 capability. Registry/policy research does not change runtime status.
 
 AS-002's [initial probes](DEPENDENCIES.md#as-002-isolated-compatibility-probes) and the experimental AS-004 scaffold do not qualify runtime rows. The scaffold's disabled-state routes, read-only bootstrap handshake and 37 packaged synthetic calculation checks on a physical phone are engineering evidence, not accepted C-23/C-30 functionality; F-03 and X-10 still govern acceptance.

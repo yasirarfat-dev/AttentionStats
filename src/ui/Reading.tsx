@@ -15,6 +15,11 @@ export function Paragraph({ children }: { children: ReactNode }) {
 }
 
 const styles = StyleSheet.create(theme => ({
-  heading: { color: theme.text, fontFamily: 'serif', fontSize: 36 },
-  body: { color: theme.text, fontSize: 17, lineHeight: 26 },
+  heading: {
+    color: theme.text,
+    fontSize: 32,
+    lineHeight: 40,
+    fontWeight: '500',
+  },
+  body: { color: theme.text, fontSize: 16, lineHeight: 24 },
 }));

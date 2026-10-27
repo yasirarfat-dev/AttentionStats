@@ -73,6 +73,8 @@ The native spike must prove window flags, noninteractive-region touch behavior, 
 
 ## Delivery and acceptance
 
+AS-043 now contains an experimental top-center `TYPE_ACCESSIBILITY_OVERLAY` renderer in the main Android app, with a 48dp minimum target, committed visit/day estimates and tap-to-open controls. Display consent is independent of source choice; privacy pause/disable invalidates queued observations/display and unknown/outside/locked states remove the window. No draw-over-apps grant is used. It is dormant while detector definitions remain unqualified. Safe insets/target-control overlap, multi-window, actual qualified-source updates, large-type/TalkBack, lifecycle and policy admission remain live-device gates; implementation is not acceptance of C-32. Leading/trailing placement, duration options, reminders and full configuration are not implemented in this narrow preview.
+
 AS-033 demonstrates this interaction in a synthetic feed with explicit next-item and duplicate-callback controls. AS-034 implements native live display only after AS-013/AS-007 qualification and native store/consent prerequisites. C-32 remains experimental; there is no enabled production renderer or supported version list.
 
 X-08 covers live updates, dedup, visit/day separation, gaps, pause/hide and large-type interaction. X-09 covers native midnight/timezone/reboot/generation/secure-context/touch/policy/battery behavior. Native tests remain not run. Optional content-topic interpretation is later, separately consented C-15; it should not clutter this minimal awareness display.

@@ -1,6 +1,7 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+apply plugin: "com.google.devtools.ksp"
 
 kotlin {
     compilerOptions { allWarningsAsErrors.set(true) }
@@ -98,6 +99,7 @@ android {
     }
     sourceSets {
         androidTest.java.srcDir('../../native/analytics-core/src/test/kotlin')
+        androidTest.java.srcDir('../../native/reels-core/src/test/kotlin')
     }
     defaultConfig {
         applicationId "com.attentionstats"
@@ -127,12 +129,27 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
+        preview {
+            initWith debug
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-reels-preview"
+            signingConfig signingConfigs.debug
+            matchingFallbacks = ['debug']
+            debuggable true
+            manifestPlaceholders = [usesCleartextTraffic: "false"]
+        }
     }
 }
 
 dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation project(':analytics-core')
+    implementation project(':reels-core')
+    implementation(libs.room.runtime)
+    implementation(libs.sqlite)
+    implementation(libs.sqlcipher)
+    implementation(libs.coroutines)
+    ksp(libs.room.compiler)
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
@@ -142,3 +159,7 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+ksp { arg("room.schemaLocation", "$projectDir/schemas") }
+
+dependencyLocking { lockAllConfigurations() }

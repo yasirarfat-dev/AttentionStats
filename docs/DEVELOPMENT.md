@@ -149,6 +149,14 @@ The separate [Tink fixture](../native/archive-qualification/README.md) uses the 
 
 ## Debugging procedure
 
+### AS-043 self-contained Android preview
+
+Build with `python tools/android_build.py :app:assemblePreview :app:assembleDebugAndroidTest :app:lintPreview :reels-core:verifyReels --arch arm64-v8a`. Use `--write-locks` only for a reviewed native dependency introduction/refresh; routine builds consume committed locks. Preview uses the existing development key/debug identity, debug-matched C++ dependencies, bundled JS/Hermes and disabled dev support; Metro is unnecessary. It is not a release-signed distribution APK.
+
+`python -m unittest discover -s tools/tests -p test_reels_phone.py` verifies host ownership/failure safeguards. `python tools/reels_phone.py qualify --adb <existing-adb>` requires one authorized physical ARM64 phone, verifies APK identity/signatures/bundle/permissions, upgrades the main preview without clearing history, refuses a pre-existing test package, runs unique-key/directory synthetic storage checks and own-window React Native navigation/capture, then removes only its installed test package. It leaves the preview installed. Private screenshots/results stay under ignored `.cache/reels-mvp`; no system/target UI capture or raw phone output. No grants/settings/server resets or emulator fallback.
+
+After the person manually enables the disclosed sources/accessibility and separately starts the structure check, `python tools/reels_phone.py structure --label reels-entry` reads only the fixed private metadata file through `run-as`, strictly validates bounded fields and saves an ignored per-context snapshot. A missing file is not consent. Labels identify the person's manually confirmed context; use target navigation/swipes only within explicit user authorization and never infer accuracy from synthetic fixtures. The production service performs no actions. `install` upgrades only the bundled main preview. See [State](STATE.md) for actual results and remaining detector work.
+
 Start with native capability status and last-success time, compare consent/configuration revision to current grant, then inspect bounded redacted local reason codes. Distinguish UI stale cache, missing source events, native process stop, Android force-stop and unsupported detector versions. Test with JS deliberately stopped to prove native independence. Use synthetic fixture apps/node structures; do not capture personal app trees.
 
 Reproduce clock/DST/reboot/revocation failures using injected clocks and dedicated emulators/test devices. Do not change the shared machine timezone, kill shared Node/Java processes, reset shared adb state or alter other repositories. If an emulator/device is in use by another agent, select an isolated target and explicit serial. Keep diagnostics, profiles, traces and real-device captures outside Git. Privacy and data-loss verification takes precedence over making a demo look complete.

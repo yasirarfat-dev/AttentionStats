@@ -19,6 +19,12 @@ The separate [archive-envelope build](../native/archive-qualification/README.md)
 
 ## Required policy
 
+### AS-043 main-app native additions
+
+Resolved from official Google/Maven Central metadata on 2026-10-27: Room 3 runtime/compiler **3.0.3**, AndroidX SQLite **2.7.1**, KSP **2.3.12**, Kotlin coroutines **1.11.0** (Apache-2.0), and SQLCipher Android **4.20.0** (Zetetic Community BSD terms; [vendor license](https://www.zetetic.net/sqlcipher/license/)). SQLCipher's first 4.19.1 resolution was superseded by Maven Central's 4.20.0 release during the build review; the isolated AS-006 fixture retains its historical locked graph. Main-app native pins, schema export and dependency locks are committed separately from unchanged pnpm pins/lock. NOTICE identifies product use and retains SQLCipher/LibTomCrypt terms. The latest stack compiles; native runtime/security admission is separately scoped in [State](STATE.md).
+
+The custom preview must use debug-matched native dependencies to match its debug C++ codegen; release fallback caused missing React debug virtual symbols. The same reviewed Zod package uses its published CJS export because RN's Babel preset rejects the ESM namespace re-export. Neither compatibility fix downgrades a package, forces peers or suppresses Kotlin metadata checks. Preview explicitly bundles JS despite retaining debuggability for scoped local qualification.
+
 Use **pnpm** for application packages, scripts and lockfiles. At introduction or an intentional dependency refresh, resolve every direct runtime and development package with `package@latest`, including React Native, React, TypeScript, CLI and tooling. Record date, selector, exact result, license, engine/peer constraints and actual compatibility evidence. A latest tag is a selection rule, not proof that the latest versions work together. Generated template pins must be audited against latest before accepting the scaffold.
 
 Do not silently use older versions, force peer resolution, disable security checks, or pin a historical Nitro/toolchain version to make a build work. Record the conflict, upstream evidence, proposed remediation and any explicitly authorized exception in [Decisions](DECISIONS.md); until resolved the affected implementation is blocked. Use project-local tool isolation and do not change global pnpm/Node/Java or other agents' projects. All package installation is deferred to tracked implementation tasks.

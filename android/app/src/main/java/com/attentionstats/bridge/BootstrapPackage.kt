@@ -8,12 +8,18 @@ import com.facebook.react.module.model.ReactModuleInfoProvider
 
 class BootstrapPackage : BaseReactPackage() {
     override fun getModule(name: String, reactContext: ReactApplicationContext): NativeModule? =
-        if (name == BootstrapModule.NAME) BootstrapModule(reactContext) else null
+        when (name) {
+            BootstrapModule.NAME -> BootstrapModule(reactContext)
+            ReelsModule.NAME -> ReelsModule(reactContext)
+            else -> null
+        }
 
     override fun getReactModuleInfoProvider() = ReactModuleInfoProvider {
         mapOf(BootstrapModule.NAME to ReactModuleInfo(
             BootstrapModule.NAME, BootstrapModule.NAME,
             false, false, false, true,
+        ), ReelsModule.NAME to ReactModuleInfo(
+            ReelsModule.NAME, ReelsModule.NAME, false, false, false, true,
         ))
     }
 }

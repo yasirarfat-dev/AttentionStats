@@ -8,9 +8,10 @@ import { StatusBar, useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { WelcomeScreen } from '../features/onboarding';
 import { PrivacyScreen } from '../features/privacy';
+import { ReelsScreen } from '../features/reels';
 import { themes } from '../ui/theme';
 
-type Routes = { Welcome: undefined; Privacy: undefined };
+type Routes = { Welcome: undefined; Privacy: undefined; Reels: undefined };
 const Stack = createNativeStackNavigator<Routes>();
 
 export default function App() {
@@ -34,11 +35,20 @@ export default function App() {
         }}
       >
         <Stack.Navigator
+          initialRouteName="Reels"
           screenOptions={{ headerShadowVisible: false, animation: 'none' }}
         >
           <Stack.Screen name="Welcome" options={{ title: 'Attention Stats' }}>
             {({ navigation }) => (
-              <WelcomeScreen onPrivacy={() => navigation.navigate('Privacy')} />
+              <WelcomeScreen
+                onPrivacy={() => navigation.navigate('Privacy')}
+                onReels={() => navigation.navigate('Reels')}
+              />
+            )}
+          </Stack.Screen>
+          <Stack.Screen name="Reels" options={{ title: 'Attention Stats' }}>
+            {({ navigation }) => (
+              <ReelsScreen onPrivacy={() => navigation.navigate('Privacy')} />
             )}
           </Stack.Screen>
           <Stack.Screen

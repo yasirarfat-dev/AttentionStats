@@ -11,6 +11,8 @@ The separate [archive-envelope fixture](../native/archive-qualification/README.m
 
 ## Entity catalog
 
+AS-043 introduces a narrow **local Room schema v1**, exported at `android/app/schemas/com.attentionstats.storage.AttentionDatabase/1.json`: StoreMetadata, SourceConfiguration, LiveOverlayConfiguration, ConsentRecord, SurfaceEpisode, Exposure and CoverageInterval. This is the initial installed-preview schema, not the complete catalog or a portable archive format. Source IDs are `reels.instagram`/`reels.facebook`; source enablement and persisted pause are independent of OS accessibility and HUD visibility. Metadata separates configuration revision from history revision. Exposures retain observed wall/elapsed times, zone/offset, detector/consent revisions, count kind/reason and per-episode ordinal, with a cascading episode foreign key. No item content or target-page identity is persisted. Interrupted visits close with uncertain quality on reopen; transient dedup is discarded and the first uncertain returning page is withheld. Future changes to installed v1 require explicit versioned migrations; no destructive fallback.
+
 All IDs are locally generated opaque strings. No hardware/advertising identifier, contact, product account or remote user key is needed. Stable observation identity is distinct from any transient item identity used by a detector.
 
 | Entity | Required fields and relationships | Invariants / indexes |

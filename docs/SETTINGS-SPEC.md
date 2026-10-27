@@ -7,6 +7,8 @@
 
 ## Persistence and change rules
 
+AS-043 exposes a narrow working implementation of these planned controls in the React Native Reels route: independently disclosed Instagram/Facebook source switches (default off), persisted pause/resume of enabled sources, separately persisted live HUD switch (default off), actual accessibility health/settings launch and confirmed all-Reels-history deletion. Deletion also disables both sources/HUD. Unsupported versions stay count-unavailable even after consent. A separate, volatile ten-minute structural diagnostic requires its own affirmative disclosure and source/grant checks; stop removes the local file. Export, restore, per-app deletion, retention tiers and broader settings remain planned. Native configuration revisions protect saves; a failed/stale save is visibly unconfirmed and requires refresh.
+
 N = native authoritative Room configuration, U = non-sensitive UI preference in MMKV, K = secure native credential/token storage. Defaults apply to new installation, never as a silent reset on update. Source/detail expansions need affirmative consent. Data mutations return native revision/success before the UI reports saved; conflict/failure keeps a visible unsaved draft. Display current defaults, effect scope and relevant capability health.
 
 ## Catalog

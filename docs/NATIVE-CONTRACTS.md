@@ -54,6 +54,14 @@ Capability results must distinguish query freshness, metric coverage and live-si
 
 ## Operation catalog
 
+### AS-043 narrow preview contract
+
+The snapshot distinguishes `accessibilitySelected` (this component remains in Android's persisted choice) from `accessibilityEnabled`/`serviceConnected` (operational availability). A selected but disconnected/crashed service is not reported as usable or treated as a fresh grant request. Temporary-check failure/prerequisites and active status appear beside that control. Developer inspection of the flat file may include at most 32 static-ID clickable-control bounds; these are numeric layout metadata, never labels/content, and the host rejects extra fields or out-of-bounds structures.
+
+The experimental `NativeReels` TurboModule is separate from the unchanged bootstrap handshake and the full operation catalog below. `getSnapshot` returns bounded JSON (8 KiB maximum): generation, configuration `revision`, independent `historyRevision`, storage/service/grant health, day/zone, overlay/temporary-diagnostics state and exactly the Instagram/Facebook source states. Counts are canonical nonnegative signed-int64 **decimal strings**, validated without conversion to JavaScript numbers; unsupported zero observations display unavailable. Both revisions belong to the returned generation. Polling occurs only while the screen is focused and the app is active.
+
+`configure(app, enabled, noticeRevision=1, expectedRevision)`, `setPaused`, `setOverlay` and `deleteHistory` commit native state before returning a fresh snapshot. Configuration revisions prevent stale settings from overwriting newer choices; exposure writes advance only history revision. This narrow bridge has no command-ID replay/event/paging/archive contract and does not implement those full-product operations. Errors are sanitized stable codes; UI refreshes rather than silently replaying destructive commands. `openAccessibilitySettings` and `openTarget` return whether launch succeeded, never permission or source enablement. `setCalibration` controls an independently consented, process-local ten-minute structure check. The React Native screen owns affirmative disclosure; native code rechecks source choice and actual grant before observation. See [AS-043 scope](STATE.md#active-priority-installed-reels-counter).
+
 | Operation | Request | Result and side effects |
 |---|---|---|
 | getCapabilities | none | Registry with status per capability, detector versions, service health, current revision and check time |

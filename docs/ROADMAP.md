@@ -21,6 +21,8 @@ Exit requires a viable latest-version path or explicitly recorded blocked incomp
 
 ## Stage 2: MVP
 
+User-directed AS-043/ADR-032 takes the narrow Reels preview ahead of full Stage-2 completion: integrate the required native-store/consent/detector/UI/HUD subsets in the main app and install a self-contained development package for both Instagram and Facebook. Detector/version evidence still gates actual counting. This does not close the archive, minimum-API, lifecycle, security or distribution gates for the full MVP; isolated fixture success is not the requested usable counter.
+
 Deliver C-01–C-07 where supported, C-12/C-13, C-16/C-17/C-20/C-21 and C-23–C-25/C-27/C-28/C-30. Reliable app/device history and social-app summaries are the baseline; short-video support remains declared-scope experimental until qualification. Configurable permissions, source controls, basic local insights, budgets/focus schedules, emergency access and encrypted export/restore are required. Unsupported targets display gaps/unavailable status rather than artificial parity.
 
 Exit: relevant [acceptance](TESTING.md), privacy/restore/emergency gates, latest locked clean build, accessible core journeys, real-device lifecycle evidence, truthful source/detector ranges and maintainer-reviewed signed candidate. Ship limited surface support honestly if wider detection is infeasible; revise supported claims with a decision. Do not silently remove consent, archive recovery or deletion to meet a date.

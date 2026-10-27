@@ -7,6 +7,8 @@
 
 ## Current repository
 
+AS-043 adds `src/features/reels` (public screen API), the bounded `src/platform/specs/NativeReels` adapter/decoder, pure `native/reels-core` wired through `android/reels-core`, and app-owned Android `reels`/`storage` infrastructure. The initial Room v1 schema and native application dependency locks are retained under `android/app`. `src/preview/AndroidManifest.xml` removes debug-library network/overlay permissions. App androidTest probes and `tools/reels_phone.py` qualify unique synthetic storage and our own React Native window; private APKs/images/diagnostics remain ignored. These are main-app additions; the isolated AS-006 projects stay excluded from the product.
+
 ```text
 AttentionStats/
   README.md, LICENSE, CONTRIBUTING.md, SECURITY.md

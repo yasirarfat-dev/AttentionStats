@@ -7,6 +7,8 @@
 
 ## Runtime boundaries
 
+AS-043 integrates the narrow preview into the existing React Native application. Main screens, navigation, consent, privacy and settings are TypeScript under `src/features`; Kotlin owns Android accessibility, serialized counting/storage, Keystore wrapping and the TurboModule. Only the small cross-app accessibility HUD is native Android UI. `native/reels-core` remains a pure domain module with no Android/storage/React imports; `android/app` supplies adapters and the sole encrypted Room composition root. The `preview` build uses debug-matched native dependencies/signing but bundles JS/Hermes and explicitly disables dev support, so it runs without Metro. This does not replace React Native with Kotlin screens or admit an unqualified social adapter.
+
 Supported product targets are mobile: Android first, future iOS through native adapters. React Native renders mobile components; do not introduce React Native Web, a website/PWA/desktop runtime, an embedded copy of the browser study, or browser-extension scaffolding. AS-033 is a completed non-shipping design reference. A potential Chrome extension is deferred beyond mobile completion and would require a separate design/task decision (ADR-024).
 
 | Layer | Responsibility | Forbidden ownership |

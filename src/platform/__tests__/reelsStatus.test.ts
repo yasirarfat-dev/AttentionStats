@@ -1,0 +1,84 @@
+import { parseReelsSnapshot } from '../reelsStatus';
+
+const generation = '11111111-1111-4111-8111-111111111111';
+function fixture() {
+  return {
+    contractVersion: 1,
+    revision: generation + ':1',
+    historyRevision: generation + ':1',
+    generation,
+    storage: 'ready',
+    accessibilityEnabled: false,
+    accessibilitySelected: false,
+    serviceConnected: false,
+    overlayEnabled: false,
+    calibrationEnabled: false,
+    day: '2026-10-27',
+    zone: 'UTC',
+    sources: ['instagram', 'facebook'].map(app => ({
+      app,
+      enabled: false,
+      paused: false,
+      installed: true,
+      version: 'fixture-only',
+      supported: false,
+      today: '0',
+      visit: null,
+    })),
+  };
+}
+function sourceAt(value: ReturnType<typeof fixture>, index: number) {
+  const selected = value.sources[index];
+  if (!selected) throw new Error('Missing synthetic source');
+  return selected;
+}
+test('accepts bounded native status without conflating grant, consent and support', () => {
+  const value = fixture();
+  value.accessibilityEnabled = true;
+  const status = parseReelsSnapshot(JSON.stringify(value));
+  expect(status.accessibilityEnabled).toBe(true);
+  expect(status.sources.every(item => !item.enabled && !item.supported)).toBe(
+    true,
+  );
+});
+test('keeps 64-bit counts as decimal strings', () => {
+  const value = fixture();
+  sourceAt(value, 0).today = '9223372036854775807';
+  expect(parseReelsSnapshot(JSON.stringify(value)).sources[0]?.today).toBe(
+    '9223372036854775807',
+  );
+});
+test.each(['-1', '1.5', '00', '1e6', '9223372036854775808', 'content-marker'])(
+  'rejects invalid count %s',
+  count => {
+    const value = fixture();
+    sourceAt(value, 0).today = count;
+    expect(() => parseReelsSnapshot(JSON.stringify(value))).toThrow(
+      'Counter unavailable',
+    );
+  },
+);
+test('rejects duplicate/unknown apps and mismatched generation', () => {
+  const duplicate = fixture();
+  sourceAt(duplicate, 1).app = 'instagram';
+  const unknown = fixture();
+  sourceAt(unknown, 1).app = 'unknown';
+  const mismatch = fixture();
+  mismatch.revision = '22222222-2222-4222-8222-222222222222:1';
+  const historyMismatch = fixture();
+  historyMismatch.historyRevision = '22222222-2222-4222-8222-222222222222:1';
+  for (const value of [duplicate, unknown, mismatch, historyMismatch])
+    expect(() => parseReelsSnapshot(JSON.stringify(value))).toThrow();
+});
+test('rejects extra fields, bad version/types and oversized/malformed transport', () => {
+  for (const raw of [
+    JSON.stringify({ ...fixture(), extra: true }),
+    JSON.stringify({ ...fixture(), contractVersion: 2 }),
+    JSON.stringify({ ...fixture(), accessibilityEnabled: 'yes' }),
+    'x'.repeat(8193),
+    '{"private-marker":',
+    null,
+  ]) {
+    expect(() => parseReelsSnapshot(raw)).toThrow('Counter unavailable');
+  }
+});
