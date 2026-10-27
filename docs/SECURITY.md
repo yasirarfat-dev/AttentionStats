@@ -1,9 +1,9 @@
 # Security design
 
-**Status:** Threat model and release gates accepted; no security implementation or audit completed. Updated 2026-10-26.
+**Status:** Threat model and prototype crypto design accepted; no security implementation or audit completed. Updated 2026-10-27.
 **Responsibility:** Owns threat boundaries, encryption requirements, credentials, supply chain and incident response.
-**Related specifications:** [Privacy](PRIVACY.md), [Backup](BACKUP-RESTORE.md), [Models](DATA-MODELS.md), [Release](RELEASE.md), [Reporting entrypoint](../SECURITY.md).
-**Unresolved feasibility:** F-03 and F-04 in [Decisions](DECISIONS.md); crypto dependencies, KDF parameters and encrypted Room integration need review.
+**Related specifications:** [Privacy](PRIVACY.md), [Backup](BACKUP-RESTORE.md), [Crypto design](CRYPTO-ARCHIVE-DESIGN.md), [Models](DATA-MODELS.md), [Release](RELEASE.md), [Reporting entrypoint](../SECURITY.md).
+**Unresolved feasibility:** F-03 and F-04 in [Decisions](DECISIONS.md); reviewed prototype candidates/parameters still need build, interoperability, device-resource and encrypted Room qualification.
 
 ## Threat model
 
@@ -21,13 +21,13 @@ Protected assets include usage and optional content history, rule configuration,
 
 ## Encryption and key lifecycle
 
-At-rest target: an encrypted Room-compatible SQLite solution using a randomly generated database key wrapped by Android Keystore. Room alone is not encryption. Until AS-006 validates a maintained driver, migrations, WAL/temp handling and recovery behavior, database encryption remains unimplemented and cannot be claimed. Android Keystore can protect non-exportable key material and constrain its use; hardware-backed guarantees depend on device capabilities. See [Android Keystore](https://developer.android.com/privacy-and-security/keystore).
+At-rest target: encrypted Room 3 using SQLCipherDriver, with a random per-generation database key wrapped by Android Keystore AES-256-GCM. ADR-031 and [crypto design](CRYPTO-ARCHIVE-DESIGN.md#encrypted-room-and-device-keys) select the qualification path, key ownership and non-destructive corruption handler. Room alone is not encryption. Until AS-006/AS-009 validate the driver, migrations, WAL/temp handling and recovery behavior, database encryption remains unimplemented and cannot be claimed. Android Keystore can protect non-exportable key material and constrain its use; hardware-backed guarantees depend on device capabilities. See [Android Keystore](https://developer.android.com/privacy-and-security/keystore).
 
-Export encryption is independent of device Keystore so a new device can restore using user-held recovery credentials. Proposed baseline: authenticated encryption with an audited library, 256-bit random archive data key, fresh salt/nonces, authenticated bounded header and manifest, and a password-derived wrapping key using a reviewed memory-hard KDF. Algorithm suite, format framing, KDF cost, streaming/chunk sequencing and nonce construction must be finalized in a versioned format ADR under AS-006 before implementation ships. Do not invent cryptography or treat an unauthenticated checksum as integrity protection.
+Export encryption is independent of device Keystore so a new device can restore using user-held recovery credentials. ADR-031 selects Tink AES256_GCM_HKDF_1MB, a fresh archive keyset, AES-256-GCM keyset wrapping and bounded authenticated framing for the prototype. A generated 256-bit recovery key is the initial path; the optional Argon2id profile stays unavailable pending qualification. [Crypto design](CRYPTO-ARCHIVE-DESIGN.md#archive-credentials-and-suite) owns exact profiles, domain separation, limits and format-freeze gates. These decisions are not an independent security audit or shipping format. Do not invent cryptography or treat an unauthenticated checksum as integrity protection.
 
 Offer a generated high-entropy recovery key and optionally a passphrase route after KDF evaluation. Display recovery credentials only in a secure explicit flow, require acknowledgement/test, and never send them to the developer or provider. Loss of credentials can make archives unrecoverable; present that before enabling a backup. Biometric unlock may gate local access later but cannot be the only portable recovery mechanism. Do not place secrets on clipboard by default or in normal screenshots, logs, change events or generic JS stores.
 
-If a device key is invalidated or unavailable, stop sensitive reads/writes safely, explain recovery choices, and preserve encrypted files; never silently reset history. Key rotation must be interruption-safe and tested with both current and prior archive formats. Deleting all data removes key material and tokens. Local logical deletion cannot promise forensic flash erasure.
+If a device key is invalidated or unavailable, stop sensitive reads/writes safely, explain recovery choices, and preserve encrypted files; never silently reset history. [Rotation design](CRYPTO-ARCHIVE-DESIGN.md#loss-rotation-and-crash-recovery) distinguishes wrapping-key rewrap, database-generation replacement and portable credential changes. Each needs interruption tests; existing archive credentials remain necessary for old copies. Deleting all data removes key material and tokens. Local logical deletion cannot promise forensic flash erasure.
 
 ## Components, transport and builds
 

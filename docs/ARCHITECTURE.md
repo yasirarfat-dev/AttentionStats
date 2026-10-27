@@ -21,6 +21,8 @@ Supported product targets are mobile: Android first, future iOS through native a
 
 Room is a SQLite abstraction, not encryption by itself. At-rest encrypted database integration needs a maintained compatible driver and audit under AS-006. Device storage protections alone must not be advertised as app-level database encryption. See [Room documentation](https://developer.android.com/jetpack/androidx/releases/room).
 
+ADR-031 selects [Room 3/SQLCipherDriver and Tink archive prototypes](CRYPTO-ARCHIVE-DESIGN.md), without installing dependencies or admitting encryption. Native infrastructure owns Keystore wrapping, driver/key lifetime, non-destructive corruption handling, immutable ciphertext input and encrypted staging. Portable logical records never expose a live DB or keys to JS. Full authentication and staged validation precede revision-bound generation activation; filesystem/pool/crash behavior remains unqualified.
+
 ## Domain-oriented modular design
 
 Use a **modular monolith on the device** with domain-driven boundaries. The enterprise-style requirement means clear ownership, stable interfaces, testability and disciplined change; it does not require a backend, microservices or a distributed system. Domain language and invariants live with their domain. Do not scatter business rules through screens or create one global services/utils folder.

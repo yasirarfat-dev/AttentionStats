@@ -97,6 +97,8 @@ Host and shared-source Gradle suites run the same source; current results are in
 | B-06 | Automatic Google backup selected while F-05 unresolved | Blocked explanation; no OAuth prompt, upload, misleading schedule or silently substituted transport |
 | B-07 | Picker cancelled, URI revoked, provider offline/quota, account switched | Safe cancel/failure with current history preserved; manual transport status distinct from automatic backup |
 
+AS-006 [ADR-031 design](CRYPTO-ARCHIVE-DESIGN.md#qualification-before-acceptance) adds concrete qualification requirements to these existing scenarios; **none ran for the proposed crypto/store stack**. D-02 must exercise an explicit non-destructive SQLCipher handler, driver/pool key lifetime, wrapper loss, interrupted rewrap/generation activation and encrypted WAL/temp/log sentinels. B-01/B-02 require RFC HKDF/Argon2 vectors, portable envelope vectors, exact segment boundaries, every header/keyset/segment/end mutation, truncation/splicing/reordering/append, strict JSON duplicate/depth/integer/reference/count bounds and KDF/resource rejection before expensive allocation. B-03/B-05 cover immutable input/two-pass authentication, encrypted staging, disk reserve/ENOSPC and crash/cancel at each commit boundary, with no live-store mutation before activation. Measure generated-key/passphrase peak memory and latency separately on declared devices; targets are not passing benchmarks. S-01/S-03/S-04/S-05 still gate transfer exclusions, logs/dependency/key/deletion behavior. API-36 results cannot qualify the API-24 floor or provider durability.
+
 ## Privacy and experience gates
 
 | ID | Verification | Required result |

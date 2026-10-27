@@ -3,7 +3,7 @@
 **Status:** Logical schema accepted; SQL/Room implementation and migrations pending. Updated 2026-10-27.
 **Responsibility:** Defines entities, invariants, time, provenance and schema evolution.
 **Related specifications:** [Storage](STORAGE-AND-RETENTION.md), [Contracts](NATIVE-CONTRACTS.md), [Tracking](TRACKING-SPEC.md), [Backup](BACKUP-RESTORE.md).
-**Unresolved feasibility:** F-03 and F-04 in [Decisions](DECISIONS.md); encrypted Room driver and serialization remain unselected.
+**Unresolved feasibility:** F-03 and F-04 in [Decisions](DECISIONS.md); Room 3/SQLCipher and archive envelope selected for prototype qualification; entity serialization, schema/migrations and integration remain unimplemented.
 
 ## Entity catalog
 
@@ -76,3 +76,5 @@ Summary-only deletion operates at retained resolution. For a date/app/topic requ
 Use monotonically increasing Room schema versions, committed exported schemas, explicit transactional migrations, and fixtures for every supported upgrade path. No destructive fallback migration for user history. Migration failure leaves the original store recoverable and collection paused. Test database/WAL handling, storage exhaustion and interruption before changing a release's schema.
 
 Backup format version and database schema version are independent. Portable archives contain a documented logical representation and manifest, not an uncontrolled copy of an open SQLite database. Import validates schema and bounds, applies supported staged migrations, and rejects unsupported future versions without touching live data. Rebuildable aggregates may be omitted; provenance, consent scope and coverage cannot.
+
+The [ADR-031 prototype envelope](CRYPTO-ARCHIVE-DESIGN.md#logical-payload-and-restore-validation) uses strict length-bounded JSON records inside authenticated streaming encryption. Signed-64-bit fields use canonical decimal strings with domain validation; counts/references must agree across manifest, rows and end record. Exact entity bodies are not yet selected. Local wrappers/aliases, grants, ingestion cursors, command replay state and provider credentials are never portable entities; historical consent is provenance only, with imported sources/rules inactive. Generation-key routing metadata lives in native no-backup storage and does not introduce a second history authority.

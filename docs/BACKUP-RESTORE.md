@@ -2,14 +2,16 @@
 
 **Status:** Portable encrypted archives planned; direct automatic Drive integration blocked. Updated 2026-10-27.
 **Responsibility:** Defines backup experience, format requirements, transports, recovery and failure atomicity.
-**Related specifications:** [Security](SECURITY.md), [Privacy](PRIVACY.md), [Storage](STORAGE-AND-RETENTION.md), [Contracts](NATIVE-CONTRACTS.md), [Testing](TESTING.md).
-**Unresolved feasibility:** F-04–F-06 in [Decisions](DECISIONS.md); crypto format, provider durability and automatic-backup policy must be resolved independently.
+**Related specifications:** [Security](SECURITY.md), [Crypto design](CRYPTO-ARCHIVE-DESIGN.md), [Privacy](PRIVACY.md), [Storage](STORAGE-AND-RETENTION.md), [Contracts](NATIVE-CONTRACTS.md), [Testing](TESTING.md).
+**Unresolved feasibility:** F-04–F-06 in [Decisions](DECISIONS.md); prototype format selected under ADR-031, but interoperability, resource behavior, provider durability and automatic-backup policy remain independently unqualified.
 
 ## Portable encrypted archive: MVP
 
 Export/import is available without a product account or cloud integration once implemented. User chooses included apps/sources/time ranges, basic history versus separately consented content, and whether protection configuration is included. Preview size, scope and known omissions. Generate a consistent snapshot at a known revision; do not copy an actively changing database/WAL as if it were a complete archive.
 
 Use a documented versioned logical archive with authenticated encryption. Proposed manifest fields: format version, minimum reader version, schema/model revisions, creation UTC, snapshot generation/revision, data scope, entity counts, coverage, timezone representation and bounded crypto parameters. Sensitive manifest details live inside the encrypted payload; public header contains only necessary version/crypto framing. No provider token, device key, account email or raw recovery credential is included. [Security](SECURITY.md) owns algorithm review; no unreviewed cipher/KDF parameters become a shipping format.
+
+ADR-031 and [crypto design](CRYPTO-ARCHIVE-DESIGN.md) define the prototype's 60-byte prefix, bounded wrapped keyset, Tink streaming payload, generated-key/optional-gated-passphrase profiles, strict logical record framing and quotas. No archive codec exists and version 1 is not frozen. There is no compression or path-bearing file extraction. Authenticate the complete private ciphertext before history parsing, then parse a second authenticated pass into an encrypted staging database; require end record, final tag and physical EOF before preview. A valid prefix cannot authorize replacement. Exact entity encodings/migrations and supported summary scope still need AS-009/AS-020 review.
 
 A generated recovery key or reviewed passphrase flow is user-held. Show recovery consequences and verify a round trip before advertising backup as ready. Device Keystore protection can secure a local remembered credential for scheduled use, but restoration on another device must not require the old Keystore. Lost credentials cannot be reset by the developer. Credential changes apply to future archives unless older archives are explicitly re-encrypted.
 

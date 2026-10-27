@@ -9,6 +9,8 @@
 
 Room-backed SQLite is the sole authority for history, protection configuration, consent and native job state. MMKV holds only small UI preferences; JS query caches are disposable. A write coordinator serializes collection, deletion, migration and restore. Commit a normalized batch, high-water mark, dedup state and revision together. Crash replay must be idempotent and cannot advance the cursor before history is durable.
 
+ADR-031 selects Room 3 plus SQLCipherDriver for qualification. [Crypto design](CRYPTO-ARCHIVE-DESIGN.md#encrypted-room-and-device-keys) requires independently keyed generations, Keystore-wrapped local keys, an explicit non-destructive corruption handler and pool-aware key lifetime. Wrapper rotation and validated generation activation are separate operations; files/old keys remain recoverable until durable activation/reopen is confirmed. These are unimplemented protocols. Do not use default destructive recovery, delete history to make staging space, or claim WAL/temp confidentiality from dependency metadata alone.
+
 Raw here means minimized normalized observations, not raw accessibility payloads. Whole trees, screenshots, credential fields and notification bodies never enter storage. Bounded overlapping queries recover permitted source history only while Android retains it. After a missed source interval, mark an unknown gap instead of synthesizing uninterrupted sessions.
 
 ## Retention controls

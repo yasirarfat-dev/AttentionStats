@@ -1,0 +1,542 @@
+{
+  "reviewedDate": "2026-10-27",
+  "reviewedAtUtc": "2026-10-27T09:26:50.750948+00:00",
+  "scope": "AS-006 design research and archive inspection only; no dependency, runtime implementation, independent security audit or device test",
+  "selectionRule": "Native candidates use latest stable. Registry latest/release may name prereleases; do not equate those tags with stable. Re-resolve before installation.",
+  "candidates": [
+    {
+      "coordinate": "androidx.room3:room3-runtime",
+      "selector": "latest stable numeric release; prereleases excluded",
+      "resolvedVersion": "3.0.3",
+      "role": "selected",
+      "license": "Apache-2.0",
+      "metadata": {
+        "url": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-runtime/maven-metadata.xml",
+        "sha256": "83631698f90bba59be70a58c2f381e297a19173ad54214fa897b2b5934c4a427",
+        "reportedLatest": "3.1.0-alpha03",
+        "reportedRelease": "3.1.0-alpha03"
+      },
+      "pom": {
+        "url": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-runtime/3.0.3/room3-runtime-3.0.3.pom",
+        "sha256": "0cb1b4a7600426506ffa200486b39f4f92ba584620cd33123552ca2b225fea73",
+        "declaredDependencies": [
+          {
+            "groupId": "androidx.collection",
+            "artifactId": "collection",
+            "version": "1.5.0",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "org.jetbrains.kotlinx",
+            "artifactId": "kotlinx-coroutines-core",
+            "version": "1.9.0",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.sqlite",
+            "artifactId": "sqlite",
+            "version": "2.7.1",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.room3",
+            "artifactId": "room3-common",
+            "version": "[3.0.3]",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.room3",
+            "artifactId": "room3-runtime-android",
+            "version": "3.0.3",
+            "scope": "compile"
+          },
+          {
+            "groupId": "androidx.sqlite",
+            "artifactId": "sqlite-async",
+            "version": "2.7.1",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.sqlite",
+            "artifactId": "sqlite-framework",
+            "version": "2.7.0",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "org.jetbrains.kotlin",
+            "artifactId": "kotlin-stdlib",
+            "version": "2.1.20",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "org.jetbrains.kotlinx",
+            "artifactId": "atomicfu",
+            "version": "0.28.0",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.annotation",
+            "artifactId": "annotation",
+            "version": "1.9.1",
+            "scope": "runtime"
+          }
+        ]
+      },
+      "installation": "not installed",
+      "applicationBuild": "not run",
+      "deviceQualification": "not run"
+    },
+    {
+      "coordinate": "androidx.room3:room3-compiler",
+      "selector": "latest stable numeric release; prereleases excluded",
+      "resolvedVersion": "3.0.3",
+      "role": "selected",
+      "license": "Apache-2.0",
+      "metadata": {
+        "url": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-compiler/maven-metadata.xml",
+        "sha256": "d3ee08cf9806a39646d33f7a04ea820ee8ccd2773427137d5a0f0105aa1905dc",
+        "reportedLatest": "3.1.0-alpha03",
+        "reportedRelease": "3.1.0-alpha03"
+      },
+      "pom": {
+        "url": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-compiler/3.0.3/room3-compiler-3.0.3.pom",
+        "sha256": "7384e139f728d7353a2c56f53aa590a23f49f1b7cfd679b83c01e1bf6992a7c2",
+        "declaredDependencies": [
+          {
+            "groupId": "org.xerial",
+            "artifactId": "sqlite-jdbc",
+            "version": "3.50.3.0",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "org.jetbrains.kotlin",
+            "artifactId": "kotlin-stdlib",
+            "version": "2.3.20",
+            "scope": "compile"
+          },
+          {
+            "groupId": "androidx.room3",
+            "artifactId": "room3-external-antlr",
+            "version": "[3.0.3]",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.room3",
+            "artifactId": "room3-migration-jvm",
+            "version": "[3.0.3]",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.room3",
+            "artifactId": "room3-common-jvm",
+            "version": "[3.0.3]",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.room3",
+            "artifactId": "room3-compiler-processing",
+            "version": "[3.0.3]",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "com.google.auto",
+            "artifactId": "auto-common",
+            "version": "1.2.1",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "com.squareup",
+            "artifactId": "kotlinpoet-jvm",
+            "version": "2.0.0",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "com.google.devtools.ksp",
+            "artifactId": "symbol-processing-api",
+            "version": "2.0.10-1.0.24",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "com.squareup",
+            "artifactId": "kotlinpoet-javapoet",
+            "version": "2.0.0",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "com.google.auto.value",
+            "artifactId": "auto-value-annotations",
+            "version": "1.6.3",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "com.intellij",
+            "artifactId": "annotations",
+            "version": "12.0",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "com.squareup",
+            "artifactId": "javapoet",
+            "version": "1.13.0",
+            "scope": "runtime"
+          }
+        ]
+      },
+      "installation": "not installed",
+      "applicationBuild": "not run",
+      "deviceQualification": "not run"
+    },
+    {
+      "coordinate": "net.zetetic:sqlcipher-android",
+      "selector": "latest stable numeric release; prereleases excluded",
+      "resolvedVersion": "4.19.1",
+      "role": "selected",
+      "license": "BSD-style SQLCipher Community; bundled notices require audit",
+      "metadata": {
+        "url": "https://repo.maven.apache.org/maven2/net/zetetic/sqlcipher-android/maven-metadata.xml",
+        "sha256": "9b842ab2cf5a7d8d4ae764193d454034b251590687fdf2406f2395ca40911f9e",
+        "reportedLatest": "4.19.1",
+        "reportedRelease": "4.19.1"
+      },
+      "pom": {
+        "url": "https://repo.maven.apache.org/maven2/net/zetetic/sqlcipher-android/4.19.1/sqlcipher-android-4.19.1.pom",
+        "sha256": "eab40b0e64892aacd3d789f6e93d5818d3f0be1710032202efa65e4860ad46d8",
+        "declaredDependencies": [
+          {
+            "groupId": "org.jetbrains.kotlin",
+            "artifactId": "kotlin-stdlib",
+            "version": "2.2.10",
+            "scope": "compile"
+          },
+          {
+            "groupId": "androidx.sqlite",
+            "artifactId": "sqlite",
+            "version": "2.7.0",
+            "scope": "runtime"
+          }
+        ]
+      },
+      "installation": "not installed",
+      "applicationBuild": "not run",
+      "deviceQualification": "not run"
+    },
+    {
+      "coordinate": "androidx.sqlite:sqlite",
+      "selector": "latest stable numeric release; prereleases excluded",
+      "resolvedVersion": "2.7.1",
+      "role": "selected",
+      "license": "Apache-2.0",
+      "metadata": {
+        "url": "https://dl.google.com/dl/android/maven2/androidx/sqlite/sqlite/maven-metadata.xml",
+        "sha256": "7a066da7dc679357feb589e7539d96476034e60b28064b46736153062410e19c",
+        "reportedLatest": "2.8.0-alpha03",
+        "reportedRelease": "2.8.0-alpha03"
+      },
+      "pom": {
+        "url": "https://dl.google.com/dl/android/maven2/androidx/sqlite/sqlite/2.7.1/sqlite-2.7.1.pom",
+        "sha256": "67945c1ed0bb9531c634287592c6a3bf4449635e60bb3ed3a3453fc612ad3065",
+        "declaredDependencies": [
+          {
+            "groupId": "androidx.annotation",
+            "artifactId": "annotation",
+            "version": "1.9.1",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.sqlite",
+            "artifactId": "sqlite-android",
+            "version": "2.7.1",
+            "scope": "compile"
+          },
+          {
+            "groupId": "org.jetbrains.kotlin",
+            "artifactId": "kotlin-stdlib",
+            "version": "2.1.20",
+            "scope": "runtime"
+          }
+        ]
+      },
+      "installation": "not installed",
+      "applicationBuild": "not run",
+      "deviceQualification": "not run"
+    },
+    {
+      "coordinate": "com.google.devtools.ksp:symbol-processing-gradle-plugin",
+      "selector": "latest stable numeric release; prereleases excluded",
+      "resolvedVersion": "2.3.12",
+      "role": "selected",
+      "license": "Apache-2.0",
+      "metadata": {
+        "url": "https://repo.maven.apache.org/maven2/com/google/devtools/ksp/symbol-processing-gradle-plugin/maven-metadata.xml",
+        "sha256": "1c10eb930a68957dd52952557667db6266ba7e32121e6b980fbb54ad83e0324f",
+        "reportedLatest": "2.3.12",
+        "reportedRelease": "2.3.12"
+      },
+      "pom": {
+        "url": "https://repo.maven.apache.org/maven2/com/google/devtools/ksp/symbol-processing-gradle-plugin/2.3.12/symbol-processing-gradle-plugin-2.3.12.pom",
+        "sha256": "a8e7a3444dadba0b5c54a3dc09a0ebdb293ec338d8fc673f7d84e39c0b926251",
+        "declaredDependencies": [
+          {
+            "groupId": "com.google.devtools.ksp",
+            "artifactId": "symbol-processing-api",
+            "version": "2.3.12",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "com.google.devtools.ksp",
+            "artifactId": "symbol-processing-common-deps",
+            "version": "2.3.12",
+            "scope": "runtime"
+          }
+        ]
+      },
+      "installation": "not installed",
+      "applicationBuild": "not run",
+      "deviceQualification": "not run"
+    },
+    {
+      "coordinate": "com.google.crypto.tink:tink-android",
+      "selector": "latest stable numeric release; prereleases excluded",
+      "resolvedVersion": "1.24.0",
+      "role": "selected",
+      "license": "Apache-2.0",
+      "metadata": {
+        "url": "https://repo.maven.apache.org/maven2/com/google/crypto/tink/tink-android/maven-metadata.xml",
+        "sha256": "7ae5d3456e19888357e3023a0d5c7f00cd4deeeb00c27e68ef46f832b0ba7bb1",
+        "reportedLatest": "1.24.0",
+        "reportedRelease": "1.24.0"
+      },
+      "pom": {
+        "url": "https://repo.maven.apache.org/maven2/com/google/crypto/tink/tink-android/1.24.0/tink-android-1.24.0.pom",
+        "sha256": "ccaabd3e92984057efbe19ed02db93affbfa2770111a36b82eb9893b72093546",
+        "declaredDependencies": [
+          {
+            "groupId": "androidx.annotation",
+            "artifactId": "annotation-jvm",
+            "version": "${androidx_annotation.version}",
+            "scope": null
+          },
+          {
+            "groupId": "com.google.code.findbugs",
+            "artifactId": "jsr305",
+            "version": "${jsr305.version}",
+            "scope": null
+          },
+          {
+            "groupId": "com.google.code.gson",
+            "artifactId": "gson",
+            "version": "${gson.version}",
+            "scope": null
+          },
+          {
+            "groupId": "com.google.errorprone",
+            "artifactId": "error_prone_annotations",
+            "version": "${error_prone_annotations.version}",
+            "scope": null
+          }
+        ]
+      },
+      "installation": "not installed",
+      "applicationBuild": "not run",
+      "deviceQualification": "not run"
+    },
+    {
+      "coordinate": "org.bouncycastle:bcprov-jdk18on",
+      "selector": "latest stable numeric release; prereleases excluded",
+      "resolvedVersion": "1.86",
+      "role": "passphrase evaluation only",
+      "license": "MIT",
+      "metadata": {
+        "url": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/maven-metadata.xml",
+        "sha256": "13fa5055fbca5db0afe1f00fe19fc6aca6651a858f47f9fd999d2dbfd1daec36",
+        "reportedLatest": "1.86",
+        "reportedRelease": "1.86"
+      },
+      "pom": {
+        "url": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/1.86/bcprov-jdk18on-1.86.pom",
+        "sha256": "970b70cb75a184639b6fb9ba3c465aca6a4e1a5f3fff4d65ce8574b2fd79ef38",
+        "declaredDependencies": []
+      },
+      "installation": "not installed",
+      "applicationBuild": "not run",
+      "deviceQualification": "not run"
+    },
+    {
+      "coordinate": "androidx.room:room-runtime",
+      "selector": "latest stable numeric release; prereleases excluded",
+      "resolvedVersion": "2.8.5",
+      "role": "comparison only; Room 3 selected",
+      "license": "Apache-2.0",
+      "metadata": {
+        "url": "https://dl.google.com/dl/android/maven2/androidx/room/room-runtime/maven-metadata.xml",
+        "sha256": "01a7f04442e6121a5fb50fe6bf754e5366a16de73a68a75281aa08fd2cd02436",
+        "reportedLatest": "2.8.5",
+        "reportedRelease": "2.8.5"
+      },
+      "pom": {
+        "url": "https://dl.google.com/dl/android/maven2/androidx/room/room-runtime/2.8.5/room-runtime-2.8.5.pom",
+        "sha256": "0f13072c552ae6171780ecfb746bee061769fc17ca215455d548dc3384553b37",
+        "declaredDependencies": [
+          {
+            "groupId": "androidx.sqlite",
+            "artifactId": "sqlite-framework",
+            "version": "2.6.2",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.sqlite",
+            "artifactId": "sqlite",
+            "version": "2.6.2",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.annotation",
+            "artifactId": "annotation",
+            "version": "1.9.1",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.room",
+            "artifactId": "room-common",
+            "version": "[2.8.5]",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "org.jetbrains.kotlin",
+            "artifactId": "kotlin-stdlib",
+            "version": null,
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.room",
+            "artifactId": "room-runtime-android",
+            "version": "2.8.5",
+            "scope": "compile"
+          },
+          {
+            "groupId": "org.jetbrains.kotlinx",
+            "artifactId": "kotlinx-coroutines-core",
+            "version": "1.8.1",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "org.jetbrains.kotlinx",
+            "artifactId": "atomicfu",
+            "version": "0.27.0",
+            "scope": "runtime"
+          },
+          {
+            "groupId": "androidx.collection",
+            "artifactId": "collection",
+            "version": "1.5.0",
+            "scope": "runtime"
+          }
+        ]
+      },
+      "installation": "not installed",
+      "applicationBuild": "not run",
+      "deviceQualification": "not run"
+    }
+  ],
+  "inspectedArtifacts": [
+    {
+      "name": "room3-runtime",
+      "url": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-runtime-android/3.0.3/room3-runtime-android-3.0.3.aar",
+      "size": 534151,
+      "sha256": "5771ff62b70e3de1826ff12eee2c31e9d773b59d7b8464ad8d506048f0bbb31b",
+      "aarMetadata": {
+        "META-INF/com/android/build/gradle/aar-metadata.properties": "aarFormatVersion=1.0\naarMetadataVersion=1.0\nminCompileSdk=34\nminCompileSdkExtension=0\nminAndroidGradlePluginVersion=8.1.1\ncoreLibraryDesugaringEnabled=false\n"
+      },
+      "driverClasses": [],
+      "abis": [],
+      "repositoryDigest": {
+        "url": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-runtime-android/3.0.3/room3-runtime-android-3.0.3.aar.sha256",
+        "algorithm": "sha256",
+        "value": "5771ff62b70e3de1826ff12eee2c31e9d773b59d7b8464ad8d506048f0bbb31b",
+        "matched": true
+      },
+      "minSdk": 23
+    },
+    {
+      "name": "sqlcipher",
+      "url": "https://repo.maven.apache.org/maven2/net/zetetic/sqlcipher-android/4.19.1/sqlcipher-android-4.19.1.aar",
+      "size": 4016379,
+      "sha256": "43fc10cae8f1f1059f0933e8942a1eb328989d13426378597cd4add1b34a34fd",
+      "aarMetadata": {
+        "META-INF/com/android/build/gradle/aar-metadata.properties": "aarFormatVersion=1.0\naarMetadataVersion=1.0\nminCompileSdk=36\nminCompileSdkExtension=0\nminAndroidGradlePluginVersion=1.0.0\ncoreLibraryDesugaringEnabled=false\n"
+      },
+      "driverClasses": [
+        "net/zetetic/database/sqlcipher/driver/SQLCipherDriver.class"
+      ],
+      "abis": [
+        "arm64-v8a",
+        "armeabi-v7a",
+        "x86",
+        "x86_64"
+      ],
+      "repositoryDigest": {
+        "url": "https://repo.maven.apache.org/maven2/net/zetetic/sqlcipher-android/4.19.1/sqlcipher-android-4.19.1.aar.sha256",
+        "algorithm": "sha256",
+        "value": "43fc10cae8f1f1059f0933e8942a1eb328989d13426378597cd4add1b34a34fd",
+        "matched": true
+      },
+      "minSdk": 23
+    },
+    {
+      "name": "tink",
+      "url": "https://repo.maven.apache.org/maven2/com/google/crypto/tink/tink-android/1.24.0/tink-android-1.24.0.jar",
+      "size": 3508938,
+      "sha256": "86ff5d879d4ac5e827ae3974c90fce1a25e7c2698538af833ed824efbfe4c06e",
+      "keyClasses": [
+        "com/google/crypto/tink/subtle/NonceBasedStreamingAead.class",
+        "com/google/crypto/tink/streamingaead/subtle/AesGcmHkdfStreamingAead.class",
+        "com/google/crypto/tink/streamingaead/subtle/AesCtrHmacStreamingAead.class",
+        "com/google/crypto/tink/streamingaead/internal/WrappedStreamingAead.class",
+        "com/google/crypto/tink/streamingaead/internal/LegacyFullStreamingAead.class",
+        "com/google/crypto/tink/TinkProtoKeysetFormat.class",
+        "com/google/crypto/tink/StreamingAead.class"
+      ],
+      "repositoryDigest": {
+        "url": "https://repo.maven.apache.org/maven2/com/google/crypto/tink/tink-android/1.24.0/tink-android-1.24.0.jar.sha256",
+        "algorithm": "sha256",
+        "value": "86ff5d879d4ac5e827ae3974c90fce1a25e7c2698538af833ed824efbfe4c06e",
+        "matched": true
+      }
+    },
+    {
+      "name": "bcprov",
+      "url": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/1.86/bcprov-jdk18on-1.86.jar",
+      "size": 7224011,
+      "sha256": "2af190b300cbb0b35e248ccf5f4a06b6072030aeb3da7a98ec73abe5b4cb371f",
+      "keyClasses": [
+        "org/bouncycastle/crypto/generators/Argon2BytesGenerator.class"
+      ],
+      "repositoryDigest": {
+        "url": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/1.86/bcprov-jdk18on-1.86.jar.sha256",
+        "algorithm": "sha256",
+        "value": "2af190b300cbb0b35e248ccf5f4a06b6072030aeb3da7a98ec73abe5b4cb371f",
+        "matched": true
+      }
+    }
+  ],
+  "sqlcipherSourceArchive": {
+    "url": "https://repo.maven.apache.org/maven2/net/zetetic/sqlcipher-android/4.19.1/sqlcipher-android-4.19.1-sources.jar",
+    "size": 122653,
+    "sha256": "65dc9be0117c281e188269e23b8e95ae5b0f4ba21ce2888176850b14edc9dfd5",
+    "findings": [
+      "SQLCipherDriver implements androidx.sqlite.SQLiteDriver and retains the supplied byte array for its lifetime.",
+      "Driver source passes custom DatabaseErrorHandler through to openOrCreateDatabase.",
+      "DefaultDatabaseErrorHandler contains deletion/logging paths and a hasCodec early-return guard; runtime behavior has not been tested. Require an explicit non-destructive handler.",
+      "Tagged README examples retain older 4.19.0/SQLite 2.7.0 versions; stable registry candidates are 4.19.1/2.7.1.",
+      "Upstream Android tests select Room 3.0.1 and KSP 2.3.10. This does not qualify reviewed Room 3.0.3/KSP 2.3.12/Kotlin 2.4.21/AGP 9.4.1/Gradle 9.8.2."
+    ]
+  },
+  "openGates": [
+    "Room/KSP/SQLCipher build and connection-pool/key-lifetime behavior",
+    "SQLCipher WAL/temp/log/16-KiB-page and corruption preservation on supported devices",
+    "Tink stream finalization, vectors, malformed inputs and independent portable reader",
+    "Argon2 RFC vectors, Android packaging/provider coexistence, actual memory/time/cancellation",
+    "Keystore loss, wrapping rotation and interrupted generation activation",
+    "Resource quotas and free-space/crash/recovery protocol"
+  ]
+}

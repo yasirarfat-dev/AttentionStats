@@ -22,7 +22,7 @@ AS-035 now supplies a separate [pure Kotlin analytics slice](../native/analytics
 | Native tracking | Tracking → Collection feasibility → Social → Permissions → Models → Native contracts → Testing |
 | Protection | Protection → Permissions → Architecture → Contracts → Testing |
 | Interface work | Human factors → UX → Navigation → Design system → Settings → Contracts |
-| Data/privacy/backup | Privacy → Security → Models → Storage → Backup → Testing |
+| Data/privacy/backup | Privacy → Security → Crypto design → Models → Storage → Backup → Testing |
 | Dependency/scaffold | Dependencies → Development → Conventions → Structure → Architecture |
 | Release/iPhone work | Release or iOS guide → Capabilities → current platform evidence → contribution workflow |
 
@@ -54,6 +54,7 @@ AS-035 now supplies a separate [pure Kotlin analytics slice](../native/analytics
 | Durability | [STORAGE-AND-RETENTION.md](STORAGE-AND-RETENTION.md) | Preservation, pruning, deletion, dedup and growth |
 | Privacy | [PRIVACY.md](PRIVACY.md) | Inventory, consent, transfers, no-developer-data claims |
 | Security | [SECURITY.md](SECURITY.md) | Threat model, keys, encryption target and release gates |
+| Crypto qualification | [CRYPTO-ARCHIVE-DESIGN.md](CRYPTO-ARCHIVE-DESIGN.md) | AS-006 suite/envelope, encrypted Room candidate, key lifecycle, resource limits and open qualification gates |
 | Access | [PERMISSIONS.md](PERMISSIONS.md) | Declarations, grants, separate disclosures and revocation |
 | Portability | [BACKUP-RESTORE.md](BACKUP-RESTORE.md) | Encrypted archives, restore atomicity, blocked Drive and OS exclusions |
 | Standards | [CONVENTIONS.md](CONVENTIONS.md) | Coding/state/logging/dependency rules and done criteria |
