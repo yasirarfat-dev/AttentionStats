@@ -9,7 +9,7 @@
 
 The designated public repository is [yasirarfat-dev/AttentionStats](https://github.com/yasirarfat-dev/AttentionStats). The user explicitly authorized public publication of this foundation. Review all files, run documentation checks and whitespace validation, inspect the staged tree for secrets/private material, commit and push without application scaffolding. Verify repository visibility and the remote commit; record actual evidence in the dated log. Do not claim a binary release or publish invented badges/download links.
 
-GitHub documentation CI uses read-only repository permission, Python and no release credentials. Public issue/PR templates require synthetic reports. Private vulnerability reporting should be enabled when repository administration permits. Documentation “implemented” means the documents/checks exist; it does not change any application capability's status.
+GitHub documentation CI uses read-only repository permission, Python and no release credentials. Under ADR-030 all CI/CD workflows are manual only (`workflow_dispatch`); publishing a commit or opening/updating a pull request starts no pipeline. Run appropriate local checks before publication; a remote run requires an explicit user request. Public issue/PR templates require synthetic reports. Private vulnerability reporting should be enabled when repository administration permits. Documentation “implemented” means the documents/checks exist; it does not change any application capability's status.
 
 ## Android release ownership
 

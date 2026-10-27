@@ -1,40 +1,6 @@
 name: Android native qualification
 
 on:
-  push:
-    paths:
-      - 'android/**'
-      - 'src/**'
-      - 'native/analytics-core/**'
-      - 'native/collection-prototype/**'
-      - 'patches/**'
-      - 'tools/android_build.py'
-      - 'tools/check_mobile.py'
-      - 'docs/evidence/mobile-scaffold.json'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'index.js'
-      - 'babel.config.js'
-      - 'metro.config.js'
-      - '.github/workflows/android.yml'
-  pull_request:
-    paths:
-      - 'android/**'
-      - 'src/**'
-      - 'native/analytics-core/**'
-      - 'native/collection-prototype/**'
-      - 'patches/**'
-      - 'tools/android_build.py'
-      - 'tools/check_mobile.py'
-      - 'docs/evidence/mobile-scaffold.json'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'index.js'
-      - 'babel.config.js'
-      - 'metro.config.js'
-      - '.github/workflows/android.yml'
   workflow_dispatch:
 
 permissions:

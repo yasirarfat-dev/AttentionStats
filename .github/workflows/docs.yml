@@ -1,8 +1,6 @@
 name: Documentation, native domain and design reference
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
 
 permissions:

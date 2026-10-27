@@ -7,6 +7,8 @@
 
 Status vocabulary: **planned** = specified future work; **experimental** = feasibility/evidence required; **blocked** = explicit unmet gate; **implemented** = code/artifact and acceptance evidence recorded. Active work is described in State; experimental scaffold source does not establish an accepted app capability. Priority P0 precedes P1; order within a dependency-ready priority is the listed order. Documentation status does not imply an installable product.
 
+ADR-030 makes all GitHub CI/CD workflows manual only. Continue local task-appropriate checks and reviewed pushes; remote runs require an explicit user request. Existing CI evidence does not authorize automatic future runs.
+
 User-directed design continuation prioritizes AS-033 as a separate interaction study under ADR-019/ADR-020. It does not clear native feasibility prerequisites. Resume AS-002 after this reviewable study; AS-018 adopts the direction when its native dependencies are satisfied.
 
 ADR-024 confirms mobile-only delivery. AS-033 is complete and retained as a non-shipping design reference; it does not establish a continuing web-app workstream. No Chrome-extension task is scheduled. Next implementation is native Android feasibility/scaffolding and its dependent mobile tasks.

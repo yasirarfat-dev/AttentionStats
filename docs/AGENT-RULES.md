@@ -19,6 +19,8 @@ When documents disagree, identify the conflict, resolve against explicit accepte
 4. Update domain specs/contracts/models, capability status, Tracker, State and dated implementation log in the same change. Record deliberate deviations and unresolved gates. Do not write implementation code inconsistent with the source of truth.
 5. Report concrete outcome, verification and limitations. Distinguish local commit, remote publication, installed binary and policy approval; they are separate facts. The user explicitly requests a reviewed commit and push to this repository's GitHub remote at the end of each work session (2026-10-27); perform the identity/remote/authentication checks below and record the result. This is not authorization to force-push, publish binaries or deploy.
 
+GitHub Actions CI/CD is **manual only** by explicit user instruction (2026-10-27, ADR-030). All workflows must use only `workflow_dispatch`; pushes, pull requests, schedules and other automatic events must not start pipelines. Continue appropriate local checks and reviewed regular pushes. Do not dispatch or rerun a remote workflow as routine verification; start one only when the user explicitly requests that run. Preserve this rule when adding or editing workflows.
+
 Allowed feature states are planned, experimental, blocked and implemented. Runtime capability states are separate and defined in [Contracts](NATIVE-CONTRACTS.md). If a task is underway, keep its feature status accurate and record active work in State rather than claiming implementation early. IDs are stable: never renumber AS/C/scenario/ADR/F IDs to fill gaps. New ideas enter Queue and get promoted through a documented decision.
 
 ## Package and machine rules

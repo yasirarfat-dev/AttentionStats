@@ -147,6 +147,10 @@ Updated phone execution is pending: one authorized physical phone was visible at
 
 The [measurement protocol](COLLECTION-FEASIBILITY.md#self-package-timing-and-cancellation-protocol) accepts no OS allocation/peak-memory bound, service CPU budget, latency percentile or in-flight interruption guarantee. Injected same-thread checkpoints do not measure cross-thread cancellation response. No production collector/store/bridge, permission/manifest, scheduler or grant/settings change was introduced. AS-003 remains experimental and F-02/F-09 stay open.
 
+## Manual-only GitHub workflows
+
+User instruction in ADR-030 changes both workflows to `workflow_dispatch` only. Push and pull-request triggers are removed; no automatic schedule or workflow chain exists. Local verification and reviewed regular pushes continue. Agents must not manually dispatch or rerun remote jobs without an explicit user request. Historical CI results remain evidence for their original commits. This configuration change is verified locally and by inspecting the published workflow files; no remote workflow is started to test it. The AS-003 phone timing/cancellation run remains pending reconnection.
+
 ## Next action
 
 Session continuity follows the user's **pause → checkpoint → compact → continue** cycle at reported **100k–150k context tokens**. Preserve the checkpoint and resume the same objective after compaction; unavailable counters/controls must not be represented as measured or invoked.

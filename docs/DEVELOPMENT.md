@@ -16,7 +16,7 @@ git diff --check
 git status --short
 ```
 
-The checker verifies expected documents, metadata, relative links/anchors, capability/scenario/task coverage, dependency-ledger consistency and prohibited public artifacts. It does not prove Android behavior or external link availability. Manually review public text and policy interpretation. The documentation CI job performs these offline checks; separate mobile jobs compile and verify the experimental scaffold without signing secrets.
+The checker verifies expected documents, metadata, relative links/anchors, capability/scenario/task coverage, dependency-ledger consistency and prohibited public artifacts. It does not prove Android behavior or external link availability. Manually review public text and policy interpretation. The documentation CI job performs these offline checks; separate mobile jobs compile and verify the experimental scaffold without signing secrets. All GitHub workflows are manual only under ADR-030: pushes and pull requests start no pipeline. Run appropriate checks locally before publishing. Start a remote run only on explicit user request through GitHub Actions → select workflow → Run workflow ([GitHub instructions](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow)).
 
 ## Native analytics slice: AS-035
 
@@ -73,7 +73,7 @@ python tools/android_build.py --sdk .cache/as-004/sdk --arch x86_64 assembleDebu
 
 AS-002 also has an ARM64 native CI job using exact SDK/NDK/CMake components on a disposable Linux runner. It compiles debug, unsigned release and synthetic Android test APKs, runs the shared Gradle analytics suite and app lint, and uploads no binaries. Workflow configuration and a passing remote run are separate evidence.
 
-The app enables core library desugaring for the pure module's `java.time` calls on the declared API-24/25 baseline. The latest stable reviewed native dependency is pinned in `android/gradle/libs.versions.toml`; its license and artifact evidence are recorded in [Dependencies](DEPENDENCIES.md#android-core-library-desugaring). After a native build with the task-local Gradle cache, `python tools/check_mobile.py --native-cache` checks the resolved JAR's size/SHA-256. Native CI performs this check too, and runs only for relevant source/toolchain changes or manual dispatch.
+The app enables core library desugaring for the pure module's `java.time` calls on the declared API-24/25 baseline. The latest stable reviewed native dependency is pinned in `android/gradle/libs.versions.toml`; its license and artifact evidence are recorded in [Dependencies](DEPENDENCIES.md#android-core-library-desugaring). After a native build with the task-local Gradle cache, `python tools/check_mobile.py --native-cache` checks the resolved JAR's size/SHA-256. Native CI performs this check too when manually dispatched on explicit user request; source/toolchain changes do not trigger it.
 
 Current user instruction requires runtime checks on the connected debug phone. Do not start/use an emulator; ask the user to connect the phone with USB debugging enabled if unavailable. Build the application and synthetic test APK for the phone's ABI:
 
