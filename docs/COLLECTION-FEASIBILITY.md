@@ -82,11 +82,26 @@ After both synthetic resumed/paused pairs are observed, the same read routine in
 
 The host runner requires all twelve unique, bounded numeric aggregate fields and validates duration/count relationships before accepting success. Missing, duplicate, malformed or inconsistent measurements refuse the result and still clean up the temporary test package. It retains no timestamps, class/package names, payloads, identifiers or raw instrumentation output. No grant, manifest, production source/store, scheduler or public bridge change is part of this protocol.
 
+The changed harness passed on the connected physical API-36 phone on 2026-10-27, using the ARM64 debug/test APKs built for source commit `e70c97d` (unchanged at session base `83f02f9`). Both synthetic resumed/paused pairs passed, instrumentation returned `-1`, and the host validated every aggregate below. The temporary test package was removed; the debug app remains installed. No grants/settings changed. Private APK hashes and aggregate evidence remain in ignored `.cache/as-003/self-query-result.json`.
+
+| Aggregate | Observed value |
+|---|---|
+| Query calls / completed iterator passes | 3 / 1 |
+| Query total / maximum | 4,284,615 / 2,078,462 ns |
+| Completed iteration total / maximum | 160,615 / 160,615 ns |
+| Maximum events scanned in a completed pass | 5 |
+| Before-dispatch cancellation: extra calls | 0 |
+| After-response cancellation: events scanned | 0 |
+| During-iteration cancellation: events scanned | 1 |
+| Cancelled batches / discarded snapshots | 3 / 1 |
+
+This single small-fixture run establishes the asserted read boundaries only. The totals include two queries whose responses were discarded; iteration timing excludes cancelled passes. No latency distribution, production budget, cross-thread cancellation bound or OS allocation/CPU/peak-memory result is inferred.
+
 Only the self-package row has passed on the physical API-36 ARM64 phone. The synthetic row has host JVM evidence only; every other runtime row is **not run**. T/L IDs refer to [Testing](TESTING.md). Record exact build/API/OEM/locale, synthetic fixture, expected/actual result, query bounds, durations/counts and limitations. Public evidence contains aggregate outcomes only. Host tests execute no Android source scenarios.
 
 | Stage | Experiment | Acceptance boundary |
 |---|---|---|
-| Self-package public API — passed 2026-10-27 | Physical API-36 ARM64 phone; two test-only activities create events during an explicit run; query only this package from run start. No source grant changes or prior history | Both resumed/paused pairs and bounded iterator/copied snapshots pass; instrumentation `-1`. Confirms public self-query mechanics only; no C-01–C-04 admission or cross-app accuracy claim |
+| Self-package public API — passed 2026-10-27 | Physical API-36 phone, ARM64 debug/test APKs; two test-only activities create events during an explicit run; query only this package from run start. No source grant changes or prior history | Both resumed/paused pairs, bounded iterator/copied snapshots, validated query/iteration aggregates and three cancellation boundaries pass; instrumentation `-1`, temporary test package removed. Confirms public self-query mechanics only; no C-01–C-04 admission or cross-app accuracy claim |
 | Synthetic adapter/reconciliation — JVM subset passed 2026-10-27 | Inject null/empty/denied/truncated responses, repeated/shifted overlap, equal-time multiplicity, late arrivals, wall jumps, cancellation, revision races, consent/fence planning, density/backoff, receipt recovery and bounded correction passes | T-01/T-16, L-01/L-03/L-08 subsets only; 129 synthetic checks including 100 equal-time permutations, 300 interval-oracle, 128 density-budget, 200 receipt-oracle and 200 correction-chain fixtures. Simulated assignment/lost acknowledgement and explicit rebuilt-scope decisions, not an actual crash, Android adapter, durable coordinator or complete scenario admission |
 | Consented fixture packages | Only after an in-app prototype disclosure and user-controlled Usage Access/consent: transition among allowlisted synthetic activities/packages | T-01–T-04; independently check activity versus package opens, screen/keyguard, multi-window and missing edges |
 | Process separation | Stop JS, remove the task, then terminate only the task app's process in separate scoped runs | L-05; measure actual permitted continuation/reconciliation, not uptime assertions |
@@ -97,7 +112,7 @@ Only the self-package row has passed on the physical API-36 ARM64 phone. The syn
 
 Current authorization covers task-app debug checks without unrelated phone/settings/history changes. Grant changes, reboot and battery/restriction trials require their own agreed scope before execution. No emulator is a fallback. Ask for a connected USB-debugging phone when a runtime step needs one and it is unavailable.
 
-AS-003 can advance per evidence stage while remaining experimental. F-02/F-09 stay open until source fidelity, durable consent-fenced recovery, viable permitted execution and device limitations are documented. Bounded correction proposals and explicit rebuilt-scope boundaries now have synthetic evidence; production scheduling, durable consent reconstruction and scope migration remain unimplemented. Next, review source response-cost/latency and cooperative cancellation measurements within the self-package protocol before connecting a broader source. Keep experimental values distinct from the eventual durable schema. Repeat the passing self-package run only for changed code or unresolved concerns. The harness stays test-only and leaves the production bootstrap `not_implemented`.
+AS-003 can advance per evidence stage while remaining experimental. F-02/F-09 stay open until source fidelity, durable consent-fenced recovery, viable permitted execution and device limitations are documented. Bounded correction proposals and explicit rebuilt-scope boundaries now have synthetic evidence; production scheduling, durable consent reconstruction and scope migration remain unimplemented. The self-package timing/cancellation checkpoint now passes; OS response cost, worst-case latency and broader source qualification remain separate work. AS-006 archive/encryption design review is the next independent dependency-ready task. Keep experimental values distinct from the eventual durable schema. Repeat the passing self-package run only for changed code or unresolved concerns. The harness stays test-only and leaves the production bootstrap `not_implemented`.
 
 ## Harness reproduction and current evidence
 
