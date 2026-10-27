@@ -1,6 +1,6 @@
 # Privacy specification
 
-**Status:** Product privacy commitments accepted; implementation unverified. Updated 2026-10-27.
+**Status:** Product privacy commitments accepted; implementation unverified. Updated 2026-10-28.
 **Responsibility:** Owns data inventory, consent, local processing, external transfers and public claims.
 **Related specifications:** [Permissions](PERMISSIONS.md), [Security](SECURITY.md), [Storage](STORAGE-AND-RETENTION.md), [Backup](BACKUP-RESTORE.md), [Release](RELEASE.md).
 **Unresolved feasibility:** F-01, F-04–F-06 and F-08 in [Decisions](DECISIONS.md); implementation and policy review must prove these commitments before release.
@@ -15,7 +15,7 @@ No application backend, mandatory product account, advertising SDK, remote analy
 
 ## Data inventory
 
-AS-043's installed-preview inventory is narrower than the planned catalog: per-app source choices, disclosure decisions, pause/HUD configuration, exposure counts/timestamps, visits and coverage in encrypted local storage. Its passive accessibility adapter reads only bounded selected-package resource IDs, class/role and numeric page/scroll positions; it never reads node text/descriptions, images, messages, input values or content fingerprints. No content/topic control is implemented. An independent affirmative developer-only choice temporarily retains a bounded flat structural diagnostic in private no-backup storage, for up to ten minutes; stopping, expiry, deletion or a fresh process removes it. The developer may read this one file during the local qualification; no automatic upload. User consent and a verified detector are required separately before real counts can be admitted. See [permissions](PERMISSIONS.md) and [current status](STATE.md).
+AS-043's installed-preview inventory is narrower than the planned catalog: per-app source choices, disclosure decisions, pause/HUD configuration, exposure counts/timestamps, layout categories, visits and coverage in encrypted local storage. ADR-034 separates video layouts, photo/carousel pages, recognized image ads and unclassified pages; totals include ads. These are layout estimates, not content inspection or complete ad recognition. Normal-feed posts remain unavailable. Room v2 preserves old rows as unclassified; disclosure revision 2 requires a fresh affirmative source choice before collecting the changed categories. Its passive accessibility adapter reads only bounded selected-package resource IDs, class/role and numeric page/scroll positions; it never reads node text/descriptions, images, messages, input values or content fingerprints. No content/topic control is implemented. An independent affirmative developer-only choice temporarily retains a bounded flat structural diagnostic in private no-backup storage, for up to ten minutes; stopping, expiry, deletion or a fresh process removes it. The developer may read this one file during the local qualification; no automatic upload. User consent and detector qualification are separate gates. See [permissions](PERMISSIONS.md) and [current status](STATE.md).
 
 | Data class | Why / default | Storage and recipients | Control |
 |---|---|---|---|

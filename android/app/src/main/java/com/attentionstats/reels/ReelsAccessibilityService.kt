@@ -3,7 +3,6 @@ package com.attentionstats.reels
 import android.accessibilityservice.AccessibilityService
 import android.app.KeyguardManager
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.os.Build
@@ -15,7 +14,6 @@ import android.view.Gravity
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
-import android.widget.TextView
 import com.attentionstats.MainActivity
 import org.attentionstats.reels.CounterSignal
 import org.attentionstats.reels.ReelApp
@@ -30,7 +28,12 @@ class ReelsAccessibilityService : AccessibilityService() {
     private val main = Handler(Looper.getMainLooper())
     private val coordinator by lazy { ReelsCoordinator.get(this) }
     private val listener: () -> Unit = { configurationChanged() }
-    private var hud: TextView? = null
+    private var hud: CounterHudView? = null
+    private var hudParams: WindowManager.LayoutParams? = null
+    private var hudOffsetX = 0
+    private var hudOffsetY: Int? = null
+    private var moveRemainderX = 0f
+    private var moveRemainderY = 0f
     private var scheduled = false
     private var scanning = false
     @Volatile private var destroyed = false
@@ -151,18 +154,20 @@ class ReelsAccessibilityService : AccessibilityService() {
                 shape.editable || definition?.excludedIds?.any { it in shape.ids } == true -> Surface.EXCLUDED
                 definition == null || !shape.bounded -> Surface.UNKNOWN
                 definition.requiredIds.all { it in shape.ids } -> Surface.REELS
+                definition.scrollSourceIds.any { it in shape.ids } -> Surface.REELS // Known viewer, page still settling.
                 else -> Surface.OUTSIDE
             }
-            val page = shape.centerPage ?: pages[app]
+            val page = if (definition?.requiredIds?.all { it in shape.ids } == true) shape.centerPage ?: pages[app] else null
             val current = rootInActiveWindow
             val sameWindow = try { current != null && current.packageName?.toString() == app.packageName && current.windowId == root.windowId }
                 finally { recycleCompat(current) }
             if (!sameWindow || capturedEpoch != coordinator.epoch() || keyguard.isKeyguardLocked || !power.isInteractive) {
                 outside(SystemClock.elapsedRealtime()); return
             }
-            displayEligible = surface == Surface.REELS && page != null
+            displayEligible = surface == Surface.REELS
             if (surface != Surface.REELS) removeHud()
-            coordinator.observe(app, CounterSignal(SystemClock.elapsedRealtime(), surface, page, root.windowId), capturedEpoch)
+            coordinator.observe(app, CounterSignal(SystemClock.elapsedRealtime(), surface, page, root.windowId,
+                DetectorRegistry.category(app, shape.ids)), capturedEpoch)
             if (surface == Surface.REELS || coordinator.calibrationEnabled) schedule(500)
         } finally { recycleCompat(root) }
     }
@@ -248,40 +253,88 @@ class ReelsAccessibilityService : AccessibilityService() {
             state.epoch != coordinator.epoch() || !coordinator.allowed(state.app) ||
             getSystemService(KeyguardManager::class.java).isKeyguardLocked ||
             !getSystemService(PowerManager::class.java).isInteractive) { removeHud(); return }
-        val text = "This visit ~${state.visit} · Today ~${state.today}"
         if (hud == null) {
             val density = resources.displayMetrics.density
-            val view = TextView(this).apply {
-                setTextColor(Color.WHITE); setBackgroundColor(Color.rgb(36, 60, 50))
-                textSize = 13f; gravity = Gravity.CENTER
-                setPadding((12 * density).toInt(), (6 * density).toInt(), (12 * density).toInt(), (6 * density).toInt())
-                minimumHeight = (48 * density).toInt()
-                contentDescription = "Estimated Reels exposures. Tap to open counter controls."
-                setOnClickListener { startActivity(Intent(this@ReelsAccessibilityService, MainActivity::class.java)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)); removeHud() }
-            }
+            val view = CounterHudView(this, ::openDashboard, { counterControl(pause = true) },
+                { counterControl(pause = false) })
             val params = WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT).apply {
                     gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-                    y = (32 * density).toInt()
+                    x = hudOffsetX
+                    y = hudOffsetY ?: (32 * density).toInt()
                 }
-            try { getSystemService(WindowManager::class.java).addView(view, params); hud = view }
-            catch (_: RuntimeException) { return }
+            view.moveCounter = { dx, dy -> moveCounter(dx, dy) }
+            view.resetPosition = {
+                val current = hudParams
+                if (current != null) {
+                    hudOffsetX = 0; hudOffsetY = (32 * density).toInt()
+                    moveRemainderX = 0f; moveRemainderY = 0f
+                    current.x = hudOffsetX; current.y = checkNotNull(hudOffsetY)
+                    moveCounter(0f, 0f)
+                }
+            }
+            view.addOnLayoutChangeListener { _, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+                if (right - left != oldRight - oldLeft || bottom - top != oldBottom - oldTop) moveCounter(0f, 0f)
+            }
+            try { hud = view; hudParams = params; getSystemService(WindowManager::class.java).addView(view, params) }
+            catch (_: RuntimeException) { hud = null; hudParams = null; return }
         }
-        hud?.let {
-            if (it.text.toString() != text) {
-                it.text = text
-                it.contentDescription = "$text. Estimated Reels exposures. Tap to open counter controls."
+        hud?.update(state)
+    }
+
+    private fun moveCounter(dx: Float, dy: Float) {
+        val view = hud ?: return
+        val params = hudParams ?: return
+        if (view.width <= 0 || view.height <= 0) return
+        val metrics = resources.displayMetrics
+        val inset = (8 * metrics.density).toInt()
+        // Keep both compact and expanded bounds inside the usable display, including after rotation.
+        val safeInsets = Rect(0, inset, 0, inset)
+        if (Build.VERSION.SDK_INT >= 30) {
+            view.rootWindowInsets?.getInsetsIgnoringVisibility(
+                android.view.WindowInsets.Type.systemBars() or android.view.WindowInsets.Type.displayCutout())?.let {
+                safeInsets.set(it.left, it.top, it.right, it.bottom)
             }
         }
+        val safeWidth = metrics.widthPixels - safeInsets.left - safeInsets.right - 2 * inset
+        val maxX = maxOf(0, (safeWidth - view.width) / 2)
+        val maxY = maxOf(inset, metrics.heightPixels - safeInsets.top - safeInsets.bottom - view.height - inset)
+        // Android reports fractional raw coordinates. Retain subpixel displacement across events.
+        val preciseX = dx + moveRemainderX
+        val preciseY = dy + moveRemainderY
+        val requestedX = params.x + preciseX.toInt()
+        val requestedY = params.y + preciseY.toInt()
+        params.x = requestedX.coerceIn(-maxX, maxX)
+        params.y = requestedY.coerceIn(inset, maxY)
+        moveRemainderX = if (params.x == requestedX) preciseX - preciseX.toInt() else 0f
+        moveRemainderY = if (params.y == requestedY) preciseY - preciseY.toInt() else 0f
+        hudOffsetX = params.x; hudOffsetY = params.y
+        try { getSystemService(WindowManager::class.java).updateViewLayout(view, params) }
+        catch (_: RuntimeException) { removeHud() }
+    }
+
+    private fun openDashboard() {
+        startActivity(Intent(this, MainActivity::class.java)
+            .setAction(Intent.ACTION_VIEW).setData(android.net.Uri.parse("attentionstats://reels"))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+        removeHud()
+    }
+
+    private fun counterControl(pause: Boolean) {
+        coordinator.snapshot({ value ->
+            val revision = JSONObject(value).getString("revision")
+            if (pause) coordinator.setPaused(true, revision, { removeHud() }, { main.post { openDashboard() } })
+            else coordinator.setOverlay(false, revision, { removeHud() }, { main.post { openDashboard() } })
+        }, { main.post { openDashboard() } })
     }
 
     private fun removeHud() {
         if (Looper.myLooper() != Looper.getMainLooper()) { main.post { removeHud() }; return }
         hud?.let { view -> try { getSystemService(WindowManager::class.java).removeView(view) } catch (_: RuntimeException) { } }
         hud = null
+        hudParams = null
     }
 
     @Suppress("DEPRECATION") // recycle is required on supported API 24-32, a no-op on newer Android.

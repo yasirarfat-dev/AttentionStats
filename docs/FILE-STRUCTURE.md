@@ -1,13 +1,15 @@
 # File structure
 
-**Status:** Experimental mobile tree, pure analytics source, documentation and retained design reference exist; downstream feature folders remain proposed. Updated 2026-10-27.
+**Status:** Experimental mobile tree, pure analytics source, documentation and retained design reference exist; five-tab domain feature folders now exist; unconnected runtime features remain planned. Updated 2026-10-28.
 **Responsibility:** Defines file placement and ownership to avoid duplicate stores or rules.
 **Related specifications:** [Architecture](ARCHITECTURE.md), [Conventions](CONVENTIONS.md), [Development](DEVELOPMENT.md), [Agent rules](AGENT-RULES.md).
 **Unresolved feasibility:** F-03 and F-07 in [Decisions](DECISIONS.md); generated CLI layout must be reconciled after latest-version resolution.
 
 ## Current repository
 
-AS-043 adds `src/features/reels` (public screen API), the bounded `src/platform/specs/NativeReels` adapter/decoder, pure `native/reels-core` wired through `android/reels-core`, and app-owned Android `reels`/`storage` infrastructure. The initial Room v1 schema and native application dependency locks are retained under `android/app`. `src/preview/AndroidManifest.xml` removes debug-library network/overlay permissions. App androidTest probes and `tools/reels_phone.py` qualify unique synthetic storage and our own React Native window; private APKs/images/diagnostics remain ignored. These are main-app additions; the isolated AS-006 projects stay excluded from the product.
+AS-045 adds feature-owned `today`, `history`, `patterns`, `protection`, `settings`, `sources`, `storage`, `backup`, `appearance` and `convenience` folders with public index APIs. Reels owns its reusable live summary component. `src/app/App.tsx` composes typed native stacks and five bottom tabs; shared `Panel`/`NavIcon` own presentation only. No new feature store or cross-feature private imports. Android `CounterHudView` renders committed projections and delegates source mutations to the existing coordinator.
+
+AS-043 adds `src/features/reels` (public screen API), the bounded `src/platform/specs/NativeReels` adapter/decoder, pure `native/reels-core` wired through `android/reels-core`, and app-owned Android `reels`/`storage` infrastructure. Both Room v1 and v2 schemas and native application dependency locks are retained under `android/app`. `src/preview/AndroidManifest.xml` removes debug-library network/overlay permissions. App androidTest probes and `tools/reels_phone.py` qualify unique synthetic storage and our own React Native window; private APKs/images/diagnostics remain ignored. These are main-app additions; the isolated AS-006 projects stay excluded from the product.
 
 ```text
 AttentionStats/

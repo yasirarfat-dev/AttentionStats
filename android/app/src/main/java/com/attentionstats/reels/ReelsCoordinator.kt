@@ -25,6 +25,7 @@ import org.attentionstats.reels.CounterReducer
 import org.attentionstats.reels.CounterSignal
 import org.attentionstats.reels.ReelApp
 import org.attentionstats.reels.Surface
+import org.attentionstats.reels.PageCategory
 import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
@@ -48,6 +49,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
     private val calibrationExpiry = Runnable { setCalibration(false) }
     private var lastStructureBytes: ByteArray? = null
     @Volatile private var configuration: Map<String, SourceConfiguration> = emptyMap()
+    @Volatile private var currentNotices: Set<String> = emptySet()
     @Volatile var overlayEnabled = false
         private set
     @Volatile var serviceConnected = false
@@ -58,7 +60,9 @@ internal class ReelsCoordinator private constructor(private val context: Context
     @Volatile var calibrationEnabled = false
         private set
 
-    data class OverlaySnapshot(val app: ReelApp, val visit: Long, val today: Long, val epoch: Long)
+    data class OverlayCategory(val category: PageCategory, val visit: Long, val today: Long)
+    data class OverlaySnapshot(val app: ReelApp, val visit: Long, val today: Long, val epoch: Long,
+        val categories: List<OverlayCategory> = emptyList(), val scrollBack: Boolean = false)
 
     init {
         scope.launch { for (job in jobs) job() }
@@ -67,7 +71,8 @@ internal class ReelsCoordinator private constructor(private val context: Context
     fun addListener(listener: () -> Unit) { listeners.add(listener) }
     fun removeListener(listener: () -> Unit) { listeners.remove(listener) }
     fun epoch(): Long = epoch.get()
-    fun allowed(app: ReelApp): Boolean = health == "ready" && configuration[app.sourceId]?.let { it.enabled && !it.paused } == true
+    fun allowed(app: ReelApp): Boolean = health == "ready" && app.sourceId in currentNotices &&
+        configuration[app.sourceId]?.let { it.enabled && !it.paused } == true
     fun grantEnabled(): Boolean {
         val expected = ComponentName(context, ReelsAccessibilityService::class.java)
         return context.getSystemService(AccessibilityManager::class.java)
@@ -127,6 +132,9 @@ internal class ReelsCoordinator private constructor(private val context: Context
 
     private suspend fun refreshConfiguration(history: HistoryStore) {
         configuration = history.database.data().configurations().associateBy { it.sourceId }
+        currentNotices = configuration.keys.filter {
+            (history.database.data().allowedNotice(it) ?: 0) >= NOTICE_REVISION
+        }.toSet()
         overlayEnabled = history.database.data().overlay()?.enabled == true
     }
 
@@ -154,13 +162,18 @@ internal class ReelsCoordinator private constructor(private val context: Context
             val version = installedVersion(app)
             val supported = DetectorRegistry.definition(app, version) != null
             val visit = visits[app]
+            val counts = JSONObject()
+            for (category in PageCategory.entries) counts.put(category.key,
+                if (category == PageCategory.POST) JSONObject.NULL else
+                    dao.categoryCount(app.key, start, end, category.key).toString())
             sources.put(JSONObject().put("app", app.key).put("enabled", config.enabled)
+                .put("consentCurrent", app.sourceId in currentNotices).put("counts", counts)
                 .put("paused", config.paused).put("installed", version.isNotEmpty())
                 .put("version", version).put("supported", supported)
                 .put("today", dao.dayCount(app.key, start, end).toString())
                 .put("visit", visit?.let { dao.visitCount(it).toString() } ?: JSONObject.NULL))
         }
-        return JSONObject().put("contractVersion", 1).put("revision", revision(metadata.generation, metadata.configurationRevision))
+        return JSONObject().put("contractVersion", 2).put("revision", revision(metadata.generation, metadata.configurationRevision))
             .put("historyRevision", revision(metadata.generation, metadata.lastRevision))
             .put("generation", metadata.generation).put("storage", health)
             .put("accessibilityEnabled", grantEnabled()).put("accessibilitySelected", grantSelected())
@@ -187,7 +200,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
                 val next = Math.addExact(checkNotNull(dao.metadata()).configurationRevision, 1)
                 closeVisits(history, app)
                 dao.configure(app.sourceId, enabled, next, now)
-                dao.insertConsent(ConsentRecord(UUID.randomUUID().toString(), app.sourceId, 1,
+                dao.insertConsent(ConsentRecord(UUID.randomUUID().toString(), app.sourceId, NOTICE_REVISION,
                     if (enabled) "allow" else "withdraw", now, next))
                 dao.closeCoverage(app.sourceId, now)
                 dao.insertCoverage(CoverageInterval(UUID.randomUUID().toString(), app.sourceId, now, null,
@@ -304,30 +317,40 @@ internal class ReelsCoordinator private constructor(private val context: Context
             history.database.withWriteTransaction {
                 if (capturedEpoch != epoch.get() || !allowed(app) || !grantEnabled()) throw ObservationInvalidated()
                 val dao = history.database.data()
-                if (visits[app] == null) dao.insertEpisode(SurfaceEpisode(id, app.key, "short_video", now,
-                    null, 1, "estimate"))
+                val detectorRevision = checkNotNull(DetectorRegistry.definition(app, installedVersion(app))).revision
+                if (visits[app] == null) dao.insertEpisode(SurfaceEpisode(id, app.key, "reels_viewer", now,
+                    null, detectorRevision, "estimate"))
                 dao.insertExposure(Exposure(UUID.randomUUID().toString(), id, app.key, now,
-                    proposal.elapsedMs, Math.addExact(dao.visitCount(id), 1), 1, "estimate",
+                    proposal.elapsedMs, Math.addExact(dao.visitCount(id), 1), detectorRevision, "estimate",
                     config.consentRevision, "settled_page_transition", observedZoneId,
-                    Instant.ofEpochMilli(now).atZone(ZoneId.of(observedZoneId)).offset.totalSeconds))
+                    Instant.ofEpochMilli(now).atZone(ZoneId.of(observedZoneId)).offset.totalSeconds, proposal.category.key))
                 dao.advanceRevision()
                 if (capturedEpoch != epoch.get() || !allowed(app) || !grantEnabled()) throw ObservationInvalidated()
             }
             visits[app] = id
             reducer.acknowledge(proposal)
         }
-        if (reducer.visible && capturedEpoch == epoch.get()) {
+        // Keep committed totals in place during a known viewer's unsettled page transition.
+        if (signal.surface == Surface.REELS && capturedEpoch == epoch.get()) {
             val dao = history.database.data()
             val zone = ZoneId.systemDefault()
             val day = Instant.now().atZone(zone).toLocalDate()
+            val start = day.atStartOfDay(zone).toInstant().toEpochMilli()
+            val end = day.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
+            val todayCategories = dao.dayCategories(app.key, start, end).associate { it.category to it.count }
+            val visitCategories = visits[app]?.let { dao.visitCategories(it).associate { row -> row.category to row.count } }
+                ?: emptyMap()
             liveOverlay = OverlaySnapshot(app, visits[app]?.let { dao.visitCount(it) } ?: 0,
-                dao.dayCount(app.key, day.atStartOfDay(zone).toInstant().toEpochMilli(),
-                    day.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()), capturedEpoch)
+                dao.dayCount(app.key, start, end), capturedEpoch,
+                PageCategory.entries.filter { it != PageCategory.POST }.map {
+                    OverlayCategory(it, visitCategories[it.key] ?: 0, todayCategories[it.key] ?: 0)
+                }, proposal?.scrollBack ?: liveOverlay?.takeIf { it.app == app }?.scrollBack ?: false)
         } else liveOverlay = null
         publish()
     }
 
     companion object {
+        const val NOTICE_REVISION = 2
         @Volatile private var instance: ReelsCoordinator? = null
         fun get(context: Context): ReelsCoordinator = instance ?: synchronized(this) {
             instance ?: ReelsCoordinator(context.applicationContext).also { instance = it }

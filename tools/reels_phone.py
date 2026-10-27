@@ -103,7 +103,7 @@ def parse_result(output: str, mode: str) -> dict[str, int]:
         raise RuntimeError("Reels " + mode + " probe failed; stage=" + (stage[1] if stage else "unreported") +
                            "; type=" + (kind[1] if kind else "unreported") + "; raw phone output withheld")
     limits = {"storage_checks": (30, 200), "key_rejections": (3, 3), "sentinel_files": (1, 3),
-              "fixture_removed": (1, 1)} if mode == "storage" else {"ui_checks": (10, 30)}
+              "fixture_removed": (1, 1)} if mode == "storage" else {"ui_checks": (20, 160), "shell_routes": (20, 20)}
     values = {}
     for key, (low, high) in limits.items():
         found = re.findall(rf"^INSTRUMENTATION_RESULT: {key}=([0-9]{{1,6}})$", output, re.M)
@@ -115,11 +115,15 @@ def parse_result(output: str, mode: str) -> dict[str, int]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["qualify", "ui", "health", "install", "structure", "own-failure-image"])
+    parser.add_argument("action", choices=["qualify", "ui", "health", "show-counter", "install", "structure", "own-failure-image"])
     parser.add_argument("--label", choices=["reels-entry", "reels-next", "reels-return", "feed", "comments", "ad", "profile", "inbox", "outside"], default="reels-entry")
+    parser.add_argument("--user-authorized-display", action="store_true",
+                        help="Required for show-counter; use only after the person explicitly requests display")
     sdk_adb = Path(os.environ.get("ANDROID_HOME", str(ROOT / ".cache/as-004/sdk"))) / "platform-tools" / ("adb.exe" if os.name == "nt" else "adb")
     parser.add_argument("--adb", type=Path, default=sdk_adb)
     args = parser.parse_args()
+    if args.action == "show-counter" and not args.user_authorized_display:
+        parser.error("show-counter requires explicit user display authorization; sources/grants stay separate")
     if not args.adb.is_file() or not PREVIEW.is_file() or (args.action in ["qualify", "ui"] and not TEST_APK.is_file()):
         raise RuntimeError("Existing adb and built preview/test APKs required")
     with zipfile.ZipFile(PREVIEW) as archive:
@@ -149,20 +153,24 @@ def main() -> int:
         raise RuntimeError("Own-window UI qualification requires API 26 or newer")
     if "package:" + TEST in device("shell", "pm", "list", "packages", TEST).splitlines():
         raise RuntimeError("Existing test package preserved; resolve ownership before qualification")
-    if args.action == "health":
+    if args.action in ["health", "show-counter"]:
         if api < 31: raise RuntimeError("Non-restarting health probe requires API 31 or newer")
         installed_health = False
         try:
             if "Success" not in device("install", str(TEST_APK), timeout=180):
                 raise RuntimeError("Health probe installation did not report success")
             installed_health = True
-            output = device("shell", "am", "instrument", "--no-restart", "-w", "-r", "-e", "qualification", "reels-health", RUNNER)
+            output = device("shell", "am", "instrument", *(["--no-restart"] if args.action == "health" else []),
+                            "-w", "-r", "-e", "qualification",
+                            "reels-show-counter" if args.action == "show-counter" else "reels-health", RUNNER)
             lines = output.splitlines()
             if [x for x in lines if x.startswith("INSTRUMENTATION_CODE:")] != ["INSTRUMENTATION_CODE: -1"] or \
                "INSTRUMENTATION_RESULT: stream=PASS: bounded preview control health" not in lines:
-                raise RuntimeError("Non-restarting health probe failed; no restart fallback attempted")
+                kind = re.search(r"^INSTRUMENTATION_RESULT: stream=FAIL: ([A-Za-z]{1,80})", output, re.M)
+                raise RuntimeError("Counter control probe failed; type=" + (kind[1] if kind else "unreported") +
+                                   "; no health restart fallback attempted; raw output withheld")
             flags = {}
-            for key in ["accessibilityEnabled", "serviceConnected", "calibrationEnabled", "storageReady", "enabledSources", "pausedSources"]:
+            for key in ["accessibilityEnabled", "serviceConnected", "calibrationEnabled", "overlayEnabled", "storageReady", "enabledSources", "pausedSources"]:
                 found = re.findall(rf"^INSTRUMENTATION_RESULT: {key}=([0-3])$", output, re.M)
                 if len(found) != 1: raise RuntimeError("Malformed health flag; raw output withheld")
                 flags[key] = int(found[0])
@@ -170,6 +178,9 @@ def main() -> int:
         finally:
             if installed_health and "Success" not in device("uninstall", TEST):
                 raise RuntimeError("Owned health probe cleanup failed")
+            if installed_health and args.action == "show-counter":
+                if "Success" not in device("install", "-r", str(PREVIEW), timeout=180):
+                    raise RuntimeError("Same-preview replacement failed; no settings or data reset attempted")
         return 0
     if args.action == "own-failure-image":
         raw = device("exec-out", "run-as", APP, "cat", "no_backup/reels-ui-failure.png", binary=True)
@@ -185,7 +196,10 @@ def main() -> int:
         value = validate_structure(raw)
         CACHE.mkdir(parents=True, exist_ok=True)
         (CACHE / ("structure-" + args.label + ".json")).write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
-        print(json.dumps(value, indent=2))
+        print(json.dumps({"savedPrivateStructure": True, "targets": {
+            key: {"bounded": target["bounded"], "editableExcluded": target["editable"],
+                  "layoutIdCount": len(target["ids"]), "positionCount": len(target["positions"])}
+            for key, target in value["targets"].items()}}))
         return 0
     evidence = {"scope": "main-app bundled preview; synthetic encrypted storage and own-window UI only",
                 "api": api, "abi": "arm64-v8a", "installed": False, "passed": False,
@@ -208,7 +222,10 @@ def main() -> int:
                                 "reels-" + mode, RUNNER, timeout=180)
                 evidence[mode] = parse_result(output, mode)
                 print("PASS: Reels " + mode + " phone checks", flush=True)
-            for name in ["controls", "privacy", "reels", "facebook"]:
+            for name in ["controls", "privacy", "reels", "facebook", "hud-collapsed", "hud-expanded",
+                         *["shell-" + item for item in ["today", "history", "patterns", "protect", "settings", "diary",
+                             "explanation", "categories", "focus", "rules", "sources", "storage", "backup",
+                             "appearance", "counter", "convenience", "about", "welcome"]]]:
                 relative = "no_backup/reels-ui-" + name + ".png"
                 data = device("exec-out", "run-as", APP, "cat", relative, binary=True)
                 if not data.startswith(b"\x89PNG\r\n\x1a\n") or len(data) > 16 * 1024 * 1024:

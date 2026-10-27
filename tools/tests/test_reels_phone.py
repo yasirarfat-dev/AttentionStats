@@ -1,6 +1,7 @@
 """Preserve live data and foreign test-package ownership when phone operations fail."""
 
 import importlib.util
+import io
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -15,6 +16,44 @@ SPEC.loader.exec_module(probe)
 
 
 class ReelsPhoneSafety(unittest.TestCase):
+    def test_structure_read_saves_private_metadata_but_prints_only_aggregates(self):
+        value = self.structure()
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            apk = root / "preview.apk"
+            with zipfile.ZipFile(apk, "w") as archive:
+                archive.writestr("assets/index.android.bundle", b"synthetic")
+            adb = root / "adb"; adb.touch()
+            def phone(command, **_):
+                if command[1:] == ["devices"]: output = "List of devices attached\nprivate-fixture-id\tdevice\n"
+                else:
+                    args = command[3:]
+                    if args == ["shell", "getprop", "ro.kernel.qemu"]: output = "0\n"
+                    elif args == ["shell", "getprop", "ro.product.cpu.abi"]: output = "arm64-v8a\n"
+                    elif args == ["shell", "getprop", "ro.build.version.sdk"]: output = "36\n"
+                    elif args[:4] == ["shell", "pm", "list", "packages"]: output = ""
+                    elif args == ["exec-out", "run-as", probe.APP, "cat", "no_backup/reels-structure.json"]:
+                        output = json.dumps(value).encode()
+                    else: raise AssertionError("Unexpected phone operation")
+                return SimpleNamespace(returncode=0, stdout=output)
+            printed = io.StringIO()
+            with patch.object(probe, "PREVIEW", apk), patch.object(probe, "CACHE", root / "cache"), \
+                 patch.object(probe, "audit_apks"), patch.object(probe.subprocess, "run", side_effect=phone), \
+                 patch.object(probe.sys, "argv", ["reels_phone.py", "structure", "--adb", str(adb)]), \
+                 patch("sys.stdout", printed):
+                self.assertEqual(probe.main(), 0)
+            self.assertEqual(json.loads(printed.getvalue()), {"savedPrivateStructure": True, "targets": {
+                "instagram": {"bounded": True, "editableExcluded": False, "layoutIdCount": 1, "positionCount": 0}}})
+            self.assertNotIn("private-fixture-id", printed.getvalue())
+            self.assertEqual(json.loads((root / "cache/structure-reels-entry.json").read_text()), value)
+
+    def test_display_opt_in_requires_explicit_authorization_before_phone_access(self):
+        with patch.object(probe.sys, "argv", ["reels_phone.py", "show-counter"]), \
+             patch.object(probe.subprocess, "run") as run, self.assertRaises(SystemExit), \
+             patch("sys.stderr"):
+            probe.main()
+        run.assert_not_called()
+
     def run_failure(self, existing=False, install_failure=False):
         calls = []
         with TemporaryDirectory() as directory:
@@ -78,9 +117,9 @@ class ReelsPhoneSafety(unittest.TestCase):
 
     def test_contradictory_completion_rejected(self):
         output = "\n".join(["INSTRUMENTATION_RESULT: stream=PASS: own-window React Native preview screens",
-                            "INSTRUMENTATION_RESULT: ui_checks=12", "INSTRUMENTATION_CODE: -1"])
-        self.assertEqual(probe.parse_result(output, "ui"), {"ui_checks": 12})
-        for extra in ["INSTRUMENTATION_CODE: 0", "INSTRUMENTATION_RESULT: ui_checks=12"]:
+                            "INSTRUMENTATION_RESULT: ui_checks=120", "INSTRUMENTATION_RESULT: shell_routes=20", "INSTRUMENTATION_CODE: -1"])
+        self.assertEqual(probe.parse_result(output, "ui"), {"ui_checks": 120, "shell_routes": 20})
+        for extra in ["INSTRUMENTATION_CODE: 0", "INSTRUMENTATION_RESULT: ui_checks=120", "INSTRUMENTATION_RESULT: shell_routes=19"]:
             with self.assertRaises(RuntimeError): probe.parse_result(output + "\n" + extra, "ui")
 
     def structure(self):

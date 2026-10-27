@@ -88,14 +88,14 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
     const module = NativeReels;
     const revision = snapshot.revision;
     const apply = () =>
-      mutate(() => module.configure(app, enabled, 1, revision));
+      mutate(() => module.configure(app, enabled, 2, revision));
     if (!enabled) {
       apply();
       return;
     }
     Alert.alert(
       `Observe ${names[app]} Reels?`,
-      `Attention Stats uses Android accessibility to inspect layout identifiers and numeric page positions in ${names[app]} when you use it. It estimates settled Reels exposures and saves counts and times in encrypted storage on this device. It does not read screen text, messages, titles, creators, search terms, photos or video, and sends no history to us. Ads, comments and unsupported layouts must not count. Coverage can be incomplete. You can pause, disable or delete this history at any time. Accessibility access is a separate setting you enable yourself.`,
+      `Attention Stats uses Android accessibility to inspect layout identifiers, roles and numeric page positions in ${names[app]} when you use it. It saves estimated settled viewer-page counts and times in encrypted storage on this device, separating recognized video layouts, photo/carousel layouts, ads and unclassified pages. Recognized ads are kept separate from video/photo counts. Layouts do not prove that every ad is recognized. Normal-feed posts are not supported yet. It does not read screen text, messages, titles, creators, search terms, photos or video, and sends no history to us. Comments do not count. Coverage can be incomplete. You can pause, disable or delete this history at any time. Accessibility access is a separate setting you enable yourself.`,
       [
         { text: 'Keep off', style: 'cancel' },
         { text: 'I agree — enable observation', onPress: apply },
@@ -123,7 +123,9 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
     }
   }
   const anyRunning =
-    snapshot?.sources.some(source => source.enabled && !source.paused) === true;
+    snapshot?.sources.some(
+      source => source.enabled && source.consentCurrent && !source.paused,
+    ) === true;
   const current = snapshot?.storage === 'ready' && !error;
   const canCheck =
     current &&
@@ -191,19 +193,22 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
                 current &&
                 ((source.supported &&
                   source.enabled &&
+                  source.consentCurrent &&
                   snapshot.accessibilityEnabled) ||
                   source.today !== '0');
               const status = !source.installed
                 ? 'Not installed'
                 : !source.enabled
                   ? 'Observation off'
-                  : source.paused
-                    ? 'Paused'
-                    : !source.supported
-                      ? 'Needs verification'
-                      : !snapshot.accessibilityEnabled
-                        ? 'Access needed'
-                        : 'Observation on';
+                  : !source.consentCurrent
+                    ? 'Review updated observation notice'
+                    : source.paused
+                      ? 'Paused'
+                      : !source.supported
+                        ? 'Needs verification'
+                        : !snapshot.accessibilityEnabled
+                          ? 'Access needed'
+                          : 'Observation on';
               return (
                 <View key={source.app} style={styles.appCard}>
                   <View style={styles.row}>
@@ -233,7 +238,7 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
                     <Switch
                       style={styles.switchTarget}
                       accessibilityLabel={`Observe ${names[source.app]} Reels`}
-                      value={source.enabled}
+                      value={source.enabled && source.consentCurrent}
                       disabled={busy || !source.installed}
                       onValueChange={value => consent(source.app, value)}
                     />
@@ -244,10 +249,26 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
                     </Text>
                     <Text style={styles.support}>
                       {available
-                        ? 'Reels observed today · partial coverage'
+                        ? 'All viewer pages today · includes ads · partial'
                         : 'Count unavailable'}
                     </Text>
                   </View>
+                  {(
+                    [
+                      ['reel', 'Video layouts'],
+                      ['photo', 'Photo / carousel pages'],
+                      ['post', 'Normal-feed posts'],
+                      ['ad', 'Recognized image ads'],
+                      ['unclassified', 'Unclassified pages'],
+                    ] as const
+                  ).map(([key, label]) => (
+                    <Text key={key} style={styles.support}>
+                      {label}:{' '}
+                      {available && source.counts[key] !== null
+                        ? `~${source.counts[key]}`
+                        : '—'}
+                    </Text>
+                  ))}
                   {current && source.visit !== null && (
                     <Text style={styles.support}>
                       This visit ~{source.visit} · included in today
@@ -264,8 +285,12 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
             })}
           </View>
           <Text style={styles.support}>
-            Estimates of settled Reels pages, not unique videos or completed
-            views. Unverified layouts stay unavailable.
+            Separate estimates of settled viewer pages, not unique items or
+            completed views. Returning to an earlier page counts again; looping
+            on the same page does not. Unique items and repeat breakdowns are
+            unavailable. Recognized ads stay separate. Ad detection is
+            incomplete; video/photo labels describe layouts. Normal-feed posts
+            and Facebook counting are not available yet.
           </Text>
 
           <View style={styles.panel}>
@@ -312,7 +337,7 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
               <View style={styles.grow}>
                 <Text style={styles.settingTitle}>Live counter</Text>
                 <Text style={styles.support}>
-                  Visit and today, while you’re in Reels
+                  Session and today. Tap for details; drag to move.
                 </Text>
               </View>
               <Switch

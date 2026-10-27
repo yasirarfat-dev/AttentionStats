@@ -1,6 +1,6 @@
 # User experience
 
-**Status:** Native experience planned; AS-033 implements a separate synthetic browser design study. Updated 2026-10-27.
+**Status:** AS-045 implements an experimental native five-tab shell; most domain features remain unavailable. Updated 2026-10-28.
 **Responsibility:** Defines journeys, screen states, permissions, chart semantics and accessible interactions.
 **Related specifications:** [Human factors](HUMAN-FACTORS.md), [Navigation](NAVIGATION.md), [Design](DESIGN-SYSTEM.md), [Settings](SETTINGS-SPEC.md), [Product](PRODUCT.md), [Privacy](PRIVACY.md).
 **Unresolved feasibility:** F-01, F-02 and F-06 in [Decisions](DECISIONS.md); native grant routes, detectors and provider flows require device validation.

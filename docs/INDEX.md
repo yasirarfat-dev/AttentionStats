@@ -15,6 +15,8 @@ Attention Stats is a local-first, open-source personal digital wellbeing app: **
 
 AS-035 now supplies a separate [pure Kotlin analytics slice](../native/analytics-core/README.md), with domain packages and synthetic JVM/ART tests. It implements calculations only, not an installable app, collectors or mobile screens. The expanded [diary specification](ANALYTICS-SPEC.md) and [64-metric catalog](METRIC-CATALOG.md) make per-platform surface/detail analytics first-class. [Architecture](ARCHITECTURE.md#domain-oriented-modular-design) specifies feature-owned `src/` folders and live mobile verification for every implemented screen/behavior.
 
+AS-045 now adds an installed experimental native five-tab/20-route shell. AS-043 supplies actual saved category-count summaries and a compact draggable scrolling counter; unknown time/history/protection/customization features remain unavailable. Physical own-window traversal and scoped native fixtures pass; full collector/accessibility/accuracy/lifecycle admission is separate. [State](STATE.md) and [structured evidence](evidence/reels-preview.json) record the current artifacts and limits, including unavailable mixed-feed and distinct/repeat counts.
+
 | Reader/task | Reading order |
 |---|---|
 | New contributor | Vision → Product → Capabilities → State → Roadmap → Tracker → Contributing |

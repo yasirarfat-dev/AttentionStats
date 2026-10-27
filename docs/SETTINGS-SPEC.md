@@ -1,6 +1,6 @@
 # Settings specification
 
-**Status:** Complete planned catalog for the scoped capabilities; not implemented. Updated 2026-10-27.
+**Status:** Planned catalog with working narrow Reels controls and experimental settings routes; broader preferences remain unimplemented. Updated 2026-10-28.
 **Responsibility:** Defines user controls, defaults, persistence owner and change effects.
 **Related specifications:** [UX](UX-SPEC.md), [Privacy](PRIVACY.md), [Protection](PROTECTION-SPEC.md), [Backup](BACKUP-RESTORE.md), [Models](DATA-MODELS.md).
 **Unresolved feasibility:** F-01–F-08 in [Decisions](DECISIONS.md); unavailable settings must state the gate rather than appear functional.
@@ -10,6 +10,8 @@
 AS-043 exposes a narrow working implementation of these planned controls in the React Native Reels route: independently disclosed Instagram/Facebook source switches (default off), persisted pause/resume of enabled sources, separately persisted live HUD switch (default off), actual accessibility health/settings launch and confirmed all-Reels-history deletion. Deletion also disables both sources/HUD. Unsupported versions stay count-unavailable even after consent. A separate, volatile ten-minute structural diagnostic requires its own affirmative disclosure and source/grant checks; stop removes the local file. Export, restore, per-app deletion, retention tiers and broader settings remain planned. Native configuration revisions protect saves; a failed/stale save is visibly unconfirmed and requires refresh.
 
 N = native authoritative Room configuration, U = non-sensitive UI preference in MMKV, K = secure native credential/token storage. Defaults apply to new installation, never as a silent reset on update. Source/detail expansions need affirmative consent. Data mutations return native revision/success before the UI reports saved; conflict/failure keeps a visible unsaved draft. Display current defaults, effect scope and relevant capability health.
+
+AS-045 adds native Settings destinations for sources/health, local storage, backup/recovery, app appearance, floating counter, convenience and about. Read-only unavailable rows describe unimplemented controls; they do not persist fake preferences. System theme remains automatic. The compact counter is draggable for the service session and has accessible move/reset actions; full appearance profiles are not implemented. Optional completion-triggered auto-scroll is a separate disabled/unavailable convenience setting under AS-044, not a statistics/source switch.
 
 ## Catalog
 

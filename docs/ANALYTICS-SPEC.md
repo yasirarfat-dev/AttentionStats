@@ -1,6 +1,6 @@
 # Detailed personal activity diary
 
-**Status:** Expanded mobile specification; AS-035 pure Kotlin calculation slice implemented, collectors and screens unimplemented. Updated 2026-10-27.
+**Status:** Expanded mobile specification; AS-035 pure Kotlin calculation slice implemented, collectors and screens unimplemented. Updated 2026-10-28.
 **Responsibility:** Defines detailed app/activity analytics, evidence accounting, diary exploration, comparisons and summary semantics.
 **Related specifications:** [Metric catalog](METRIC-CATALOG.md), [Tracking](TRACKING-SPEC.md), [Social](SOCIAL-MEDIA-SPEC.md), [Models](DATA-MODELS.md), [Storage](STORAGE-AND-RETENTION.md), [UX](UX-SPEC.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-01/F-02/F-08/F-09 and F-10; no social-platform detector or network collector has device qualification. A calculation fixture is not source verification.
@@ -14,6 +14,8 @@ Supported output can grow to include per-app sessions/opens, primary activities,
 No website, web app, extension or WebView is added. The completed browser study is not expanded for this request. Android-native collectors and React Native mobile screens remain the delivery architecture.
 
 ## Meaning and dimensions
+
+ADR-036 explicitly separates **whole-app time** from **Reels-viewer time** and preserves per-session, calendar-day, week and month counts/time in the app. The floating control shows only the current session and today. Viewer occupancy is a subset of app occupancy, never an extra additive duration or proof of completed viewing. Periods carry zone/coverage and use half-open bounds; unavailable collectors do not become zero time. The AS-043 preview currently supplies viewer-page counts only; whole-app/Reels duration and weekly/monthly runtime views await AS-011/AS-013/AS-014/AS-037. Optional auto-scroll is an independent bonus (AS-044), not a prerequisite or implicit statistics consent.
 
 Every result carries metric ID/semantic revision, unit, evidence kind, app/profile scope, surface/facet when relevant, UTC half-open range, selected grouping zone, source and detector revisions, configuration revision, store generation/revision, known/eligible coverage, source freshness and reason codes. Counts/bytes use 64-bit native arithmetic with overflow rejection; values crossing JavaScript use safe numbers or decimal strings. Missing access, unqualified detection, unavailable history and unknown values are distinct from covered zero.
 
@@ -32,6 +34,8 @@ Device-interactive union is a separate metric; overlapping apps in multi-window 
 ### Item and interaction counts
 
 Exposure means a qualified, settled visible item occurrence, including revisits. A swipe, content callback, public like counter, comment count shown on a post or server view count is not the user's activity count. Only declared surface/item predicates can create normalized transition ordinals. Repeated callbacks and ingestion replay retain the same identity; a new confirmed transition gets a new ordinal. Count semantics distinguish short-video, feed-post, story-frame, ad and photo exposure; media exclusions in the short-video metric do not erase separately enabled ad/feed statistics. Ambiguous media is unknown.
+
+ADR-039 preserves exposures as the default and treats distinct items/repeat exposures as independently qualified breakdowns under [Social](SOCIAL-MEDIA-SPEC.md#repeat-visits-and-distinct-items). Automatic same-page loops do not increment. Unknown identities remain explicit; session position is not a cross-session content ID. Distinct counts are non-additive across periods and cannot be recovered from today's stored ordinal-only preview history.
 
 Keep interaction evidence in two lanes: attempted control activation and observed UI outcome. A qualified unselected→selected reaction control can support “observed like-state changes”; a button click alone supports “like attempts.” Count unlike/unsave/unfollow separately; net changes may be derived within matching covered scope. Never silently collapse toggles into unique liked posts. A comment composer opening is not a submitted comment. A submit action plus a qualified non-content acknowledgement may support “observed comment submissions”; it still does not prove server acceptance or retention. A share sheet opening is distinct from a handoff and from delivery. Do not inspect text to resolve outcomes. Transient interaction correlation must be bounded and expire on uncertain context changes.
 

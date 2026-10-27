@@ -1,6 +1,6 @@
 # Data models
 
-**Status:** Logical schema accepted; SQL/Room implementation and migrations pending. Updated 2026-10-27.
+**Status:** Logical schema accepted; SQL/Room implementation and migrations pending. Updated 2026-10-28.
 **Responsibility:** Defines entities, invariants, time, provenance and schema evolution.
 **Related specifications:** [Storage](STORAGE-AND-RETENTION.md), [Contracts](NATIVE-CONTRACTS.md), [Tracking](TRACKING-SPEC.md), [Backup](BACKUP-RESTORE.md).
 **Unresolved feasibility:** F-03 and F-04 in [Decisions](DECISIONS.md); Room 3/SQLCipher and archive envelope selected for prototype qualification; entity serialization, schema/migrations and integration remain unimplemented.
@@ -11,7 +11,7 @@ The separate [archive-envelope fixture](../native/archive-qualification/README.m
 
 ## Entity catalog
 
-AS-043 introduces a narrow **local Room schema v1**, exported at `android/app/schemas/com.attentionstats.storage.AttentionDatabase/1.json`: StoreMetadata, SourceConfiguration, LiveOverlayConfiguration, ConsentRecord, SurfaceEpisode, Exposure and CoverageInterval. This is the initial installed-preview schema, not the complete catalog or a portable archive format. Source IDs are `reels.instagram`/`reels.facebook`; source enablement and persisted pause are independent of OS accessibility and HUD visibility. Metadata separates configuration revision from history revision. Exposures retain observed wall/elapsed times, zone/offset, detector/consent revisions, count kind/reason and per-episode ordinal, with a cascading episode foreign key. No item content or target-page identity is persisted. Interrupted visits close with uncertain quality on reopen; transient dedup is discarded and the first uncertain returning page is withheld. Future changes to installed v1 require explicit versioned migrations; no destructive fallback.
+AS-043 introduces a narrow **local Room schema v2**, with retained versioned schemas under `android/app/schemas/com.attentionstats.storage.AttentionDatabase`: StoreMetadata, SourceConfiguration, LiveOverlayConfiguration, ConsentRecord, SurfaceEpisode, Exposure and CoverageInterval. It is not the complete catalog or a portable archive format. Source IDs are `reels.instagram`/`reels.facebook`; source enablement and persisted pause are independent of OS accessibility and HUD visibility. Metadata separates configuration revision from history revision. Exposures retain observed wall/elapsed times, zone/offset, detector/consent revisions, count kind/reason, category and per-episode ordinal, with a cascading episode foreign key. Category is one of reel/photo/post/ad/unclassified under ADR-034. The explicit 1→2 auto-migration adds the column with unclassified as the default, preserving old history without inventing old categories. No destructive fallback. No item content or target-page identity is persisted. Interrupted visits close with uncertain quality on reopen; transient dedup is discarded and the first uncertain returning page is withheld.
 
 All IDs are locally generated opaque strings. No hardware/advertising identifier, contact, product account or remote user key is needed. Stable observation identity is distinct from any transient item identity used by a detector.
 
@@ -48,6 +48,8 @@ All IDs are locally generated opaque strings. No hardware/advertising identifier
 | ImportedActivityRecord | id, parser/schemaRevision, archiveLocalDigest, sourceLane, originalRecordKey?, appId?, occurredAtMs?, range?, fields, coverage | Future allowlisted file import only; never raw archive/text dump; imported versus live totals separate until identity reconciliation proven |
 
 LiveSurfaceSnapshot is a **derived read model**, not a second durable counter. It projects a SurfaceEpisode, committed Exposure records, CoverageIntervals and day bounds from [Live overlay](LIVE-OVERLAY-SPEC.md); [Contracts](NATIVE-CONTRACTS.md) owns its shape. This visit is already part of today; midnight changes daily membership without closing a continuous visit. Generation/revision invalidation follows deletion/restore. Rendering or replayed callbacks never increments an independent value.
+
+ADR-039 does not change schema v2 or retain target-content identity. Ordinal exposure history includes real return transitions, with same-page redraw/loop deduplication. It cannot reconstruct distinct Reels or repeat frequencies. Future identity-qualified breakdowns need explicit scope, provenance, unknown-identity coverage, consent/retention/deletion behavior and a reviewed migration; never backfill identities into old rows or sum distinct counts across periods.
 
 ## Time, evidence and precision
 

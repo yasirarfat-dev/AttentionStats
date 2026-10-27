@@ -14,16 +14,24 @@ const count = z
 const source = z.strictObject({
   app: z.enum(['instagram', 'facebook']),
   enabled: z.boolean(),
+  consentCurrent: z.boolean(),
   paused: z.boolean(),
   installed: z.boolean(),
   version: z.string().max(100),
   supported: z.boolean(),
   today: count,
   visit: count.nullable(),
+  counts: z.strictObject({
+    reel: count,
+    photo: count,
+    post: z.null(),
+    ad: count,
+    unclassified: count,
+  }),
 });
 const schema = z
   .strictObject({
-    contractVersion: z.literal(1),
+    contractVersion: z.literal(2),
     revision: z.string().regex(/^[0-9a-f-]{36}:[0-9]{1,19}$/),
     historyRevision: z.string().regex(/^[0-9a-f-]{36}:[0-9]{1,19}$/),
     generation: z.string().uuid(),

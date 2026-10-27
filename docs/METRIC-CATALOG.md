@@ -39,7 +39,7 @@ Phase: M = MVP; E = expansion; C = continuous evolution. For A/H rows, F-01 and 
 | Metric | Meaning / source and access | Controls | Accuracy / restriction | Phase / status | Scenario |
 |---|---|---|---|---|---|
 | M-015 Short-video surface duration | Qualified Reels/Shorts/feed occupancy / A + U attribution | S | Not verified playback/watch completion; subset of app time | M / experimental | T-06, T-17 |
-| M-016 Short-video exposures | Settled qualifying video occurrences / A | S | Estimate; replay/revisits distinguished, ads excluded | M / experimental | T-07, T-18 |
+| M-016 Short-video exposures | Settled qualifying video occurrences / A | S | Estimate; return transitions included, same-page loops/redraws deduped, ads excluded. Distinct/repeat breakdowns require independently qualified scoped identity (ADR-039); unavailable in current preview | M / experimental | T-07, T-18 |
 | M-017 Short-video visits | Qualified surface episodes / A | S | Unknown continuity splits/censors visits | M / experimental | T-06, X-09 |
 | M-018 Current-visit exposures / time | Committed current episode projection / L(A) | D; optional HUD | Visit already included in today | M / experimental | X-08, X-09 |
 | M-019 Exposures per covered surface minute | M-016 divided by M-015 / L(A,U) | D | Matching scope; undefined at zero/unknown duration | M / experimental | T-18, T-23 |

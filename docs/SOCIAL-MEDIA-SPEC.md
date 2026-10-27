@@ -1,6 +1,6 @@
 # Social surfaces and optional context
 
-**Status:** Expanded experimental detector design; no app/version/locale qualified. Updated 2026-10-27.
+**Status:** Expanded experimental detector design; no app/version/locale qualified. Updated 2026-10-28.
 **Responsibility:** Defines transparent app/surface identification, short-video counts, optional metadata and detector qualification.
 **Related specifications:** [Tracking](TRACKING-SPEC.md), [Intelligence](BEHAVIOR-INTELLIGENCE.md), [Privacy](PRIVACY.md), [Protection](PROTECTION-SPEC.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-01 and F-08 in [Decisions](DECISIONS.md). No private implementation or universal detector is assumed.
@@ -15,7 +15,11 @@ Configure service package filters to minimize callbacks, then recheck the packag
 
 ## Candidate adapter registry
 
-AS-043 maps the canonical installed candidates `com.instagram.android` and `com.facebook.katana` to independent preview sources. Mapping package identity does not qualify a Reels surface. The native `DetectorRegistry` currently has **no admitted definitions**; both versions remain unavailable until independently consented structural/manual trials establish surface, page transition and ad/comment/feed/private-context exclusions. The bounded passive adapter and 500 ms pure reducer are implemented experimental infrastructure. They never infer Reels from a generic scroll event; synthetic reducer checks are not per-app detector evidence. Optional ten-minute local structural qualification reads no node text/descriptions or target screenshots and requires separate consent. Both applications remain unaccepted as working counters.
+ADR-034 adds separate preview categories: `reel` (recognized single-video layout), `photo` (recognized photo/carousel page), `post` (normal-feed post, unavailable initially), `ad` (positively recognized ad layout) and `unclassified`. Recognized ads never add to video/photo categories. One carousel page is one exposure, not its hidden image count. Layout labels do not establish universal ad exclusion; show that limitation and unclassified counts. Total viewer pages includes all categories and must say so. This is separate from the stricter M-016 short-video metric; do not present these provisional layout counts as fully qualified M-016 or normal-feed history.
+
+The experimental Instagram definition is pinned to the consented installed version and requires its viewer/media/action-container IDs plus a centered pager row. Feed/profile/comment trials and 110 controlled swipe attempts establish candidate structure; no content was read. Recognized image ads and photo-carousel layouts have distinct markers. Video-ad fidelity and broader lifecycle/accuracy remain open. Facebook exposes useful settled indices in the manually confirmed viewer, but generic classes also occur elsewhere; no Facebook definition is admitted yet. Disclosure revision 2 is required before new recording.
+
+AS-043 maps the canonical installed candidates `com.instagram.android` and `com.facebook.katana` to independent preview sources. Mapping package identity does not qualify a Reels surface. The bounded passive adapter and 500 ms pure reducer never infer Reels from a generic scroll event; synthetic reducer checks are not per-app detector evidence. Optional ten-minute local structural qualification reads no node text/descriptions or target screenshots and requires separate consent. The current category implementation and phone acceptance are recorded in State; neither application has full detector/metric acceptance.
 
 | Adapter key | Intended surface | Must distinguish | Current status |
 |---|---|---|---|
@@ -39,6 +43,14 @@ States: OUTSIDE → CANDIDATE → ACTIVE(item) → TRANSITION → ACTIVE(next), 
 5. App switch, screen off, consent withdrawal or unsupported layout closes or suspends the episode. On uncertain return, avoid a duplicate initial exposure and mark continuity uncertain. After process death do not persist content merely to recover an identity; re-enter with an uncertainty boundary.
 
 Persist exposure ordinal/event ID, app/surface, UTC and monotonic evidence, detector revision, confidence class, coverage and reason codes. Default counts contain no title, creator, URL or global content identifier. Transient identities expire with the episode; hashing content is still processing content and is not a consent bypass. Persist dedup state transactionally with exposure events, and scope identity to package/window/session so events from different apps cannot merge.
+
+### Repeat visits and distinct items
+
+ADR-039 keeps total **exposures** as the default: leaving A for B and settling on A again contributes three exposures. Remaining on A while it loops, redraws or pauses contributes one. This measures observed encounters, not playback starts, completions or attention. The preview already follows this transition rule; existing totals are not rewritten as unique-item history.
+
+Distinct items and repeat exposures are separate future breakdowns, admitted only for an adapter's qualified identity scope. With complete stable identity, A → B → A means three exposures, two distinct items and one repeat exposure. A repeat is an exposure after the first observed encounter with the same identity **within the selected scope**, not evidence the person has never seen it before. Items with uncertain identity stay in an explicit unknown-identity group; never infer exact repeats by subtracting an incomplete distinct count from the total. Distinct counts cannot be added across days/weeks or sessions; requery the identity union for a supported range. A selected-range repeat and an earlier-lifetime encounter are different questions.
+
+Pager positions identify locations in a current viewer, not durable Reel identities. Reload/reordering/recycled nodes, app switch, process death and feed changes invalidate unproven continuity. Session-only revisits may be offered as such after independent qualification; cross-session/day identity requires a separate reviewed, disclosed metadata/storage design. No title/creator/image fingerprinting, hidden permalink capture or persistent content ID is added to obtain it. The current preview shows distinct/repeat breakdowns as unavailable rather than zero. Android's [node unique-ID API](https://developer.android.com/reference/android/view/accessibility/AccessibilityNodeInfo#getUniqueId()) is nullable and identifies a node; its existence alone does not establish target-content identity or stability.
 
 The planned short-video count excludes positively identified advertisements, stories, live streams and photo carousels. Interleaved ads must be part of qualification, not guessed from a swipe. Ambiguous eligibility withholds the transition and marks coverage incomplete; it must not produce a fabricated exact count or a false zero. Any future all-feed/ad metric requires an explicit separate definition. On return from an excluded context, prove continuity/dedup before adding a new item. See [live count semantics](LIVE-OVERLAY-SPEC.md).
 

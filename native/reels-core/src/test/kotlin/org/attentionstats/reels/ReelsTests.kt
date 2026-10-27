@@ -17,10 +17,12 @@ fun main() {
     expect(counter.observe(signal(50_500, 8)) == null)
     val skipped = checkNotNull(counter.observe(signal(50_501, 8)))
     expect(skipped.sequence == 2L) // Never extrapolate seven unseen pages.
+    expect(!skipped.scrollBack)
     counter.acknowledge(skipped)
     expect(counter.observe(signal(50_502, 0)) == null)
     val returned = checkNotNull(counter.observe(signal(51_002, 0)))
     expect(returned.sequence == 3L)
+    expect(returned.scrollBack) // Presentation direction does not turn a revisit into a unique item.
     counter.acknowledge(returned)
     expect(counter.observe(signal(51_003, surface = Surface.EXCLUDED)) == null && !counter.visible)
     expect(counter.observe(signal(51_004)) == null)
@@ -49,5 +51,15 @@ fun main() {
     expect(ReelApp.byKey("instagram") == ReelApp.INSTAGRAM)
     expect(ReelApp.byPackage("com.facebook.katana") == ReelApp.FACEBOOK)
     expect(ReelApp.byKey("unsupported") == null)
+    val classified = CounterReducer(false)
+    classified.observe(CounterSignal(0, Surface.REELS, 0, 1, PageCategory.UNCLASSIFIED))
+    expect(classified.observe(CounterSignal(400, Surface.REELS, 0, 1, PageCategory.AD)) == null)
+    expect(classified.observe(CounterSignal(500, Surface.REELS, 0, 1, PageCategory.AD)) == null)
+    val ad = checkNotNull(classified.observe(CounterSignal(900, Surface.REELS, 0, 1, PageCategory.AD)))
+    expect(ad.category == PageCategory.AD)
+    classified.acknowledge(ad)
+    classified.observe(CounterSignal(901, Surface.REELS, 0, 1, PageCategory.REEL))
+    expect(classified.observe(CounterSignal(1401, Surface.REELS, 0, 1, PageCategory.REEL)) == null)
+    expect(PageCategory.entries.map { it.key }.toSet().size == 5)
     println("PASS: $checks synthetic Reels reducer checks")
 }

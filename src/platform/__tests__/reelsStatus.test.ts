@@ -3,7 +3,7 @@ import { parseReelsSnapshot } from '../reelsStatus';
 const generation = '11111111-1111-4111-8111-111111111111';
 function fixture() {
   return {
-    contractVersion: 1,
+    contractVersion: 2,
     revision: generation + ':1',
     historyRevision: generation + ':1',
     generation,
@@ -18,12 +18,14 @@ function fixture() {
     sources: ['instagram', 'facebook'].map(app => ({
       app,
       enabled: false,
+      consentCurrent: false,
       paused: false,
       installed: true,
       version: 'fixture-only',
       supported: false,
       today: '0',
       visit: null,
+      counts: { reel: '0', photo: '0', post: null, ad: '0', unclassified: '0' },
     })),
   };
 }
@@ -73,7 +75,7 @@ test('rejects duplicate/unknown apps and mismatched generation', () => {
 test('rejects extra fields, bad version/types and oversized/malformed transport', () => {
   for (const raw of [
     JSON.stringify({ ...fixture(), extra: true }),
-    JSON.stringify({ ...fixture(), contractVersion: 2 }),
+    JSON.stringify({ ...fixture(), contractVersion: 1 }),
     JSON.stringify({ ...fixture(), accessibilityEnabled: 'yes' }),
     'x'.repeat(8193),
     '{"private-marker":',
@@ -81,4 +83,33 @@ test('rejects extra fields, bad version/types and oversized/malformed transport'
   ]) {
     expect(() => parseReelsSnapshot(raw)).toThrow('Counter unavailable');
   }
+});
+
+test('keeps updated consent independent of old enablement and supported layouts', () => {
+  const value = fixture();
+  const source = sourceAt(value, 0);
+  source.enabled = true;
+  source.supported = true;
+  const result = parseReelsSnapshot(JSON.stringify(value));
+  expect(result.sources[0]?.consentCurrent).toBe(false);
+  expect(result.sources[0]?.counts.post).toBeNull();
+});
+
+test.each(['reel', 'photo', 'ad', 'unclassified'] as const)(
+  'rejects invalid or missing category %s',
+  category => {
+    for (const bad of ['9223372036854775808', '-1', '00', null, 1, undefined]) {
+      const value = fixture();
+      Object.assign(sourceAt(value, 0).counts, { [category]: bad });
+      expect(() => parseReelsSnapshot(JSON.stringify(value))).toThrow(
+        'Counter unavailable',
+      );
+    }
+  },
+);
+
+test('rejects normal-feed post counts while that capability is unavailable', () => {
+  const value = fixture();
+  Object.assign(sourceAt(value, 0).counts, { post: '0' });
+  expect(() => parseReelsSnapshot(JSON.stringify(value))).toThrow();
 });

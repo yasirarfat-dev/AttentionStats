@@ -1,6 +1,6 @@
 # Local development
 
-**Status:** Experimental mobile scaffold and tooling commands exist; native build/live acceptance tracked in State. Updated 2026-10-27.
+**Status:** Experimental mobile scaffold and tooling commands exist; native build/live acceptance tracked in State. Updated 2026-10-28.
 **Responsibility:** Defines local setup, reproducible commands, isolation and debugging.
 **Related specifications:** [Dependencies](DEPENDENCIES.md), [Testing](TESTING.md), [Structure](FILE-STRUCTURE.md), [Agent rules](AGENT-RULES.md).
 **Unresolved feasibility:** F-02–F-04 in [Decisions](DECISIONS.md); attempted builds are not accepted binaries; see current evidence.
@@ -150,6 +150,8 @@ The separate [Tink fixture](../native/archive-qualification/README.md) uses the 
 ## Debugging procedure
 
 ### AS-043 self-contained Android preview
+
+The category preview uses Room schema 2 with an explicit 1→2 auto-migration, retaining old exposures as unclassified. Snapshot contract 2 and observation notice revision 2 accompany ADR-034; old source choices do not silently authorize category recording. Review the updated in-app notice manually before a live trial. The Instagram candidate is version-pinned; Facebook and normal-feed posts remain unavailable. Totals/HUD count viewer pages including ads, not a qualified short-video metric. Keep package changes and instrumentation outside active ten-minute diagnostic sessions.
 
 Build with `python tools/android_build.py :app:assemblePreview :app:assembleDebugAndroidTest :app:lintPreview :reels-core:verifyReels --arch arm64-v8a`. Use `--write-locks` only for a reviewed native dependency introduction/refresh; routine builds consume committed locks. Preview uses the existing development key/debug identity, debug-matched C++ dependencies, bundled JS/Hermes and disabled dev support; Metro is unnecessary. It is not a release-signed distribution APK.
 

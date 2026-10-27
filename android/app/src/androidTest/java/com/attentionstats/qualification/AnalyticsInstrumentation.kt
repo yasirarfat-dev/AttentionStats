@@ -46,17 +46,29 @@ class AnalyticsInstrumentation : Instrumentation() {
                     ui = ReelsUiProbe(this)
                     ui.verify()
                     result.putInt("ui_checks", ui.checks)
+                    result.putInt("shell_routes", ui.routes)
                     result.putString("stream", "PASS: own-window React Native preview screens\n")
                 }
-                "reels-health" -> {
+                "reels-health", "reels-show-counter" -> {
                     val done = java.util.concurrent.CountDownLatch(1)
                     var snapshot: org.json.JSONObject? = null
                     com.attentionstats.reels.ReelsCoordinator.get(targetContext).snapshot({
                         snapshot = org.json.JSONObject(it); done.countDown()
                     }, { done.countDown() })
                     check(done.await(30, java.util.concurrent.TimeUnit.SECONDS))
-                    val value = checkNotNull(snapshot)
-                    for (key in listOf("accessibilityEnabled", "serviceConnected", "calibrationEnabled"))
+                    var value = checkNotNull(snapshot)
+                    if (qualification == "reels-show-counter") check(!value.getBoolean("calibrationEnabled"))
+                    if (qualification == "reels-show-counter" && !value.getBoolean("overlayEnabled")) {
+                        // User-directed display opt-in only; never enables a source, diagnostics or OS grant.
+                        val applied = java.util.concurrent.CountDownLatch(1)
+                        snapshot = null
+                        com.attentionstats.reels.ReelsCoordinator.get(targetContext).setOverlay(true,
+                            value.getString("revision"), { snapshot = org.json.JSONObject(it); applied.countDown() },
+                            { applied.countDown() })
+                        check(applied.await(30, java.util.concurrent.TimeUnit.SECONDS))
+                        value = checkNotNull(snapshot)
+                    }
+                    for (key in listOf("accessibilityEnabled", "serviceConnected", "calibrationEnabled", "overlayEnabled"))
                         result.putInt(key, if (value.getBoolean(key)) 1 else 0)
                     result.putInt("storageReady", if (value.getString("storage") == "ready") 1 else 0)
                     val sources = value.getJSONArray("sources")

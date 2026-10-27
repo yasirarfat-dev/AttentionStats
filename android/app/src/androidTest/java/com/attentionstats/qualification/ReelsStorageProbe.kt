@@ -11,6 +11,8 @@ import androidx.room3.withWriteTransaction
 import com.attentionstats.storage.ConsentRecord
 import com.attentionstats.storage.Exposure
 import com.attentionstats.storage.HistoryStore
+import com.attentionstats.storage.LocalKeyEnvelope
+import com.attentionstats.storage.OwnedCipherDriver
 import com.attentionstats.storage.SurfaceEpisode
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -69,11 +71,17 @@ internal class ReelsStorageProbe(private val instrumentation: Instrumentation) {
                 dao.insertConsent(ConsentRecord(UUID.randomUUID().toString(), "reels.instagram", 1, "allow", instant, 1))
                 dao.insertEpisode(SurfaceEpisode(episode, marker, "short_video", instant, instant + 1000, 1, "estimate"))
                 repeat(12) { index -> dao.insertExposure(Exposure(UUID.randomUUID().toString(), episode,
-                    marker, instant + index, index.toLong(), index.toLong() + 1, 1, "estimate", 1, "synthetic", "UTC", 0)) }
+                    marker, instant + index, index.toLong(), index.toLong() + 1, 1, "estimate", 1, "synthetic", "UTC", 0,
+                    listOf("reel", "photo", "ad")[index % 3])) }
                 dao.advanceConfigurationRevision()
             }
             expect(dao.dayCount(marker, instant, instant + 1000) == 12L)
             expect(dao.visitCount(episode) == 12L)
+            for (category in listOf("reel", "photo", "ad"))
+                expect(dao.categoryCount(marker, instant, instant + 1000, category) == 4L)
+            expect(dao.dayCategories(marker, instant, instant + 1000).associate { it.category to it.count } ==
+                mapOf("reel" to 4L, "photo" to 4L, "ad" to 4L))
+            expect(dao.visitCategories(episode).sumOf { it.count } == 12L)
             expect(dao.dayCount(marker, instant, instant + 1) == 1L) // Half-open range boundary.
             expect(checkNotNull(dao.metadata()).configurationRevision == 1L)
             stage = "encrypted_files"
@@ -86,6 +94,29 @@ internal class ReelsStorageProbe(private val instrumentation: Instrumentation) {
                 sentinelFiles++
             }
             expect(!database.readBytes().take(16).toByteArray().contentEquals("SQLite format 3\u0000".toByteArray()))
+            history.close(); history = null
+
+            stage = "v1_migration"
+            // Only this synthetic fixture: reconstruct installed v1 by removing the added column.
+            val keys = LocalKeyEnvelope(scoped, database, alias).open()
+            val literal = ("x'" + keys.raw.joinToString("") { "%02x".format(it.toInt() and 255) } + "'")
+                .toByteArray(Charsets.US_ASCII)
+            keys.raw.fill(0)
+            val migrationDriver = try { OwnedCipherDriver(literal) } finally { literal.fill(0) }
+            try {
+                migrationDriver.open(database.path).use { connection ->
+                    fun execute(sql: String) { connection.prepare(sql).use { it.step() } }
+                    execute("ALTER TABLE Exposure DROP COLUMN category")
+                    execute("UPDATE room_master_table SET identity_hash = 'b833294b18d888c8f6f9501a08ab743b' WHERE id = 42")
+                    execute("PRAGMA user_version = 1")
+                }
+            } finally { migrationDriver.retire() }
+            history = HistoryStore.open(scoped, alias)
+            dao = history.database.data()
+            expect(dao.dayCount(marker, instant, instant + 1000) == 12L)
+            expect(dao.categoryCount(marker, instant, instant + 1000, "unclassified") == 12L)
+            expect(dao.categoryCount(marker, instant, instant + 1000, "ad") == 0L)
+            expect(checkNotNull(dao.metadata()).generation == metadata.generation)
             history.close(); history = null
 
             stage = "keystore_reopen"

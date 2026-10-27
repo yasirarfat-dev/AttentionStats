@@ -1,13 +1,15 @@
 # Navigation
 
-**Status:** Native navigation planned; separate browser study implements demonstration routes only. Updated 2026-10-27.
+**Status:** Experimental native five-tab shell and 20 routes are implemented; all 20 routes pass own-window physical-phone traversal; broader accessibility/performance qualification remains open. Updated 2026-10-28.
 **Responsibility:** Defines route ownership, hierarchy, parameters, back behavior and external entrypoints.
 **Related specifications:** [UX](UX-SPEC.md), [Design](DESIGN-SYSTEM.md), [Contracts](NATIVE-CONTRACTS.md), [Settings](SETTINGS-SPEC.md).
-**Unresolved feasibility:** F-03 in [Decisions](DECISIONS.md); latest navigator/native-screen compatibility needs build verification.
+**Unresolved feasibility:** F-03 in [Decisions](DECISIONS.md); the current ARM64 build/traversal passes; minimum API, wider devices and full accessibility remain open.
 
 ## Hierarchy
 
-AS-043's installed-preview default is the **Reels daily dashboard**, with a Privacy route and native-stack back navigation. The earlier Welcome route remains informational. Main screens remain React Native. Reels contains source disclosures, manual settings/app launches, saved-state/health, pause/HUD/delete and optional diagnostics. The HUD opens the same app activity; a cold launch now starts at Reels. Full navigation/HUD lifecycle qualification remains open. Explicit user-authorized adb launches/taps/swipes qualify the two target apps; production accessibility remains passive and never navigates them. This subset does not implement the complete hierarchy below.
+ADR-037/AS-045 replaces the earlier Reels-only entry with **Today, History, Patterns, Protect and Settings**, each retaining its own native stack and a persistent bottom bar. The 20-route shell includes the five hubs, Reels, diary, pattern explanation, categories, focus, rules, sources/health, storage, backup, appearance, counter appearance, convenience, about, welcome and privacy. Today shows actual saved viewer-page estimates through the Reels feature API. Unconnected time/history/protection/recovery/customization features explain unavailability rather than using synthetic activity or successful activation states.
+
+The native overlay's explicit dashboard action opens `attentionstats://reels` through an explicit MainActivity intent and typed navigation mapping to Today’s Reels detail; it does not depend on whichever tab was last selected. The link only navigates and cannot enable a source/grant/action. Source disclosures, pause/display/delete and diagnostics remain in Reels; source health also has a dedicated read-only screen. App launch defaults to Today. Period selection in History changes the shell's unavailable period view, not native history or source state.
 
 ```text
 Root

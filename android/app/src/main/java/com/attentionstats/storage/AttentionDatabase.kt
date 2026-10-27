@@ -1,6 +1,8 @@
 package com.attentionstats.storage
 
 import androidx.room3.Dao
+import androidx.room3.AutoMigration
+import androidx.room3.ColumnInfo
 import androidx.room3.Database
 import androidx.room3.Entity
 import androidx.room3.ForeignKey
@@ -71,6 +73,7 @@ data class Exposure(
     val reasonCode: String,
     val observedZoneId: String,
     val observedOffsetSeconds: Int,
+    @ColumnInfo(defaultValue = "'unclassified'") val category: String = "unclassified",
 )
 
 @Entity(indices = [Index("sourceId", "startMs")])
@@ -114,6 +117,14 @@ interface AttentionDao {
     @Insert suspend fun insertExposure(value: Exposure)
     @Query("SELECT COUNT(*) FROM Exposure WHERE appId = :appId AND occurredAtMs >= :start AND occurredAtMs < :end")
     suspend fun dayCount(appId: String, start: Long, end: Long): Long
+    @Query("SELECT COUNT(*) FROM Exposure WHERE appId = :appId AND occurredAtMs >= :start AND occurredAtMs < :end AND category = :category")
+    suspend fun categoryCount(appId: String, start: Long, end: Long, category: String): Long
+    @Query("SELECT category, COUNT(*) AS count FROM Exposure WHERE appId = :appId AND occurredAtMs >= :start AND occurredAtMs < :end GROUP BY category")
+    suspend fun dayCategories(appId: String, start: Long, end: Long): List<CategoryTotal>
+    @Query("SELECT category, COUNT(*) AS count FROM Exposure WHERE surfaceEpisodeId = :id GROUP BY category")
+    suspend fun visitCategories(id: String): List<CategoryTotal>
+    @Query("SELECT MAX(noticeRevision) FROM ConsentRecord WHERE sourceId = :sourceId AND decision = 'allow'")
+    suspend fun allowedNotice(sourceId: String): Int?
     @Query("SELECT EXISTS(SELECT 1 FROM Exposure WHERE appId = :appId LIMIT 1)")
     suspend fun hasExposure(appId: String): Boolean
     @Query("SELECT COUNT(*) FROM Exposure WHERE surfaceEpisodeId = :id")
@@ -126,9 +137,11 @@ interface AttentionDao {
     @Query("DELETE FROM ConsentRecord") suspend fun deleteConsents()
 }
 
+data class CategoryTotal(val category: String, val count: Long)
+
 @Database(entities = [StoreMetadata::class, SourceConfiguration::class, LiveOverlayConfiguration::class,
     ConsentRecord::class, SurfaceEpisode::class, Exposure::class, CoverageInterval::class],
-    version = 1, exportSchema = true)
+    version = 2, autoMigrations = [AutoMigration(from = 1, to = 2)], exportSchema = true)
 abstract class AttentionDatabase : RoomDatabase() {
     abstract fun data(): AttentionDao
 }
