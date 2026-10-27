@@ -1,0 +1,94 @@
+# Android collection and lifecycle feasibility
+
+**Status:** AS-003 research and qualification protocol; no collector or scheduler implemented. Reviewed 2026-10-27.
+**Responsibility:** Records public API constraints, candidate execution paths and the evidence required before admitting a collection capability.
+**Related specifications:** [Tracking](TRACKING-SPEC.md), [Architecture](ARCHITECTURE.md), [Permissions](PERMISSIONS.md), [Models](DATA-MODELS.md), [Tests](TESTING.md), [Decisions](DECISIONS.md).
+**Unresolved feasibility:** F-02 and F-09 remain open. Research establishes neither reliable background execution nor event completeness on a device.
+
+## Review outcome
+
+AS-003 now has a test-only self-package harness: two internal debug activities generate transitions, and instrumentation queries only this run's own-package events with wall/elapsed range checks, an iteration cap and a deadline. ARM64 debug/test compilation and app lint pass. The connected physical API-36 ARM64 phone passed both activities' resumed/paused checks, bounded iteration and copied snapshots, with instrumentation result `-1`. Synthetic reconciliation fixtures remain future work. Broader source access, durable ingestion and continuous operation are separate stages. AS-009/AS-010 still own the authoritative store and consent flow; the harness creates no alternate history store or production tracking.
+
+The candidate historical path is native reconciliation during user-visible operation plus deferred background work, subject to consent and device qualification. This is a hypothesis to measure. It cannot establish the timely foreground/surface signals needed for protection or the live HUD. No foreground-service type has been selected or approved for this product.
+
+## Public API findings
+
+These are primary-source findings reviewed on 2026-10-27, followed by project implications. API availability is distinct from observed fidelity. The declared min API remains 24; individual capabilities may be unavailable there.
+
+| Source | Verified boundary | Project consequence |
+|---|---|---|
+| [UsageStatsManager](https://developer.android.com/reference/android/app/usage/UsageStatsManager) | Event queries use an inclusive start/exclusive end, retain only a few days, and require Usage Access for other packages. From API 30 they may return null before user unlock. `queryEventsForSelf` starts at API 28 and needs no Usage Access | Bounded reconciliation only; no fixed retention promise. A self-package probe cannot qualify other-app collection |
+| [UsageEvents.Event](https://developer.android.com/reference/android/app/usage/UsageEvents.Event) | Legacy foreground/background constants exist from API 21; resumed/paused names and stopped events from API 29. Historical interactive/non-interactive and keyguard shown/hidden events start at API 28. Shutdown/startup events start at API 29 | Guard event families by API; unavailable historical screen/keyguard evidence on API 24–27 stays unknown. A shutdown record is a persistence boundary, not an exact power-off time |
+| [UsageEventsQuery.Builder](https://developer.android.com/reference/android/app/usage/UsageEventsQuery.Builder) | API 35 adds event-type and package filters | Use narrow OS filters where supported. Earlier APIs need immediate in-memory rejection of disallowed fields/packages. Separately qualify global screen/reboot events when package filters are active |
+| [UsageEvents iterator](https://developer.android.com/reference/android/app/usage/UsageEvents) | `getNextEvent` fills a caller-supplied mutable event; the public interface exposes iteration, not a continuation cursor | Copy permitted scalar values before advancing. A bridge page limit does not bound the OS response; measure response cost with bounded time slices |
+| [Direct Boot](https://developer.android.com/privacy-and-security/direct-boot) and [UserManager](https://developer.android.com/reference/android/os/UserManager#isUserUnlocked()) | Credential-encrypted storage becomes available after first unlock and remains available through later screen locks until reboot | First-unlock readiness and current keyguard state are independent. Keep history out of device-protected storage |
+| [WorkManager requests](https://developer.android.com/develop/background-work/background-tasks/persistent/getting-started/define-work) and [Doze](https://developer.android.com/training/monitoring-device-state/doze-standby) | Periodic work has a 15-minute minimum; constraints/optimizations can delay or skip runs. Doze defers jobs | Deferred reconciliation is a candidate, never a real-time polling mechanism or freshness guarantee |
+| [FGS types](https://developer.android.com/develop/background-work/services/fgs/service-types) and [background starts](https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start) | Appropriate service types/permissions are required on applicable targets; background starts are restricted. `specialUse` requires a described use case reviewed through Play | A visible notification or OS grant does not establish eligibility. Do not substitute `dataSync`, `shortService` or `systemExempted` for a validated collection purpose |
+| [Android stopped state](https://developer.android.com/about/versions/15/behavior-changes-all) | Android 15 cancels pending intents when force-stopped; user interaction is required to leave stopped state | Separate force-stop from task removal/process death. Recover on permitted user return; no restart promise |
+
+## Observation provenance
+
+The public [event API](https://developer.android.com/reference/android/app/usage/UsageEvents.Event#getTimeStamp()) supplies epoch-millisecond timestamps. Its documented getter surface provides neither an event UUID nor historical elapsed realtime, boot ID or timezone. This is a limitation of the reviewed public interface, not permission to use hidden fields. Collector-side identity and provenance must remain explicit.
+
+For historical queries, leave event-time elapsed/zone/boot evidence absent unless independently established. Query receipt time, current zone and a wall/elapsed clock sample describe the query, not every returned event. Do not reverse-map old timestamps with today's clock offset and call them monotonic observations. [SystemClock](https://developer.android.com/reference/android/os/SystemClock) supports live elapsed-time sampling; reconstructing old intervals still needs anomaly/uncertainty handling under L-03.
+
+The normalized model therefore needs nullable event-time provenance and a time basis distinguishing source wall time from directly observed monotonic time. View-zone calendar grouping remains deterministic even when event-time zone is unknown. This corrects an assumption in the original draft; it does not change stored data because no store exists.
+
+Replay matching is an unresolved qualification item. A random ID per query duplicates events; a hash of timestamp/type/package/class alone can collapse legitimate equal-millisecond occurrences. A query-local index is not stable when a window moves. Prototype multiplicity-aware matching for equal timestamp/signature groups, preserving all observable occurrences and marking unresolved correspondence as uncertain. Test shifted windows, reordered equal-time groups, late arrivals and partial groups at resource boundaries before choosing a durable key/ordinal strategy. No exact identity claim is justified for indistinguishable events.
+
+## Candidate execution paths
+
+| Path | Allowed purpose in the prototype | Evidence still needed |
+|---|---|---|
+| Native work while the app is visible | Explicit bounded query, off the main thread; JS renders results/status only | Query latency, cancellation, null/denial handling, no query before consent, no work after withdrawal |
+| Deferred native reconciliation | Candidate one-time/periodic work after user enablement; no network constraint for local history | Current latest dependency review before adding WorkManager; actual scheduled/running/completed times, stale age, overlap recovery, Doze/OEM behavior |
+| System-bound accessibility/listener services | Only their separately consented surface/notification sources | AS-007 policy review, callback/disconnect evidence; never enable a service just to keep usage queries alive |
+| Eligible user-visible foreground service | Research only; no manifest declaration selected | AS-007 purpose/type/disclosure/distribution review and actual allowed start/stop/timeout paths |
+| Reboot/user return | Recheck first-unlock readiness and committed consent, then enqueue only permitted work | Physical reboot/unlock and force-stop-return evidence. A boot broadcast alone grants neither consent nor unrestricted FGS starts |
+
+If deferred reconciliation cannot preserve sufficiently useful history, keep that capability degraded or unavailable and revisit feasibility explicitly. Do not compensate with exact-alarm loops, a JS timer, wake-lock retention, hidden APIs or automatic battery exemptions.
+
+## Bounded reconciliation experiment
+
+This protocol specifies future prototype behavior; no steps below have been executed against a source.
+
+1. Snapshot installation/store generation, source consent revision, grant state, first-unlock readiness, filters, pause/deletion fences and cursor. Disabled/unknown gates admit no query. Pin the query end; never chase a moving `now` indefinitely.
+2. Intersect the proposed overlap with permitted effective-time ranges. Split around pauses/deletions. Filter again before normalization and before commit. Do not query an earlier range merely to find a missing session start.
+3. Run small time slices off the main thread with an explicit elapsed-time deadline, iteration cap and cancellation checks. Tune values with synthetic density fixtures and device measurements; no cadence or resource budget is accepted yet. Reducing application iteration cannot guarantee bounded Binder/service allocation, so measure that separately.
+4. Map only supported event kinds and allowlisted scalar evidence; discard unrelated payload immediately. Never retain `extras`, notification contents, shortcut labels, node trees or raw diagnostic dumps. Preserve uncertain ordering instead of inventing causal order.
+5. Treat null, denial, exception, cancellation and resource truncation distinctly. An exhausted non-null iterator establishes query completion, not complete usage coverage. A successful empty query may update query-health metadata; it must not manufacture a measured zero or erase an existing gap.
+6. Before any future durable commit, recheck revision/generation/grant/fences through the serialized write coordinator. Persist accepted facts, reconciliation position and coverage assessment atomically. AS-003 may simulate this with an injected fake; production storage waits for AS-009/AS-010. Never advance across an unprocessed slice. Late arrivals require overlap; missing retention-bound evidence remains a gap.
+7. Report query freshness separately from metric coverage and live-signal availability. Derive gaps from demonstrated evidence, not just process heartbeat. An otherwise current query with a missing screen boundary cannot approve interactive duration.
+
+## Staged device qualification
+
+Only the self-package row has passed on the physical API-36 ARM64 phone; every other runtime row is **not run**. T/L IDs refer to [Testing](TESTING.md). Record exact build/API/OEM/locale, synthetic fixture, expected/actual result, query bounds, durations/counts and limitations. Public evidence contains aggregate outcomes only. Host tests of runner safety do not execute these source scenarios.
+
+| Stage | Experiment | Acceptance boundary |
+|---|---|---|
+| Self-package public API — passed 2026-10-27 | Physical API-36 ARM64 phone; two test-only activities create events during an explicit run; query only this package from run start. No source grant changes or prior history | Both resumed/paused pairs and bounded iterator/copied snapshots pass; instrumentation `-1`. Confirms public self-query mechanics only; no C-01–C-04 admission or cross-app accuracy claim |
+| Synthetic adapter/reconciliation | Inject null/empty/denied/truncated responses, repeated/shifted overlap, equal-time multiplicity, wall jumps and withdrawal during query | T-01/T-16, L-01/L-03/L-08 subsets; host results remain synthetic |
+| Consented fixture packages | Only after an in-app prototype disclosure and user-controlled Usage Access/consent: transition among allowlisted synthetic activities/packages | T-01–T-04; independently check activity versus package opens, screen/keyguard, multi-window and missing edges |
+| Process separation | Stop JS, remove the task, then terminate only the task app's process in separate scoped runs | L-05; measure actual permitted continuation/reconciliation, not uptime assertions |
+| Force-stop and return | With the user's scoped test authorization, force-stop only the task app, then reopen it | L-05/L-06; distinguish absence of execution from bounded later reconstruction; no erased coverage gap |
+| Reboot and first unlock | User-coordinated physical reboot; no credential/history read before first unlock | L-04; shutdown uncertainty and post-unlock permitted recovery, distinct from ordinary keyguard locking |
+| Background/OEM/offline | User-coordinated battery/restriction trials, including disconnected charging/network states and seven-day baseline | L-06/L-07; query delays, lost intervals and power cost. No settings/grants changed automatically |
+| Minimum API and newer OS | Physical API 24/25 for baseline; API 28, 29, 30, 35+ branches on available physical devices | Unsupported historical events remain unavailable; the current API-36 phone cannot qualify older branches |
+
+Current authorization covers task-app debug checks without unrelated phone/settings/history changes. Grant changes, reboot and battery/restriction trials require their own agreed scope before execution. No emulator is a fallback. Ask for a connected USB-debugging phone when a runtime step needs one and it is unavailable.
+
+AS-003 can advance per evidence stage while remaining experimental. F-02/F-09 stay open until source fidelity, durable consent-fenced recovery, viable permitted execution and device limitations are documented. The next action is synthetic reconciliation cases; repeat the passing self-package run only for changed code or unresolved concerns. The harness stays test-only and leaves the production bootstrap `not_implemented`.
+
+## Harness reproduction and current evidence
+
+With the existing reviewed isolated SDK/toolchain, build ARM64 debug/test APKs and lint:
+
+```powershell
+python tools/android_build.py :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug --arch arm64-v8a
+python -m unittest discover -s tools/tests -p test_collection_probe.py
+python tools/test_collection_probe.py
+```
+
+The last command requires an existing `adb` on PATH (or `--adb <path>`) and exactly one authorized physical phone on API 28+. It rejects an existing test package, installs the task debug/test APKs, runs only `qualification=usage-self` with structured `am instrument -w -r` results, requires the success marker and instrumentation result `-1`, and removes its temporary test package in a finally block. The debug app remains installed. It makes no grant/settings changes and uses no emulator, reset, reboot or app force-stop. Sanitized aggregate evidence and APK hashes go only to ignored `.cache/as-003/self-query-result.json`; no serial or event trace is written.
+
+Twelve host safety tests pass using synthetic APK bytes and mocked adb responses: absent/unauthorized/emulator-only/ambiguous targets, a virtual target posing as physical, unsupported API, preservation of an existing test package, success/result validation, refusal of pretty output without its final code, sanitized failure diagnostics, cleanup after failure/timeout and cleanup failure reporting. These do not test Android source fidelity. The fixtures live in `src/debug` and are unexported; the query runner lives in `src/androidTest`. Release source contains neither fixture activities nor the self-query probe. No new dependency was added.

@@ -1,6 +1,6 @@
 # Permissions and capability access
 
-**Status:** Access model specified; no manifest or permission flow implemented. Updated 2026-10-27.
+**Status:** Source access model specified; source permission declarations/flows unimplemented in the scaffold. Updated 2026-10-27.
 **Responsibility:** Defines Android declarations, user grants, disclosures, revocation and safe degradation.
 **Related specifications:** [Capabilities](CAPABILITY-MATRIX.md), [UX](UX-SPEC.md), [Privacy](PRIVACY.md), [Architecture](ARCHITECTURE.md).
 **Unresolved feasibility:** F-02, F-08 and F-09 in [Decisions](DECISIONS.md); final manifest depends on target SDK and tested service strategy.
@@ -36,6 +36,8 @@ Permission states are separate from consent/configuration: OS-granted but produc
 If Android/OEM has no deep link, show a manual path and remain available. Do not loop prompts or block access to prior history. New observation detail needs separate consent even if the OS grant already covers it. Permission dashboard shows granted/needed/unsupported alongside source enablement, pause and last-success time. Revocation keeps prior data and offers deletion separately.
 
 ## Policy and lifecycle evidence
+
+[AS-003 qualification](COLLECTION-FEASIBILITY.md) starts with test-only self-package events on API 28+, which require no Usage Access and cannot establish cross-app capability. The scaffold still declares no collection permissions or source services. Broader source/grant and phone reboot/restriction tests need their documented user-controlled scope; this research adds no grants, receivers, scheduler or FGS type. `specialUse` is a candidate requiring purpose/distribution review, not an accepted service strategy ([Android FGS types](https://developer.android.com/develop/background-work/services/fgs/service-types)).
 
 Accessibility disclosure must be in the normal in-app flow, describe access/use/sharing, require affirmative action, and support the store declaration/review requirements. Do not infer that another released application proves this one's eligibility. Recheck [Google Play Accessibility policy](https://support.google.com/googleplay/android-developer/answer/10964491?hl=en) before any release.
 

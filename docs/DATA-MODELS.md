@@ -15,7 +15,7 @@ All IDs are locally generated opaque strings. No hardware/advertising identifier
 | AppDescriptor | appId, platformPackage, profileScope, label, version, firstObservedAtMs | Unique package/profile within supported observation scope; label from OS not trusted executable text |
 | SourceConfiguration | sourceId, enabled, consentRevision, effectiveAtMs, filters, detail, pauseUntilMs, retentionPolicyId | Default off; versioned atomic config; no old grant implies consent |
 | ConsentRecord | id, source/detail, noticeRevision, decision, atMs, configRevision | Minimal affirmative/withdrawal evidence; contains no screen content |
-| SourceEvent | id, sourceId, appId?, kind, occurredAtMs, receivedAtMs, elapsedMs?, bootEpoch?, zoneId, offsetSeconds, dedupKey, occurrenceOrdinal, collectorRevision, quality | Unique source/dedup identity; index `(occurredAtMs,id)` and `(appId,occurredAtMs,id)` |
+| SourceEvent | id, sourceId, appId?, kind, occurredAtMs, receivedAtMs, elapsedMs?, bootEpoch?, zoneId?, offsetSeconds?, timeBasis, timeProvenance, dedupKey, occurrenceOrdinal, collectorRevision, quality | Unique source/dedup identity; index `(occurredAtMs,id)` and `(appId,occurredAtMs,id)`; unavailable event-time evidence stays null |
 | Session | id, appId, startMs, endMs?, countedMs, sourceStartId?, sourceEndId?, quality, boundaryReasons, reducerRevision | end ≥ start; countedMs excludes known locked/off gaps; null end is censored, never infinite |
 | SurfaceEpisode | id, sessionId?, appId, surfaceId, startMs, endMs?, detectorRevision, quality | Known interval subset of corresponding app usage where link is available; no extra app duration |
 | Exposure | id, surfaceEpisodeId, occurredAtMs, ordinal, detectorRevision, countKind, reasonCodes | Unique episode/ordinal; optional transition evidence contains no content by default |
@@ -45,7 +45,9 @@ LiveSurfaceSnapshot is a **derived read model**, not a second durable counter. I
 
 ## Time, evidence and precision
 
-UTC epoch milliseconds are the transport/storage instant. Store event-time zone ID and offset for provenance, and use explicit selected view zone for calendar grouping. Elapsed realtime is valid only within the same boot epoch. Durations are nonnegative milliseconds, counts nonnegative integers; SQL 64-bit values crossing JS must be safely representable or encoded as decimal strings under a versioned contract.
+UTC epoch milliseconds are the transport/storage instant. Store event-time zone ID and offset when established, and use explicit selected view zone for calendar grouping. Elapsed realtime is valid only within the same boot epoch. Durations are nonnegative milliseconds, counts nonnegative integers; SQL 64-bit values crossing JS must be safely representable or encoded as decimal strings under a versioned contract.
+
+`timeBasis` distinguishes `source_wall` from `observed_monotonic`; `timeProvenance` records how each optional zone/boot/elapsed field was established, including reconstructed uncertainty. Query receipt clocks and current zone are query metadata, not historical event-time facts. Do not infer old elapsed endpoints from current clock offset. Durable observation identity/occurrence ordinals need the shifted-window and multiplicity qualification in [Collection feasibility](COLLECTION-FEASIBILITY.md#observation-provenance); query-local indexes are insufficient. No Room schema or migration exists yet.
 
 Every measure identifies source observation IDs or a bounded query provenance descriptor, reducer/model version, configuration revision, coverage interval, and kind (observed/estimate/classification/prediction). A confidence class is not a measured probability. Unknown metrics use null and reasons. Synthetic example: `com.example.social` has a covered episode from 2026-10-20T10:00:00Z to 10:10:00Z, 600000 ms; an unknown period afterward has no inferred duration.
 

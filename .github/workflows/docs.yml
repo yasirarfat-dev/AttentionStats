@@ -24,6 +24,8 @@ jobs:
         run: python tools/check_docs.py
       - name: Verify current native domain boundaries
         run: python tools/check_architecture.py
+      - name: Verify synthetic phone-runner safety boundaries
+        run: python -m unittest discover -s tools/tests -p "test_collection_probe.py"
       - name: Verify whitespace
         run: git show --format= --check HEAD
 

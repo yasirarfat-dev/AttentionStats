@@ -44,6 +44,8 @@ interface NativeError {
 
 ID and revision strings are opaque; local-only random installation epoch is not an advertising identifier. Results use a discriminated success/error envelope. Numeric durations are milliseconds; counts are nonnegative safe integers; unavailable measures are null with reason codes, not zero. Validate range length, package filters and limits; cap pages at 500, default 100. Long operations return job IDs with cancellation and status queries.
 
+Capability results must distinguish query freshness, metric coverage and live-signal availability under [Collection feasibility](COLLECTION-FEASIBILITY.md). `lastSuccessMs` means the operation succeeded, not that every event/metric is covered; an empty query does not justify a measured zero. History provenance preserves absent event-time zone/boot/elapsed fields and the [model's time basis](DATA-MODELS.md#time-evidence-and-precision). These are requirements for the pending full contract; the version-1 bootstrap remains unchanged.
+
 ## Operation catalog
 
 | Operation | Request | Result and side effects |

@@ -4,4 +4,9 @@
     <!-- Debugging uses loopback through adb reverse, without nearby-device or overlay access. -->
     <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" tools:node="remove" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" tools:node="remove" />
+    <application>
+        <!-- Internal synthetic fixtures; never merged into release or exposed to other apps. -->
+        <activity android:name="com.attentionstats.qualification.FirstFixtureActivity" android:exported="false" />
+        <activity android:name="com.attentionstats.qualification.SecondFixtureActivity" android:exported="false" />
+    </application>
 </manifest>

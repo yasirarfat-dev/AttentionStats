@@ -52,6 +52,8 @@ Each application evidence record needs commit/build, exact dependency/toolchain 
 | L-07 | Offline throughout seven days; grants/settings navigation partly unavailable | Core local history/rules work where supported, no product login/network requirement |
 | L-08 | One million minimized events, one-year history, multi-window and secondary display | Bounded paging/memory; no duplicate aggregate duration; overlap/coverage labelled |
 
+AS-003's [staged qualification protocol](COLLECTION-FEASIBILITY.md#staged-device-qualification) adds API-family absence, first unlock versus later keyguard lock, null versus successful-empty queries, shifted overlap/equal-time multiplicity, mutable-event copying, truncation without cursor advancement and missing historical monotonic/zone provenance. Only the self-package stage has runtime evidence: physical API36 ARM64, two synthetic activity resumed/paused pairs, bounded iteration and copied snapshots, instrumentation result `-1`. Twelve host runner-safety tests pass and are configured in CI; those mocked responses establish no source fidelity. Durable ingestion and cross-app/source/lifecycle scenarios remain not run. Runtime tests require the connected debug phone; reboot/grant/battery changes need their scoped user authorization.
+
 ## Protection scenarios
 
 | ID | Given / action | Required result |

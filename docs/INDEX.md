@@ -19,7 +19,7 @@ AS-035 now supplies a separate [pure Kotlin analytics slice](../native/analytics
 |---|---|
 | New contributor | Vision → Product → Capabilities → State → Roadmap → Tracker → Contributing |
 | Every human/agent session | Agent rules → State → Tracker → relevant decisions and domain specs |
-| Native tracking | Tracking → Social → Permissions → Models → Native contracts → Testing |
+| Native tracking | Tracking → Collection feasibility → Social → Permissions → Models → Native contracts → Testing |
 | Protection | Protection → Permissions → Architecture → Contracts → Testing |
 | Interface work | Human factors → UX → Navigation → Design system → Settings → Contracts |
 | Data/privacy/backup | Privacy → Security → Models → Storage → Backup → Testing |
@@ -37,6 +37,7 @@ AS-035 now supplies a separate [pure Kotlin analytics slice](../native/analytics
 | Detailed diary | [ANALYTICS-SPEC.md](ANALYTICS-SPEC.md) | Duration conservation, interactions, network accounting, exploration and summaries |
 | Metric inventory | [METRIC-CATALOG.md](METRIC-CATALOG.md) | Individual metric definitions and platform-by-platform qualification research |
 | Observation | [TRACKING-SPEC.md](TRACKING-SPEC.md) | Sessions, opens, screen/keyguard, notifications, coverage/time |
+| Source qualification | [COLLECTION-FEASIBILITY.md](COLLECTION-FEASIBILITY.md) | Dated public API/lifecycle research, candidate execution paths and staged AS-003 protocol |
 | Surfaces | [SOCIAL-MEDIA-SPEC.md](SOCIAL-MEDIA-SPEC.md) | App versus surface detection, exposures, safe optional metadata |
 | In-context awareness | [LIVE-OVERLAY-SPEC.md](LIVE-OVERLAY-SPEC.md) | Optional visit/day counters, native snapshots, renderer safety and permission boundaries |
 | Interpretation | [BEHAVIOR-INTELLIGENCE.md](BEHAVIOR-INTELLIGENCE.md) | Categories, patterns, predictions, optional topics and confidence |
