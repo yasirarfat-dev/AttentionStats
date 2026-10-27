@@ -12,7 +12,7 @@ AttentionStats/
   README.md, LICENSE, CONTRIBUTING.md, SECURITY.md
   AGENTS.md, CLAUDE.md
   .gitattributes, .gitignore
-  .github/                 documentation checks and public review templates
+  .github/                 documentation/mobile/native CI and public review templates
   docs/                    authoritative specifications and continuity
     evidence/              public dependency metadata, not device traces
     IMPLEMENTATION_LOG/    dated work and validation records
@@ -20,7 +20,7 @@ AttentionStats/
   tools/test_analytics.py  verified local Kotlin compiler and synthetic JVM/ART tests
   tools/check_architecture.py  current native package/dependency boundary checks
   tools/probe_mobile_stack.py  AS-002 isolated tooling preparation, parity audit and smoke checks
-  tools/check_mobile.py    root manifest/lock/installed-version and patch audit
+  tools/check_mobile.py    manifest/lock/installed-version, native catalog/notices and patch audit
   tools/android_build.py   task-local SDK/Gradle wrapper runner
   package.json, pnpm-lock.yaml, pnpm-workspace.yaml
   src/                     experimental mobile composition/features/UI/bootstrap adapter

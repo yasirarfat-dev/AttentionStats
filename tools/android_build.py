@@ -15,6 +15,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("tasks", nargs="+", choices=[
         "assembleDebug", "assembleRelease", "bundleRelease", "lintDebug",
+        ":app:assembleDebug", ":app:assembleRelease", ":app:assembleDebugAndroidTest", ":app:lintDebug",
         "testDebugUnitTest", ":analytics-core:verifyAnalytics", "generateCodegenArtifactsFromSchema",
         "help", "dependencies",
     ])
@@ -33,7 +34,7 @@ def main() -> int:
         java = shutil.which("java")
         if java:
             env["JAVA_HOME"] = str(Path(java).resolve().parents[1])
-    if "assembleDebug" in args.tasks:
+    if any(task in args.tasks for task in ["assembleDebug", ":app:assembleDebug", ":app:assembleDebugAndroidTest"]):
         debug_key = ROOT / ".cache/android-debug.keystore"
         if not debug_key.exists():
             debug_key.parent.mkdir(parents=True, exist_ok=True)

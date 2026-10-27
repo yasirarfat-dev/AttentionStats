@@ -700,6 +700,29 @@
       "version": "260318099.0.4",
       "owner": "react-native@0.88.0 exact transitive dependency; resolved through its package location",
       "directDependency": false
+    },
+    "desugar": {
+      "version": "2.1.5",
+      "resolvedDate": "2026-10-27",
+      "source": "https://dl.google.com/dl/android/maven2/com/android/tools/desugar_jdk_libs/maven-metadata.xml",
+      "pom": "https://dl.google.com/dl/android/maven2/com/android/tools/desugar_jdk_libs/2.1.5/desugar_jdk_libs-2.1.5.pom",
+      "license": "GPL-2.0-only WITH Classpath-exception-2.0",
+      "url": "https://dl.google.com/dl/android/maven2/com/android/tools/desugar_jdk_libs/2.1.5/desugar_jdk_libs-2.1.5.jar",
+      "sha256": "d8044befae095781b9a80bf1faa92edc30382d75d437476784c1bf991598a976",
+      "size": 6113073,
+      "reason": "Backport analytics-core java.time calls for the declared Android API24/25 baseline; runtime qualification is separate",
+      "notices": [
+        {
+          "path": "licenses/desugar-jdk-libs.txt",
+          "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726"
+        },
+        {
+          "path": "licenses/desugar-jdk-libs-additional.txt",
+          "sha256": "69369283a3e40c098832bf4fd4fe38c7b780679a2a58d8f32fa892f639ed8424"
+        }
+      ],
+      "noticeSourceCommit": "092407c51c3eaaaa9e46f7b7e436dc642f614064",
+      "noticeNormalization": "Upstream license wording retained; trailing whitespace removed"
     }
   },
   "checks": [
@@ -770,6 +793,34 @@
     {
       "check": "release merged APK internal-receiver permission only",
       "status": "passed"
+    },
+    {
+      "check": "ARM64 unsigned release APK with latest stable core library desugaring",
+      "status": "passed"
+    },
+    {
+      "check": "ARM64 release min API24/target37, transformed time classes, internal receiver permission only and unsigned artifact inspection",
+      "status": "passed"
+    },
+    {
+      "check": "Native audit guard exercise: clean source/cache and six rejected catalog/config/notice/path/artifact faults",
+      "status": "passed"
+    },
+    {
+      "check": "ARM64 debug/test APK compilation and 37 synthetic analytics checks on physical API36 phone through app D8/desugaring pipeline",
+      "status": "passed"
+    },
+    {
+      "check": "Resolved desugar_jdk_libs JAR matches reviewed size/SHA-256",
+      "status": "passed"
+    },
+    {
+      "check": "Resolved native artifact audit rejects missing and modified JARs",
+      "status": "passed"
+    },
+    {
+      "check": "ARM64 app lint after escaped local SDK paths and fresh analysis: 0 errors, 15 template/dependency warnings",
+      "status": "passed"
     }
   ],
   "limitations": [
@@ -777,7 +828,7 @@
     "No collector, history store, encryption, intervention or export implemented",
     "No phone settings or source grants changed; app install/launch and adb loopback only",
     "No private phone captures or identifiers published",
-    "Native CI, ARM64 release, API24/25 java.time desugaring and full library functionality unqualified",
+    "API24/25 runtime and full library functionality unqualified; native CI results recorded separately in State/log",
     "TalkBack, complete RTL/localization, landscape/tablet and frame/battery behavior unqualified",
     "iOS project generated but untested",
     "Dedicated emulator had System UI cold-boot ANRs; no smoothness/performance claim"
@@ -809,6 +860,47 @@
       "sha256": "7f21cf4dab58eb4eb4876755de628fd9d2a62e09e3537da3741d3d3159f57e1d",
       "size": 33230100,
       "published": false
+    },
+    {
+      "kind": "arm64-v8a unsigned release APK",
+      "sha256": "70468cb225942a85465ab565638b6fa7bcdaea3ddf19fc57d055cbfb502e07f2",
+      "size": 32792754,
+      "published": false,
+      "abis": [
+        "arm64-v8a"
+      ],
+      "desugaredTimePresent": true,
+      "v1SignaturePresent": false
+    },
+    {
+      "kind": "arm64-v8a debug APK",
+      "sha256": "1c6837fe073e991299b047d2d5032ddec3482af73206f2752d95a6e6117e9d7d",
+      "size": 72567738,
+      "published": false
+    },
+    {
+      "kind": "arm64-v8a synthetic analytics test APK",
+      "sha256": "8fd563c97f86927c24adc30f9431e6df03533c0f78a3d8905dac37f721d28592",
+      "size": 65432,
+      "published": false
     }
-  ]
+  ],
+  "nativeCi": {
+    "action": "actions/setup-java",
+    "version": "6.1.0",
+    "commit": "b843ebf9b913146b38da2eaa7aeddf76074ae1ad",
+    "license": "MIT",
+    "resolvedDate": "2026-10-27",
+    "status": "Configured; remote execution results are recorded separately in State/log"
+  },
+  "deviceTestingInstruction": "User requires the connected debug phone; ask for USB debugging connection if unavailable; do not run an emulator",
+  "phonePackagingQualification": {
+    "api": "36",
+    "abi": "arm64-v8a",
+    "checks": 37,
+    "result": "passed",
+    "instrumentationCode": -1,
+    "testPackageRemoved": true,
+    "sourceGrantsChanged": false
+  }
 }

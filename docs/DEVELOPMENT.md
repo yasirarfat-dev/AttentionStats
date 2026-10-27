@@ -16,7 +16,7 @@ git diff --check
 git status --short
 ```
 
-The checker verifies expected documents, metadata, relative links/anchors, capability/scenario/task coverage, dependency-ledger consistency and prohibited public artifacts. It does not prove Android behavior or external link availability. Manually review public text and policy interpretation. The CI job performs the same offline documentation checks without application builds or secrets.
+The checker verifies expected documents, metadata, relative links/anchors, capability/scenario/task coverage, dependency-ledger consistency and prohibited public artifacts. It does not prove Android behavior or external link availability. Manually review public text and policy interpretation. The documentation CI job performs these offline checks; separate mobile jobs compile and verify the experimental scaffold without signing secrets.
 
 ## Native analytics slice: AS-035
 
@@ -61,6 +61,8 @@ pnpm build --extra-params '-PreactNativeArchitectures=arm64-v8a --max-workers=4 
 pnpm run android:release --extra-params '-PreactNativeArchitectures=x86_64 --max-workers=4 --no-daemon'
 ```
 
+In Windows `local.properties`, escape drive-letter colons and use forward slashes, for example `sdk.dir=C\:/path/to/sdk`. Lint checks these properties even when Gradle can resolve an unescaped path. If lint reuses a stale result after correcting this ignored file, rerun the app's `lintAnalyzeDebug` task explicitly before `lintDebug`.
+
 Optional lower-level qualification commands use the same Gradle wrapper:
 
 ```powershell
@@ -68,6 +70,21 @@ python tools/android_build.py --sdk .cache/as-004/sdk --arch x86_64 generateCode
 python tools/android_build.py --sdk .cache/as-004/sdk --arch x86_64 :analytics-core:verifyAnalytics
 python tools/android_build.py --sdk .cache/as-004/sdk --arch x86_64 assembleDebug assembleRelease
 ```
+
+AS-002 also has an ARM64 native CI job using exact SDK/NDK/CMake components on a disposable Linux runner. It compiles debug, unsigned release and synthetic Android test APKs, runs the shared Gradle analytics suite and app lint, and uploads no binaries. Workflow configuration and a passing remote run are separate evidence.
+
+The app enables core library desugaring for the pure module's `java.time` calls on the declared API-24/25 baseline. The latest stable reviewed native dependency is pinned in `android/gradle/libs.versions.toml`; its license and artifact evidence are recorded in [Dependencies](DEPENDENCIES.md#android-core-library-desugaring). After a native build with the task-local Gradle cache, `python tools/check_mobile.py --native-cache` checks the resolved JAR's size/SHA-256. Native CI performs this check too, and runs only for relevant source/toolchain changes or manual dispatch.
+
+Current user instruction requires runtime checks on the connected debug phone. Do not start/use an emulator; ask the user to connect the phone with USB debugging enabled if unavailable. Build the application and synthetic test APK for the phone's ABI:
+
+```powershell
+python tools/android_build.py --sdk .cache/as-004/sdk --arch arm64-v8a :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug
+adb -s <authorized-phone> install -r android/app/build/outputs/apk/debug/app-debug.apk
+adb -s <authorized-phone> install -r -t android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+adb -s <authorized-phone> shell am instrument -w -r com.attentionstats.debug.test/com.attentionstats.qualification.AnalyticsInstrumentation
+```
+
+The custom instrumentation runner reuses the original synthetic calculation suite through the app's actual Android DEX/desugaring pipeline. Require the success stream and `INSTRUMENTATION_CODE: -1`; adb exit status alone is insufficient. A current-API phone result does not establish Android 24/25 runtime compatibility. Installation touches only the task app/test packages and requests no source grants or phone-setting changes.
 
 Before the first debug build, create a task-local key at `.cache/android-debug.keystore` using the JDK's `keytool` (alias `androiddebugkey`, standard Android debug credentials), or use the optional isolation helper once, which creates it. Preserve the existing key and never commit it. Debug ID is `com.attentionstats.debug`; release ID/namespace is `com.attentionstats`, chosen for development, with signing/store registration still a release-maintainer gate. Release artifacts are unsigned; the template's debug release-signing fallback has been removed. Use `--arch arm64-v8a` for an appropriate phone; an x86_64 build is not ARM qualification.
 

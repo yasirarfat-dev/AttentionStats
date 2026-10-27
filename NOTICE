@@ -4,3 +4,8 @@ Copyright 2026 Attention Stats contributors
 The native application scaffold is adapted from @react-native-community/template
 0.88.0 (Meta Platforms, Inc. and affiliates), licensed under the MIT license.
 See licenses/react-native-template.txt.
+
+Android core library desugaring uses com.android.tools:desugar_jdk_libs 2.1.5,
+a subset of OpenJDK libraries licensed under GPL-2.0 with the Classpath Exception.
+See licenses/desugar-jdk-libs.txt and licenses/desugar-jdk-libs-additional.txt.
+Upstream source: https://github.com/google/desugar_jdk_libs

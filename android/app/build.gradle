@@ -92,12 +92,20 @@ android {
     compileSdk rootProject.ext.compileSdkVersion
 
     namespace "com.attentionstats"
+    // analytics-core uses java.time, which Android 24/25 do not provide.
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+    }
+    sourceSets {
+        androidTest.java.srcDir('../../native/analytics-core/src/test/kotlin')
+    }
     defaultConfig {
         applicationId "com.attentionstats"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "com.attentionstats.qualification.AnalyticsInstrumentation"
     }
     signingConfigs {
         debug {
@@ -123,6 +131,7 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation project(':analytics-core')
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")

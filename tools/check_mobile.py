@@ -7,11 +7,12 @@ import json
 from pathlib import Path
 import re
 import sys
+import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def review(root: Path, installed: bool = False) -> list[str]:
+def review(root: Path, installed: bool = False, native_cache: bool = False) -> list[str]:
     errors: list[str] = []
     manifest = json.loads((root / "package.json").read_text(encoding="utf-8"))
     evidence = json.loads((root / "docs/evidence/mobile-scaffold.json").read_text(encoding="utf-8"))
@@ -71,21 +72,51 @@ def review(root: Path, installed: bool = False) -> list[str]:
     if (f"gradle-{gradle['version']}-bin.zip" not in properties or
             f"distributionSha256Sum={gradle['checksum']}" not in properties):
         errors.append("Gradle distribution/version checksum differs from review")
+    desugar = evidence["native"]["desugar"]
+    catalog = tomllib.loads((root / "android/gradle/libs.versions.toml").read_text(encoding="utf-8"))
+    if (catalog["versions"]["desugar-jdk-libs"] != desugar["version"] or
+            catalog["libraries"]["desugar-jdk-libs"] != {
+                "module": "com.android.tools:desugar_jdk_libs",
+                "version": {"ref": "desugar-jdk-libs"},
+            }):
+        errors.append("Core library desugaring catalog differs from reviewed native dependency")
+    app_build = (root / "android/app/build.gradle").read_text(encoding="utf-8")
+    if ("coreLibraryDesugaringEnabled true" not in app_build or
+            "coreLibraryDesugaring(libs.desugar.jdk.libs)" not in app_build):
+        errors.append("Android 24/25 java.time requires the reviewed core library desugaring configuration")
+    for notice in desugar["notices"]:
+        path = (root / notice["path"]).resolve()
+        if not path.is_relative_to((root / "licenses").resolve()):
+            errors.append("Native dependency notice leaves the license directory")
+        elif not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != notice["sha256"]:
+            errors.append(f"Native dependency notice hash mismatch: {notice['path']}")
+    if native_cache:
+        cache = root / ".cache/gradle-user-home/caches/modules-2/files-2.1/com.android.tools/desugar_jdk_libs"
+        artifacts = list((cache / desugar["version"]).glob(f"*/desugar_jdk_libs-{desugar['version']}.jar"))
+        if not artifacts:
+            errors.append("Build first: reviewed desugaring artifact is absent from the task-local Gradle cache")
+        for artifact in artifacts:
+            if (artifact.stat().st_size != desugar["size"] or
+                    hashlib.sha256(artifact.read_bytes()).hexdigest() != desugar["sha256"]):
+                errors.append("Resolved core library desugaring artifact differs from reviewed size/SHA-256")
     return errors
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--installed", action="store_true")
+    parser.add_argument("--native-cache", action="store_true", help="Verify the resolved desugaring JAR after a native build")
     args = parser.parse_args()
     try:
-        errors = review(ROOT, args.installed)
+        errors = review(ROOT, args.installed, args.native_cache)
     except (OSError, ValueError, KeyError, IndexError) as exc:
         errors = [str(exc)]
     if errors:
         print("Mobile dependency verification failed:\n" + "\n".join("  - " + error for error in errors))
         return 1
-    print("PASS: mobile direct pins, lockfile importer, dated latest/license/integrity evidence and local install policy")
+    print("PASS: mobile pins/lock/patch, native catalog/notices and reviewed install policy")
+    if args.native_cache:
+        print("PASS: resolved native desugaring JAR size/SHA-256")
     print("This is a dated review, not a live registry check or a native/runtime qualification.")
     return 0
 
