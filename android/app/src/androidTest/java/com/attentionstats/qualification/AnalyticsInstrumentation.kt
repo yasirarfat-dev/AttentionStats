@@ -27,6 +27,7 @@ class AnalyticsInstrumentation : Instrumentation() {
                 "usage-self" -> {
                     probe = SelfUsageProbe(this)
                     result.putString("stream", probe.verify())
+                    probe.measurements.forEach { (key, value) -> result.putLong(key, value) }
                 }
                 else -> error("Unknown qualification mode")
             }

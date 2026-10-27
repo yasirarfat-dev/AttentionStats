@@ -31,7 +31,11 @@ class PhoneRunnerSafety(unittest.TestCase):
         self.api = "36"
         self.virtual = "0"
         self.existing_test = False
-        self.instrumentation = probe.SUCCESS + "\nINSTRUMENTATION_CODE: -1\n"
+        self.measurements = {key: bounds[0] for key, bounds in probe.MEASUREMENT_LIMITS.items()}
+        self.measurements.update(query_total_ns=30, query_max_ns=10,
+                                 iteration_total_ns=5, iteration_max_ns=5)
+        self.instrumentation = probe.SUCCESS + "\nINSTRUMENTATION_CODE: -1\n" + "".join(
+            f"INSTRUMENTATION_RESULT: {key}={value}\n" for key, value in self.measurements.items())
         self.cleanup = "Success\n"
         self.calls = []
 
@@ -107,6 +111,7 @@ class PhoneRunnerSafety(unittest.TestCase):
         evidence = self.evidence()
         self.assertTrue(evidence["passed"])
         self.assertTrue(evidence["testPackageRemoved"])
+        self.assertEqual(evidence["measurements"], self.measurements)
         self.assertNotIn("fixture-phone", json.dumps(evidence))
         self.assertEqual([call for call in self.calls if call[0] == "uninstall"],
                          [["uninstall", probe.TEST]])
@@ -170,6 +175,40 @@ class PhoneRunnerSafety(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "cleanup failed"):
             self.run_probe()
         self.assertFalse(self.evidence()["testPackageRemoved"])
+
+    def test_incomplete_duplicate_malformed_and_out_of_range_metrics_are_rejected(self):
+        original = self.instrumentation
+        for replacement in ["", "INSTRUMENTATION_RESULT: query_calls=3\n" * 2,
+                            "INSTRUMENTATION_RESULT: query_calls=-1\n",
+                            "INSTRUMENTATION_RESULT: query_calls=65\n",
+                            "INSTRUMENTATION_RESULT: query_calls=private-fixture\n"]:
+            with self.subTest(replacement=replacement):
+                self.instrumentation = original.replace("INSTRUMENTATION_RESULT: query_calls=3\n", replacement)
+                with self.assertRaises(RuntimeError):
+                    self.run_probe()
+                self.assertFalse(self.evidence()["passed"])
+                self.assertTrue(self.evidence()["testPackageRemoved"])
+                self.assertNotIn("private-fixture", json.dumps(self.evidence()))
+
+    def test_impossible_duration_and_query_count_relationships_are_rejected(self):
+        original = self.instrumentation
+        for key, value in [("query_calls", 4), ("query_total_ns", 9), ("query_total_ns", 31),
+                           ("iteration_total_ns", 4), ("iteration_total_ns", 6),
+                           ("cancel_before_calls", 1), ("cancel_after_scanned", 1),
+                           ("discarded_snapshots", 0), ("cancel_during_scanned", 0)]:
+            with self.subTest(key=key, value=value):
+                self.instrumentation = original.replace(
+                    f"INSTRUMENTATION_RESULT: {key}={self.measurements[key]}\n",
+                    f"INSTRUMENTATION_RESULT: {key}={value}\n")
+                with self.assertRaises(RuntimeError):
+                    self.run_probe()
+                self.assertFalse(self.evidence()["passed"])
+                self.assertTrue(self.evidence()["testPackageRemoved"])
+
+    def test_unrecognized_fields_are_never_retained(self):
+        self.instrumentation += "INSTRUMENTATION_RESULT: unknown_field=private-fixture\n"
+        self.assertEqual(self.run_probe(), 0)
+        self.assertNotIn("private-fixture", json.dumps(self.evidence()))
 
 
 if __name__ == "__main__":

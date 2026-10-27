@@ -15,6 +15,35 @@ APP = "com.attentionstats.debug"
 TEST = APP + ".test"
 RUNNER = TEST + "/com.attentionstats.qualification.AnalyticsInstrumentation"
 SUCCESS = "PASS: self-package usage probe; 2 synthetic activities resumed/paused;"
+MEASUREMENT_LIMITS = {
+    "query_calls": (3, 64), "query_total_ns": (0, 90_000_000_000),
+    "query_max_ns": (0, 90_000_000_000), "iteration_total_ns": (0, 90_000_000_000),
+    "iteration_max_ns": (0, 90_000_000_000), "completed_queries": (1, 62),
+    "events_scanned_max": (4, 1_000), "cancel_before_calls": (0, 0),
+    "cancel_after_scanned": (0, 0), "cancel_during_scanned": (1, 1_000),
+    "cancelled_batches": (3, 3), "discarded_snapshots": (1, 1),
+}
+
+
+def parse_measurements(output: str) -> dict[str, int]:
+    """Accept only complete, unique aggregate counters; never persist raw phone output."""
+    values = {}
+    for key, (minimum, maximum) in MEASUREMENT_LIMITS.items():
+        prefix = f"INSTRUMENTATION_RESULT: {key}="
+        matches = [line[len(prefix):] for line in output.splitlines() if line.startswith(prefix)]
+        if len(matches) != 1 or not re.fullmatch(r"[0-9]{1,12}", matches[0]):
+            raise RuntimeError("Missing or malformed probe measurements; no result accepted")
+        value = int(matches[0])
+        if not minimum <= value <= maximum:
+            raise RuntimeError("Probe measurements outside test bounds; no result accepted")
+        values[key] = value
+    if values["query_calls"] != values["completed_queries"] + 2:
+        raise RuntimeError("Inconsistent probe query counts; no result accepted")
+    for phase, count in [("query", values["query_calls"]),
+                         ("iteration", values["completed_queries"])]:
+        if not values[f"{phase}_max_ns"] <= values[f"{phase}_total_ns"] <= values[f"{phase}_max_ns"] * count:
+            raise RuntimeError("Inconsistent probe durations; no result accepted")
+    return values
 
 
 def main() -> int:
@@ -73,10 +102,9 @@ def main() -> int:
         output = device("shell", "am", "instrument", "-w", "-r", "-e", "qualification", "usage-self", RUNNER)
         # adb exit zero can still describe a failing instrumentation run.
         lines = output.splitlines()
-        evidence["passed"] = SUCCESS in output and "INSTRUMENTATION_CODE: -1" in lines
-        if not evidence["passed"]:
+        if SUCCESS not in output or "INSTRUMENTATION_CODE: -1" not in lines:
             # Only fixed diagnostic keys/values, never raw output, names or event timestamps.
-            stage = re.search(r"^INSTRUMENTATION_RESULT: probe_stage=(preflight|fixtures|query|missing_transitions)$",
+            stage = re.search(r"^INSTRUMENTATION_RESULT: probe_stage=(preflight|fixtures|query|cancellation|missing_transitions)$",
                               output, re.M)
             counts = {key: int(match[1]) for key in ["fixture_resumed", "fixture_paused"]
                       if (match := re.search(rf"^INSTRUMENTATION_RESULT: {key}=([0-2])$", output, re.M))}
@@ -91,7 +119,11 @@ def main() -> int:
                                "; fixture counts=" + json.dumps(counts) +
                                "; processCrashed=" + str(evidence["processCrashed"]) +
                                "; runnerMissing=" + str(evidence["runnerMissing"]))
+        evidence["measurements"] = parse_measurements(output)
+        evidence["passed"] = True
         print("PASS: physical-phone self-package probe; two synthetic activity lifecycle pairs")
+        print("Aggregate query/iteration measurements and three cancellation boundaries: " +
+              json.dumps(evidence["measurements"], sort_keys=True))
     finally:
         try:
             if installed_test:
