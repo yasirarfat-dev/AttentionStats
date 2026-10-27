@@ -41,6 +41,7 @@ AS-045 now adds an installed experimental native five-tab/20-route shell. AS-043
 | Observation | [TRACKING-SPEC.md](TRACKING-SPEC.md) | Sessions, opens, screen/keyguard, notifications, coverage/time |
 | Source qualification | [COLLECTION-FEASIBILITY.md](COLLECTION-FEASIBILITY.md) | Dated public API/lifecycle research, candidate execution paths and staged AS-003 protocol |
 | Surfaces | [SOCIAL-MEDIA-SPEC.md](SOCIAL-MEDIA-SPEC.md) | App versus surface detection, exposures, safe optional metadata |
+| App adapters | [SOCIAL-ADAPTERS.md](SOCIAL-ADAPTERS.md) | Per-app isolation, shared domains, new-source admission and bounded Home-feed diagnostics |
 | In-context awareness | [LIVE-OVERLAY-SPEC.md](LIVE-OVERLAY-SPEC.md) | Optional visit/day counters, native snapshots, renderer safety and permission boundaries |
 | Interpretation | [BEHAVIOR-INTELLIGENCE.md](BEHAVIOR-INTELLIGENCE.md) | Categories, patterns, predictions, optional topics and confidence |
 | Protection | [PROTECTION-SPEC.md](PROTECTION-SPEC.md) | Limits, focus, schedules, conflicts, overrides and safe enforcement |

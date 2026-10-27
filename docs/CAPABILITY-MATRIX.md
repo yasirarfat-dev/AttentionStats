@@ -7,6 +7,8 @@
 
 ## Interpretation
 
+ADR-041 isolates the current Instagram adapter from Android acquisition/lifecycle and shared counting/storage/UI, with enforced package boundaries and broader social-app scope including Reddit. The preview's two-source catalog/bridge remains narrow. A revised optional geometry diagnostic supports further Home-feed qualification, without enabling feed counts or admitting another platform/metric. C-06/C-07/C-33 remain experimental; see [adapter guide](SOCIAL-ADAPTERS.md).
+
 AS-043 integrates experimental native encrypted storage, source/privacy controls, metadata-only adapter infrastructure and an optional HUD into the main React Native Android preview. ADR-034 adds a version-pinned Instagram viewer-page candidate and separate layout/ad/unclassified categories, gated by updated disclosure consent; Facebook counting remains unavailable. This is a narrow implementation slice, not admission of complete C-06/C-07/C-23/C-24/C-30/C-32 or the stricter short-video metric. No working two-app counter or full-MVP status follows from a build, synthetic storage check or navigation screenshot. See [current integrated priority](STATE.md#active-priority-installed-reels-counter).
 
 M = MVP, E = expansion, C = continuous evolution. Planned = specified; experimental = requires a feasibility prototype; blocked = cannot advance until the named gate clears; implemented = code and acceptance evidence exist. No row is currently implemented. No end-to-end row below has admitted device qualification. The scaffold has separate bootstrap/navigation phone/emulator checks; these do not qualify collection, storage, protection or the full C-23/C-30 capability. Registry/policy research does not change runtime status.

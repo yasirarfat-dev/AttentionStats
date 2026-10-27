@@ -15,6 +15,10 @@ import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import com.attentionstats.MainActivity
+import com.attentionstats.detectors.DetectorRegistry
+import com.attentionstats.detectors.SurfaceEvidence
+import com.attentionstats.detectors.SurfaceObservation
+import com.attentionstats.detectors.accessibility.StructuralSnapshotReader
 import org.attentionstats.reels.CounterSignal
 import org.attentionstats.reels.ReelApp
 import org.attentionstats.reels.Surface
@@ -69,24 +73,24 @@ class ReelsAccessibilityService : AccessibilityService() {
         if (event == null) return
         val app = ReelApp.byPackage(event.packageName?.toString() ?: "") ?: return
         if (!coordinator.allowed(app)) return
-        val definition = DetectorRegistry.definition(app, coordinator.installedVersion(app))
-        if (definition == null && !coordinator.calibrationEnabled) return
+        val detector = DetectorRegistry.detector(app, coordinator.installedVersion(app))
+        if (detector == null && !coordinator.calibrationEnabled) return
         if (event.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
             val source = event.source
             try {
-                val id = resourceId(app, source?.viewIdResourceName)
+                val id = StructuralSnapshotReader.resourceId(app, source?.viewIdResourceName)
                 val sample = JSONObject().put("source", id ?: "").put("from", event.fromIndex)
-                    .put("sourceClass", className(source))
+                    .put("sourceClass", StructuralSnapshotReader.className(source))
                     .put("to", event.toIndex).put("items", event.itemCount)
                     .put("scrollY", event.scrollY).put("maxScrollY", event.maxScrollY)
                     .put("deltaY", if (Build.VERSION.SDK_INT >= 28) event.scrollDeltaY else 0)
-                synchronized(samples) {
+                if (coordinator.calibrationEnabled) synchronized(samples) {
                     samples.getOrPut(app) { ArrayDeque() }.apply {
                         if (size == 16) removeFirst()
                         addLast(sample)
                     }
                 }
-                if (definition != null && id in definition.scrollSourceIds && event.fromIndex >= 0 &&
+                if (detector != null && id in detector.definition.scrollSourceIds && event.fromIndex >= 0 &&
                     event.fromIndex == event.toIndex) pages[app] = event.fromIndex.toLong()
             } finally { recycleCompat(source) }
         }
@@ -140,24 +144,20 @@ class ReelsAccessibilityService : AccessibilityService() {
             if (app == null || !coordinator.allowed(app)) { outside(now); return }
             if (currentApp != null && currentApp != app) outside(now)
             currentApp = app
-            val definition = DetectorRegistry.definition(app, coordinator.installedVersion(app))
-            if (definition == null && !coordinator.calibrationEnabled) { outside(now); return }
-            val shape = inspect(app, root, definition)
+            val detector = DetectorRegistry.detector(app, coordinator.installedVersion(app))
+            if (detector == null && !coordinator.calibrationEnabled) { outside(now); return }
+            val shape = StructuralSnapshotReader.inspect(app, root, detector, coordinator.calibrationEnabled)
             if (coordinator.calibrationEnabled) coordinator.recordStructure(app,
                 JSONObject().put("version", coordinator.installedVersion(app)).put("nodes", shape.nodes)
                     .put("bounded", shape.bounded).put("editable", shape.editable)
                     .put("ids", JSONArray(shape.ids.toList())).put("positions", shape.positions)
                     .put("controls", shape.controls)
+                    .put("geometryRevision", 1).put("viewport", shape.viewport).put("anchors", shape.anchors)
                     .put("classes", JSONArray(shape.classes.toList()))
                     .put("scrolls", JSONArray(synchronized(samples) { samples[app]?.toList() ?: emptyList<JSONObject>() })), capturedEpoch)
-            val surface = when {
-                shape.editable || definition?.excludedIds?.any { it in shape.ids } == true -> Surface.EXCLUDED
-                definition == null || !shape.bounded -> Surface.UNKNOWN
-                definition.requiredIds.all { it in shape.ids } -> Surface.REELS
-                definition.scrollSourceIds.any { it in shape.ids } -> Surface.REELS // Known viewer, page still settling.
-                else -> Surface.OUTSIDE
-            }
-            val page = if (definition?.requiredIds?.all { it in shape.ids } == true) shape.centerPage ?: pages[app] else null
+            val observation = detector?.detect(SurfaceEvidence(shape.ids, shape.bounded, shape.editable,
+                shape.centerPage ?: pages[app])) ?: SurfaceObservation(Surface.UNKNOWN)
+            val surface = observation.surface
             val current = rootInActiveWindow
             val sameWindow = try { current != null && current.packageName?.toString() == app.packageName && current.windowId == root.windowId }
                 finally { recycleCompat(current) }
@@ -166,8 +166,8 @@ class ReelsAccessibilityService : AccessibilityService() {
             }
             displayEligible = surface == Surface.REELS
             if (surface != Surface.REELS) removeHud()
-            coordinator.observe(app, CounterSignal(SystemClock.elapsedRealtime(), surface, page, root.windowId,
-                DetectorRegistry.category(app, shape.ids)), capturedEpoch)
+            coordinator.observe(app, CounterSignal(SystemClock.elapsedRealtime(), surface, observation.page, root.windowId,
+                observation.category), capturedEpoch)
             if (surface == Surface.REELS || coordinator.calibrationEnabled) schedule(500)
         } finally { recycleCompat(root) }
     }
@@ -179,72 +179,6 @@ class ReelsAccessibilityService : AccessibilityService() {
         currentApp = null
         pages.clear()
     }
-
-    private data class Shape(val ids: Set<String>, val nodes: Int, val bounded: Boolean,
-        val editable: Boolean, val positions: JSONArray, val controls: JSONArray,
-        val centerPage: Long?, val classes: Set<String>)
-
-    private fun inspect(app: ReelApp, root: AccessibilityNodeInfo, definition: DetectorDefinition?): Shape {
-        val ids = linkedSetOf<String>()
-        val classes = linkedSetOf<String>()
-        val positions = JSONArray()
-        val controls = JSONArray()
-        var nodes = 0
-        var editable = false
-        var centerPage: Long? = null
-        var truncated = false
-        val screen = Rect().also { root.getBoundsInScreen(it) }
-        data class Pending(val node: AccessibilityNodeInfo, val owner: String?, val owned: Boolean)
-        val queue = ArrayDeque<Pending>()
-        queue.add(Pending(root, null, false))
-        try {
-            while (queue.isNotEmpty() && nodes < 192) {
-                val pending = queue.removeFirst()
-                val node = pending.node
-                try {
-                    nodes++
-                    if (node.packageName?.toString() != app.packageName || !node.isVisibleToUser) continue
-                    // Do not read even structural descendants of editable/password fields.
-                    if (node.isEditable || node.isPassword) { editable = true; continue }
-                    if (classes.size < 24) className(node).takeIf { it.isNotEmpty() }?.let { classes.add(it) }
-                    val id = resourceId(app, node.viewIdResourceName)
-                    if (id != null && ids.size < 96) ids.add(id)
-                    if (id != null && node.isClickable && controls.length() < 32) {
-                        val bounds = Rect().also { node.getBoundsInScreen(it) }
-                        controls.put(JSONObject().put("id", id).put("class", className(node))
-                            .put("left", bounds.left).put("top", bounds.top)
-                            .put("right", bounds.right).put("bottom", bounds.bottom))
-                    }
-                    val owner = if (id != null && (id in (definition?.scrollSourceIds ?: emptySet()) || node.isScrollable)) id else pending.owner
-                    val item = node.collectionItemInfo
-                    if (item != null && positions.length() < 12) {
-                        val bounds = Rect().also { node.getBoundsInScreen(it) }
-                        val centered = bounds.contains(screen.centerX(), screen.centerY())
-                        positions.put(JSONObject().put("id", id ?: "").put("owner", owner ?: "")
-                            .put("row", item.rowIndex).put("column", item.columnIndex).put("centered", centered))
-                        if (centered && owner in (definition?.scrollSourceIds ?: emptySet()) && item.rowIndex >= 0)
-                            centerPage = item.rowIndex.toLong()
-                    }
-                    val remaining = 192 - nodes - queue.size
-                    if (node.childCount > remaining) truncated = true
-                    for (index in 0 until minOf(node.childCount, remaining)) {
-                        node.getChild(index)?.let { queue.add(Pending(it, owner, true)) }
-                    }
-                } finally { if (pending.owned) recycleCompat(node) }
-            }
-            return Shape(ids, nodes, queue.isEmpty() && !truncated, editable, positions, controls, centerPage, classes)
-        } finally { queue.forEach { if (it.owned) recycleCompat(it.node) } }
-    }
-
-    private fun resourceId(app: ReelApp, value: String?): String? {
-        val prefix = app.packageName + ":id/"
-        if (value == null || !value.startsWith(prefix)) return null
-        val name = value.removePrefix(prefix)
-        return name.takeIf { Regex("[a-zA-Z0-9_]{1,80}").matches(it) }
-    }
-
-    private fun className(node: AccessibilityNodeInfo?): String = node?.className?.toString()
-        ?.takeIf { Regex("[A-Za-z0-9_.$]{1,120}").matches(it) } ?: ""
 
     private fun renderHud() {
         val state = coordinator.liveOverlay

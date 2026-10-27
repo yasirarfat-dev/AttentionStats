@@ -1,9 +1,9 @@
 {
   "reviewedDate": "2026-10-28",
-  "recordedAtUtc": "2026-10-27T20:46:41.509438+00:00",
-  "task": "AS-043/AS-045",
+  "recordedAtUtc": "2026-10-27T21:09:30.174357+00:00",
+  "task": "AS-041/AS-043/AS-045",
   "status": "experimental",
-  "scope": "Installed experimental five-tab native shell, 20 own-window routes, category-count preview and compact draggable overlay. Target accuracy and full-product capability admission remain open.",
+  "scope": "Installed native shell/category counter with isolated Instagram adapter and bounded optional Home-feed geometry qualification. Home counting and additional app support remain unqualified.",
   "nativeStableResolutions": [
     {
       "coordinate": "androidx.room3:room3-runtime",
@@ -120,7 +120,11 @@
     },
     {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt",
-      "sha256Lf": "d976af3f64b03b07ad80409b8a14a2a4b4adb794db6588f17eca259479cf8be9"
+      "sha256Lf": "0e58dd6763a4ea0ea08460f7f333c4b687db3a1d3c1b038165017b224da80dbb"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/attentionstats/qualification/DetectorProbe.kt",
+      "sha256Lf": "cdcab2c2f043bc5b59e98db4f05d833a37ff737b08077ae6d7409f0272588433"
     },
     {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/ReelsStorageProbe.kt",
@@ -147,20 +151,32 @@
       "sha256Lf": "794410d5b47e75a6910b7366584774a664395d812ab9928089ab0a9fe48d8c23"
     },
     {
+      "path": "android/app/src/main/java/com/attentionstats/detectors/DetectorRegistry.kt",
+      "sha256Lf": "856cd18e563b75043e95e835c2df0215d9c29d708b26bbd34ac9328e81bfe580"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/detectors/SurfaceDetector.kt",
+      "sha256Lf": "744cf1318dc3d10403518ca9c105d98ebfece19b8e8030158ad6d95b1fd5449e"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/detectors/accessibility/StructuralSnapshotReader.kt",
+      "sha256Lf": "1d045f11503dbfbfa733ef8e6e823820bf06c394cc7f02bd843157f6f51235c3"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/detectors/social/instagram/InstagramDetector.kt",
+      "sha256Lf": "0a03e0d79297bf392554f7d9ed3a92c54e8654d1ff1f62ea1adf2be8777fb137"
+    },
+    {
       "path": "android/app/src/main/java/com/attentionstats/reels/CounterHudView.kt",
       "sha256Lf": "fada98c86493bf3dc2aee97fb2eff873cbef4ce1452afd8cf7ca6b9e344efc9b"
     },
     {
-      "path": "android/app/src/main/java/com/attentionstats/reels/DetectorRegistry.kt",
-      "sha256Lf": "c6c2d8b7a96601393de19c11e7b9be6b93277832e8bee5219548ce0c377c3db5"
-    },
-    {
       "path": "android/app/src/main/java/com/attentionstats/reels/ReelsAccessibilityService.kt",
-      "sha256Lf": "d7f177bda727a6a557c0be20c1218f7c5a2807cd803bfe9078594e9d984d0558"
+      "sha256Lf": "0a7b29a26d3c69e44e08a2b689a10474075411fe0cc80ca4dc0114d7843c8a2d"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/reels/ReelsCoordinator.kt",
-      "sha256Lf": "5419757bf49d4f162d5f16fcd4c617c3cb2fe9e7e4a17f0fb96dc8935d1c3951"
+      "sha256Lf": "01d1a6d554c1930245ea81b945c6272aa379e88494f7dd533b864727adf1d707"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/reels/ScrollingCountView.kt",
@@ -296,7 +312,7 @@
     },
     {
       "path": "src/features/reels/screens/ReelsScreen.tsx",
-      "sha256Lf": "9343cd82d85950db0e77048d8588604f799f25d54e0770bee4f4215586d207c5"
+      "sha256Lf": "5767855d1bb04a7db59b92e71bd5406066ac9510b63a087df12de2394714218c"
     },
     {
       "path": "src/features/settings/index.ts",
@@ -372,25 +388,29 @@
     },
     {
       "path": "tools/check_architecture.py",
-      "sha256Lf": "88561695c15636a38c8ceaa77b471521afeebf2a1f6eae255af84d8e95762143"
+      "sha256Lf": "58354863ca96ccc2eeb3921abe8035f842e125fca319153cf81ba0a8f8ac9704"
     },
     {
       "path": "tools/reels_phone.py",
-      "sha256Lf": "a1499095a7e3bd7be0347c9baca7122bcdd824ec8ecb6e69301873eb00dca452"
+      "sha256Lf": "2b8876d896dcb7c63ee5dbb9016a64e9ea5a166d130a90a63824d72050a1031b"
+    },
+    {
+      "path": "tools/tests/test_architecture.py",
+      "sha256Lf": "7133ba4fc39cec1f604f7f3a27d800cdd1ea25316e45193c6e5f6d79930d6deb"
     },
     {
       "path": "tools/tests/test_reels_phone.py",
-      "sha256Lf": "fdb9a67dbd8153d916e101c6a444d0186b4e0ed02ed90e0ce3dd13387854a13d"
+      "sha256Lf": "f05229bf7149f8e0434937fde093c8a95d91db01f428cbdf9db6e1d3d30ddd67"
     }
   ],
   "sourceHashNormalization": "UTF-8 tracked text normalized to LF; excludes generated build/cache/binary/phone captures.",
   "installedPreview": {
-    "sha256": "317855696c4b92a31f693aa9865ea9ae9530c450687ed2c1c100edbc901bb005",
-    "size": 82635073
+    "sha256": "92c94855854a2621b68d6fa9b9d0a98834ffd3092d13122459c5e77272b6efa6",
+    "size": 82635307
   },
   "bundledJavaScript": {
     "name": "assets/index.android.bundle",
-    "sha256": "836d9d5512fcf810b4efdff4a68fe658637293941a0cdf6d6bfa065016a12797"
+    "sha256": "aab4d7dc17af28faac3eaabc61a3d4845c844edde645f9e4203e0d43de05881c"
   },
   "phoneChecks": {
     "physical": true,
@@ -399,21 +419,22 @@
     "storage": {
       "aggregates": {
         "storage_checks": 47,
+        "detector_checks": 34,
         "key_rejections": 3,
         "sentinel_files": 3,
         "fixture_removed": 1
       },
       "reducerArtChecks": 38,
       "previewArtifact": {
-        "sha256": "317855696c4b92a31f693aa9865ea9ae9530c450687ed2c1c100edbc901bb005",
-        "size": 82635073
+        "sha256": "92c94855854a2621b68d6fa9b9d0a98834ffd3092d13122459c5e77272b6efa6",
+        "size": 82635307
       },
       "testArtifact": {
-        "sha256": "1b4cedcedef0d229a3f0f10ee7bd18bed29007da35945da8b908903c5ff1220c",
-        "size": 158229
+        "sha256": "2af9cfa9221caa7a4336f7900720f86f7f900a41392811b42497690f7350cd48",
+        "size": 160634
       },
       "testPackageRemoved": true,
-      "scope": "Isolated synthetic encrypted store, grouped visit/day category totals, and v1-to-v2 migration; fixture/key cleanup. Never live history."
+      "scope": "34 artificial detector/acquisition checks plus isolated encrypted store/grouped totals/migration/key cleanup; 38 reducer ART checks. Never live history or target content."
     },
     "dashboard": {
       "aggregates": {
@@ -421,12 +442,12 @@
         "shell_routes": 20
       },
       "previewArtifact": {
-        "sha256": "317855696c4b92a31f693aa9865ea9ae9530c450687ed2c1c100edbc901bb005",
-        "size": 82635073
+        "sha256": "92c94855854a2621b68d6fa9b9d0a98834ffd3092d13122459c5e77272b6efa6",
+        "size": 82635307
       },
       "testArtifact": {
-        "sha256": "1b4cedcedef0d229a3f0f10ee7bd18bed29007da35945da8b908903c5ff1220c",
-        "size": 158229
+        "sha256": "2af9cfa9221caa7a4336f7900720f86f7f900a41392811b42497690f7350cd48",
+        "size": 160634
       },
       "testPackageRemoved": true,
       "scope": "121 own-window assertions, all five tabs and 20 distinct native routes, period selection, detail/back navigation and actual-native counter fixture including retained old/new pages and opposing full-height motion in both directions. No target window capture or automated consent/grant."
@@ -436,7 +457,7 @@
   "localChecks": {
     "reducerJvmChecks": 38,
     "jestCases": 25,
-    "hostOwnershipAndSanitizerCases": 10,
+    "hostOwnershipAndSanitizerCases": 13,
     "textContrastPairs": 22,
     "minimumTextContrast": 5.03,
     "typecheck": true,
@@ -446,7 +467,8 @@
     "previewLintWarnings": 17,
     "mobileTypeScriptFiles": 41,
     "documentation": true,
-    "mobileDependencyAudit": true
+    "mobileDependencyAudit": true,
+    "adapterBoundaryCases": 3
   },
   "packaging": {
     "arm64Only": true,
@@ -635,7 +657,11 @@
   },
   "liveSmoke": {
     "scope": "User-confirmed Instagram viewer; three controlled foreground-checked swipes and persisted category counts visible after reopen. No isolated count-delta baseline or ad/category ground truth; not accuracy acceptance.",
-    "targetContentCaptured": false
+    "targetContentCaptured": false,
+    "previewArtifact": {
+      "sha256": "317855696c4b92a31f693aa9865ea9ae9530c450687ed2c1c100edbc901bb005",
+      "size": 82635073
+    }
   },
   "counterButton": {
     "compact": "session and calendar icons with estimated counts; no visible words",
@@ -661,7 +687,11 @@
     "threeSwipePersistenceSamples": 24,
     "sameOverlayInAllSamples": true,
     "dashboardActionRemovesOverlay": true,
-    "scope": "Own overlay window identity/bounds only; no target content or count-accuracy claim."
+    "scope": "Own overlay window identity/bounds only; no target content or count-accuracy claim.",
+    "previewArtifact": {
+      "sha256": "92c94855854a2621b68d6fa9b9d0a98834ffd3092d13122459c5e77272b6efa6",
+      "size": 82635307
+    }
   },
   "repeatSemantics": {
     "total": "Settled exposures including confirmed return transitions; same-page loops/redraws do not increment.",
@@ -690,6 +720,46 @@
     "independentTemporaryConsent": true,
     "postIdentityQualified": false,
     "counterEnabled": false,
-    "finding": "Feed media/carousel/recommendation layouts and unscoped scroll ranges. Ordinary visible item rows lack qualified post ownership/identity; no generic-scroll count admitted."
+    "finding": "Feed media/carousel/recommendation layouts and unscoped scroll ranges. Ordinary visible item rows lack qualified post ownership/identity; no generic-scroll count admitted.",
+    "previewArtifact": {
+      "sha256": "317855696c4b92a31f693aa9865ea9ae9530c450687ed2c1c100edbc901bb005",
+      "size": 82635073
+    }
+  },
+  "adapterBoundary": {
+    "contract": "Structural values in; normalized surface/page/category out. No Android nodes, storage, UI or actions in platform predicates.",
+    "composition": "Registry selects exact app/version; selectors isolated in detectors/social/instagram; generic acquisition in detectors/accessibility.",
+    "enforcement": "Static sibling/import/qualified/infrastructure checks and physical artificial-node tests.",
+    "sourceCatalogLimit": "ReelApp/source initialization/package queries/bridge contract 2 still enumerate only Instagram/Facebook; further sources need additive catalog/contract/consent/UI work.",
+    "additionalAppsSupported": false
+  },
+  "homeGeometryQualification": {
+    "previewArtifact": {
+      "sha256": "92c94855854a2621b68d6fa9b9d0a98834ffd3092d13122459c5e77272b6efa6",
+      "size": 82635307
+    },
+    "geometryRevision": 1,
+    "independentFreshTemporaryConsent": true,
+    "settledSamples": 7,
+    "slowMotionSamples": 12,
+    "controlledForwardSwipes": 5,
+    "controlledReturnSwipes": 3,
+    "allBounded": true,
+    "counterEnabled": false,
+    "identityQualified": false,
+    "finding": "Media geometry is exposed, but sampled media/ancestors have no changing item row or absolute scroll offset. Relative event deltas are not yet reliably associated with matching geometry; no generic-swipe counter admitted.",
+    "scope": "Bounded metadata-only trial. No target text/descriptions/images, personal totals, raw diagnostics or durable content identities in public evidence."
+  },
+  "previousLiveOverlayTrial": {
+    "expandCollapse": true,
+    "dragAndReturnWithin4Pixels": true,
+    "threeSwipePersistenceSamples": 24,
+    "sameOverlayInAllSamples": true,
+    "dashboardActionRemovesOverlay": true,
+    "scope": "Own overlay window identity/bounds only; no target content or count-accuracy claim.",
+    "previewArtifact": {
+      "sha256": "317855696c4b92a31f693aa9865ea9ae9530c450687ed2c1c100edbc901bb005",
+      "size": 82635073
+    }
   }
 }

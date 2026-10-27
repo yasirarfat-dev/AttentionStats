@@ -16,6 +16,7 @@ import com.attentionstats.storage.HistoryStore
 import com.attentionstats.storage.SourceConfiguration
 import com.attentionstats.storage.SurfaceEpisode
 import com.attentionstats.BuildConfig
+import com.attentionstats.detectors.DetectorRegistry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -160,7 +161,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
         for (app in ReelApp.entries) {
             val config = checkNotNull(configuration[app.sourceId])
             val version = installedVersion(app)
-            val supported = DetectorRegistry.definition(app, version) != null
+            val supported = DetectorRegistry.detector(app, version) != null
             val visit = visits[app]
             val counts = JSONObject()
             for (category in PageCategory.entries) counts.put(category.key,
@@ -317,7 +318,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
             history.database.withWriteTransaction {
                 if (capturedEpoch != epoch.get() || !allowed(app) || !grantEnabled()) throw ObservationInvalidated()
                 val dao = history.database.data()
-                val detectorRevision = checkNotNull(DetectorRegistry.definition(app, installedVersion(app))).revision
+                val detectorRevision = checkNotNull(DetectorRegistry.detector(app, installedVersion(app))).definition.revision
                 if (visits[app] == null) dao.insertEpisode(SurfaceEpisode(id, app.key, "reels_viewer", now,
                     null, detectorRevision, "estimate"))
                 dao.insertExposure(Exposure(UUID.randomUUID().toString(), id, app.key, now,

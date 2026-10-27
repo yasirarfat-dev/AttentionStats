@@ -152,6 +152,44 @@ class ReelsPhoneSafety(unittest.TestCase):
             data["targets"]["instagram"][key] = value
             with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(data).encode())
 
+    def geometry(self):
+        value = self.structure()
+        target = value["targets"]["instagram"]
+        target["nodes"] = 4
+        layout = {"id": "synthetic_media", "slot": 3, "row": -1, "column": -1,
+                  "left": 0, "top": 100, "right": 400, "bottom": 600}
+        target.update(geometryRevision=1, viewport={"left": 0, "top": 0, "right": 400, "bottom": 800},
+                      anchors=[dict(layout, ancestors=[dict(layout, id="synthetic_container", slot=1)])])
+        return value
+
+    def test_bounded_geometry_and_scan_local_association_accepted(self):
+        value = self.geometry()
+        self.assertEqual(probe.validate_structure(json.dumps(value).encode()), value)
+
+    def test_geometry_rejects_content_extra_fields_and_invalid_revision(self):
+        for change in [lambda t: t.update(geometryRevision=2),
+                       lambda t: t.update(geometryRevision=True),
+                       lambda t: t["anchors"][0].update(text="PRIVATE_SYNTHETIC_MARKER"),
+                       lambda t: t["anchors"][0]["ancestors"][0].update(url="synthetic"),
+                       lambda t: t["viewport"].update(image="synthetic"),
+                       lambda t: t.pop("geometryRevision")]:
+            value = self.geometry()
+            change(value["targets"]["instagram"])
+            with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(value).encode())
+
+    def test_geometry_rejects_invalid_bounds_slots_and_depth(self):
+        for change in [lambda t: t.update(anchors=t["anchors"] * 17),
+                       lambda t: t["anchors"][0].update(slot=4),
+                       lambda t: t["anchors"][0].update(slot=True),
+                       lambda t: t["anchors"][0].update(left=401),
+                       lambda t: t["anchors"][0].update(bottom=float("inf")),
+                       lambda t: t["anchors"][0].update(ancestors=t["anchors"][0]["ancestors"] * 4),
+                       lambda t: t["anchors"][0]["ancestors"][0].update(slot=3),
+                       lambda t: t.update(anchors=t["anchors"] * 2)]:
+            value = self.geometry()
+            change(value["targets"]["instagram"])
+            with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(value).encode())
+
 
 if __name__ == "__main__":
     unittest.main()

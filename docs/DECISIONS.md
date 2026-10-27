@@ -53,6 +53,8 @@ No decision here establishes a permanent Android application ID, signing identit
 
 | ADR-040 / 2026-10-28 | Scroll the old and new count as vertical pages, rather than wiggling the replacement | User clarifies that the earlier 3dp settle did not match the requested vertical swipe effect. Supersedes that motion detail of ADR-038: two opaque number pages move in opposite directions through a clipped viewport over 240ms. Forward settled transitions move old up/new in from below; a lower confirmed pager position reverses direction. The window/icons stay fixed, counts update only after commit, and no intermediate counts or finger-progress prediction is invented. Initial/hidden/system-disabled-motion updates are immediate. Transient position-direction hints do not persist content identity or change exposure semantics; no fade/bounce/loop |
 
+| ADR-041 / 2026-10-28 | Keep social support additive through per-app adapters and shared domains | User confirms relevant social apps including YouTube/TikTok/Reddit are in scope. Instagram selectors move into an isolated app-owned adapter; bounded Android acquisition, lifecycle, counting, consent, encrypted storage and UI have separate owners. Architecture checks reject cross-platform/infrastructure coupling. The two-source preview catalog/bridge remains narrow and must evolve deliberately before additional sources ship. Mixed-feed qualification continues through a newly disclosed, independently selected bounded geometry diagnostic; no Home counting or additional app support is implied |
+
 ## Feasibility register
 
 | Gate | Status / owner task | Question / required evidence to clear | Safe interim behavior |

@@ -7,6 +7,8 @@
 
 ## Current repository
 
+ADR-041 adds actual `android/app/src/main/java/com/attentionstats/detectors/` packages: `SurfaceDetector.kt`/`DetectorRegistry.kt`, `social/instagram/InstagramDetector.kt` and `accessibility/StructuralSnapshotReader.kt`. The former `reels/DetectorRegistry.kt` is removed. Other platform packages remain absent until substantive work begins. See [adapter guide](SOCIAL-ADAPTERS.md); the Reels enum/source catalog/bridge still enumerate two preview candidates.
+
 AS-045 adds feature-owned `today`, `history`, `patterns`, `protection`, `settings`, `sources`, `storage`, `backup`, `appearance` and `convenience` folders with public index APIs. Reels owns its reusable live summary component. `src/app/App.tsx` composes typed native stacks and five bottom tabs; shared `Panel`/`NavIcon` own presentation only. No new feature store or cross-feature private imports. Android `CounterHudView` renders committed projections and delegates source mutations to the existing coordinator.
 
 AS-043 adds `src/features/reels` (public screen API), the bounded `src/platform/specs/NativeReels` adapter/decoder, pure `native/reels-core` wired through `android/reels-core`, and app-owned Android `reels`/`storage` infrastructure. Both Room v1 and v2 schemas and native application dependency locks are retained under `android/app`. `src/preview/AndroidManifest.xml` removes debug-library network/overlay permissions. App androidTest probes and `tools/reels_phone.py` qualify unique synthetic storage and our own React Native window; private APKs/images/diagnostics remain ignored. These are main-app additions; the isolated AS-006 projects stay excluded from the product.
@@ -101,7 +103,7 @@ ios/                       future native adapter and platform project
 tests/                     cross-layer scenarios and synthetic history fixtures
 ```
 
-Actual mobile source currently contains `src/app/App.tsx`, onboarding/privacy feature public APIs and screens, `src/ui` primitives/tokens and `src/platform` bootstrap adapter/spec/tests. Other feature folders above remain proposed and were not generated empty. `android/app` uses `com.attentionstats`, `.debug` application suffix and the read-only `bridge` package; `android/analytics-core` references existing pure source/test directories. Android XML excludes backup/transfer, debug alone declares Internet for Metro, and release stays unsigned. `ios/` is generated and untested. [ADR-029](DECISIONS.md) records development identity and adaptations; store identity/signing and native acceptance remain gates. No collectors/storage/detector modules exist yet.
+AS-045 mobile source now contains the five-tab composition and feature-owned screens listed above, shared UI and typed platform adapters. The expansion tree is a placement guide; absent features are not generated as empty folders. `android/app` uses `com.attentionstats`, `.debug` application suffix and the read-only `bridge` package; `android/analytics-core` references existing pure source/test directories. Android XML excludes backup/transfer, debug alone declares Internet for Metro, and release stays unsigned. `ios/` is generated and untested. [ADR-029](DECISIONS.md) records development identity and adaptations; store identity/signing and native acceptance remain gates. The AS-043 storage/coordinator/service and ADR-041 detector packages now exist inside the app module; further standalone infrastructure modules remain planned.
 
 ## Placement rules
 

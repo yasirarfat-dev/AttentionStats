@@ -15,6 +15,8 @@ Configure service package filters to minimize callbacks, then recheck the packag
 
 ## Candidate adapter registry
 
+ADR-041 confirms relevant social apps, including Reddit alongside the existing four candidates, are in the broader scope. Instagram now owns its selectors under `detectors/social/instagram`; generic acquisition and lifecycle no longer own platform predicates. See [adapter ownership and admission](SOCIAL-ADAPTERS.md) for implemented boundaries and the still-narrow source catalog/bridge. Additional services/surfaces require independent evidence and consent.
+
 ADR-034 adds separate preview categories: `reel` (recognized single-video layout), `photo` (recognized photo/carousel page), `post` (normal-feed post, unavailable initially), `ad` (positively recognized ad layout) and `unclassified`. Recognized ads never add to video/photo categories. One carousel page is one exposure, not its hidden image count. Layout labels do not establish universal ad exclusion; show that limitation and unclassified counts. Total viewer pages includes all categories and must say so. This is separate from the stricter M-016 short-video metric; do not present these provisional layout counts as fully qualified M-016 or normal-feed history.
 
 The experimental Instagram definition is pinned to the consented installed version and requires its viewer/media/action-container IDs plus a centered pager row. Feed/profile/comment trials and 110 controlled swipe attempts establish candidate structure; no content was read. Recognized image ads and photo-carousel layouts have distinct markers. Video-ad fidelity and broader lifecycle/accuracy remain open. Facebook exposes useful settled indices in the manually confirmed viewer, but generic classes also occur elsewhere; no Facebook definition is admitted yet. Disclosure revision 2 is required before new recording.
@@ -27,6 +29,7 @@ AS-043 maps the canonical installed candidates `com.instagram.android` and `com.
 | youtube.short_video | YouTube Shorts | long-form player, home previews, search, comments, live | Experimental; no selectors or package mapping validated |
 | instagram.short_video | Instagram Reels | feed, stories, direct messages, profiles, comments | Experimental; no selectors or package mapping validated |
 | tiktok.short_video | TikTok short-video feed | inbox, profile, search, live, photo carousel, ads | Experimental; regional/build variants unverified |
+| reddit.feed | Reddit feed/media surfaces | text/image/video posts, discussion, chat, ads, embedded players | Planned candidate; no package mapping, selectors or metrics qualified |
 
 These target services are observation targets, not reference implementations. Do not invent their current view IDs, assume package variants are equivalent, or hardcode a display name as a package identifier. Resolve package/version from an explicit supported registry during the spike. Lite, regional, web, work-profile and cloned variants need independent qualification. Until then app-level summaries can work while surface status remains unsupported/experimental.
 

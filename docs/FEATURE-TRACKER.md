@@ -15,6 +15,8 @@ ADR-024 confirms mobile-only delivery. AS-033 is complete and retained as a non-
 
 ADR-025–ADR-027 authorize the expanded diary and domain-owned architecture. AS-035 is a completed standalone native calculation slice before AS-004; it does not implement any end-to-end mobile capability or clear source/store/toolchain gates. Root mobile `src/features` and native domain module boundaries must be enforced as the app arrives; all implemented mobile routes/behaviors need X-10 live verification. Richer metrics have independent AS-036–AS-041 dependencies.
 
+ADR-041 continues AS-041/AS-043 with isolated app adapters and shared acquisition/counting/storage/UI, including future YouTube/TikTok/Reddit scope. Installed API36 evidence adds 34 artificial detector/acquisition checks plus existing 47 store/121 UI assertions; 16 host boundary/privacy cases pass. A freshly user-selected geometry trial adds seven settled and 12 slow-motion snapshots: media geometry is exposed, but per-post continuity remains unqualified; no Home counter or additional app support is admitted. The two-source catalog/bridge remains an expansion task. See [adapter guide](SOCIAL-ADAPTERS.md).
+
 | Task | Priority / stage | Status | Capability coverage | Prerequisites / concrete completion evidence |
 |---|---|---|---|---|
 | AS-001 Documentation foundation and public repository | P0 / foundation | implemented | All specifications, no runtime capability | 50 reviewed files, passing local checks and GitHub CI; public push/Apache-2.0 verified; [evidence](IMPLEMENTATION_LOG/2026-10-27.md) |

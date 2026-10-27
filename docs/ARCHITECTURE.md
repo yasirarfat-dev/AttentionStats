@@ -27,6 +27,8 @@ ADR-031 selects [Room 3/SQLCipherDriver and Tink archive prototypes](CRYPTO-ARCH
 
 ## Domain-oriented modular design
 
+ADR-041 and [Adding social-app support](SOCIAL-ADAPTERS.md) make the incremental boundary concrete: `detectors/social/<service>` owns versioned predicates, `detectors/accessibility` owns Android acquisition, and the registry composes implementations. Adapters receive structural values and cannot access Android nodes, storage, UI or actions. Counting, consent, writes and presentation remain shared. The preview's two-source enum/bridge/catalog still need additive evolution for other apps; YouTube/TikTok/Reddit support is not implemented.
+
 Use a **modular monolith on the device** with domain-driven boundaries. The enterprise-style requirement means clear ownership, stable interfaces, testability and disciplined change; it does not require a backend, microservices or a distributed system. Domain language and invariants live with their domain. Do not scatter business rules through screens or create one global services/utils folder.
 
 Mobile TypeScript application source belongs in root `src/`: `app/` is the composition/navigation root; `features/` contains onboarding, usage, social, interactions, network, diary, insights, protection, privacy, backup and settings; `platform/` owns typed native adapters; `ui/` owns source-agnostic design primitives; `shared/` contains only small genuinely shared types/formatting. Each substantial feature exposes a deliberate `index.ts` public API and gains `screens/`, `components/`, `application/`, `domain/`, `data/`, `hooks/` and tests when needed. Do not generate empty folders or wrappers merely to imitate a template. Feature screens cannot import another feature's private internals.

@@ -393,7 +393,7 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
                   ? calibration(false)
                   : Alert.alert(
                       'Allow a temporary structure check?',
-                      'Only for enabled apps, for up to ten minutes. This creates a local metadata-only diagnostic file for this development test. No messages or screen content are included.',
+                      'Only for enabled apps, for up to ten minutes. This development check saves static layout IDs, numeric positions, media/control bounds and up to three ancestor layouts in a local diagnostic file. No text, descriptions, messages or images are read. Stopping removes the file.',
                       [
                         { text: 'Cancel', style: 'cancel' },
                         {

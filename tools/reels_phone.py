@@ -41,7 +41,9 @@ def validate_structure(raw: bytes) -> dict:
         targets = value["targets"]
         expect(type(targets) is dict and 1 <= len(targets) <= 2 and set(targets) <= {"instagram", "facebook"})
         for target in targets.values():
-            expect(type(target) is dict and set(target) == {"version", "nodes", "bounded", "editable", "ids", "positions", "controls", "classes", "scrolls"})
+            base_keys = {"version", "nodes", "bounded", "editable", "ids", "positions", "controls", "classes", "scrolls"}
+            geometry_keys = {"geometryRevision", "viewport", "anchors"}
+            expect(type(target) is dict and set(target) in [base_keys, base_keys | geometry_keys])
             expect(isinstance(target["version"], str) and re.fullmatch(r"[A-Za-z0-9._-]{1,100}", target["version"]) is not None)
             expect(type(target["nodes"]) is int and 0 <= target["nodes"] <= 192)
             expect(type(target["bounded"]) is bool and type(target["editable"]) is bool)
@@ -61,6 +63,32 @@ def validate_structure(raw: bytes) -> dict:
                 expect(type(row) is dict and set(row) == {"source", "sourceClass", "from", "to", "items", "scrollY", "maxScrollY", "deltaY"})
                 expect(ident(row["source"]) and ident(row["sourceClass"], 120))
                 expect(all(number(row[key]) for key in ["from", "to", "items", "scrollY", "maxScrollY", "deltaY"]))
+            if "geometryRevision" in target:
+                expect(type(target["geometryRevision"]) is int and target["geometryRevision"] == 1)
+                bounds_keys = {"left", "top", "right", "bottom"}
+                def bounds(row):
+                    expect(all(number(row[key]) for key in bounds_keys))
+                    expect(row["left"] <= row["right"] and row["top"] <= row["bottom"])
+                expect(type(target["viewport"]) is dict and set(target["viewport"]) == bounds_keys)
+                bounds(target["viewport"])
+                expect(type(target["anchors"]) is list and len(target["anchors"]) <= 16)
+                layout_keys = bounds_keys | {"slot", "id", "row", "column"}
+                def layout(row, extra):
+                    expect(type(row) is dict and set(row) == layout_keys | extra)
+                    expect(type(row["slot"]) is int and 0 <= row["slot"] < target["nodes"])
+                    expect(ident(row["id"]) and number(row["row"]) and number(row["column"]))
+                    bounds(row)
+                slots = set()
+                for anchor in target["anchors"]:
+                    layout(anchor, {"ancestors"})
+                    expect(anchor["slot"] not in slots)
+                    slots.add(anchor["slot"])
+                    expect(type(anchor["ancestors"]) is list and len(anchor["ancestors"]) <= 3)
+                    previous = anchor["slot"]
+                    for ancestor in anchor["ancestors"]:
+                        layout(ancestor, set())
+                        expect(ancestor["slot"] < previous)
+                        previous = ancestor["slot"]
         return value
     except (ValueError, TypeError, KeyError, UnicodeError, RecursionError):
         raise RuntimeError("Diagnostic does not match the bounded metadata-only schema; raw content withheld") from None
@@ -102,7 +130,7 @@ def parse_result(output: str, mode: str) -> dict[str, int]:
         kind = re.search(r"^INSTRUMENTATION_RESULT: stream=FAIL: ([A-Za-z]{1,80})\s*$", output, re.M)
         raise RuntimeError("Reels " + mode + " probe failed; stage=" + (stage[1] if stage else "unreported") +
                            "; type=" + (kind[1] if kind else "unreported") + "; raw phone output withheld")
-    limits = {"storage_checks": (30, 200), "key_rejections": (3, 3), "sentinel_files": (1, 3),
+    limits = {"storage_checks": (30, 200), "detector_checks": (30, 100), "key_rejections": (3, 3), "sentinel_files": (1, 3),
               "fixture_removed": (1, 1)} if mode == "storage" else {"ui_checks": (20, 160), "shell_routes": (20, 20)}
     values = {}
     for key, (low, high) in limits.items():

@@ -17,6 +17,36 @@ DEPENDENCIES = {
 }
 
 
+def check_detectors(source: Path, errors: list[str]) -> int:
+    """Adapters consume values; only the registry knows individual platform implementations."""
+    paths = sorted(source.rglob("*.kt"))
+    for path in paths:
+        label = path.relative_to(source).as_posix()
+        value = path.read_text(encoding="utf-8")
+        parts = path.relative_to(source).parts
+        expected = "com.attentionstats.detectors" + ("." + ".".join(parts[:-1]) if len(parts) > 1 else "")
+        if not re.search(rf"^package {re.escape(expected)}$", value, re.M):
+            errors.append(f"{label}: detector package must match its path")
+        platform = parts[1] if len(parts) > 2 and parts[0] == "social" else None
+        # Inspect qualified references too; an adapter may not reach across a sibling boundary.
+        for target in re.findall(r"\bcom\.attentionstats\.detectors\.social\.([\w*]+)", value):
+            if target != platform and path.name != "DetectorRegistry.kt":
+                errors.append(f"{label}: only registry may reference another social adapter")
+        if platform is not None:
+            for imported in re.findall(r"^import ([\w.*]+)$", value, re.M):
+                if not imported.startswith(("kotlin.", "org.attentionstats.reels.", "com.attentionstats.detectors.")):
+                    errors.append(f"{label}: infrastructure dependency in social adapter")
+            if re.search(r"\b(?:android\.|androidx\.|org\.json\.|java\.|com\.facebook\.|com\.attentionstats\.(?:reels|storage|bridge)\.)", value):
+                errors.append(f"{label}: social adapter must consume immutable evidence only")
+            if re.search(r"\bcom\.attentionstats\.detectors\.(?:accessibility\b|DetectorRegistry\b)", value):
+                errors.append(f"{label}: adapter cannot depend on acquisition or registry composition")
+        if re.search(r"\bcom\.attentionstats\.(?:reels\.|storage\.|bridge\.|MainActivity\b)", value):
+            errors.append(f"{label}: detectors cannot depend on counting infrastructure or app UI")
+        if parts[0] != "accessibility" and re.search(r"\b(?:android\.|androidx\.|org\.json\.)", value):
+            errors.append(f"{label}: Android acquisition belongs in detectors/accessibility")
+    return len(paths)
+
+
 def check_mobile_source(source: Path, errors: list[str]) -> int:
     paths = sorted([*source.rglob("*.ts"), *source.rglob("*.tsx")])
     for path in paths:
@@ -116,7 +146,11 @@ def main() -> int:
         if re.search(r"\b(?:android\.|androidx\.|java\.(?:io|net|sql|security)\.|com\.facebook\.react\.|kotlinx\.|javax\.crypto\.)", source_text):
             errors.append(f"{path.relative_to(ROOT)}: side effect dependency in Reels domain")
     counter_source = ROOT / "android/app/src/main/java/com/attentionstats/reels"
-    for path in counter_source.rglob("*.kt"):
+    detector_source = ROOT / "android/app/src/main/java/com/attentionstats/detectors"
+    detector_count = check_detectors(detector_source, errors)
+    if not detector_count:
+        errors.append("No isolated social detector adapters found")
+    for path in [*counter_source.rglob("*.kt"), *detector_source.rglob("*.kt")]:
         source_text = path.read_text(encoding="utf-8")
         if re.search(r"\b(?:node|root|source|event)\s*\??\.\s*(?:text|contentDescription|beforeText|getText|getContentDescription|getBeforeText)\b", source_text):
             errors.append(f"{path.relative_to(ROOT)}: counter must not read captured text/descriptions")
@@ -142,6 +176,7 @@ def main() -> int:
     print(f"PASS: {len(paths)} Kotlin source files; package paths and declared domain import boundaries")
     print(f"PASS: {len(prototype_paths)} collection prototype source files; pure boundary and no app dependency")
     print(f"PASS: {len(reels_paths)} Reels domain source files; pure boundary and passive metadata-only source guard")
+    print(f"PASS: {detector_count} detector files; registry, per-platform adapters and Android acquisition boundaries")
     print("PASS: standalone storage/archive qualification excluded from product settings/dependencies/source")
     print(f"PASS: {mobile_count} mobile TypeScript files; relative imports, feature public APIs and layer direction")
     print("Static checks do not establish native compilation, UI or runtime source support.")

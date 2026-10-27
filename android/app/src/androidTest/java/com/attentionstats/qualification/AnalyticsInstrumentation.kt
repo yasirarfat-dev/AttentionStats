@@ -34,6 +34,7 @@ class AnalyticsInstrumentation : Instrumentation() {
                 }
                 "reels-storage" -> {
                     verifyReels()
+                    result.putInt("detector_checks", DetectorProbe.verify())
                     reels = ReelsStorageProbe(this)
                     reels.verify()
                     result.putInt("storage_checks", reels.checks)

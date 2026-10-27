@@ -14,6 +14,8 @@ The detailed [digital diary](docs/ANALYTICS-SPEC.md) and [64-metric catalog](doc
 
 Development uses **pnpm** and resolves new direct packages with `package@latest`. [Dependency evidence](docs/DEPENDENCIES.md) separates historical candidates, installed scaffold packages and isolated Kotlin tools. The [native analytics core](native/analytics-core/README.md) passed 37 synthetic calculation checks on a host JVM and connected Android ART; this does not verify collection or UI.
 
+The broader social-app scope includes Instagram, Facebook, YouTube, TikTok, Reddit and other relevant apps, introduced as independently verified subsets. [The adapter guide](docs/SOCIAL-ADAPTERS.md) explains app-specific detectors, shared domains and remaining source-catalog work. Additional app support is not implemented yet.
+
 Application source uses domain-owned root `src/features`, a typed bootstrap adapter and a separate pure Kotlin analytics module. Full native contracts and infrastructure modules remain planned. See [architecture](docs/ARCHITECTURE.md#domain-oriented-modular-design) and [file structure](docs/FILE-STRUCTURE.md). Every implemented screen/behavior must be verified on a live authorized debug phone or dedicated emulator.
 
 A completed [interaction study](design/prototype/README.md) is retained solely as a non-shipping mobile-design reference. Its browser preview is not the product or a web implementation track. Mobile screens will use React Native components and native platform adapters. [Human factors](docs/HUMAN-FACTORS.md) governs the experience; next development follows the native tasks in the [tracker](docs/FEATURE-TRACKER.md).
