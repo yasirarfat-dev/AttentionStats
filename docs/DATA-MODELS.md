@@ -49,6 +49,8 @@ UTC epoch milliseconds are the transport/storage instant. Store event-time zone 
 
 `timeBasis` distinguishes `source_wall` from `observed_monotonic`; `timeProvenance` records how each optional zone/boot/elapsed field was established, including reconstructed uncertainty. Query receipt clocks and current zone are query metadata, not historical event-time facts. Do not infer old elapsed endpoints from current clock offset. Durable observation identity/occurrence ordinals need the shifted-window and multiplicity qualification in [Collection feasibility](COLLECTION-FEASIBILITY.md#observation-provenance); query-local indexes are insufficient. No Room schema or migration exists yet.
 
+The AS-003 pure prototype's `Signature`/`Occurrence` and `Batch` are experimental values scoped by its injected source/installation/generation snapshot, not SourceEvent entities or a persisted schema. Local ordinals preserve maximum observed group multiplicity; overlap correspondence remains unresolved and decreases are flagged. A batch contains query completion/position without metric coverage. Do not copy these values into the durable contract as proven identity or complete coverage.
+
 Every measure identifies source observation IDs or a bounded query provenance descriptor, reducer/model version, configuration revision, coverage interval, and kind (observed/estimate/classification/prediction). A confidence class is not a measured probability. Unknown metrics use null and reasons. Synthetic example: `com.example.social` has a covered episode from 2026-10-20T10:00:00Z to 10:10:00Z, 600000 ms; an unknown period afterward has no inferred duration.
 
 ## Relationships and deletion

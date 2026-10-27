@@ -17,6 +17,7 @@ def main() -> int:
         "assembleDebug", "assembleRelease", "bundleRelease", "lintDebug",
         ":app:assembleDebug", ":app:assembleRelease", ":app:assembleDebugAndroidTest", ":app:lintDebug",
         "testDebugUnitTest", ":analytics-core:verifyAnalytics", "generateCodegenArtifactsFromSchema",
+        ":collection-prototype:verifyReconciliation",
         "help", "dependencies",
     ])
     local_sdk = ROOT / ".cache/as-004/sdk"

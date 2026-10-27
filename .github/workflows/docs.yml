@@ -41,6 +41,8 @@ jobs:
           python-version: '3.x'
       - name: Compile and verify synthetic Kotlin analytics
         run: python tools/test_analytics.py
+      - name: Compile and verify synthetic collection reconciliation
+        run: python tools/test_reconciliation.py --offline
 
   mobile-tooling:
     runs-on: ubuntu-latest

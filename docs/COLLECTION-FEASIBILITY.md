@@ -7,7 +7,7 @@
 
 ## Review outcome
 
-AS-003 now has a test-only self-package harness: two internal debug activities generate transitions, and instrumentation queries only this run's own-package events with wall/elapsed range checks, an iteration cap and a deadline. ARM64 debug/test compilation and app lint pass. The connected physical API-36 ARM64 phone passed both activities' resumed/paused checks, bounded iteration and copied snapshots, with instrumentation result `-1`. Synthetic reconciliation fixtures remain future work. Broader source access, durable ingestion and continuous operation are separate stages. AS-009/AS-010 still own the authoritative store and consent flow; the harness creates no alternate history store or production tracking.
+AS-003 now has a test-only self-package harness: two internal debug activities generate transitions, and instrumentation queries only this run's own-package events with wall/elapsed range checks, an iteration cap and a deadline. ARM64 debug/test compilation and app lint pass. The connected physical API-36 ARM64 phone passed both activities' resumed/paused checks, bounded iteration and copied snapshots, with instrumentation result `-1`. A separate [synthetic JVM prototype](../native/collection-prototype/README.md) now exercises bounded reconciliation and replay uncertainty through injected source/commit ports. Broader source access, durable ingestion and continuous operation are separate stages. AS-009/AS-010 still own the authoritative store and consent flow; neither harness creates an alternate history store or production tracking.
 
 The candidate historical path is native reconciliation during user-visible operation plus deferred background work, subject to consent and device qualification. This is a hypothesis to measure. It cannot establish the timely foreground/surface signals needed for protection or the live HUD. No foreground-service type has been selected or approved for this product.
 
@@ -36,6 +36,8 @@ The normalized model therefore needs nullable event-time provenance and a time b
 
 Replay matching is an unresolved qualification item. A random ID per query duplicates events; a hash of timestamp/type/package/class alone can collapse legitimate equal-millisecond occurrences. A query-local index is not stable when a window moves. Prototype multiplicity-aware matching for equal timestamp/signature groups, preserving all observable occurrences and marking unresolved correspondence as uncertain. Test shifted windows, reordered equal-time groups, late arrivals and partial groups at resource boundaries before choosing a durable key/ordinal strategy. No exact identity claim is justified for indistinguishable events.
 
+The synthetic prototype keeps the maximum multiplicity observed per timestamp/package/class/transition group across fully exhausted slices, appending local ordinals only when a group grows. It preserves earlier facts and flags decreases/missing groups. Overlap correspondence remains unresolved: equal-count replacements are indistinguishable, so this policy establishes neither exact identity nor a count lower bound. Equal-time groups carry no invented causal ordering. It is not the chosen durable SourceEvent key strategy.
+
 ## Candidate execution paths
 
 | Path | Allowed purpose in the prototype | Evidence still needed |
@@ -52,6 +54,8 @@ If deferred reconciliation cannot preserve sufficiently useful history, keep tha
 
 This protocol specifies future prototype behavior; no steps below have been executed against a source.
 
+The separate JVM experiment executes a subset with fakes: one pinned, wholly permitted slice; bounded raw iteration/scalar sizes and cooperative clock/deadline/cancellation checks; mutable-buffer snapshots; fixed null/denial/failure outcomes; all-or-nothing staged additions; and a simulated atomic scope/history-revision comparison. It rejects slices spanning pause/deletion fences or an unprocessed cursor gap. The caller must split permitted ranges; adaptive planning, Android response allocation/latency, Room transactions, historical gap assessment and real consent wiring remain future work. A completed query advances query position/health only; it supplies no metric coverage field or measured zero. Default budgets are test inputs, not qualified product limits.
+
 1. Snapshot installation/store generation, source consent revision, grant state, first-unlock readiness, filters, pause/deletion fences and cursor. Disabled/unknown gates admit no query. Pin the query end; never chase a moving `now` indefinitely.
 2. Intersect the proposed overlap with permitted effective-time ranges. Split around pauses/deletions. Filter again before normalization and before commit. Do not query an earlier range merely to find a missing session start.
 3. Run small time slices off the main thread with an explicit elapsed-time deadline, iteration cap and cancellation checks. Tune values with synthetic density fixtures and device measurements; no cadence or resource budget is accepted yet. Reducing application iteration cannot guarantee bounded Binder/service allocation, so measure that separately.
@@ -62,12 +66,12 @@ This protocol specifies future prototype behavior; no steps below have been exec
 
 ## Staged device qualification
 
-Only the self-package row has passed on the physical API-36 ARM64 phone; every other runtime row is **not run**. T/L IDs refer to [Testing](TESTING.md). Record exact build/API/OEM/locale, synthetic fixture, expected/actual result, query bounds, durations/counts and limitations. Public evidence contains aggregate outcomes only. Host tests of runner safety do not execute these source scenarios.
+Only the self-package row has passed on the physical API-36 ARM64 phone. The synthetic row has host JVM evidence only; every other runtime row is **not run**. T/L IDs refer to [Testing](TESTING.md). Record exact build/API/OEM/locale, synthetic fixture, expected/actual result, query bounds, durations/counts and limitations. Public evidence contains aggregate outcomes only. Host tests execute no Android source scenarios.
 
 | Stage | Experiment | Acceptance boundary |
 |---|---|---|
 | Self-package public API — passed 2026-10-27 | Physical API-36 ARM64 phone; two test-only activities create events during an explicit run; query only this package from run start. No source grant changes or prior history | Both resumed/paused pairs and bounded iterator/copied snapshots pass; instrumentation `-1`. Confirms public self-query mechanics only; no C-01–C-04 admission or cross-app accuracy claim |
-| Synthetic adapter/reconciliation | Inject null/empty/denied/truncated responses, repeated/shifted overlap, equal-time multiplicity, wall jumps and withdrawal during query | T-01/T-16, L-01/L-03/L-08 subsets; host results remain synthetic |
+| Synthetic adapter/reconciliation — JVM subset passed 2026-10-27 | Inject null/empty/denied/truncated responses, repeated/shifted overlap, equal-time multiplicity, late arrivals, wall jumps, cancellation and withdrawal/revision races | T-01/T-16, L-01/L-03/L-08 subsets only; 49 synthetic checks including 100 equal-time permutations. No Android adapter, durable coordinator or complete scenario admission |
 | Consented fixture packages | Only after an in-app prototype disclosure and user-controlled Usage Access/consent: transition among allowlisted synthetic activities/packages | T-01–T-04; independently check activity versus package opens, screen/keyguard, multi-window and missing edges |
 | Process separation | Stop JS, remove the task, then terminate only the task app's process in separate scoped runs | L-05; measure actual permitted continuation/reconciliation, not uptime assertions |
 | Force-stop and return | With the user's scoped test authorization, force-stop only the task app, then reopen it | L-05/L-06; distinguish absence of execution from bounded later reconstruction; no erased coverage gap |
@@ -77,7 +81,7 @@ Only the self-package row has passed on the physical API-36 ARM64 phone; every o
 
 Current authorization covers task-app debug checks without unrelated phone/settings/history changes. Grant changes, reboot and battery/restriction trials require their own agreed scope before execution. No emulator is a fallback. Ask for a connected USB-debugging phone when a runtime step needs one and it is unavailable.
 
-AS-003 can advance per evidence stage while remaining experimental. F-02/F-09 stay open until source fidelity, durable consent-fenced recovery, viable permitted execution and device limitations are documented. The next action is synthetic reconciliation cases; repeat the passing self-package run only for changed code or unresolved concerns. The harness stays test-only and leaves the production bootstrap `not_implemented`.
+AS-003 can advance per evidence stage while remaining experimental. F-02/F-09 stay open until source fidelity, durable consent-fenced recovery, viable permitted execution and device limitations are documented. Next, qualify permitted-range slice planning and bounded retry decisions with synthetic density/fence fixtures before connecting any broader source. Repeat the passing self-package run only for changed code or unresolved concerns. The harness stays test-only and leaves the production bootstrap `not_implemented`.
 
 ## Harness reproduction and current evidence
 
@@ -92,3 +96,5 @@ python tools/test_collection_probe.py
 The last command requires an existing `adb` on PATH (or `--adb <path>`) and exactly one authorized physical phone on API 28+. It rejects an existing test package, installs the task debug/test APKs, runs only `qualification=usage-self` with structured `am instrument -w -r` results, requires the success marker and instrumentation result `-1`, and removes its temporary test package in a finally block. The debug app remains installed. It makes no grant/settings changes and uses no emulator, reset, reboot or app force-stop. Sanitized aggregate evidence and APK hashes go only to ignored `.cache/as-003/self-query-result.json`; no serial or event trace is written.
 
 Twelve host safety tests pass using synthetic APK bytes and mocked adb responses: absent/unauthorized/emulator-only/ambiguous targets, a virtual target posing as physical, unsupported API, preservation of an existing test package, success/result validation, refusal of pretty output without its final code, sanitized failure diagnostics, cleanup after failure/timeout and cleanup failure reporting. These do not test Android source fidelity. The fixtures live in `src/debug` and are unexported; the query runner lives in `src/androidTest`. Release source contains neither fixture activities nor the self-query probe. No new dependency was added.
+
+The independent reconciliation experiment uses the same reviewed Kotlin compiler with `python tools/test_reconciliation.py --offline`, or the shared-source Gradle task `python tools/android_build.py :collection-prototype:verifyReconciliation --arch arm64-v8a`. Both run JVM fixtures only. Its pure module is absent from app dependencies, and the architecture check enforces that boundary. CI runs the suite without device access; local/remote results are recorded separately in State/log. No dependency was added for this experiment.

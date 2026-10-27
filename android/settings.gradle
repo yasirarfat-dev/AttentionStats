@@ -9,4 +9,5 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
 rootProject.name = 'AttentionStats'
 include ':app'
 include ':analytics-core'
+include ':collection-prototype'
 includeBuild('../node_modules/@react-native/gradle-plugin')

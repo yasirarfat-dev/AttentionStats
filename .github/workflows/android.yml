@@ -6,6 +6,7 @@ on:
       - 'android/**'
       - 'src/**'
       - 'native/analytics-core/**'
+      - 'native/collection-prototype/**'
       - 'patches/**'
       - 'tools/android_build.py'
       - 'tools/check_mobile.py'
@@ -22,6 +23,7 @@ on:
       - 'android/**'
       - 'src/**'
       - 'native/analytics-core/**'
+      - 'native/collection-prototype/**'
       - 'patches/**'
       - 'tools/android_build.py'
       - 'tools/check_mobile.py'
@@ -73,7 +75,7 @@ jobs:
       - name: Compile ARM64 debug, unsigned release and synthetic test APK
         run: >-
           python tools/android_build.py --sdk "$ANDROID_HOME" --arch arm64-v8a
-          :app:assembleDebug :app:assembleRelease :app:assembleDebugAndroidTest :analytics-core:verifyAnalytics :app:lintDebug
+          :app:assembleDebug :app:assembleRelease :app:assembleDebugAndroidTest :analytics-core:verifyAnalytics :collection-prototype:verifyReconciliation :app:lintDebug
       - name: Verify resolved native backport artifact
         run: python tools/check_mobile.py --native-cache
       # No signing secrets, device access or binary upload. Compilation is not runtime acceptance.

@@ -84,12 +84,33 @@ def main() -> int:
         # Reject qualified bypasses as well as imports for common infrastructure.
         if re.search(r"\b(?:android\.|androidx\.|java\.(?:io|net|sql)\.|com\.facebook\.|kotlinx\.coroutines\.)", text):
             errors.append(f"{label}: platform/storage/side-effect dependency in pure calculations")
+    prototype = ROOT / "native/collection-prototype/src/main/kotlin"
+    prototype_paths = sorted(prototype.rglob("*.kt"))
+    if not prototype_paths:
+        errors.append("No collection prototype source found")
+    for path in prototype_paths:
+        text = path.read_text(encoding="utf-8")
+        label = path.relative_to(ROOT).as_posix()
+        expected = ".".join(path.parent.relative_to(prototype).parts)
+        declaration = re.search(r"^package ([\w.]+)$", text, re.M)
+        if declaration is None or declaration[1] != expected or expected != "org.attentionstats.collection.reconciliation":
+            errors.append(f"{label}: invalid collection prototype package boundary")
+        for imported in re.findall(r"^import ([\w.*]+)$", text, re.M):
+            if not imported.startswith(("kotlin.", "org.attentionstats.collection.reconciliation.")):
+                errors.append(f"{label}: non-domain prototype dependency {imported}")
+        if re.search(r"\b(?:android\.|androidx\.|java\.(?:io|net|sql)\.|com\.facebook\.|kotlinx\.coroutines\.)", text):
+            errors.append(f"{label}: platform/storage/side-effect dependency in prototype")
+    # The experimental JVM module is deliberately absent from application dependencies.
+    app_build = (ROOT / "android/app/build.gradle").read_text(encoding="utf-8")
+    if "collection-prototype" in app_build:
+        errors.append("Application must not depend on the collection prototype")
     mobile_count = check_mobile_source(ROOT / "src", errors)
     if errors:
         print("Architecture verification failed:")
         print("\n".join(f"  - {error}" for error in errors))
         return 1
     print(f"PASS: {len(paths)} Kotlin source files; package paths and declared domain import boundaries")
+    print(f"PASS: {len(prototype_paths)} collection prototype source files; pure boundary and no app dependency")
     print(f"PASS: {mobile_count} mobile TypeScript files; relative imports, feature public APIs and layer direction")
     print("Static checks do not establish native compilation, UI or runtime source support.")
     return 0

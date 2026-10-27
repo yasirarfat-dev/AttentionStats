@@ -23,10 +23,11 @@ AttentionStats/
   tools/check_mobile.py    manifest/lock/installed-version, native catalog/notices and patch audit
   tools/android_build.py   task-local SDK/Gradle wrapper runner
   tools/test_collection_probe.py  bounded self-package test on one physical phone
+  tools/test_reconciliation.py  synthetic JVM source/commit experiments, reviewed compiler reuse
   tools/tests/             synthetic phone-runner safety checks
   package.json, pnpm-lock.yaml, pnpm-workspace.yaml
   src/                     experimental mobile composition/features/UI/bootstrap adapter
-  android/                 application and analytics-core Gradle module
+  android/                 application, analytics-core and isolated collection-prototype Gradle modules
     app/src/debug/         unexported synthetic AS-003 activities, excluded from release
     app/src/androidTest/   selectable calculation/self-package instrumentation
   ios/                     generated, untested future platform project
@@ -36,6 +37,9 @@ AttentionStats/
     src/main/kotlin/org/attentionstats/analytics/
       time/ activity/ observation/ network/ summary/
     src/test/kotlin/       synthetic deterministic test program
+  native/collection-prototype/  AS-003 pure experiment, no application dependency
+    src/main/kotlin/org/attentionstats/collection/reconciliation/  slice/replay experiment and ports
+    src/test/kotlin/       synthetic source, in-memory coordinator and failure/race fixtures
   design/prototype/        synthetic browser study, tokens, tests, isolated manifest/lockfile
 ```
 

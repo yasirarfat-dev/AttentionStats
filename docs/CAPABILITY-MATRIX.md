@@ -13,6 +13,8 @@ AS-002's [initial probes](DEPENDENCIES.md#as-002-isolated-compatibility-probes) 
 
 [AS-003 public API review](COLLECTION-FEASIBILITY.md) adds staged source/lifecycle qualification, with no runtime admission. Historical screen/keyguard support starts at API 28; C-03/C-04 must expose unavailable fields on earlier APIs unless an independent live source is qualified. Query freshness alone cannot establish C-01–C-04 coverage or C-23 health. F-02/F-09 remain open.
 
+The separate AS-003 JVM reconciliation experiment tests bounded slices, multiplicity uncertainty and simulated consent/revision races. It is excluded from application dependencies and establishes no C-01–C-04/C-23 runtime support, durable identity or complete coverage. The existing self-package phone result remains source-mechanics evidence only.
+
 Access codes: U = user-granted Android Usage Access; A = separately disclosed and user-enabled Accessibility Service; N = Notification Listener access; P = notification posting permission where required; O = special overlay access if the chosen renderer needs it; S = system document-picker URI grant; D = notification policy access for optional DND; G = future provider authorization, blocked. “Local” means no Android grant beyond normal application storage. See [Permissions](PERMISSIONS.md) for declarations and grant types.
 
 Individual data points, including short-video time/counts, post/story/ad exposure estimates, action evidence, byte statistics and summary tiers, are enumerated in [Metric catalog](METRIC-CATALOG.md). Source/control/limit/scenario definitions there complement these capability families. “Maximum detail” remains a user-selected, disclosed supported subset; [Analytics](ANALYTICS-SPEC.md) owns accounting semantics.
