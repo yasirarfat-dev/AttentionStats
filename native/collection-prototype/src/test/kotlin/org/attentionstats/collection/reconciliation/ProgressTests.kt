@@ -15,8 +15,8 @@ private fun accept(state: RangeProgress, receipt: RangeReceipt) =
 private fun gaps(state: RangeProgress) = (recoverProgress(state, state.scope) as Recovery.Ready).unresolved
 
 /** Single assigned snapshot simulates the facts/receipts/health transaction. No disk or real crash. */
-private data class AtomicFixture(val progress: RangeProgress, val rows: Set<Occurrence> = emptySet(), val healthAtMs: Long? = null)
-private class RangeCoordinator(var saved: AtomicFixture = AtomicFixture(initial())) {
+internal data class AtomicFixture(val progress: RangeProgress, val rows: Set<Occurrence> = emptySet(), val healthAtMs: Long? = null)
+internal class RangeCoordinator(var saved: AtomicFixture = AtomicFixture(initial())) {
     var currentScope = saved.progress.scope
     var beforeWrite: () -> Unit = {}
     var refuseWrite = false
@@ -41,7 +41,8 @@ private class RangeCoordinator(var saved: AtomicFixture = AtomicFixture(initial(
                     work.scope == currentScope && work.requested == saved.progress.requested &&
                     firstGap != null && firstGap.contains(window) && firstGap.startMs == window.startMs
                 return ReadState(work.revision, if (admitted) window.startMs else -1,
-                    saved.rows.filter { window.contains(it.signature.atMs) }.groupingBy { it.signature }.eachCount())
+                    saved.rows.filter { window.contains(it.signature.atMs) && it.signature.packageName in currentScope.packages }
+                        .groupingBy { it.signature }.eachCount())
             }
             override fun compareAndCommit(expectedScope: Scope, expectedRevision: Long, batch: Batch): Boolean {
                 beforeWrite()

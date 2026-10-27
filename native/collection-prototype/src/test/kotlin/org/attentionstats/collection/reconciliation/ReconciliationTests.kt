@@ -424,5 +424,6 @@ fun main() {
     }
     passed += planningChecks()
     passed += progressChecks()
-    println("PASS: $passed synthetic reconciliation/planning/progress checks; no Android source, storage or coverage admission")
+    passed += correctionChecks()
+    println("PASS: $passed synthetic reconciliation/planning/progress/correction checks; no Android source, storage or coverage admission")
 }
