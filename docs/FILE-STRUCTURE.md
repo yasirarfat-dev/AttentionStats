@@ -24,6 +24,8 @@ AttentionStats/
   tools/android_build.py   task-local SDK/Gradle wrapper runner
   tools/test_collection_probe.py  bounded self-package test on one physical phone
   tools/storage_qualification.py  standalone AS-006 build and synthetic phone runner
+  tools/archive_qualification.py  standalone AS-006 envelope build/phone/readback runner
+  tools/archive_reader.mjs independent bounded test oracle, no Tink or product dependency
   tools/test_reconciliation.py  synthetic JVM source/commit experiments, reviewed compiler reuse
   tools/tests/             synthetic phone-runner safety checks
   package.json, pnpm-lock.yaml, pnpm-workspace.yaml
@@ -35,10 +37,12 @@ AttentionStats/
   patches/                 reviewed RNGP compiler compatibility patch
   licenses/, NOTICE        template MIT attribution
   native/analytics-core/   AS-035 pure Kotlin mobile-domain calculation slice
-  native/storage-qualification/  standalone debug-only synthetic Room/SQLCipher APK, excluded from product settings
     src/main/kotlin/org/attentionstats/analytics/
       time/ activity/ observation/ network/ summary/
     src/test/kotlin/       synthetic deterministic test program
+  native/storage-qualification/  standalone debug-only synthetic Room/SQLCipher APK, excluded from product settings
+  native/archive-qualification/  standalone debug-only Tink envelope APK, excluded from product settings
+    vectors/              compact public artificial keys/envelopes, never real credentials
   native/collection-prototype/  AS-003 pure experiment, no application dependency
     src/main/kotlin/org/attentionstats/collection/reconciliation/  slice/replay ports, planner/retry, receipts and correction proposals
     src/test/kotlin/       synthetic coordinators, interval/receipt/correction oracles, density/failure/restart fixtures

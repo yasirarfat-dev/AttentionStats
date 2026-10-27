@@ -17,3 +17,9 @@ Its native cryptography uses LibTomCrypt under its public-domain option;
 see licenses/libtomcrypt.txt.
 The Android binding includes Apache-2.0 Android Open Source Project code;
 SQLite core is in the public domain. These libraries are not product dependencies.
+
+The isolated, development-only archive qualification APK uses Tink Android 1.24.0
+(Google LLC), Apache-2.0; see licenses/tink.txt.
+Its shaded Protocol Buffers runtime uses the BSD-3-Clause license;
+see licenses/protobuf.txt. Upstream Tink v1.24.0 pins protobuf 33.6.
+These libraries are not product dependencies.

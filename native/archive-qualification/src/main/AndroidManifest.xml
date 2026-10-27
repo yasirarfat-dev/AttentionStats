@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false"
+        android:label="Archive qualification"
+        android:supportsRtl="true" />
+    <instrumentation
+        android:name=".ArchiveInstrumentation"
+        android:targetPackage="org.attentionstats.qualification.archive"
+        android:label="Synthetic archive checks" />
+</manifest>

@@ -1,0 +1,484 @@
+{
+  "reviewedDate": "2026-10-27",
+  "recordedAtUtc": "2026-10-27T14:10:27.025405+00:00",
+  "task": "AS-006",
+  "status": "experimental",
+  "scope": "Standalone in-memory synthetic generated-credential primitive/envelope fixture. Excluded from product settings/dependencies/source. No history parser, Keystore, provider, staging or production export/restore. No format freeze or independent security audit.",
+  "nativeStableResolutions": [
+    {
+      "coordinate": "com.google.crypto.tink:tink-android",
+      "version": "1.24.0",
+      "metadataUrl": "https://repo.maven.apache.org/maven2/com/google/crypto/tink/tink-android/maven-metadata.xml",
+      "metadataSha256": "7ae5d3456e19888357e3023a0d5c7f00cd4deeeb00c27e68ef46f832b0ba7bb1",
+      "pomUrl": "https://repo.maven.apache.org/maven2/com/google/crypto/tink/tink-android/1.24.0/tink-android-1.24.0.pom",
+      "pomSha256": "ccaabd3e92984057efbe19ed02db93affbfa2770111a36b82eb9893b72093546",
+      "licenses": [
+        {
+          "name": "Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-gradle-plugin",
+      "version": "2.4.21",
+      "metadataUrl": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/maven-metadata.xml",
+      "metadataSha256": "ba4f1c16c09ff41f45d7c92879ac58b31a5c5f0fe472e60d0b85091ebc2d6d63",
+      "pomUrl": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/2.4.21/kotlin-gradle-plugin-2.4.21.pom",
+      "pomSha256": "21389e11c74edc552b0615bbcb96d2473dced92617eaab596d8d7557918f6e17",
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.android.tools.build:gradle",
+      "version": "9.4.1",
+      "metadataUrl": "https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/maven-metadata.xml",
+      "metadataSha256": "d6a8f3034ac24ebd313f65de8d486a5b1da62a040bef1b08770f9c4b13292d9d",
+      "pomUrl": "https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/9.4.1/gradle-9.4.1.pom",
+      "pomSha256": "ee7d29e7d41cb389dc65b02518ffa8c806c522ca565510694eb8ee8dad7f938a",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ]
+    }
+  ],
+  "toolchain": {
+    "gradle": "9.8.2",
+    "java": "Temurin 17.0.20.1",
+    "kotlin": "2.4.21",
+    "agp": "9.4.1",
+    "buildTools": "37.0.0",
+    "compileSdk": 37,
+    "minSdk": 24,
+    "targetSdk": 37,
+    "node": "26.12.1",
+    "newJsDependencies": 0,
+    "versionForcingOrSuppression": false,
+    "configuration": "Current explicit RegistryConfiguration overloads; only fixture Tink AEAD/streaming registration; no security provider registration."
+  },
+  "runtimeGraph": [
+    {
+      "coordinate": "androidx.annotation:annotation-jvm:1.8.2",
+      "pomUrl": "https://dl.google.com/dl/android/maven2/androidx/annotation/annotation-jvm/1.8.2/annotation-jvm-1.8.2.pom",
+      "pomSha256": "7d3b2860ea36511153a9713559dab60d77f72167fadc9c1c3198c23035fbc480",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "artifacts": [
+        {
+          "name": "annotation-jvm-1.8.2.jar",
+          "size": 56126,
+          "sha256": "9aab326d9492800991854360ac248f493ce7f7c3183519309b78ace9e240f6f6"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.code.findbugs:jsr305:3.0.2",
+      "pomUrl": "https://repo.maven.apache.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.pom",
+      "pomSha256": "19889dbdf1b254b2601a5ee645b8147a974644882297684c798afe5d63d78dfe",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "artifacts": [
+        {
+          "name": "jsr305-3.0.2.jar",
+          "size": 19936,
+          "sha256": "766ad2a0783f2687962c8ad74ceecc38a28b9f72a2d085ee438b7813e928d0c7"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.code.gson:gson:2.13.2",
+      "pomUrl": "https://repo.maven.apache.org/maven2/com/google/code/gson/gson/2.13.2/gson-2.13.2.pom",
+      "pomSha256": "3aa06aa7c0f9af092961a42d09578e4324be146348a0ee6ed47857f7c2677b76",
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "artifacts": [
+        {
+          "name": "gson-2.13.2.jar",
+          "size": 289901,
+          "sha256": "dd0ce1b55a3ed2080cb70f9c655850cda86c206862310009dcb5e5c95265a5e0"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.crypto.tink:tink-android:1.24.0",
+      "pomUrl": "https://repo.maven.apache.org/maven2/com/google/crypto/tink/tink-android/1.24.0/tink-android-1.24.0.pom",
+      "pomSha256": "ccaabd3e92984057efbe19ed02db93affbfa2770111a36b82eb9893b72093546",
+      "licenses": [
+        {
+          "name": "Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "artifacts": [
+        {
+          "name": "tink-android-1.24.0.jar",
+          "size": 3508938,
+          "sha256": "86ff5d879d4ac5e827ae3974c90fce1a25e7c2698538af833ed824efbfe4c06e"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.errorprone:error_prone_annotations:2.41.0",
+      "pomUrl": "https://repo.maven.apache.org/maven2/com/google/errorprone/error_prone_annotations/2.41.0/error_prone_annotations-2.41.0.pom",
+      "pomSha256": "a151df1e2e0b48618d8b06a180748a29b3abb39b1b2396f6a1c879a727488c6e",
+      "licenses": [
+        {
+          "name": "Apache 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "artifacts": [
+        {
+          "name": "error_prone_annotations-2.41.0.jar",
+          "size": 20389,
+          "sha256": "a56e782b5b50811ac204073a355a21d915a2107fce13ec711331ad036f660fcc"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib:2.4.21",
+      "pomUrl": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/2.4.21/kotlin-stdlib-2.4.21.pom",
+      "pomSha256": "b92b23ec9c444b2578b9852447565efc72c24b3ea77b4c3bf4e644f685eeef07",
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "artifacts": [
+        {
+          "name": "kotlin-stdlib-2.4.21.jar",
+          "size": 1853315,
+          "sha256": "bd8250210584cb659847dce9cda660f8e9906e5def7fbebcea93dc6dcb6a88a3"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains:annotations:13.0",
+      "pomUrl": "https://repo.maven.apache.org/maven2/org/jetbrains/annotations/13.0/annotations-13.0.pom",
+      "pomSha256": "965aeb2bedff369819bdde1bf7a0b3b89b8247dd69c88b86375d76163bb8c397",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "artifacts": [
+        {
+          "name": "annotations-13.0.jar",
+          "size": 17536,
+          "sha256": "ace2a10dc8e2d5fd34925ecac03e4988b2c0f851650c94b8cef49ba1bd111478"
+        }
+      ]
+    }
+  ],
+  "tinkArtifactConsistency": {
+    "repositoryDigestUrl": "https://repo.maven.apache.org/maven2/com/google/crypto/tink/tink-android/1.24.0/tink-android-1.24.0.jar.sha256",
+    "sha256": "86ff5d879d4ac5e827ae3974c90fce1a25e7c2698538af833ed824efbfe4c06e",
+    "matchesCachedArtifact": true,
+    "limit": "Repository digest consistency is not independent provenance, complete SBOM or vulnerability review."
+  },
+  "bundledRuntime": {
+    "name": "shaded Protocol Buffers",
+    "observedInTinkJar": true,
+    "declaredUpstreamVersion": "33.6",
+    "sourceUrl": "https://github.com/tink-crypto/tink-java/blob/v1.24.0/MODULE.bazel",
+    "sourceSha256": "25ed4311a012b8bbdd2a5b9d8607b41c6823a6e6dfa31025d21f68f677975be0",
+    "license": "BSD-3-Clause",
+    "limit": "Version comes from tagged upstream build declaration; embedded binary provenance is not independently reconstructed."
+  },
+  "retainedLicenses": [
+    {
+      "path": "licenses/tink.txt",
+      "url": "https://raw.githubusercontent.com/tink-crypto/tink-java/v1.24.0/LICENSE",
+      "size": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "licenses/protobuf.txt",
+      "url": "https://raw.githubusercontent.com/protocolbuffers/protobuf/v33.6/LICENSE",
+      "size": 1732,
+      "sha256": "6e5e117324afd944dcf67f36cf329843bc1a92229a8cd9bb573d7a83130fea7d"
+    }
+  ],
+  "dependencyLocks": [
+    {
+      "path": "native/archive-qualification/gradle.lockfile",
+      "size": 11031,
+      "sha256": "96a3a1d7c8405b513bb5b2ac14ff2579529ae551d4041b9ccf36a9de95c7f06c"
+    },
+    {
+      "path": "native/archive-qualification/settings-gradle.lockfile",
+      "size": 198,
+      "sha256": "e58bb2ed80db9f829601a658d7c33b9802eb7d2191c31e79c28e01f14c225926"
+    }
+  ],
+  "fixtureAndRunnerSources": [
+    {
+      "path": "native/archive-qualification/settings.gradle.kts",
+      "size": 278,
+      "sha256": "b9b44e4c25ae26594ad482b9165f3acc6b0d132dcb15cbab90457f58fd2ec6bc"
+    },
+    {
+      "path": "native/archive-qualification/build.gradle.kts",
+      "size": 1177,
+      "sha256": "b80ff75789209cfa870ce833396f53ff536dcc45fa9bb27bb727e41ac8cce5a5"
+    },
+    {
+      "path": "native/archive-qualification/gradle.properties",
+      "size": 163,
+      "sha256": "4586de8945c00f837d8a1049a2293ac9abdfd3fd1f41302bcb0acf66521cd262"
+    },
+    {
+      "path": "native/archive-qualification/gradle/libs.versions.toml",
+      "size": 302,
+      "sha256": "4e74999934ad6c4d5e22d64e864efa494b5bbc2916c5264b9ab5fb8608cbd0d4"
+    },
+    {
+      "path": "native/archive-qualification/src/main/AndroidManifest.xml",
+      "size": 519,
+      "sha256": "11d01d138bb7ee7a2541963a2dbb3fe83bb0d9c4a77070b0a9bd046ee5acb037"
+    },
+    {
+      "path": "native/archive-qualification/src/main/res/xml/data_extraction_rules.xml",
+      "size": 319,
+      "sha256": "ff0d88626958c813576dd881606c697f34955038af74b28c76edba9625a1f40d"
+    },
+    {
+      "path": "native/archive-qualification/src/main/kotlin/org/attentionstats/qualification/archive/ArchiveInstrumentation.kt",
+      "size": 17914,
+      "sha256": "91bed0d7d47a962fdc9998bd55a8ffcb4fd3dbab70371764da6a9b2d1a0b4eaa"
+    },
+    {
+      "path": "native/archive-qualification/src/main/kotlin/org/attentionstats/qualification/archive/EnvelopeFixture.kt",
+      "size": 11022,
+      "sha256": "e821ff97e73613646c7c48ebf384ce0f39f1aaded706e67288e858d6bafcfe9d"
+    },
+    {
+      "path": "tools/archive_qualification.py",
+      "size": 9203,
+      "sha256": "0e6acc5d959f46ac40ad9df3b922b0f9ff4470ec18d6262c80ac80e3339dd037"
+    },
+    {
+      "path": "tools/archive_reader.mjs",
+      "size": 7444,
+      "sha256": "597ec0f2611a5dbb3586516a1dcf7c915fc4e382d5a526d7e2ac316ba164b9d6"
+    },
+    {
+      "path": "tools/tests/test_archive_qualification.py",
+      "size": 8129,
+      "sha256": "2e75e3deedc7173ec3f8b7f109b94880afc312f286e15bdce97c40be8299c26d"
+    },
+    {
+      "path": "tools/tests/archive_reader.test.mjs",
+      "size": 4443,
+      "sha256": "b06b7ba4e17e86478275c32c663a01a653142fb12bf99fe1598a0f4caadf7069"
+    },
+    {
+      "path": "tools/check_architecture.py",
+      "size": 7051,
+      "sha256": "61232b60d7f1550e8e4cbc035d526a04873dd8a48672d7420808920fe83446d8"
+    }
+  ],
+  "publicVectors": {
+    "file": {
+      "path": "native/archive-qualification/vectors/generated-profile.json",
+      "size": 2730,
+      "sha256": "8aedd6693f761fdb37f4ff28825a06ef2e9dcb8c85da3850f72d0ffcae7eeeaf"
+    },
+    "producer": "Tink Android 1.24.0 on physical API36 ARM64",
+    "scope": "PUBLIC SYNTHETIC TEST KEYS ONLY; NEVER USE FOR REAL DATA",
+    "cases": [
+      {
+        "name": "primitive-0",
+        "plaintextBytes": 0,
+        "plaintextSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "envelopeSha256": "f0addebe7ef794a09560afd5535da05cf28f438793205cf172037548ae4b265b"
+      },
+      {
+        "name": "primitive-1",
+        "plaintextBytes": 1,
+        "plaintextSha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+        "envelopeSha256": "0b1734acb5fd30a71226a882d7264cb511c528906c514bb41cfcc1c31bd39cae"
+      },
+      {
+        "name": "synthetic-records",
+        "plaintextBytes": 127,
+        "plaintextSha256": "76785ce5611def5972e1549594f07dcac275625432f8bf141735690c8c80d9fc",
+        "envelopeSha256": "0294a84bf8dcaf79972172362425c6e676f279b75cd4c4217493ea3604cf2086"
+      }
+    ],
+    "sourceKeystoreRequired": false,
+    "limit": "Public artificial credentials must never protect real data; reader compatibility is scoped to these vectors, not another writer or shipping format."
+  },
+  "build": {
+    "command": "python tools/archive_qualification.py build",
+    "passed": true,
+    "duration": "47s",
+    "tasks": {
+      "total": 45,
+      "executed": 7,
+      "upToDate": 38
+    },
+    "dependencyLocksReused": true,
+    "lint": {
+      "errors": 0,
+      "warnings": [
+        "MissingApplicationIcon: disposable fixture has no launcher activity/icon"
+      ]
+    },
+    "visibleToolingWarnings": [
+      "AGP external Kotlin / legacy DSL and Gradle 10 deprecations",
+      "Task-local SDK lacks platform-tools; existing external adb used without reset"
+    ],
+    "releaseVariantEnabled": false
+  },
+  "artifact": {
+    "path": "native/archive-qualification/build/outputs/apk/debug/archive-qualification-debug.apk",
+    "size": 2344157,
+    "sha256": "d96b753b9fec01086e1c4d66a5dc962da7d734f6cca3493bd78bf99029125c07"
+  },
+  "mergedManifest": {
+    "package": "org.attentionstats.qualification.archive",
+    "permissions": 0,
+    "activities": 0,
+    "services": 0,
+    "receivers": 0,
+    "providers": 0,
+    "allowBackup": false,
+    "fullBackupContent": false,
+    "explicitCloudAndDeviceTransferExclusions": true,
+    "debuggable": true,
+    "minSdk": 24,
+    "targetSdk": 37,
+    "nativeLibraries": [],
+    "inspectedBinaryApkBadging": true
+  },
+  "phone": {
+    "scope": "standalone synthetic archive primitive/envelope fixture only; no history parser, provider or Keystore",
+    "api": 36,
+    "abi": "arm64-v8a",
+    "passed": true,
+    "packageRemoved": true,
+    "apk": {
+      "sha256": "d96b753b9fec01086e1c4d66a5dc962da7d734f6cca3493bd78bf99029125c07",
+      "size": 2344157
+    },
+    "measurements": {
+      "checks": 1759,
+      "rejections": 869,
+      "round_trips": 9,
+      "hkdf_vectors": 3,
+      "cancellations": 6,
+      "largest_plaintext": 3145735,
+      "segments": 4,
+      "golden_cases": 3,
+      "vector_cases": 3
+    },
+    "independentReaderCases": 4
+  },
+  "assertionScope": {
+    "rfcHkdfSha256Cases": [
+      1,
+      2,
+      3
+    ],
+    "roundTripPlaintextBytes": [
+      0,
+      1,
+      1048519,
+      1048520,
+      1048521,
+      2097080,
+      2097081,
+      3145735,
+      "fixture-only logical record bytes"
+    ],
+    "negativeCases": [
+      "Wrong/noncanonical credential",
+      "Every single-byte small-envelope mutation including raw EncryptedKeyset metadata",
+      "Every small-envelope truncation; oversized/unsigned length and ciphertext",
+      "Unavailable profile 2 even with exact draft Argon parameters",
+      "Authenticated unsupported key type/segment parameters/multiple keys",
+      "Authenticated non-RAW prefix and wrong key material with otherwise valid payload",
+      "Selected large segment bytes/tags/boundaries",
+      "Append one byte, 16 bytes, complete archive",
+      "Reorder/duplicate/delete/missing final segment",
+      "Same-envelope/key/AAD independently randomized stream splice",
+      "Plaintext quota and oversized export rejection"
+    ],
+    "cancellation": {
+      "readBoundaries": 4,
+      "writeBoundaries": 2,
+      "libraryCallInterruptibilityClaimed": false
+    },
+    "immutableSnapshotCallerMutationTrial": true,
+    "authenticationPassesBeforeDelivery": 2,
+    "rejectedOrCancelledPlaintextCallbacks": 0,
+    "limits": {
+      "plaintextBytes": 4194304,
+      "ciphertextBytes": 4210688,
+      "wrappedKeysetBytes": 4096,
+      "copyBufferBytes": 8192
+    }
+  },
+  "hostChecks": {
+    "pythonRunnerSafetyTests": 13,
+    "nodeReaderTestGroups": 9,
+    "nodeRfcHkdfCases": 3,
+    "publicIndependentReaderCases": 3,
+    "freshPhoneIndependentReaderCases": 4,
+    "prettier": "passed",
+    "pythonSyntax": "passed",
+    "architecture": "passed; both store/archive fixtures excluded from product",
+    "architectureNegativeTrial": "Injected product settings include rejected without workspace mutation",
+    "documentation": "passed: 55 Markdown, 39 core, 38 capabilities, 64 metrics, 42 tasks, 68 scenarios"
+  },
+  "developmentNotes": [
+    {
+      "stage": "first compile",
+      "outcome": "Failed because latest Tink convenience overloads are deprecated and source warnings are errors. Replaced with explicit configuration overloads; no version downgrade or warning suppression."
+    },
+    {
+      "stage": "vector bootstrap",
+      "outcome": "Initial successful phone run: 1756 assertions, 0 packaged golden cases; generated compact public vectors and independent readback. Final rebuilt APK requires and reads 3 packaged golden cases; 1759 assertions pass."
+    },
+    {
+      "stage": "source review",
+      "outcome": "Tagged streaming key parser can ignore output-prefix metadata. Added authenticated wire-keyset checks before Tink normalization plus valid-payload non-RAW/wrong-material rejection trials."
+    },
+    {
+      "stage": "publication byte review",
+      "outcome": "Normalized fixture vectors and Python sources to repository LF policy; rebuilt the changed asset and reran phone/independent readback. Final committed-source/vector hashes use exact LF bytes."
+    }
+  ],
+  "remainingGates": [
+    "Strict UTF-8/JSON duplicate/depth/count/canonical-int64/reference/schema/overflow admission and reproducible fuzzing",
+    "Production logical entity schema/manifest/end consistency",
+    "Secure generated credential display/re-entry and fresh-install portable recovery",
+    "Passphrase/Argon2 profile and vectors (unavailable)",
+    "Bounded multi-GiB file job, encrypted staging, provider durability and file TOCTOU",
+    "Peak memory/latency/resource limits, ENOSPC and crash/cancellation at commit boundaries",
+    "Keystore wrapping/loss/rotation, SQLCipher forced callback/pool/temp/log qualification",
+    "Minimum API24, expanded device/ABI and release shrinking",
+    "Independent security/supply-chain audit and full B/S scenario acceptance"
+  ]
+}

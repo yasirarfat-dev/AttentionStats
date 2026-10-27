@@ -1,6 +1,6 @@
 # Security design
 
-**Status:** Threat model/prototype design and isolated encrypted-store fixture exist; product security implementation and audit pending. Updated 2026-10-27.
+**Status:** Threat model/prototype design and isolated store/archive-envelope fixtures exist; product security implementation and audit pending. Updated 2026-10-27.
 **Responsibility:** Owns threat boundaries, encryption requirements, credentials, supply chain and incident response.
 **Related specifications:** [Privacy](PRIVACY.md), [Backup](BACKUP-RESTORE.md), [Crypto design](CRYPTO-ARCHIVE-DESIGN.md), [Models](DATA-MODELS.md), [Release](RELEASE.md), [Reporting entrypoint](../SECURITY.md).
 **Unresolved feasibility:** F-03 and F-04 in [Decisions](DECISIONS.md); reviewed prototype candidates/parameters still need build, interoperability, device-resource and encrypted Room qualification.
@@ -30,6 +30,8 @@ Offer a generated high-entropy recovery key and optionally a passphrase route af
 If a device key is invalidated or unavailable, stop sensitive reads/writes safely, explain recovery choices, and preserve encrypted files; never silently reset history. [Rotation design](CRYPTO-ARCHIVE-DESIGN.md#loss-rotation-and-crash-recovery) distinguishes wrapping-key rewrap, database-generation replacement and portable credential changes. Each needs interruption tests; existing archive credentials remain necessary for old copies. Deleting all data removes key material and tokens. Local logical deletion cannot promise forensic flash erasure.
 
 The [isolated storage fixture](CRYPTO-ARCHIVE-DESIGN.md#isolated-encrypted-store-result) passes 55 synthetic assertions on an API-36 ARM64 phone, including encrypted DB/WAL marker scans, raw-key representation, close/reopen, wrong-key and corrupt-copy main-file preservation. It is excluded from the product build and uses neither production history nor Keystore. The SQLCipher handler was not invoked in these cases; forced callback behavior, temp/log leakage, native pool stress, minimum-API, key loss/rotation and crash/resource qualification remain open. Framework plain-SQLite negative controls also need explicit preserving handlers: read-only mode did not prevent default recovery from removing the test DB path during an earlier harness run. No product encryption or security-audit claim follows.
+
+The [isolated archive-envelope fixture](CRYPTO-ARCHIVE-DESIGN.md#isolated-archive-envelope-result) passes 1,759 synthetic API-36 ARM64 assertions, including 869 rejected inputs, exact suite/wire-keyset admission, segment boundaries and six cancellation checks. Tink and an independent Node test reader read public artificial vectors without a source Keystore; both HKDF implementations pass RFC-5869 SHA-256 cases 1–3. No production manual cryptography is introduced: the Node construction is only a bounded test oracle. This is in-memory primitive/framing evidence, not strict history parsing, secure recovery-key UX, file/staging lifecycle, resource measurement, provider recovery or an independent security audit. Passphrase support remains unavailable and the format remains unfrozen.
 
 ## Components, transport and builds
 

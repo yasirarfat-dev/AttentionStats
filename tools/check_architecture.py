@@ -105,11 +105,14 @@ def main() -> int:
     if "collection-prototype" in app_build:
         errors.append("Application must not depend on the collection prototype")
     app_settings = (ROOT / "android/settings.gradle").read_text(encoding="utf-8")
-    if "storage-qualification" in app_build or "storage-qualification" in app_settings:
-        errors.append("Storage qualification must remain outside the product Gradle build")
+    for fixture in ["storage-qualification", "archive-qualification"]:
+        if fixture in app_build or fixture in app_settings:
+            errors.append(f"{fixture} must remain outside the product Gradle build")
     for path in (ROOT / "android/app/src").rglob("*"):
-        if path.suffix in {".kt", ".java", ".xml"} and "org.attentionstats.qualification.storage" in path.read_text(encoding="utf-8"):
-            errors.append(f"{path.relative_to(ROOT)}: product source must not import the storage fixture")
+        if path.suffix in {".kt", ".java", ".xml"}:
+            for fixture in ["storage", "archive"]:
+                if f"org.attentionstats.qualification.{fixture}" in path.read_text(encoding="utf-8"):
+                    errors.append(f"{path.relative_to(ROOT)}: product source must not import the {fixture} fixture")
     mobile_count = check_mobile_source(ROOT / "src", errors)
     if errors:
         print("Architecture verification failed:")
@@ -117,7 +120,7 @@ def main() -> int:
         return 1
     print(f"PASS: {len(paths)} Kotlin source files; package paths and declared domain import boundaries")
     print(f"PASS: {len(prototype_paths)} collection prototype source files; pure boundary and no app dependency")
-    print("PASS: standalone storage qualification excluded from product settings/dependencies/source")
+    print("PASS: standalone storage/archive qualification excluded from product settings/dependencies/source")
     print(f"PASS: {mobile_count} mobile TypeScript files; relative imports, feature public APIs and layer direction")
     print("Static checks do not establish native compilation, UI or runtime source support.")
     return 0

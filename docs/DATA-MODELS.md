@@ -7,6 +7,8 @@
 
 The standalone [AS-006 fixture](../native/storage-qualification/README.md) has one artificial record table for encryption/build qualification only. It is excluded from the product build and is not an implementation or migration of these entities.
 
+The separate [archive-envelope fixture](../native/archive-qualification/README.md) has public artificial manifest/entity/end bytes for crypto readback only. Its fields are not this schema, and its independent reader implements no history/JSON admission, migration or restore. Product encodings and bounds remain AS-009/AS-020 work.
+
 ## Entity catalog
 
 All IDs are locally generated opaque strings. No hardware/advertising identifier, contact, product account or remote user key is needed. Stable observation identity is distinct from any transient item identity used by a detector.
