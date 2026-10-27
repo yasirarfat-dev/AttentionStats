@@ -423,5 +423,6 @@ fun main() {
         equal(50L, port.positionMs); equal(1L, port.revision)
     }
     passed += planningChecks()
-    println("PASS: $passed synthetic reconciliation/planning checks; no Android source, storage or coverage admission")
+    passed += progressChecks()
+    println("PASS: $passed synthetic reconciliation/planning/progress checks; no Android source, storage or coverage admission")
 }
