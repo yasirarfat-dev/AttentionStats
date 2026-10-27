@@ -5,6 +5,8 @@
 **Related specifications:** [Storage](STORAGE-AND-RETENTION.md), [Contracts](NATIVE-CONTRACTS.md), [Tracking](TRACKING-SPEC.md), [Backup](BACKUP-RESTORE.md).
 **Unresolved feasibility:** F-03 and F-04 in [Decisions](DECISIONS.md); Room 3/SQLCipher and archive envelope selected for prototype qualification; entity serialization, schema/migrations and integration remain unimplemented.
 
+The standalone [AS-006 fixture](../native/storage-qualification/README.md) has one artificial record table for encryption/build qualification only. It is excluded from the product build and is not an implementation or migration of these entities.
+
 ## Entity catalog
 
 All IDs are locally generated opaque strings. No hardware/advertising identifier, contact, product account or remote user key is needed. Stable observation identity is distinct from any transient item identity used by a detector.

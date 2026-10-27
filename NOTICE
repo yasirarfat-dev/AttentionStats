@@ -9,3 +9,11 @@ Android core library desugaring uses com.android.tools:desugar_jdk_libs 2.1.5,
 a subset of OpenJDK libraries licensed under GPL-2.0 with the Classpath Exception.
 See licenses/desugar-jdk-libs.txt and licenses/desugar-jdk-libs-additional.txt.
 Upstream source: https://github.com/google/desugar_jdk_libs
+
+The isolated, development-only storage qualification APK uses SQLCipher Android
+Community 4.19.1 (Zetetic LLC). See licenses/sqlcipher-android.txt and
+https://www.zetetic.net/sqlcipher/license/.
+Its native cryptography uses LibTomCrypt under its public-domain option;
+see licenses/libtomcrypt.txt.
+The Android binding includes Apache-2.0 Android Open Source Project code;
+SQLite core is in the public domain. These libraries are not product dependencies.

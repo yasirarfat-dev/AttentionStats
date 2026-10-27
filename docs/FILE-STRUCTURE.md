@@ -23,6 +23,7 @@ AttentionStats/
   tools/check_mobile.py    manifest/lock/installed-version, native catalog/notices and patch audit
   tools/android_build.py   task-local SDK/Gradle wrapper runner
   tools/test_collection_probe.py  bounded self-package test on one physical phone
+  tools/storage_qualification.py  standalone AS-006 build and synthetic phone runner
   tools/test_reconciliation.py  synthetic JVM source/commit experiments, reviewed compiler reuse
   tools/tests/             synthetic phone-runner safety checks
   package.json, pnpm-lock.yaml, pnpm-workspace.yaml
@@ -34,6 +35,7 @@ AttentionStats/
   patches/                 reviewed RNGP compiler compatibility patch
   licenses/, NOTICE        template MIT attribution
   native/analytics-core/   AS-035 pure Kotlin mobile-domain calculation slice
+  native/storage-qualification/  standalone debug-only synthetic Room/SQLCipher APK, excluded from product settings
     src/main/kotlin/org/attentionstats/analytics/
       time/ activity/ observation/ network/ summary/
     src/test/kotlin/       synthetic deterministic test program

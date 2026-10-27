@@ -5,6 +5,9 @@ android/.gradle/
 android/.kotlin/
 android/**/.cxx/
 android/**/build/
+native/storage-qualification/.gradle/
+native/storage-qualification/.kotlin/
+native/storage-qualification/build/
 ios/Pods/
 ios/build/
 ios/.xcode.env.local

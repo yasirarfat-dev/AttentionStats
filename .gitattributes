@@ -8,3 +8,5 @@ LICENSE text eol=lf
 *.png binary
 # Unified patches preserve a leading space on blank context lines.
 *.patch whitespace=-blank-at-eol,-blank-at-eof
+# Preserve the exact upstream license bytes, including its one trailing space.
+licenses/libtomcrypt.txt whitespace=-blank-at-eol

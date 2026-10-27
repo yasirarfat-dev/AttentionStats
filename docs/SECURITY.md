@@ -1,6 +1,6 @@
 # Security design
 
-**Status:** Threat model and prototype crypto design accepted; no security implementation or audit completed. Updated 2026-10-27.
+**Status:** Threat model/prototype design and isolated encrypted-store fixture exist; product security implementation and audit pending. Updated 2026-10-27.
 **Responsibility:** Owns threat boundaries, encryption requirements, credentials, supply chain and incident response.
 **Related specifications:** [Privacy](PRIVACY.md), [Backup](BACKUP-RESTORE.md), [Crypto design](CRYPTO-ARCHIVE-DESIGN.md), [Models](DATA-MODELS.md), [Release](RELEASE.md), [Reporting entrypoint](../SECURITY.md).
 **Unresolved feasibility:** F-03 and F-04 in [Decisions](DECISIONS.md); reviewed prototype candidates/parameters still need build, interoperability, device-resource and encrypted Room qualification.
@@ -28,6 +28,8 @@ Export encryption is independent of device Keystore so a new device can restore 
 Offer a generated high-entropy recovery key and optionally a passphrase route after KDF evaluation. Display recovery credentials only in a secure explicit flow, require acknowledgement/test, and never send them to the developer or provider. Loss of credentials can make archives unrecoverable; present that before enabling a backup. Biometric unlock may gate local access later but cannot be the only portable recovery mechanism. Do not place secrets on clipboard by default or in normal screenshots, logs, change events or generic JS stores.
 
 If a device key is invalidated or unavailable, stop sensitive reads/writes safely, explain recovery choices, and preserve encrypted files; never silently reset history. [Rotation design](CRYPTO-ARCHIVE-DESIGN.md#loss-rotation-and-crash-recovery) distinguishes wrapping-key rewrap, database-generation replacement and portable credential changes. Each needs interruption tests; existing archive credentials remain necessary for old copies. Deleting all data removes key material and tokens. Local logical deletion cannot promise forensic flash erasure.
+
+The [isolated storage fixture](CRYPTO-ARCHIVE-DESIGN.md#isolated-encrypted-store-result) passes 55 synthetic assertions on an API-36 ARM64 phone, including encrypted DB/WAL marker scans, raw-key representation, close/reopen, wrong-key and corrupt-copy main-file preservation. It is excluded from the product build and uses neither production history nor Keystore. The SQLCipher handler was not invoked in these cases; forced callback behavior, temp/log leakage, native pool stress, minimum-API, key loss/rotation and crash/resource qualification remain open. Framework plain-SQLite negative controls also need explicit preserving handlers: read-only mode did not prevent default recovery from removing the test DB path during an earlier harness run. No product encryption or security-audit claim follows.
 
 ## Components, transport and builds
 

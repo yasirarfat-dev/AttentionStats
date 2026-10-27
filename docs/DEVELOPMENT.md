@@ -139,6 +139,10 @@ pnpm --dir .cache/mobile-stack-probe/age --store-dir $as002Store --state-dir $as
 
 These historical profiles retain their original age checks. Do not alter their settings to rewrite past results. The separately authorized root scaffold uses age zero; preserve strict peers, integrity checks and disabled scripts in both contexts. Probe lockfiles, modules and detailed local smoke logs stay ignored. No frozen-lockfile claim is made for a failed/unaccepted app graph; accepted application setup must commit its own reviewed lockfile. The current first-run results are recorded in [dated evidence](IMPLEMENTATION_LOG/2026-10-27.md#continuation--as-002-latest-stack-compatibility-probes).
 
+## AS-006 isolated encrypted-store qualification
+
+The [standalone fixture](../native/storage-qualification/README.md) uses the existing wrapper, task-local SDK and debug signing key without being included in the product Android settings. Run `python tools/storage_qualification.py build`, then `python -m unittest discover -s tools/tests -p test_storage_qualification.py` and `python tools/storage_qualification.py run`. Builds use committed dependency locks; only a reviewed introduction/refresh uses `build --write-locks`. The runner requires exactly one authorized physical ARM64 phone, refuses an existing fixture package and removes the package it installs on success/failure. No emulator, grants/settings, product app, history, Keystore or shared adb-server changes. Results are bounded aggregates in ignored `.cache/as-006`; public evidence is separately reviewed. A missing phone requires reconnection, not an emulator fallback.
+
 ## Debugging procedure
 
 Start with native capability status and last-success time, compare consent/configuration revision to current grant, then inspect bounded redacted local reason codes. Distinguish UI stale cache, missing source events, native process stop, Android force-stop and unsupported detector versions. Test with JS deliberately stopped to prove native independence. Use synthetic fixture apps/node structures; do not capture personal app trees.

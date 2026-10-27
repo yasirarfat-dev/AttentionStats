@@ -3,7 +3,7 @@
 **Status:** Mobile architecture accepted; pure analytics slice and experimental mobile composition/bootstrap source exist; runtime integration unaccepted. Updated 2026-10-27.
 **Responsibility:** Owns subsystem boundaries, runtime lifecycle, data flow and future adapters.
 **Related specifications:** [Contracts](NATIVE-CONTRACTS.md), [Models](DATA-MODELS.md), [Structure](FILE-STRUCTURE.md), [Dependencies](DEPENDENCIES.md), [Security](SECURITY.md).
-**Unresolved feasibility:** F-02–F-04, F-07 and F-08 in [Decisions](DECISIONS.md); service strategy, toolchain and encryption are not build-verified.
+**Unresolved feasibility:** F-02–F-04, F-07 and F-08 in [Decisions](DECISIONS.md); service strategy, full toolchain and product encryption integration remain unqualified; isolated store build/phone evidence is scoped below.
 
 ## Runtime boundaries
 
@@ -21,7 +21,7 @@ Supported product targets are mobile: Android first, future iOS through native a
 
 Room is a SQLite abstraction, not encryption by itself. At-rest encrypted database integration needs a maintained compatible driver and audit under AS-006. Device storage protections alone must not be advertised as app-level database encryption. See [Room documentation](https://developer.android.com/jetpack/androidx/releases/room).
 
-ADR-031 selects [Room 3/SQLCipherDriver and Tink archive prototypes](CRYPTO-ARCHIVE-DESIGN.md), without installing dependencies or admitting encryption. Native infrastructure owns Keystore wrapping, driver/key lifetime, non-destructive corruption handling, immutable ciphertext input and encrypted staging. Portable logical records never expose a live DB or keys to JS. Full authentication and staged validation precede revision-bound generation activation; filesystem/pool/crash behavior remains unqualified.
+ADR-031 selects [Room 3/SQLCipherDriver and Tink archive prototypes](CRYPTO-ARCHIVE-DESIGN.md). The separate [storage qualification APK](../native/storage-qualification/README.md) builds and passes synthetic API-36 phone checks; it is excluded from product settings/dependencies and admits no production storage capability. The architecture checker rejects fixture wiring in product Gradle settings/dependencies or Android source. Native infrastructure owns Keystore wrapping, driver/key lifetime, non-destructive corruption handling, immutable ciphertext input and encrypted staging. Portable logical records never expose a live DB or keys to JS. Full authentication and staged validation precede revision-bound generation activation; filesystem/pool/crash behavior remains unqualified.
 
 ## Domain-oriented modular design
 
