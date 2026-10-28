@@ -221,3 +221,5 @@ Published the reviewed scaffold as [2d84650](https://github.com/yasirarfat-dev/A
 
 
 Published this reviewed adapter/diagnostic increment as [9c9c994](https://github.com/yasirarfat-dev/AttentionStats/commit/9c9c99480c69e000f5e3a60ad226d030a7e8654e) to main by ordinary push; local/remote SHA matched. Effective author/committer, origin and authenticated contributor were verified. All 75 evidence source hashes matched staged blobs across the reviewed 30-file change; private caches, captures and binaries were excluded. No remote workflow was dispatched. This publication receipt changes documentation only.
+
+Published the reviewed 21-file association/progress increment as [b988a26](https://github.com/yasirarfat-dev/AttentionStats/commit/b988a2629e892826d1ce23a64fd3bb3a2bcc3fcb) by regular push to main; local and remote implementation SHA matched. Author/committer no-reply identity, origin and authenticated account were separately verified as yasirarfat-dev. All 76 normalized evidence source hashes matched staged blobs; private captures, raw diagnostics, keys and binaries were excluded. No workflow was dispatched. This follow-up receipt changes documentation only.
