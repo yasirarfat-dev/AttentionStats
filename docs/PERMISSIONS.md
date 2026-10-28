@@ -9,6 +9,8 @@
 
 AS-043's Android preview declares a passive, package-scoped AccessibilityService protected by `BIND_ACCESSIBILITY_SERVICE`, with resource-ID reporting/window inspection and `canPerformGestures=false`, `isAccessibilityTool=false`. Independent per-app prominent disclosure comes before a person manually enables Android accessibility. Opening settings never grants access. The optional native HUD uses `TYPE_ACCESSIBILITY_OVERLAY`; the bundled preview explicitly removes inherited `SYSTEM_ALERT_WINDOW`, `ACCESS_LOCAL_NETWORK` and `INTERNET`. It requests no usage, notification, battery-exemption, alarm or foreground-service grant. The two explicit package-visibility queries identify candidate installed apps, not supported detectors. Settings/grant/revocation and store approval are separate from source consent and build success; F-08 remains open.
 
+ADR-042 records the user's explicit authorization for the developer to operate already-disclosed debug-phone flows through adb, including relevant source/display/diagnostic and OS permission controls. This testing authorization avoids repeated handoffs; it neither changes the product consent requirements nor permits unrelated grant changes or target-content capture. Preserve other enabled accessibility services and record only scoped changes actually made.
+
 | Code / access | Android mechanism | Purpose and in-app disclosure | Denial/revocation behavior |
 |---|---|---|---|
 | U Usage Access | `PACKAGE_USAGE_STATS` declaration plus user special-access settings/AppOps | Enabled app/device usage sources; not runtime permission dialog | Stop relevant queries, close coverage, keep prior history visible |

@@ -19,9 +19,10 @@ export function PrivacyScreen() {
       </Paragraph>
       <Paragraph>
         A separately chosen, temporary developer structure check saves only
-        layout identifiers and numeric scroll positions for enabled apps. It
-        stops after ten minutes and removes its private diagnostic file when
-        stopped. It does not upload anything automatically.
+        layout identifiers, numeric scroll positions, media and ancestor bounds,
+        and scroll-source bounds with event sequence and relative timing for
+        enabled apps. It stops after ten minutes and removes its private
+        diagnostic file when stopped. It does not upload anything automatically.
       </Paragraph>
       <Paragraph>
         Pause stops new observations and removes the live display. Deleting

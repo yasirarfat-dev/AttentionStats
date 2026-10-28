@@ -19,6 +19,7 @@ import com.attentionstats.detectors.DetectorRegistry
 import com.attentionstats.detectors.SurfaceEvidence
 import com.attentionstats.detectors.SurfaceObservation
 import com.attentionstats.detectors.accessibility.StructuralSnapshotReader
+import com.attentionstats.detectors.accessibility.DiagnosticScrollTrace
 import org.attentionstats.reels.CounterSignal
 import org.attentionstats.reels.ReelApp
 import org.attentionstats.reels.Surface
@@ -46,7 +47,7 @@ class ReelsAccessibilityService : AccessibilityService() {
     @Volatile private var currentApp: ReelApp? = null
     @Volatile private var displayEligible = false
     private val pages = ConcurrentHashMap<ReelApp, Long>()
-    private val samples = mutableMapOf<ReelApp, ArrayDeque<JSONObject>>()
+    private val scrollTrace = DiagnosticScrollTrace()
     @Volatile private var calibrationStart = 0L
     private var lastConfiguration = ""
     private val tick = Runnable {
@@ -73,22 +74,30 @@ class ReelsAccessibilityService : AccessibilityService() {
         if (event == null) return
         val app = ReelApp.byPackage(event.packageName?.toString() ?: "") ?: return
         if (!coordinator.allowed(app)) return
+        if (!getSystemService(PowerManager::class.java).isInteractive ||
+            getSystemService(KeyguardManager::class.java).isKeyguardLocked) {
+            outside(SystemClock.elapsedRealtime()); return
+        }
         val detector = DetectorRegistry.detector(app, coordinator.installedVersion(app))
         if (detector == null && !coordinator.calibrationEnabled) return
         if (event.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
+            val capturedEpoch = coordinator.epoch()
             val source = event.source
             try {
-                val id = StructuralSnapshotReader.resourceId(app, source?.viewIdResourceName)
-                val sample = JSONObject().put("source", id ?: "").put("from", event.fromIndex)
-                    .put("sourceClass", StructuralSnapshotReader.className(source))
-                    .put("to", event.toIndex).put("items", event.itemCount)
-                    .put("scrollY", event.scrollY).put("maxScrollY", event.maxScrollY)
-                    .put("deltaY", if (Build.VERSION.SDK_INT >= 28) event.scrollDeltaY else 0)
-                if (coordinator.calibrationEnabled) synchronized(samples) {
-                    samples.getOrPut(app) { ArrayDeque() }.apply {
-                        if (size == 16) removeFirst()
-                        addLast(sample)
-                    }
+                val safeSource = source != null && source.packageName?.toString() == app.packageName &&
+                    source.windowId == event.windowId && source.isVisibleToUser && !source.isEditable && !source.isPassword
+                val id = if (safeSource) StructuralSnapshotReader.resourceId(app, source.viewIdResourceName) else null
+                if (coordinator.calibrationEnabled) {
+                    val bounds = if (safeSource) Rect().also { source.getBoundsInScreen(it) } else null
+                    val sample = JSONObject().put("source", id ?: "").put("from", event.fromIndex)
+                        .put("sourceClass", if (safeSource) StructuralSnapshotReader.className(source) else "")
+                        .put("to", event.toIndex).put("items", event.itemCount)
+                        .put("scrollY", event.scrollY).put("maxScrollY", event.maxScrollY)
+                        .put("deltaY", if (Build.VERSION.SDK_INT >= 28) event.scrollDeltaY else 0)
+                        .put("sourceBounds", bounds?.let { JSONObject().put("left", it.left).put("top", it.top)
+                            .put("right", it.right).put("bottom", it.bottom) } ?: JSONObject.NULL)
+                    scrollTrace.record(DiagnosticScrollTrace.Scope(app, capturedEpoch, event.windowId),
+                        SystemClock.uptimeMillis(), event.eventTime, sample)
                 }
                 if (detector != null && id in detector.definition.scrollSourceIds && event.fromIndex >= 0 &&
                     event.fromIndex == event.toIndex) pages[app] = event.fromIndex.toLong()
@@ -104,6 +113,7 @@ class ReelsAccessibilityService : AccessibilityService() {
         renderHud()
         if (key == lastConfiguration) return
         lastConfiguration = key
+        scrollTrace.clear()
         serviceInfo = serviceInfo?.apply {
             packageNames = (selected.ifEmpty { listOf(packageName) }).toTypedArray()
         }
@@ -112,7 +122,6 @@ class ReelsAccessibilityService : AccessibilityService() {
         } else {
             if (calibrationStart > 0) coordinator.clearStructure()
             calibrationStart = 0L
-            synchronized(samples) { samples.clear() }
         }
         if (selected.isEmpty()) {
             main.removeCallbacks(tick)
@@ -146,15 +155,11 @@ class ReelsAccessibilityService : AccessibilityService() {
             currentApp = app
             val detector = DetectorRegistry.detector(app, coordinator.installedVersion(app))
             if (detector == null && !coordinator.calibrationEnabled) { outside(now); return }
-            val shape = StructuralSnapshotReader.inspect(app, root, detector, coordinator.calibrationEnabled)
-            if (coordinator.calibrationEnabled) coordinator.recordStructure(app,
-                JSONObject().put("version", coordinator.installedVersion(app)).put("nodes", shape.nodes)
-                    .put("bounded", shape.bounded).put("editable", shape.editable)
-                    .put("ids", JSONArray(shape.ids.toList())).put("positions", shape.positions)
-                    .put("controls", shape.controls)
-                    .put("geometryRevision", 1).put("viewport", shape.viewport).put("anchors", shape.anchors)
-                    .put("classes", JSONArray(shape.classes.toList()))
-                    .put("scrolls", JSONArray(synchronized(samples) { samples[app]?.toList() ?: emptyList<JSONObject>() })), capturedEpoch)
+            val diagnostic = coordinator.calibrationEnabled
+            val ticket = if (diagnostic) scrollTrace.begin(DiagnosticScrollTrace.Scope(app, capturedEpoch, root.windowId),
+                SystemClock.uptimeMillis()) else null
+            val shape = StructuralSnapshotReader.inspect(app, root, detector, diagnostic)
+            val association = ticket?.let { scrollTrace.finish(it, SystemClock.uptimeMillis()) }
             val observation = detector?.detect(SurfaceEvidence(shape.ids, shape.bounded, shape.editable,
                 shape.centerPage ?: pages[app])) ?: SurfaceObservation(Surface.UNKNOWN)
             val surface = observation.surface
@@ -164,6 +169,13 @@ class ReelsAccessibilityService : AccessibilityService() {
             if (!sameWindow || capturedEpoch != coordinator.epoch() || keyguard.isKeyguardLocked || !power.isInteractive) {
                 outside(SystemClock.elapsedRealtime()); return
             }
+            if (diagnostic && association != null && coordinator.calibrationEnabled) coordinator.recordStructure(app,
+                JSONObject().put("version", coordinator.installedVersion(app)).put("nodes", shape.nodes)
+                    .put("bounded", shape.bounded).put("editable", shape.editable)
+                    .put("ids", JSONArray(shape.ids.toList())).put("positions", shape.positions)
+                    .put("controls", shape.controls).put("association", association)
+                    .put("geometryRevision", 1).put("viewport", shape.viewport).put("anchors", shape.anchors)
+                    .put("classes", JSONArray(shape.classes.toList())).put("scrolls", JSONArray()), capturedEpoch)
             displayEligible = surface == Surface.REELS
             if (surface != Surface.REELS) removeHud()
             coordinator.observe(app, CounterSignal(SystemClock.elapsedRealtime(), surface, observation.page, root.windowId,
@@ -178,6 +190,7 @@ class ReelsAccessibilityService : AccessibilityService() {
         currentApp?.let { coordinator.observe(it, CounterSignal(now, Surface.OUTSIDE, null, 0), coordinator.epoch()) }
         currentApp = null
         pages.clear()
+        scrollTrace.clear()
     }
 
     private fun renderHud() {

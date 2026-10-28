@@ -1,6 +1,6 @@
 # Shared development rules
 
-**Status:** Active workflow for humans, Codex and Claude Code. Updated 2026-10-27.
+**Status:** Active workflow for humans, Codex and Claude Code. Updated 2026-10-28.
 **Responsibility:** Defines specification precedence, task execution, continuity and public-repository safeguards.
 **Related specifications:** [Index](INDEX.md), [State](STATE.md), [Tracker](FEATURE-TRACKER.md), [Decisions](DECISIONS.md), [Conventions](CONVENTIONS.md).
 **Unresolved feasibility:** Domain gates remain in [Decisions](DECISIONS.md); no workflow rule turns an unverified capability into fact.
@@ -52,5 +52,7 @@ Use domain-oriented modular organization under [Architecture](ARCHITECTURE.md#do
 Detailed analytics follow [Analytics](ANALYTICS-SPEC.md) and [Metric catalog](METRIC-CATALOG.md). Maximum detail is a disclosed user-selected supported subset, not hidden capture, private input/message recording, root/interception or invented metrics. Keep attempts versus observed UI outcomes, primary versus overlapping facets, coarse network bytes versus content, and retained summary authority versus rebuildable caches distinct. Record scope-specific tests and remaining gates.
 
 Current device-testing instruction (2026-10-27): run runtime checks on the user's connected debug phone; do not run an emulator. If the phone is unavailable, ask the user to connect it with USB debugging enabled. Historical emulator results remain historical evidence; a newer phone does not qualify minimum-API behavior.
+
+The user explicitly authorizes managing this app's debug-phone testing through adb, including launches, taps/swipes and relevant permission, source, display and temporary-diagnostic controls (2026-10-28, ADR-042). Complete those already-disclosed testing steps without repeated manual handoffs. This operator authorization does not change production disclosure/consent flows, authorize target content reads or unrelated phone changes, or make an unsupported metric available. Preserve other services/grants; do not replace shared accessibility settings wholesale. Keep acquisition bounded to the disclosed scope and record actual changes.
 
 The public repository must exclude private reference material, reference-app names/comparisons/assets, personal phone history, credentials, device identifiers and secrets. Target social services may be named only as candidate observation surfaces; no private implementation is inferred. Use synthetic app identifiers/fixtures. User explicitly authorized this foundation's publication as a public `yasirarfat-dev/AttentionStats` repository; no extra publication approval is required for that scoped work.

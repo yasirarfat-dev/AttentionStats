@@ -50,6 +50,43 @@ class AnalyticsInstrumentation : Instrumentation() {
                     result.putInt("shell_routes", ui.routes)
                     result.putString("stream", "PASS: own-window React Native preview screens\n")
                 }
+                "reels-live-progress" -> {
+                    // Explicitly operator-authorized trial only. No source/grant changes or target reads/actions.
+                    val coordinator = com.attentionstats.reels.ReelsCoordinator.get(targetContext)
+                    coordinator.setCalibration(false) // End the completed temporary metadata trial.
+                    fun snapshot(): org.json.JSONObject {
+                        val done = java.util.concurrent.CountDownLatch(1)
+                        var value: org.json.JSONObject? = null
+                        coordinator.snapshot({ value = org.json.JSONObject(it); done.countDown() }, { done.countDown() })
+                        check(done.await(15, java.util.concurrent.TimeUnit.SECONDS))
+                        return checkNotNull(value)
+                    }
+                    fun instagram(value: org.json.JSONObject): org.json.JSONObject {
+                        val sources = value.getJSONArray("sources")
+                        return (0 until sources.length()).map { sources.getJSONObject(it) }
+                            .single { it.getString("app") == "instagram" }
+                    }
+                    val before = snapshot()
+                    val source = instagram(before)
+                    check(before.getBoolean("accessibilityEnabled") && before.getBoolean("serviceConnected") &&
+                        before.getBoolean("overlayEnabled") && before.getString("storage") == "ready" &&
+                        source.getBoolean("enabled") && source.getBoolean("consentCurrent") &&
+                        source.getBoolean("supported") && !source.getBoolean("paused"))
+                    sendStatus(0, Bundle().apply { putInt("progress_ready", 1) })
+                    android.os.SystemClock.sleep(12_000) // Host performs separately authorized test gestures.
+                    val after = snapshot()
+                    check(before.getString("revision") == after.getString("revision") &&
+                        before.getString("day") == after.getString("day"))
+                    val final = instagram(after)
+                    val delta = final.getString("today").toLong() - source.getString("today").toLong()
+                    check(delta in 0..10)
+                    val categories = final.getJSONObject("counts")
+                    val sum = listOf("reel", "photo", "ad", "unclassified").sumOf { categories.getString(it).toLong() }
+                    check(sum == final.getString("today").toLong())
+                    result.putInt("controlled_exposures_added", delta.toInt())
+                    result.putInt("category_totals_conserved", 1)
+                    result.putString("stream", "PASS: authorized live aggregate progress check\n")
+                }
                 "reels-health", "reels-show-counter" -> {
                     val done = java.util.concurrent.CountDownLatch(1)
                     var snapshot: org.json.JSONObject? = null

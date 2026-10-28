@@ -5,6 +5,8 @@ import android.view.accessibility.AccessibilityNodeInfo
 import com.attentionstats.detectors.DetectorRegistry
 import com.attentionstats.detectors.SurfaceEvidence
 import com.attentionstats.detectors.accessibility.StructuralSnapshotReader
+import com.attentionstats.detectors.accessibility.DiagnosticScrollTrace
+import org.json.JSONObject
 import org.attentionstats.reels.PageCategory
 import org.attentionstats.reels.ReelApp
 import org.attentionstats.reels.Surface
@@ -70,6 +72,49 @@ internal object DetectorProbe {
             expect(StructuralSnapshotReader.inspect(ReelApp.INSTAGRAM, node, detector, true).ids.isEmpty())
             expect(StructuralSnapshotReader.resourceId(ReelApp.INSTAGRAM, "org.example.synthetic:id/video_container") == null)
         } finally { node.recycle() }
+        val trace = DiagnosticScrollTrace()
+        val scope = DiagnosticScrollTrace.Scope(ReelApp.INSTAGRAM, 4, 20)
+        fun row() = JSONObject().put("source", "synthetic_pager")
+        trace.record(scope, 1_000, 980, row())
+        val first = trace.begin(scope, 1_080)
+        val paired = checkNotNull(trace.finish(first, 1_100))
+        expect(paired.getBoolean("stable"))
+        expect(paired.getInt("durationMs") == 20)
+        val event = paired.getJSONArray("events").getJSONObject(0)
+        expect(event.getInt("ageMs") == 80 && event.getInt("deliveryDelayMs") == 20)
+        expect(event.getInt("sequence") == 1)
+        trace.record(scope, 1_090, 1_080, row())
+        val raced = checkNotNull(trace.finish(first, 1_110))
+        expect(!raced.getBoolean("stable"))
+        expect(raced.getInt("startSequence") == 1 && raced.getInt("endSequence") == 2)
+        expect(raced.getJSONArray("events").length() == 1) // Mid-scan event is not paired backwards.
+        expect(trace.finish(first, 1_079) == null)
+        expect(trace.finish(first, 3_081) == null)
+        expect(checkNotNull(trace.finish(trace.begin(scope, 4_000), 4_020)).getJSONArray("events").length() == 0)
+        for (changed in listOf(scope.copy(window = 21), scope.copy(epoch = 5), scope.copy(app = ReelApp.FACEBOOK))) {
+            val before = trace.begin(scope, 5_000)
+            trace.record(changed, 5_001, 5_000, row())
+            expect(trace.finish(before, 5_010) == null)
+            expect(checkNotNull(trace.finish(trace.begin(scope, 5_020), 5_030)).getJSONArray("events").length() == 0)
+        }
+        val stopped = trace.begin(scope, 6_000)
+        trace.clear()
+        trace.begin(scope, 6_001)
+        expect(trace.finish(stopped, 6_010) == null) // Same scope after stop is a new generation.
+        for (index in 0..20) trace.record(scope, 7_000L + index, 7_000L + index, row())
+        val capped = checkNotNull(trace.finish(trace.begin(scope, 7_100), 7_110)).getJSONArray("events")
+        expect(capped.length() == 16)
+        expect(capped.getJSONObject(0).getInt("sequence") == 6)
+        val invalidTime = trace.begin(scope, 8_000)
+        trace.record(scope, 8_001, 8_002, row())
+        trace.record(scope, 8_001, 5_000, row())
+        val invalidated = checkNotNull(trace.finish(invalidTime, 8_010))
+        expect(!invalidated.getBoolean("stable"))
+        expect(invalidated.getJSONArray("events").length() == 16) // Invalid events add no records.
+        val detached = checkNotNull(trace.finish(trace.begin(scope, 8_020), 8_030))
+        detached.getJSONArray("events").getJSONObject(0).put("source", "mutated_fixture")
+        expect(checkNotNull(trace.finish(trace.begin(scope, 8_020), 8_030))
+            .getJSONArray("events").getJSONObject(0).getString("source") == "synthetic_pager")
         return checks
     }
 }

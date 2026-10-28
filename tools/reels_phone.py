@@ -21,7 +21,7 @@ CACHE = ROOT / ".cache/reels-mvp"
 
 
 def validate_structure(raw: bytes) -> dict:
-    """Accept only the documented bounded, flat, content-free diagnostic shape."""
+    """Accept only documented bounded, content-free diagnostic revisions."""
     if len(raw) > 32_768: raise RuntimeError("Structure diagnostic exceeds bound")
     def unique(pairs):
         result = {}
@@ -43,7 +43,8 @@ def validate_structure(raw: bytes) -> dict:
         for target in targets.values():
             base_keys = {"version", "nodes", "bounded", "editable", "ids", "positions", "controls", "classes", "scrolls"}
             geometry_keys = {"geometryRevision", "viewport", "anchors"}
-            expect(type(target) is dict and set(target) in [base_keys, base_keys | geometry_keys])
+            expect(type(target) is dict and set(target) in [base_keys, base_keys | geometry_keys,
+                                                          base_keys | geometry_keys | {"association"}])
             expect(isinstance(target["version"], str) and re.fullmatch(r"[A-Za-z0-9._-]{1,100}", target["version"]) is not None)
             expect(type(target["nodes"]) is int and 0 <= target["nodes"] <= 192)
             expect(type(target["bounded"]) is bool and type(target["editable"]) is bool)
@@ -89,6 +90,33 @@ def validate_structure(raw: bytes) -> dict:
                         layout(ancestor, set())
                         expect(ancestor["slot"] < previous)
                         previous = ancestor["slot"]
+            if "association" in target:
+                trace = target["association"]
+                expect(target["scrolls"] == [])  # No unrelated historical event list in this revision.
+                expect(type(trace) is dict and set(trace) == {
+                    "revision", "startSequence", "endSequence", "durationMs", "stable", "events"})
+                expect(type(trace["revision"]) is int and trace["revision"] == 1)
+                for key in ["startSequence", "endSequence", "durationMs"]:
+                    expect(number(trace[key]) and trace[key] >= 0)
+                expect(trace["durationMs"] <= 2_000 and trace["startSequence"] <= trace["endSequence"])
+                expect(type(trace["stable"]) is bool and trace["stable"] == (trace["startSequence"] == trace["endSequence"]))
+                expect(type(trace["events"]) is list and len(trace["events"]) <= 16)
+                previous = 0
+                previous_age = 2_000
+                for row in trace["events"]:
+                    expect(type(row) is dict and set(row) == {"source", "sourceClass", "from", "to", "items",
+                        "scrollY", "maxScrollY", "deltaY", "sourceBounds", "sequence", "ageMs", "deliveryDelayMs"})
+                    expect(ident(row["source"]) and ident(row["sourceClass"], 120))
+                    expect(all(number(row[key]) for key in ["from", "to", "items", "scrollY", "maxScrollY", "deltaY",
+                                                          "sequence", "ageMs", "deliveryDelayMs"]))
+                    expect(previous < row["sequence"] <= trace["startSequence"])
+                    expect(0 <= row["ageMs"] <= previous_age and 0 <= row["deliveryDelayMs"] <= 2_000)
+                    previous, previous_age = row["sequence"], row["ageMs"]
+                    if row["sourceBounds"] is not None:
+                        expect(type(row["sourceBounds"]) is dict and set(row["sourceBounds"]) == bounds_keys)
+                        bounds(row["sourceBounds"])
+                    else:
+                        expect(row["source"] == "" and row["sourceClass"] == "")
         return value
     except (ValueError, TypeError, KeyError, UnicodeError, RecursionError):
         raise RuntimeError("Diagnostic does not match the bounded metadata-only schema; raw content withheld") from None

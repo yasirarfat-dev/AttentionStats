@@ -190,6 +190,64 @@ class ReelsPhoneSafety(unittest.TestCase):
             change(value["targets"]["instagram"])
             with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(value).encode())
 
+    def association(self):
+        value = self.geometry()
+        value["targets"]["instagram"]["association"] = {
+            "revision": 1, "startSequence": 2, "endSequence": 2, "durationMs": 20, "stable": True,
+            "events": [{"source": "synthetic_pager", "sourceClass": "android.view.View",
+                "from": -1, "to": -1, "items": -1, "scrollY": -1, "maxScrollY": -1, "deltaY": 40,
+                "sourceBounds": {"left": 0, "top": 0, "right": 400, "bottom": 800},
+                "sequence": 2, "ageMs": 80, "deliveryDelayMs": 12}]}
+        return value
+
+    def test_bracketed_events_and_explicitly_unstable_scans_accepted(self):
+        for stable in [True, False]:
+            value = self.association()
+            trace = value["targets"]["instagram"]["association"]
+            trace.update(stable=stable, endSequence=2 if stable else 3)
+            self.assertEqual(probe.validate_structure(json.dumps(value).encode()), value)
+
+    def test_association_rejects_fabricated_stability_and_stale_or_future_events(self):
+        for change in [lambda t: t.update(stable=False), lambda t: t.update(endSequence=1),
+                       lambda t: t.update(startSequence=True), lambda t: t.update(durationMs=2_001),
+                       lambda t: t.update(revision=True), lambda t: t.update(revision=2),
+                       lambda t: t["events"][0].update(sequence=3), lambda t: t["events"][0].update(sequence=0),
+                       lambda t: t["events"][0].update(ageMs=-1), lambda t: t["events"][0].update(ageMs=2_001),
+                       lambda t: t["events"][0].update(deliveryDelayMs=2_001),
+                       lambda t: t["events"].append(t["events"][0]),
+                       lambda t: t["events"][0]["sourceBounds"].update(text="PRIVATE_SYNTHETIC_MARKER"),
+                       lambda t: t["events"][0].update(sourceBounds=None),
+                       lambda t: t.update(windowId=123)]:
+            value = self.association()
+            change(value["targets"]["instagram"]["association"])
+            with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(value).encode())
+
+    def test_association_requires_geometry_and_rejects_parallel_old_scrolls(self):
+        for key in ["geometryRevision", "viewport", "anchors"]:
+            value = self.association()
+            del value["targets"]["instagram"][key]
+            with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(value).encode())
+        value = self.association()
+        target = value["targets"]["instagram"]
+        target["scrolls"] = [{k: v for k, v in target["association"]["events"][0].items()
+                              if k not in {"sourceBounds", "sequence", "ageMs", "deliveryDelayMs"}}]
+        with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(value).encode())
+
+    def test_unavailable_source_has_no_source_metadata(self):
+        value = self.association()
+        event = value["targets"]["instagram"]["association"]["events"][0]
+        event.update(source="", sourceClass="", sourceBounds=None)
+        self.assertEqual(probe.validate_structure(json.dumps(value).encode()), value)
+
+    def test_association_rejects_reordered_ages_and_oversized_events(self):
+        value = self.association()
+        trace = value["targets"]["instagram"]["association"]
+        trace["events"].insert(0, dict(trace["events"][0], sequence=1, ageMs=40))
+        with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(value).encode())
+        trace["events"] = [dict(trace["events"][0], sequence=i + 1) for i in range(17)]
+        trace.update(startSequence=17, endSequence=17)
+        with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(value).encode())
+
 
 if __name__ == "__main__":
     unittest.main()

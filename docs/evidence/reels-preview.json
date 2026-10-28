@@ -1,9 +1,9 @@
 {
   "reviewedDate": "2026-10-28",
-  "recordedAtUtc": "2026-10-27T21:09:30.174357+00:00",
+  "recordedAtUtc": "2026-10-28T05:28:37.594675+00:00",
   "task": "AS-041/AS-043/AS-045",
   "status": "experimental",
-  "scope": "Installed native shell/category counter with isolated Instagram adapter and bounded optional Home-feed geometry qualification. Home counting and additional app support remain unqualified.",
+  "scope": "Installed native shell/category preview with bounded optional delivered-scroll/geometry association diagnostics. Home counting and additional app support remain unqualified.",
   "nativeStableResolutions": [
     {
       "coordinate": "androidx.room3:room3-runtime",
@@ -120,11 +120,11 @@
     },
     {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt",
-      "sha256Lf": "0e58dd6763a4ea0ea08460f7f333c4b687db3a1d3c1b038165017b224da80dbb"
+      "sha256Lf": "66b8be8ec9fb864ff2159e9b84d584c7915bd5c7781a08b009df9eb74c6800aa"
     },
     {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/DetectorProbe.kt",
-      "sha256Lf": "cdcab2c2f043bc5b59e98db4f05d833a37ff737b08077ae6d7409f0272588433"
+      "sha256Lf": "4f5480823f66b00964d4cda9d7c3846e4a2181918215cb4a91ffadcc0b5d3ab2"
     },
     {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/ReelsStorageProbe.kt",
@@ -159,6 +159,10 @@
       "sha256Lf": "744cf1318dc3d10403518ca9c105d98ebfece19b8e8030158ad6d95b1fd5449e"
     },
     {
+      "path": "android/app/src/main/java/com/attentionstats/detectors/accessibility/DiagnosticScrollTrace.kt",
+      "sha256Lf": "5a8d963823b75112ede330e1c185f414cae24f5ee10b815b316ea9117635a17c"
+    },
+    {
       "path": "android/app/src/main/java/com/attentionstats/detectors/accessibility/StructuralSnapshotReader.kt",
       "sha256Lf": "1d045f11503dbfbfa733ef8e6e823820bf06c394cc7f02bd843157f6f51235c3"
     },
@@ -172,7 +176,7 @@
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/reels/ReelsAccessibilityService.kt",
-      "sha256Lf": "0a7b29a26d3c69e44e08a2b689a10474075411fe0cc80ca4dc0114d7843c8a2d"
+      "sha256Lf": "749852e0189d24217a3502295de604a84d2b121e1c92252db9779bb3a6b2f757"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/reels/ReelsCoordinator.kt",
@@ -292,7 +296,7 @@
     },
     {
       "path": "src/features/privacy/screens/PrivacyScreen.tsx",
-      "sha256Lf": "130beb846003ad92f840720c05d48337ad17890f484dca6a11c2bdaac386506e"
+      "sha256Lf": "4f0a93178bd20ccc41a5a3d578bbdf1f8f06bce5562de36ac7b7ca1bf61f708a"
     },
     {
       "path": "src/features/protection/index.ts",
@@ -312,7 +316,7 @@
     },
     {
       "path": "src/features/reels/screens/ReelsScreen.tsx",
-      "sha256Lf": "5767855d1bb04a7db59b92e71bd5406066ac9510b63a087df12de2394714218c"
+      "sha256Lf": "74865f06e7965b98f42df9dbf7f52dc287e6eaaa08b22d4f1705f44b03f7abc9"
     },
     {
       "path": "src/features/settings/index.ts",
@@ -392,7 +396,7 @@
     },
     {
       "path": "tools/reels_phone.py",
-      "sha256Lf": "2b8876d896dcb7c63ee5dbb9016a64e9ea5a166d130a90a63824d72050a1031b"
+      "sha256Lf": "c63ffbeb9e5ee4adcb9f13395b35c32f3116c6dd239a9ae3fbb595425be3288c"
     },
     {
       "path": "tools/tests/test_architecture.py",
@@ -400,17 +404,17 @@
     },
     {
       "path": "tools/tests/test_reels_phone.py",
-      "sha256Lf": "f05229bf7149f8e0434937fde093c8a95d91db01f428cbdf9db6e1d3d30ddd67"
+      "sha256Lf": "236606d9d37524d079171f8458a3f1bde613ab381da9c9ff4cc9d5e1e613b3dc"
     }
   ],
   "sourceHashNormalization": "UTF-8 tracked text normalized to LF; excludes generated build/cache/binary/phone captures.",
   "installedPreview": {
-    "sha256": "92c94855854a2621b68d6fa9b9d0a98834ffd3092d13122459c5e77272b6efa6",
-    "size": 82635307
+    "sha256": "c703183d0ca462c89ec2877c639add6561a0795b010768b753dbdaa9dcd7c04b",
+    "size": 82635459
   },
   "bundledJavaScript": {
     "name": "assets/index.android.bundle",
-    "sha256": "aab4d7dc17af28faac3eaabc61a3d4845c844edde645f9e4203e0d43de05881c"
+    "sha256": "3651af70e5bfc6e0fdf451ceb3d086c3d917d8eaae361a06347424d658383273"
   },
   "phoneChecks": {
     "physical": true,
@@ -419,22 +423,22 @@
     "storage": {
       "aggregates": {
         "storage_checks": 47,
-        "detector_checks": 34,
+        "detector_checks": 56,
         "key_rejections": 3,
         "sentinel_files": 3,
         "fixture_removed": 1
       },
       "reducerArtChecks": 38,
       "previewArtifact": {
-        "sha256": "92c94855854a2621b68d6fa9b9d0a98834ffd3092d13122459c5e77272b6efa6",
-        "size": 82635307
+        "sha256": "c703183d0ca462c89ec2877c639add6561a0795b010768b753dbdaa9dcd7c04b",
+        "size": 82635459
       },
       "testArtifact": {
-        "sha256": "2af9cfa9221caa7a4336f7900720f86f7f900a41392811b42497690f7350cd48",
-        "size": 160634
+        "sha256": "0885be86732970fba56e626777fcefea06d51a3b73e2e135cf179e84b405e000",
+        "size": 162439
       },
       "testPackageRemoved": true,
-      "scope": "34 artificial detector/acquisition checks plus isolated encrypted store/grouped totals/migration/key cleanup; 38 reducer ART checks. Never live history or target content."
+      "scope": "56 artificial detector/acquisition checks including 22 event-association cases plus isolated encrypted store/grouped totals/migration/key cleanup; 38 reducer ART checks. Never live history or target content."
     },
     "dashboard": {
       "aggregates": {
@@ -442,12 +446,12 @@
         "shell_routes": 20
       },
       "previewArtifact": {
-        "sha256": "92c94855854a2621b68d6fa9b9d0a98834ffd3092d13122459c5e77272b6efa6",
-        "size": 82635307
+        "sha256": "c703183d0ca462c89ec2877c639add6561a0795b010768b753dbdaa9dcd7c04b",
+        "size": 82635459
       },
       "testArtifact": {
-        "sha256": "2af9cfa9221caa7a4336f7900720f86f7f900a41392811b42497690f7350cd48",
-        "size": 160634
+        "sha256": "0885be86732970fba56e626777fcefea06d51a3b73e2e135cf179e84b405e000",
+        "size": 162439
       },
       "testPackageRemoved": true,
       "scope": "121 own-window assertions, all five tabs and 20 distinct native routes, period selection, detail/back navigation and actual-native counter fixture including retained old/new pages and opposing full-height motion in both directions. No target window capture or automated consent/grant."
@@ -457,7 +461,7 @@
   "localChecks": {
     "reducerJvmChecks": 38,
     "jestCases": 25,
-    "hostOwnershipAndSanitizerCases": 13,
+    "hostOwnershipAndSanitizerCases": 18,
     "textContrastPairs": 22,
     "minimumTextContrast": 5.03,
     "typecheck": true,
@@ -586,7 +590,8 @@
     "Synthetic migration/store tests use a unique fixture directory and Keystore alias, never live history. Rotation, disk-full/crash, pool stress and independent security review remain unqualified.",
     "Only our Activity windows captured. No target screenshots/text/descriptions/messages/video, personal counts, identifiers or raw diagnostics published.",
     "No minimum-API or 16-KiB-page-device runtime claim; full controls/HUD/accessibility/lifecycle/accuracy/distribution gates remain open.",
-    "No archive/export/protection implementation or Play approval. No CI run or binary publication."
+    "No archive/export/protection implementation or Play approval. No CI run or binary publication.",
+    "Home event/geometry brackets are bounded diagnostics, not atomic snapshots or qualified post identity. Three controlled Reels transitions establish narrow saved-count progress only."
   ],
   "previousInstalledPreviewEvidence": {
     "installedPreview": {
@@ -761,5 +766,122 @@
       "sha256": "317855696c4b92a31f693aa9865ea9ae9530c450687ed2c1c100edbc901bb005",
       "size": 82635073
     }
+  },
+  "previousGeometryPreviewQualification": {
+    "installedPreview": {
+      "sha256": "92c94855854a2621b68d6fa9b9d0a98834ffd3092d13122459c5e77272b6efa6",
+      "size": 82635307
+    },
+    "bundledJavaScript": {
+      "name": "assets/index.android.bundle",
+      "sha256": "aab4d7dc17af28faac3eaabc61a3d4845c844edde645f9e4203e0d43de05881c"
+    },
+    "phoneChecks": {
+      "physical": true,
+      "api": 36,
+      "abi": "arm64-v8a",
+      "storage": {
+        "aggregates": {
+          "storage_checks": 47,
+          "detector_checks": 34,
+          "key_rejections": 3,
+          "sentinel_files": 3,
+          "fixture_removed": 1
+        },
+        "reducerArtChecks": 38,
+        "previewArtifact": {
+          "sha256": "92c94855854a2621b68d6fa9b9d0a98834ffd3092d13122459c5e77272b6efa6",
+          "size": 82635307
+        },
+        "testArtifact": {
+          "sha256": "2af9cfa9221caa7a4336f7900720f86f7f900a41392811b42497690f7350cd48",
+          "size": 160634
+        },
+        "testPackageRemoved": true,
+        "scope": "34 artificial detector/acquisition checks plus isolated encrypted store/grouped totals/migration/key cleanup; 38 reducer ART checks. Never live history or target content."
+      },
+      "dashboard": {
+        "aggregates": {
+          "ui_checks": 121,
+          "shell_routes": 20
+        },
+        "previewArtifact": {
+          "sha256": "92c94855854a2621b68d6fa9b9d0a98834ffd3092d13122459c5e77272b6efa6",
+          "size": 82635307
+        },
+        "testArtifact": {
+          "sha256": "2af9cfa9221caa7a4336f7900720f86f7f900a41392811b42497690f7350cd48",
+          "size": 160634
+        },
+        "testPackageRemoved": true,
+        "scope": "121 own-window assertions, all five tabs and 20 distinct native routes, period selection, detail/back navigation and actual-native counter fixture including retained old/new pages and opposing full-height motion in both directions. No target window capture or automated consent/grant."
+      },
+      "lifecycle": "Post-instrumentation replacement of the same preview reconnects an already selected service without editing settings/grants."
+    },
+    "localChecks": {
+      "reducerJvmChecks": 38,
+      "jestCases": 25,
+      "hostOwnershipAndSanitizerCases": 13,
+      "textContrastPairs": 22,
+      "minimumTextContrast": 5.03,
+      "typecheck": true,
+      "lintAndArchitecture": true,
+      "format": true,
+      "previewLintErrors": 0,
+      "previewLintWarnings": 17,
+      "mobileTypeScriptFiles": 41,
+      "documentation": true,
+      "mobileDependencyAudit": true,
+      "adapterBoundaryCases": 3
+    }
+  },
+  "homeAssociationQualification": {
+    "samples": 16,
+    "forwardSwipes": 3,
+    "returnSwipes": 2,
+    "allBounded": true,
+    "stableBrackets": 2,
+    "unstableBrackets": 14,
+    "samplesWithEvents": 13,
+    "samplesWithAnchors": 16,
+    "distinctDeliveredEventSequences": 63,
+    "eventsWithSourceBounds": 164,
+    "maxScanDurationMs": 352,
+    "sequenceAdvanced": true,
+    "countingEnabled": false,
+    "identityQualified": false,
+    "allSamplesNonEditable": true,
+    "previewArtifact": {
+      "sha256": "c703183d0ca462c89ec2877c639add6561a0795b010768b753dbdaa9dcd7c04b",
+      "size": 82635459
+    },
+    "independentFreshTemporaryConsent": true,
+    "finding": "Delivered-scroll sequences and safe source bounds are exposed. Most scans report intervening callbacks; no atomic-tree, media-group continuity or Home-count qualification.",
+    "eventsWithSourceBoundsScope": "Event records across snapshots, including repeated observations; not unique posts or exposures."
+  },
+  "liveReelsProgress": {
+    "controlledForwardSwipes": 3,
+    "observedCommittedExposures": 3,
+    "matchesControlledTransitions": true,
+    "categoryTotalsConserved": true,
+    "overlayVisibleInAllSixSamples": true,
+    "temporaryCheckStopped": true,
+    "scope": "Own saved aggregate delta only. No personal totals or target content. Does not qualify all categories, negative contexts or general accuracy.",
+    "ownedInstrumentationRemoved": true,
+    "overlayVisibleAtFinish": true,
+    "previewArtifact": {
+      "sha256": "c703183d0ca462c89ec2877c639add6561a0795b010768b753dbdaa9dcd7c04b",
+      "size": 82635459
+    },
+    "testArtifact": {
+      "sha256": "9269d448c40e3bc9eea80836809388c01f0f103d14856e47ecfef53ec8caa108",
+      "size": 164374
+    },
+    "advancedStatisticsPanelExpandedAtFinish": true
+  },
+  "debugPhoneOperatorAuthorization": {
+    "decision": "ADR-042",
+    "scope": "Already-disclosed preview testing, relevant launches/taps/permission/source/display/diagnostic controls through adb. Preserve other services and content restrictions.",
+    "osOrSourceGrantChangesNeeded": false
   }
 }
