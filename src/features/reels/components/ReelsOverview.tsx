@@ -4,6 +4,8 @@ import { useIsFocused } from '@react-navigation/native';
 import { StyleSheet } from 'react-native-unistyles';
 import {
   NativeReels,
+  reelsSources,
+  reelsSourceKeys,
   parseReelsSnapshot,
   type ReelsSnapshot,
 } from '../../../platform';
@@ -43,7 +45,7 @@ export function ReelsOverview({ onOpen }: { onOpen: () => void }) {
   return (
     <Panel title="Reels & short videos" tinted>
       <View style={styles.row}>
-        {(['instagram', 'facebook'] as const).map(app => {
+        {reelsSourceKeys.map(app => {
           const source = snapshot?.sources.find(item => item.app === app);
           const available =
             snapshot?.storage === 'ready' &&
@@ -56,12 +58,8 @@ export function ReelsOverview({ onOpen }: { onOpen: () => void }) {
                 !source.paused));
           return (
             <View key={app} style={styles.metric}>
-              <Text style={styles.label}>
-                {app === 'instagram' ? 'Instagram' : 'Facebook'}
-              </Text>
-              <Text style={styles.count}>
-                {available ? `~${source.today}` : '—'}
-              </Text>
+              <Text style={styles.label}>{reelsSources[app].name}</Text>
+              <Text style={styles.count}>{available ? source.today : '—'}</Text>
               <Text style={styles.detail}>
                 {available
                   ? 'Viewer pages today · partial'

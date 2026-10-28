@@ -1,9 +1,19 @@
 # Release and distribution
 
-**Status:** Documentation publication authorized; no application release exists. Updated 2026-10-27.
+**Status:** Closed-test preparation authorized; no Play rollout exists. Updated 2026-10-29.
 **Responsibility:** Defines public repository publishing, Android distribution, signing and release gates.
 **Related specifications:** [Testing](TESTING.md), [Security](SECURITY.md), [Dependencies](DEPENDENCIES.md), [Contributing](CONTRIBUTING.md), [State](STATE.md).
-**Unresolved feasibility:** F-02–F-05 and F-08 in [Decisions](DECISIONS.md); signing identity, application ID, store enrollment and declarations are future maintainer decisions.
+**Unresolved feasibility:** F-01–F-04 and F-08 in [Decisions](DECISIONS.md); `attention.stats` is selected, but signing, store enrollment/declarations and release qualification remain open.
+
+## Current closed-test preparation
+
+ADR-043 sets the production package exactly **attention.stats**, versionName 0.1.0 / initial versionCode 1, subject to Console uniqueness. Keep the `com.attentionstats` source namespace and existing `com.attentionstats.debug` development identity/history; neither changes the Play package. Release snapshot contract 3 hides development-only structure controls and native code rejects those sessions.
+
+[Play Console information](../release/PLAY-CONSOLE.md) supplies listing text, app-content declarations, reviewer steps, assets, signing/tester/rollout fields and current blockers. Public user-facing [privacy](../policies/PRIVACY.md), [support](../policies/SUPPORT.md), [local deletion](../policies/DATA-DELETION.md) and [testing](../policies/CLOSED-TEST.md) documents are separate from internal specifications. The app links the policy. Publishing these GitHub documents is within the user's instruction; no GitHub Pages or automatic pipeline is needed. Signed-out URL accessibility must be verified after publication.
+
+Code/builds remain in this repository. The separate local archive is `C:\home\biobot\AppReleases\AttentionStats`, with `PLAY-CONSOLE.md` at its root and versioned `releases/<versionName>+<versionCode>/{android,metadata,notes}`, plus store, policies, testing and private/signing folders. Keep credentials and personal tester/feedback material outside Git. Never overwrite an archived release or represent an unsigned investigation bundle as uploadable.
+
+Closed testing can begin before the broad roadmap is complete only with a working, accurately described scoped candidate and applicable source/privacy/security/policy checks. Facebook/Home remain unavailable until independently qualified. Current [Google guidance](https://support.google.com/googleplay/android-developer/answer/14151465) requires applicable newer personal accounts to retain at least 12 continuously opted-in testers for 14 days before applying for production access. Documents, sideloads and internal tests do not start that period; real Console opt-ins and rollout establish eligibility. No production-approval date is promised.
 
 ## Documentation publication
 

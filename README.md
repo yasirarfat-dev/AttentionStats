@@ -8,6 +8,8 @@ An open-source personal digital wellbeing application built around **observe →
 
 The goal is to help you understand the digital behavior your device exposes and you choose to track, then act on that knowledge. Observation-only use is welcome. History stays on your device; limits and interventions are your choice. Predictions will be local and explainable. The project will not claim to measure dopamine, diagnose addiction, or read your attention state.
 
+The [complete feature vision](docs/FEATURE-VISION.md) maps the ad-free personal diary, richer counters, intentional protection, local insights and user-owned history to staged work. Encountering a video, observing playback and confirming completion are different metrics; the preview counts settled viewer-page encounters.
+
 Start with the [documentation index](docs/INDEX.md), [product scope](docs/PRODUCT.md), [capability inventory](docs/CAPABILITY-MATRIX.md), and [current state](docs/STATE.md). Android APIs and distribution policies impose real limits: supported social surfaces and short-video counts must be verified, and automatic personal Google-account backup remains blocked pending policy clarification. Portable encrypted export and restore are separately planned.
 
 The detailed [digital diary](docs/ANALYTICS-SPEC.md) and [64-metric catalog](docs/METRIC-CATALOG.md) cover candidate app/activity/short-video/interaction/network statistics, evidence limits and flexible day/week/month/year summaries. Every platform/metric requires qualification; unknown stays unknown. Tracking remains explicitly chosen and local.

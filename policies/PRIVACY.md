@@ -1,0 +1,43 @@
+# Attention Stats privacy policy
+
+Last updated: 29 October 2026. Applies to the Android closed-test candidate, package **attention.stats**, version 0.1.0, and the separately identified development preview. A closed test has not yet launched.
+
+Attention Stats is an open-source personal digital wellbeing app maintained by the [Attention Stats project](https://github.com/yasirarfat-dev/AttentionStats). Privacy contact: **consciousbiobot@gmail.com**. This policy describes the current counter candidate. Planned features do not change how this version handles data.
+
+The revised temporary development check additionally recognizes exact Like, Comment and Share controls and fixed Home/Reels/Video tab-position labels. It retains only their fixed tokens and up to three ancestor layouts, within the existing 16-match and 32-KiB limits (interface revision 2). These extra labels are diagnostic-only and never become observation signals without separate qualification. A fresh diagnostic notice describes the fields before each trial.
+
+## Data used on your device
+
+Observation is off until you agree to the separate in-app accessibility disclosure, select an app, and enable Attention Stats in Android accessibility settings. A system grant alone does not enable observation. The optional counter display is a separate choice.
+
+For a selected, supported app, the counter inspects bounded accessibility layout identifiers, roles, visibility, bounds and numeric page/scroll positions. For Facebook, it also transiently compares accessibility descriptions with seven fixed English interface labels: Reels, Video, Home, Close, Comments, Search and Back. Unmatched descriptions are immediately discarded and no raw description is saved. Instagram observation does not inspect descriptions. It uses these signals to estimate settled Reels viewer-page exposures. It saves exposure times, app/surface and layout category, visits, source choices, consent records, pause/display settings and coverage information locally. Categories include recognized video layouts, photo/carousel layouts, recognized image ads and unclassified pages. Counts include repeated visits to a page; they are not unique videos, completed views or an exact measure of watch time. Recognition and ad classification can be incomplete. Unsupported versions and contexts do not become measured zeroes.
+
+Except for the separately disclosed TikTok matching fields below, the counter does not read node text. It does not capture screenshots, photos, video, audio, contacts, location or advertising identifiers. It saves no raw descriptions, typed input, private messages, passwords, search terms, titles or creator identities. For TikTok 47.5.3 only, affirmative source notice 4 permits transient matching of the visible title/caption fields (node text or descriptions). Raw values are discarded immediately after a keyed on-device comparison; keyed tokens remain only in memory for the active app/window/consent scope and are cleared on app/window/consent changes, device lock or service teardown. Tokens and raw text are never saved in history, diagnostics, backups or uploads. History saves an event UUID, app/visit provenance, encounter ordinal and observation times; the matcher’s temporary page value is not stored. Identical, absent or changing captions can miss or misidentify transitions; no unique-video or playback accuracy is claimed. Other sources retain notice 3 and do not gain this text-matching scope. It does not act on another app or scroll for you. Home-feed counting remains unavailable. Facebook viewer support is experimental, limited to the tested version and English interface; its pages remain unclassified.
+
+## Storage and security
+
+Counts and related observation records use an encrypted database in private app storage, with a database key protected by an installation-specific Android Keystore key. This reduces ordinary unauthorized access; it is not a guarantee against a compromised or unlocked device and has not received an independent security audit. Android automatic backup and device-transfer rules exclude this app's data. Backup, export and restore are unavailable in this candidate, so uninstalling, clearing app storage or losing the device/key can make history unrecoverable.
+
+## Transfers and other services
+
+There is no Attention Stats account, developer backend, advertising SDK, remote analytics, session replay or automatic crash/diagnostic upload. The release candidate declares no Internet permission. Your observation history is not sent to us, sold or shared with other organizations. Local data access and recording still occur when you enable observation.
+
+Opening a policy, source-code or support link leaves the app and contacts the chosen website through your browser. GitHub, Google Play, your browser and the social apps you independently use have their own privacy practices. They may receive normal website/store information under their own policies; Attention Stats does not attach your history to those links.
+
+If you voluntarily contact support, we receive what you choose to send. Do not send personal history, account details, screenshots of other apps, device identifiers, passwords or keys. Public GitHub reports are public. See [support](SUPPORT.md) for the current contact mechanism. We use voluntary reports to answer requests and fix issues. Private support correspondence may remain in the maintainer's email account while resolving and following up on the request; you can ask the privacy contact to delete it. Public reports remain under GitHub's retention and deletion controls. There is no automatic support submission or promised deletion of other people's copies.
+
+## Your choices, retention and deletion
+
+You can decline access, disable an individual source, pause observation, hide the counter independently, or revoke Attention Stats accessibility access in Android settings. Pause or withdrawal stops new observation; it does not delete previously saved history.
+
+Saved history remains locally until you choose **Reels & short videos → Delete Reels history**, clear Attention Stats storage through Android settings, or uninstall the app. There is no automatic retention deadline in this candidate. The in-app history deletion disables all sources, hides the counter and removes exposure/visit, coverage and consent history; minimal local configuration/database metadata remain. Clearing app storage or uninstalling removes the app's remaining private data under Android's controls. Logical deletion cannot promise forensic flash erasure. We cannot delete copies of information you independently sent to someone else. There is no server account or server history to request deletion of. See [data deletion](DATA-DELETION.md).
+
+## Development-only checks
+
+Store release builds do not offer the temporary structure check. Separately identified development builds may offer it only after an additional affirmative choice. For enabled apps, it saves a bounded private file containing static layout/control identifiers, roles, numeric positions, media/control bounds, up to three ancestor layouts, and scroll-source bounds with event sequence and relative timing. On Facebook only, the revised check also transiently inspects accessibility descriptions to match exactly the fixed interface labels Reels, Video, Home, Close, Comments, Search and Back. Only fixed matched tokens, roles, bounds and selected/clickable states are saved, up to 16 matches. Other descriptions are discarded immediately without logging, hashing or retention. No node text, raw descriptions, captions, names, messages, images, account details or raw accessibility trees are saved. The check lasts at most ten minutes; stopping, expiry, history deletion or a fresh process removes its diagnostic file. An authorized developer can read that file locally during the test. It is never uploaded automatically and is separate from exposure history. The diagnostic has its own affirmative choice, independent of source observation and the optional live display.
+
+## Children, changes and questions
+
+This testing candidate is intended for adults and is not designed for children. It offers no medical advice, diagnosis or treatment. We will update this policy when actual behavior changes. New observation fields or purposes require a revised in-app disclosure and affirmative choice before collection expands.
+
+For privacy questions, use the contact mechanism in [support](SUPPORT.md), identifying Attention Stats and the app version without sharing sensitive information. You can inspect the [source code](https://github.com/yasirarfat-dev/AttentionStats) and [known test limits](CLOSED-TEST.md).

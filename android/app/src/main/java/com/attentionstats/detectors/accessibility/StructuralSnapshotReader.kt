@@ -4,6 +4,9 @@ import android.graphics.Rect
 import android.os.Build
 import android.view.accessibility.AccessibilityNodeInfo
 import com.attentionstats.detectors.SurfaceDetector
+import com.attentionstats.detectors.NodeRole
+import com.attentionstats.detectors.InterfaceLabel
+import com.attentionstats.detectors.LayoutBounds
 import org.attentionstats.reels.ReelApp
 import org.json.JSONArray
 import org.json.JSONObject
@@ -14,6 +17,8 @@ internal object StructuralSnapshotReader {
         val ids: Set<String>, val nodes: Int, val bounded: Boolean, val editable: Boolean,
         val positions: JSONArray, val controls: JSONArray, val centerPage: Long?,
         val classes: Set<String>, val viewport: JSONObject, val anchors: JSONArray,
+        val interfaceLabels: JSONArray, val labels: List<InterfaceLabel>,
+        val identityPage: Long? = null,
     )
 
     private data class Layout(val slot: Int, val id: String, val bounds: Rect, val row: Int, val column: Int) {
@@ -22,12 +27,16 @@ internal object StructuralSnapshotReader {
             .put("row", row).put("column", column)
     }
 
-    fun inspect(app: ReelApp, root: AccessibilityNodeInfo, detector: SurfaceDetector?, diagnostics: Boolean): Shape {
+    fun inspect(app: ReelApp, root: AccessibilityNodeInfo, detector: SurfaceDetector?, diagnostics: Boolean,
+        identity: TransientContentIdentity.Collector? = null): Shape {
         val ids = linkedSetOf<String>()
         val classes = linkedSetOf<String>()
         val positions = JSONArray()
         val controls = JSONArray()
         val anchors = JSONArray()
+        val interfaceLabels = JSONArray()
+        val labels = mutableListOf<InterfaceLabel>()
+        val inspectLabels = diagnostics || detector?.usesInterfaceLabels == true
         var nodes = 0
         var editable = false
         var centerPage: Long? = null
@@ -49,11 +58,24 @@ internal object StructuralSnapshotReader {
                     if (node.isEditable || node.isPassword) { editable = true; continue }
                     if (diagnostics && classes.size < 24) className(node).takeIf { it.isNotEmpty() }?.let { classes.add(it) }
                     val id = resourceId(app, node.viewIdResourceName)
+                    identity?.add(id, node)
                     if (id != null && ids.size < 96) ids.add(id)
                     val item = node.collectionItemInfo
-                    val bounds = if (diagnostics || item != null) Rect().also { node.getBoundsInScreen(it) } else null
+                    val bounds = if (diagnostics || inspectLabels || item != null) Rect().also { node.getBoundsInScreen(it) } else null
                     val layout = if (diagnostics) Layout(slot, id ?: "", checkNotNull(bounds),
                         item?.rowIndex ?: -1, item?.columnIndex ?: -1) else null
+                    if (inspectLabels && labels.size < 16) {
+                        InterfaceLabelMatcher.match(app, node, true, diagnostics)?.let { token ->
+                            val rect = checkNotNull(bounds)
+                            labels.add(InterfaceLabel(token, role(node),
+                                LayoutBounds(rect.left, rect.top, rect.right, rect.bottom), node.isSelected, node.isClickable))
+                            if (diagnostics) interfaceLabels.put(JSONObject().put("token", token).put("class", className(node))
+                                .put("left", checkNotNull(bounds).left).put("top", bounds.top)
+                                .put("right", bounds.right).put("bottom", bounds.bottom)
+                                .put("selected", node.isSelected).put("clickable", node.isClickable)
+                                .put("slot", slot).put("ancestors", JSONArray(pending.ancestors.map { it.json() })))
+                        }
+                    }
                     if (diagnostics && id != null && node.isClickable && controls.length() < 32) {
                         controls.put(JSONObject().put("id", id).put("class", className(node))
                             .put("left", checkNotNull(bounds).left).put("top", bounds.top)
@@ -82,7 +104,8 @@ internal object StructuralSnapshotReader {
             }
             return Shape(ids, nodes, queue.isEmpty() && !truncated, editable, positions, controls, centerPage, classes,
                 JSONObject().put("left", screen.left).put("top", screen.top).put("right", screen.right)
-                    .put("bottom", screen.bottom), anchors)
+                    .put("bottom", screen.bottom), anchors, interfaceLabels, labels,
+                identity?.finish(queue.isEmpty() && !truncated && !editable))
         } finally { queue.forEach { if (it.owned) recycleCompat(it.node) } }
     }
 
@@ -90,6 +113,13 @@ internal object StructuralSnapshotReader {
         val prefix = app.packageName + ":id/"
         if (value == null || !value.startsWith(prefix)) return null
         return value.removePrefix(prefix).takeIf { Regex("[a-zA-Z0-9_]{1,80}").matches(it) }
+    }
+
+    fun role(node: AccessibilityNodeInfo?): NodeRole = when (className(node)) {
+        "android.view.View" -> NodeRole.VIEW
+        "android.widget.Button" -> NodeRole.BUTTON
+        "androidx.recyclerview.widget.RecyclerView" -> NodeRole.RECYCLER
+        else -> NodeRole.OTHER
     }
 
     fun className(node: AccessibilityNodeInfo?): String = node?.className?.toString()

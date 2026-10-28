@@ -1,6 +1,6 @@
 # Verification and acceptance
 
-**Status:** Documentation/browser checks and pure Kotlin calculation tests available; full native application scenarios not run. Updated 2026-10-28.
+**Status:** Documentation/browser checks and pure Kotlin calculation tests available; full native application scenarios not run. Updated 2026-10-29.
 **Responsibility:** Owns acceptance scenarios, evidence quality and release gates.
 **Related specifications:** [Capabilities](CAPABILITY-MATRIX.md), [Tracking](TRACKING-SPEC.md), [Protection](PROTECTION-SPEC.md), [Backup](BACKUP-RESTORE.md), [Security](SECURITY.md).
 **Unresolved feasibility:** F-01–F-10 in [Decisions](DECISIONS.md); source/API/OEM support is not verified by calculation tests alone.
@@ -12,6 +12,8 @@ Documentation: `python tools/check_docs.py` and `git diff --check`, plus human r
 Each application evidence record needs commit/build, exact dependency/toolchain versions, Android API/build/OEM, target app/version/locale where relevant, fixture ID, expected/actual outcome, limitations and date. Public reports contain synthetic identifiers and aggregate outcomes only; no device identifiers, real accounts or usage traces. “Implemented” requires code plus passing relevant scenarios, not a written plan or mock screenshot.
 
 ## Observation and interpretation scenarios
+
+The AS-048 counter MVP applies T-06/T-07 independently to Facebook, Instagram, YouTube Shorts and TikTok. Record dedicated-tab, Home suggested-row and inline-video entry routes separately; do not inherit a passing dedicated-viewer result. For every admitted route test stable entry, forward/return transitions, idle/redraw/loop, paused player, partial fling, comments/search/profile/Home, app switch, screen lock and source revocation. An encounter is not a playback/completion assertion. Device evidence must separate expected gesture count from actual settled items and report missed/extra counts; unsupported routes remain explicit.
 
 | ID | Given / action | Required result |
 |---|---|---|
@@ -177,3 +179,5 @@ PixelCopy captures only our Activity window; no device-wide/target screenshot or
 No flaky consent/data-loss/emergency tests accepted. All deterministic fixtures must pass exactly. Experimental detectors need declared app/version/locale scope and precision/recall evidence under [Social](SOCIAL-MEDIA-SPEC.md); unsupported ranges remain disabled. Native/UI cold and warm summaries target two seconds on a declared one-year dataset; battery/CPU/storage tests use a declared device and collection-disabled baseline for at least seven days. These are unmeasured targets today.
 
 Record passed, failed, not run and blocked separately in the dated log and tracker. A documentation-only CI success is never an application test success. Apply only relevant checks to low-impact edits; broaden after new failure/risk, not by repeatedly rerunning the same suite without cause.
+
+AS-048 source-catalog qualification must simulate a two-source schema-3 store, reopen with missing YouTube/TikTok configuration rows, and verify disabled/no-consent defaults, existing consent/preferences/generation/count preservation, one configuration-revision advance and idempotent reopen. Own-Activity dispatched-touch fixtures validate view routing only; OS window targeting and actual overlay input need separate live trials.

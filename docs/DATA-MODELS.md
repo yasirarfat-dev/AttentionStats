@@ -1,6 +1,6 @@
 # Data models
 
-**Status:** Logical schema accepted; SQL/Room implementation and migrations pending. Updated 2026-10-28.
+**Status:** Logical schema accepted; SQL/Room implementation and migrations pending. Updated 2026-10-29.
 **Responsibility:** Defines entities, invariants, time, provenance and schema evolution.
 **Related specifications:** [Storage](STORAGE-AND-RETENTION.md), [Contracts](NATIVE-CONTRACTS.md), [Tracking](TRACKING-SPEC.md), [Backup](BACKUP-RESTORE.md).
 **Unresolved feasibility:** F-03 and F-04 in [Decisions](DECISIONS.md); Room 3/SQLCipher and archive envelope selected for prototype qualification; entity serialization, schema/migrations and integration remain unimplemented.
@@ -10,6 +10,8 @@ The standalone [AS-006 fixture](../native/storage-qualification/README.md) has o
 The separate [archive-envelope fixture](../native/archive-qualification/README.md) has public artificial manifest/entity/end bytes for crypto readback only. Its fields are not this schema, and its independent reader implements no history/JSON admission, migration or restore. Product encodings and bounds remain AS-009/AS-020 work.
 
 ## Entity catalog
+
+ADR-044 advances the narrow native store to **schema 3**: `LiveOverlayConfiguration` adds non-null boolean `showIcons=true` and `allAppsToday=true`, with SQL defaults of 1 and an explicit preserving 2→3 auto-migration. Enabled state, source/consent/history rows, generation and keys are retained. Existing 1→2 migration composes through 3; no destructive fallback or item identity. Display-only preferences are native-owned because the counter works without JS. Global day/category projections query authoritative exposures in the same half-open local-day range across saved apps, while visits stay app-specific. These are derived read models, not extra durable counters. The next paragraph describes the original schema-2 introduction.
 
 ADR-041 changes adapter ownership and a separately consented temporary diagnostic, with no Room schema/source-ID/bridge migration. Geometry and scan-local association slots never enter exposure rows or become durable content identity. Other apps and mixed-feed surfaces require explicit future catalog/metric/episode/consent evolution; existing viewer history keeps its meaning.
 
@@ -88,3 +90,9 @@ Use monotonically increasing Room schema versions, committed exported schemas, e
 Backup format version and database schema version are independent. Portable archives contain a documented logical representation and manifest, not an uncontrolled copy of an open SQLite database. Import validates schema and bounds, applies supported staged migrations, and rejects unsupported future versions without touching live data. Rebuildable aggregates may be omitted; provenance, consent scope and coverage cannot.
 
 The [ADR-031 prototype envelope](CRYPTO-ARCHIVE-DESIGN.md#logical-payload-and-restore-validation) uses strict length-bounded JSON records inside authenticated streaming encryption. Signed-64-bit fields use canonical decimal strings with domain validation; counts/references must agree across manifest, rows and end record. Exact entity bodies are not yet selected. Local wrappers/aliases, grants, ingestion cursors, command replay state and provider credentials are never portable entities; historical consent is provenance only, with imported sources/rules inactive. Generation-key routing metadata lives in native no-backup storage and does not introduce a second history authority.
+
+AS-048 expands the source catalog without a schema change: existing schema-3 stores transactionally insert missing `reels.youtube`/`reels.tiktok` configuration rows disabled, unpaused and consent revision zero. Existing records retain their keys, generation, consent and counts. An existing-store catalog addition increments configuration revision once; reopening an up-to-date catalog is idempotent.
+
+ADR-049 TikTok reducer page values are temporary content-change ordinals and are not stored. Saved Exposure.ordinal enumerates committed encounters within the visit for every source. No raw text, digest, durable content identity or backward-direction guarantee is added to history. Existing source rows retain their original semantics.
+
+ADR-050 lifetime history, immutable event/origin provenance, future merge/deletion semantics and rebuildable calendar summaries are defined in [Storage and retention](STORAGE-AND-RETENTION.md#lifetime-event-history-and-future-multi-origin-merging). These are design obligations; current preview storage/aggregate/restore limits remain explicit.

@@ -11,6 +11,11 @@ export interface Spec extends TurboModule {
   ): Promise<string>;
   setPaused(paused: boolean, expectedRevision: string): Promise<string>;
   setOverlay(enabled: boolean, expectedRevision: string): Promise<string>;
+  setCounterAppearance(
+    showIcons: boolean,
+    allAppsToday: boolean,
+    expectedRevision: string,
+  ): Promise<string>;
   deleteHistory(expectedRevision: string): Promise<string>;
   openAccessibilitySettings(): Promise<boolean>;
   openTarget(app: string): Promise<boolean>;

@@ -1,6 +1,6 @@
 # Dependencies and toolchain
 
-**Status:** AS-002 probes retained; AS-004 latest direct packages pinned in an experimental scaffold. Native qualification remains open. Updated 2026-10-27.
+**Status:** AS-002 probes retained; AS-004 latest direct packages pinned in an experimental scaffold. Native qualification remains open. Updated 2026-10-29.
 **Responsibility:** Owns package manager, version policy, licenses, compatibility evidence and exceptions.
 **Related specifications:** [Development](DEVELOPMENT.md), [Architecture](ARCHITECTURE.md), [Security](SECURITY.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-03 and F-04; release age explicitly overridden by the user, template tooling conflicts remediated in the scaffold, native build/runtime qualification and Room encryption remain open.
@@ -202,6 +202,10 @@ A real unmodified-plugin attempt fails because RNGP 0.88.0 compiles with Kotlin 
 The pnpm layout also requires `react.hermesCommand` to resolve `hermes-compiler` through RN's own package dependency. RN 0.88 pins compiler 260318099.0.4; keeping that transitive pairing avoids arbitrary bytecode/compiler replacement. Debug development uses adb loopback and explicitly removes framework-inherited local-network/overlay permissions. Platform API-37 debug/unsigned release builds pass on x86_64; ARM64 debug builds through Community CLI and the subsequent ARM64 unsigned release qualification also pass. Round-trip/navigation checks passed on an API-36 ARM64 phone and an API-37 emulator before the user's phone-only testing instruction. Full library functionality, minimum-API runtime and iOS remain open; the subsequent clean ARM64 native CI run passes. The continuation below configures core library desugaring; API-24/25 runtime qualification still needs a matching physical device.
 
 ## Android core library desugaring
+
+### Release-inspection tooling
+
+AS-046 resolves the latest stable standalone [Google bundletool release](https://github.com/google/bundletool/releases/tag/1.18.3) on 2026-10-28: **1.18.3**, Apache-2.0, `bundletool-all-1.18.3.jar`, 32,520,401 bytes, SHA-256 `a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29`. The official latest-release API and asset digest match the local download. It lives only in ignored `.cache/release-tools`; no application dependency or executable binary is committed. The existing JDK runs `version` successfully; exact bundle validation/manifest/alignment evidence belongs to the candidate audit. [Android guidance](https://developer.android.com/tools/bundletool) documents validation, APK generation and the distinction between an upload-signed bundle and locally generated APK signatures. No tool downgrade or global install is introduced.
 
 AS-002 continuation resolves `com.android.tools:desugar_jdk_libs` **2.1.5** as the latest stable release from [Google Maven metadata](https://dl.google.com/dl/android/maven2/com/android/tools/desugar_jdk_libs/maven-metadata.xml) on 2026-10-27. The [published POM](https://dl.google.com/dl/android/maven2/com/android/tools/desugar_jdk_libs/2.1.5/desugar_jdk_libs-2.1.5.pom) declares GPL-2.0 with the Classpath Exception and the matching 2.1.5 configuration dependency. Artifact size/SHA-256 and upstream notice source/hashes are retained in [scaffold evidence](evidence/mobile-scaffold.json); license text is retained under `licenses/` and referenced by NOTICE. No native binary is published.
 

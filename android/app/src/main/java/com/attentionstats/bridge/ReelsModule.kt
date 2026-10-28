@@ -15,13 +15,16 @@ class ReelsModule(private val context: ReactApplicationContext) : NativeReelsSpe
     private fun fail(promise: Promise, code: String) { promise.reject(code, "Counter operation unavailable; saved data preserved") }
     override fun getSnapshot(promise: Promise) = coordinator.snapshot({ promise.resolve(it) }, { fail(promise, it) })
     override fun configure(app: String, enabled: Boolean, noticeRevision: Double, expectedRevision: String, promise: Promise) {
-        if (noticeRevision != ReelsCoordinator.NOTICE_REVISION.toDouble() || expectedRevision.length !in 38..60) { fail(promise, "INVALID_ARGUMENT"); return }
+        val selected = ReelApp.byKey(app)
+        if (selected == null || noticeRevision != ReelsCoordinator.requiredNotice(selected).toDouble() || expectedRevision.length !in 38..60) { fail(promise, "INVALID_ARGUMENT"); return }
         coordinator.configure(app, enabled, expectedRevision, { promise.resolve(it) }, { fail(promise, it) })
     }
     override fun setPaused(paused: Boolean, expectedRevision: String, promise: Promise) =
         coordinator.setPaused(paused, expectedRevision, { promise.resolve(it) }, { fail(promise, it) })
     override fun setOverlay(enabled: Boolean, expectedRevision: String, promise: Promise) =
         coordinator.setOverlay(enabled, expectedRevision, { promise.resolve(it) }, { fail(promise, it) })
+    override fun setCounterAppearance(showIcons: Boolean, allAppsToday: Boolean, expectedRevision: String, promise: Promise) =
+        coordinator.setCounterAppearance(showIcons, allAppsToday, expectedRevision, { promise.resolve(it) }, { fail(promise, it) })
     override fun deleteHistory(expectedRevision: String, promise: Promise) =
         coordinator.deleteHistory(expectedRevision, { promise.resolve(it) }, { fail(promise, it) })
     override fun openAccessibilitySettings(promise: Promise) {

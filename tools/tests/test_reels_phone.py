@@ -166,6 +166,46 @@ class ReelsPhoneSafety(unittest.TestCase):
         value = self.geometry()
         self.assertEqual(probe.validate_structure(json.dumps(value).encode()), value)
 
+    def test_fixed_interface_tokens_are_facebook_only_and_strictly_bounded(self):
+        value = self.association()
+        target = value["targets"].pop("instagram")
+        value["targets"]["facebook"] = target
+        target.update(interfaceRevision=1, interfaceLabels=[{
+            "token": "reels", "class": "android.widget.Button", "left": 0, "top": 0,
+            "right": 40, "bottom": 40, "selected": True, "clickable": True}])
+        self.assertEqual(probe.validate_structure(json.dumps(value).encode()), value)
+        import copy
+        for mutate in [lambda t: t.update(interfaceRevision=True),
+                       lambda t: t["interfaceLabels"][0].update(token="PRIVATE_SYNTHETIC_MARKER"),
+                       lambda t: t["interfaceLabels"][0].update(description="PRIVATE_SYNTHETIC_MARKER"),
+                       lambda t: t["interfaceLabels"][0].update(selected=1),
+                       lambda t: t["interfaceLabels"][0].update(left=100),
+                       lambda t: t.update(interfaceLabels=t["interfaceLabels"] * 17)]:
+            changed = copy.deepcopy(value)
+            mutate(changed["targets"]["facebook"])
+            with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(changed).encode())
+        value["targets"]["instagram"] = value["targets"].pop("facebook")
+        with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(value).encode())
+
+    def test_interface_two_preserves_only_fixed_tokens_and_bounded_ancestors(self):
+        import copy
+        value = self.association()
+        target = value["targets"].pop("instagram")
+        value["targets"]["facebook"] = target
+        ancestor = target["anchors"][0]["ancestors"][0]
+        target.update(interfaceRevision=2, interfaceLabels=[{
+            "token": "reels_tab", "class": "android.view.View", "left": 0, "top": 0,
+            "right": 40, "bottom": 40, "selected": True, "clickable": True,
+            "slot": 3, "ancestors": [ancestor]}])
+        self.assertEqual(probe.validate_structure(json.dumps(value).encode()), value)
+        for mutate in [lambda t: t["interfaceLabels"][0]["ancestors"][0].update(text="PRIVATE_SYNTHETIC_MARKER"),
+                       lambda t: t["interfaceLabels"][0].update(slot=1),
+                       lambda t: t["interfaceLabels"][0].update(ancestors=[ancestor] * 4),
+                       lambda t: t["interfaceLabels"][0].update(token="PRIVATE_SYNTHETIC_MARKER")]:
+            changed = copy.deepcopy(value)
+            mutate(changed["targets"]["facebook"])
+            with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(changed).encode())
+
     def test_geometry_rejects_content_extra_fields_and_invalid_revision(self):
         for change in [lambda t: t.update(geometryRevision=2),
                        lambda t: t.update(geometryRevision=True),

@@ -143,7 +143,10 @@ def main() -> int:
         for imported in re.findall(r"^import ([\w.*]+)$", source_text, re.M):
             if not imported.startswith(("kotlin.", "org.attentionstats.reels.")):
                 errors.append(f"{path.relative_to(ROOT)}: infrastructure import in Reels domain")
-        if re.search(r"\b(?:android\.|androidx\.|java\.(?:io|net|sql|security)\.|com\.facebook\.react\.|kotlinx\.|javax\.crypto\.)", source_text):
+        # A package identifier used as data (e.g. YouTube) is not a platform dependency.
+        # Only plain identifier literals are skipped; interpolation and imports remain checked.
+        code = re.sub(r'"[A-Za-z0-9_.]+"', '""', source_text)
+        if re.search(r"\b(?:android\.|androidx\.|java\.(?:io|net|sql|security)\.|com\.facebook\.react\.|kotlinx\.|javax\.crypto\.)", code):
             errors.append(f"{path.relative_to(ROOT)}: side effect dependency in Reels domain")
     counter_source = ROOT / "android/app/src/main/java/com/attentionstats/reels"
     detector_source = ROOT / "android/app/src/main/java/com/attentionstats/detectors"
@@ -152,7 +155,13 @@ def main() -> int:
         errors.append("No isolated social detector adapters found")
     for path in [*counter_source.rglob("*.kt"), *detector_source.rglob("*.kt")]:
         source_text = path.read_text(encoding="utf-8")
-        if re.search(r"\b(?:node|root|source|event)\s*\??\.\s*(?:text|contentDescription|beforeText|getText|getContentDescription|getBeforeText)\b", source_text):
+        # Only this reviewed acquisition helper may inspect descriptions, behind its own gates.
+        description_helper = detector_source / "accessibility/InterfaceLabelMatcher.kt"
+        identity_helper = detector_source / "accessibility/TransientContentIdentity.kt"
+        forbidden = "beforeText|getBeforeText" if path == identity_helper else "text|beforeText|getText|getBeforeText"
+        if path not in [description_helper, identity_helper]:
+            forbidden += "|contentDescription|getContentDescription"
+        if re.search(rf"\b(?:node|root|source|event)\s*\??\.\s*(?:{forbidden})\b", source_text):
             errors.append(f"{path.relative_to(ROOT)}: counter must not read captured text/descriptions")
         if re.search(r"\b(?:performGlobalAction|performAction|dispatchGesture)\s*\(", source_text):
             errors.append(f"{path.relative_to(ROOT)}: counter must remain passive")

@@ -1,13 +1,13 @@
 # Product specification
 
-**Status:** Accepted mobile-only scope; all application capabilities planned, experimental, or blocked. Updated 2026-10-27.
+**Status:** Accepted mobile-only scope; all application capabilities planned, experimental, or blocked. Updated 2026-10-29.
 **Responsibility:** Defines product behavior, journeys, delivery scope, and success criteria.
 **Related specifications:** [Vision](VISION.md), [Capabilities](CAPABILITY-MATRIX.md), [UX](UX-SPEC.md), [Roadmap](ROADMAP.md).
 **Unresolved feasibility:** F-01 through F-09 in [Decisions](DECISIONS.md); no universal observation or enforcement guarantee.
 
 ## Scope
 
-Attention Stats is an open-source, Android-first personal digital wellbeing app. React Native Community CLI provides the interface; Kotlin owns collection, deterministic protection, and Room-backed SQLite. The public home is `yasirarfat-dev/AttentionStats`, licensed Apache-2.0. The documentation foundation is published; an isolated pure Kotlin calculation slice now exists, while the mobile application remains unimplemented.
+Attention Stats is an open-source, ad-free, Android-first personal digital wellbeing app. React Native Community CLI provides the interface; Kotlin owns collection, deterministic protection, and Room-backed SQLite. The public home is `yasirarfat-dev/AttentionStats`, licensed Apache-2.0. An experimental installed mobile preview now provides the native shell and narrow counter slice; full collection, protection and recovery remain unfinished. The [complete feature vision](FEATURE-VISION.md) maps the enriched experience to its delivery owners and evidence gates.
 
 **Product delivery is mobile clients only: Android first, iOS later.** No website, web app, PWA, desktop client or Chrome extension is in current scope. A possible Chrome extension is deferred until mobile work is complete and separately prioritized. The completed AS-033 browser study is a non-shipping design reference; it is not a product platform or permission to continue web development. Mobile screens use React Native components and platform adapters, not a WebView hosting that study. See ADR-024 in [Decisions](DECISIONS.md).
 

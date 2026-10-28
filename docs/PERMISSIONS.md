@@ -1,11 +1,16 @@
 # Permissions and capability access
 
-**Status:** Source access model specified; source permission declarations/flows unimplemented in the scaffold. Updated 2026-10-27.
+**Status:** Narrow preview accessibility/source/display flows exist; broader grants remain planned. Updated 2026-10-29.
 **Responsibility:** Defines Android declarations, user grants, disclosures, revocation and safe degradation.
 **Related specifications:** [Capabilities](CAPABILITY-MATRIX.md), [UX](UX-SPEC.md), [Privacy](PRIVACY.md), [Architecture](ARCHITECTURE.md).
 **Unresolved feasibility:** F-02, F-08 and F-09 in [Decisions](DECISIONS.md); final manifest depends on target SDK and tested service strategy.
 
+
+Current source increment (ADR-046): the selected Facebook viewer candidate now uses the same seven exact interface-label matches during observation under revised source notice 3. Matching transiently inspects accessibility descriptions and immediately discards nonmatches; no raw description is retained. Instagram still uses layout identifiers only. A fresh affirmative notice is required after upgrading. The temporary diagnostic remains separately selected and may save only bounded fixed tokens and structural metadata. Facebook category separation and Home-feed counts remain unqualified.
+
 ## Grant catalog
+
+The maintainer requests a complete advance inventory for Play preparation. [The release permission plan](../release/PERMISSION-PLAN.md) maps known future features/access without adding speculative grants to the counter. Google's [current-feature policy](https://support.google.com/googleplay/android-developer/answer/9888170) requires sensitive access to implement current listed features and incremental in-context consent. Later working features can update declarations; one closed-test submission does not preapprove the full roadmap. The actual release AAB, source consent and store forms must match. No extra phone grants are made merely for this inventory.
 
 AS-043's Android preview declares a passive, package-scoped AccessibilityService protected by `BIND_ACCESSIBILITY_SERVICE`, with resource-ID reporting/window inspection and `canPerformGestures=false`, `isAccessibilityTool=false`. Independent per-app prominent disclosure comes before a person manually enables Android accessibility. Opening settings never grants access. The optional native HUD uses `TYPE_ACCESSIBILITY_OVERLAY`; the bundled preview explicitly removes inherited `SYSTEM_ALERT_WINDOW`, `ACCESS_LOCAL_NETWORK` and `INTERNET`. It requests no usage, notification, battery-exemption, alarm or foreground-service grant. The two explicit package-visibility queries identify candidate installed apps, not supported detectors. Settings/grant/revocation and store approval are separate from source consent and build success; F-08 remains open.
 
@@ -35,6 +40,8 @@ For battery troubleshooting, distinguish opening general optimization settings f
 
 ## User flow
 
+ADR-045's explicit user authorization expands only the independently affirmed development diagnostic: transient Facebook descriptions may be compared to seven fixed English interface labels, with only matched tokens and bounded structural metadata retained. Show the revised notice before a fresh check. This adds no OS permission and does not expand ordinary source notice 2 or authorize production description reads. The native diagnostic remains debug-only, ten-minute and deletable; see [privacy inventory](PRIVACY.md#data-inventory).
+
 Permission states are separate from consent/configuration: OS-granted but product-disabled is valid. Onboarding offers “Continue without tracking.” Each capability explanation identifies fields, purpose, local storage, optional transfer, limitations and the Android setting about to open. An affirmative action records consent, then opens the appropriate settings route. On return recheck actual OS state; never mark successful merely because an intent launched.
 
 If Android/OEM has no deep link, show a manual path and remain available. Do not loop prompts or block access to prior history. New observation detail needs separate consent even if the OS grant already covers it. Permission dashboard shows granted/needed/unsupported alongside source enablement, pause and last-success time. Revocation keeps prior data and offers deletion separately.
@@ -48,3 +55,11 @@ Accessibility disclosure must be in the normal in-app flow, describe access/use/
 System-only permissions and APIs for usage observers or package suspension are not a distribution strategy for a normal third-party app. AOSP defines restricted usage observer access and suspension permissions; public API designs must not depend on them. See [usage observer source](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/app/usage/UsageStatsManager.java) and [package-management source](https://android.googlesource.com/platform/frameworks/base.git/+/master/core/java/android/content/pm/PackageManager.java). This is a platform boundary, not a claim about another application's private implementation.
 
 Tests cover denial, partial grant, settings cancellation, listener disconnect, revocation during writes, process death, reboot, force-stop and unsupported settings intents. Source status and enforcement outcome must remain independently accurate. OS backup/device-transfer restrictions are a release permission/privacy gate under [Backup](BACKUP-RESTORE.md).
+
+AS-048 package visibility and the passive service candidate allowlist now name only Instagram, Facebook, YouTube and the main TikTok package. Runtime service filtering still narrows to independently enabled, current-consent sources. New catalog entries start off; no accessibility grant, gesture capability, node-text access or detector support follows from package discovery. Other regional packages require separate admission.
+
+## Transient TikTok matching under ADR-049
+
+The user expressly authorizes the developer to choose effective on-device mechanisms after the content-matching tradeoff is explained. TikTok 47.5.3 source notice 4 separately discloses reading only visible, noneditable/nonpassword `title`/`desc` fields as text, with description fallback. Processing is local collection even though no raw field is retained. All other sources keep notice 3. Existing TikTok notice-3 enablement is insufficient; a fresh affirmative notice precedes acquisition.
+
+The acquisition-owned helper streams at most 4096 UTF-16 code units per field into a freshly keyed HMAC-SHA256 comparison. Fixed field framing/order avoids order/concatenation ambiguity. Only keyed digests, a random in-memory key and the previous comparison state survive the scan; no raw-value conversion, log, database, diagnostic or bridge token is permitted. Duplicate, blank, oversized, editable, invisible, foreign-package, missing-caption and incomplete scans withhold identity. Keys/comparison state reset on app/window/consent epoch changes, outside-app/keyguard and service teardown; an invalidated collector cannot commit. Only a monotonically increasing encounter ordinal enters the existing numeric page/count path. Tokens are not durable content identities. Repeated/missing captions can undercount; caption changes can misidentify transitions. Playback, completion, distinct counts and full target accuracy remain unavailable until independently qualified.

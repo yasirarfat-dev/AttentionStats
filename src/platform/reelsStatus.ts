@@ -1,4 +1,5 @@
 import type * as Zod from 'zod';
+import { reelsSourceKeys } from './reelsSources';
 // Metro supports the package's published CJS export; RN's preset currently cannot
 // transform Zod's ESM namespace re-exports. Keep the same reviewed latest package.
 const { z }: typeof Zod = require('zod');
@@ -12,7 +13,7 @@ const count = z
       (value.length === 19 && value <= '9223372036854775807'),
   );
 const source = z.strictObject({
-  app: z.enum(['instagram', 'facebook']),
+  app: z.enum(reelsSourceKeys),
   enabled: z.boolean(),
   consentCurrent: z.boolean(),
   paused: z.boolean(),
@@ -31,7 +32,7 @@ const source = z.strictObject({
 });
 const schema = z
   .strictObject({
-    contractVersion: z.literal(2),
+    contractVersion: z.literal(5),
     revision: z.string().regex(/^[0-9a-f-]{36}:[0-9]{1,19}$/),
     historyRevision: z.string().regex(/^[0-9a-f-]{36}:[0-9]{1,19}$/),
     generation: z.string().uuid(),
@@ -41,15 +42,22 @@ const schema = z
     serviceConnected: z.boolean(),
     overlayEnabled: z.boolean(),
     calibrationEnabled: z.boolean(),
+    diagnosticsAvailable: z.boolean(),
+    counterAppearance: z.strictObject({
+      showIcons: z.boolean(),
+      allAppsToday: z.boolean(),
+    }),
     day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     zone: z.string().min(1).max(100),
-    sources: z.array(source).length(2),
+    sources: z.array(source).length(reelsSourceKeys.length),
   })
   .refine(
     value =>
-      new Set(value.sources.map(item => item.app)).size === 2 &&
+      new Set(value.sources.map(item => item.app)).size ===
+        reelsSourceKeys.length &&
       value.revision.startsWith(value.generation + ':') &&
-      value.historyRevision.startsWith(value.generation + ':'),
+      value.historyRevision.startsWith(value.generation + ':') &&
+      (!value.calibrationEnabled || value.diagnosticsAvailable),
   );
 
 export type ReelsSnapshot = Zod.infer<typeof schema>;

@@ -1,0 +1,151 @@
+{
+  "updated": "2026-10-29",
+  "task": "AS-048/AS-013/AS-041",
+  "scope": "Qualification plan and bounded evidence, not a supported-everywhere claim",
+  "rules": [
+    "Viewer entry routes are independent",
+    "Inline Home video and other post types are separate surfaces/metrics",
+    "Record app version, interface locale, route ground truth and artifact for every actual trial",
+    "Test first settled encounter, forward/return, redraw/idle, comments, source off, lock/switch and ads",
+    "Keep encounter, playback and completion distinct; preserve unavailable categories"
+  ],
+  "sources": {
+    "instagram": [
+      {
+        "route": "dedicated_reels_tab",
+        "result": "historical_narrow_trial"
+      },
+      {
+        "route": "home_reel_to_viewer",
+        "result": "not_run"
+      },
+      {
+        "route": "home_inline_video",
+        "result": "not_run"
+      },
+      {
+        "route": "explore_to_viewer",
+        "result": "not_run"
+      },
+      {
+        "route": "profile_reels_grid",
+        "result": "not_run"
+      },
+      {
+        "route": "shared_link_to_viewer",
+        "result": "not_run"
+      },
+      {
+        "route": "comments_return",
+        "result": "not_run"
+      },
+      {
+        "route": "photo_carousel_and_ad_exclusions",
+        "result": "not_run"
+      }
+    ],
+    "facebook": [
+      {
+        "route": "dedicated_reels_tab",
+        "result": "candidate_only"
+      },
+      {
+        "route": "home_suggested_to_viewer",
+        "result": "candidate_only"
+      },
+      {
+        "route": "home_inline_video",
+        "result": "not_run"
+      },
+      {
+        "route": "video_watch_to_viewer",
+        "result": "not_run"
+      },
+      {
+        "route": "page_profile_reels",
+        "result": "not_run"
+      },
+      {
+        "route": "shared_link_to_viewer",
+        "result": "not_run"
+      },
+      {
+        "route": "comments_return",
+        "result": "not_run"
+      },
+      {
+        "route": "photo_text_carousel_and_ad_exclusions",
+        "result": "not_run"
+      }
+    ],
+    "youtube": [
+      {
+        "route": "shorts_viewer",
+        "result": "narrow_trial_passed"
+      },
+      {
+        "route": "home_shorts_shelf",
+        "result": "not_run"
+      },
+      {
+        "route": "search_shorts_result",
+        "result": "not_run"
+      },
+      {
+        "route": "channel_shorts",
+        "result": "not_run"
+      },
+      {
+        "route": "shared_shorts_link",
+        "result": "not_run"
+      },
+      {
+        "route": "comments_return",
+        "result": "not_run"
+      },
+      {
+        "route": "ordinary_watch_exclusion",
+        "result": "not_run"
+      },
+      {
+        "route": "ad_and_photo_exclusions",
+        "result": "not_run"
+      }
+    ],
+    "tiktok": [
+      {
+        "route": "main_feed",
+        "result": "narrow_trial_passed",
+        "scope": "Final corrected two-transition/idle/outside trials:2/0/0; historical earlier failures retained in dated log; no broad accuracy claim"
+      },
+      {
+        "route": "following_feed",
+        "result": "not_run"
+      },
+      {
+        "route": "profile_video_grid",
+        "result": "not_run"
+      },
+      {
+        "route": "search_to_viewer",
+        "result": "not_run"
+      },
+      {
+        "route": "shared_link_to_viewer",
+        "result": "not_run"
+      },
+      {
+        "route": "comments_return",
+        "result": "not_run"
+      },
+      {
+        "route": "photo_carousel_and_ad_exclusions",
+        "result": "not_run"
+      },
+      {
+        "route": "inbox_profile_search_exclusions",
+        "result": "not_run"
+      }
+    ]
+  }
+}

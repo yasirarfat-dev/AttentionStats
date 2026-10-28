@@ -1,6 +1,6 @@
 # Incoming ideas and questions
 
-**Status:** Intake active; no unreviewed idea is a product commitment. Updated 2026-10-28.
+**Status:** Intake active; no unreviewed idea is a product commitment. Updated 2026-10-29.
 **Responsibility:** Captures future proposals and routes decisions into stable tasks/specifications.
 **Related specifications:** [Product](PRODUCT.md), [Roadmap](ROADMAP.md), [Tracker](FEATURE-TRACKER.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** Each promoted idea needs its own source/access/controls/limits/evidence; existing gates remain F-01–F-09.
@@ -31,6 +31,12 @@ Promotion requires a decision, domain-spec/matrix update and AS task/dependencie
 | Q-017 / 2026-10-28 | Distinguish total views from unique Reels and repeat viewing | Accepted ADR-039: retain settled exposures including return visits, dedupe same-page loops/redraws, separately qualify scoped distinct/repeat breakdowns without hidden content IDs. Preview explains the semantics; repeat history is unavailable until identity evidence exists |
 
 ## Unscheduled evaluation questions
+
+| ID / received | Idea | Disposition |
+|---|---|---|
+| Q-018 / 2026-10-28 | A complete ad-free personal wellbeing system with rich design, counting, understanding and voluntary protection; cover viewers entered from Home videos | Accepted ADR-047; [Feature vision](FEATURE-VISION.md), AS-047 planning artifact, existing AS-013/AS-041 route qualification and AS-011/AS-014/AS-018 implementation owners; no universal watch-count promise |
+| Q-019 / 2026-10-28 | Private manual reflections, user-chosen routine experiments and a permission-free synthetic demonstration | Proposed evaluation only in Feature vision; no runtime task promotion, source access or storage schema. Require separate minimal design, accessibility/privacy review and acceptance scenarios before implementation |
+| Q-020 / 2026-10-28 | Facebook, Instagram, YouTube Shorts and TikTok counters first, before the granular full-product vision | Accepted ADR-048/AS-048; four independently qualified sources and entry routes, shared consent/store/counter; broader diary and protection follow this initial counter MVP |
 
 | ID / date | Question | Current treatment |
 |---|---|---|

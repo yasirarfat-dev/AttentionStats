@@ -61,8 +61,9 @@ internal class ReelsStorageProbe(private val instrumentation: Instrumentation) {
             var dao = history.database.data()
             val metadata = checkNotNull(dao.metadata())
             expect(metadata.lastRevision == 0L && metadata.configurationRevision == 0L)
-            expect(dao.configurations().size == 2 && dao.configurations().all { !it.enabled && !it.paused })
+            expect(dao.configurations().size == 4 && dao.configurations().all { !it.enabled && !it.paused })
             expect(dao.overlay()?.enabled == false)
+            expect(dao.overlay()?.let { it.showIcons && it.allAppsToday } == true)
             expect(wrapper.isFile && wrapper.length() in 1..256)
             expect(keystore.containsAlias(alias))
             val episode = UUID.randomUUID().toString()
@@ -73,6 +74,12 @@ internal class ReelsStorageProbe(private val instrumentation: Instrumentation) {
                 repeat(12) { index -> dao.insertExposure(Exposure(UUID.randomUUID().toString(), episode,
                     marker, instant + index, index.toLong(), index.toLong() + 1, 1, "estimate", 1, "synthetic", "UTC", 0,
                     listOf("reel", "photo", "ad")[index % 3])) }
+                val otherEpisode = UUID.randomUUID().toString()
+                dao.insertEpisode(SurfaceEpisode(otherEpisode, "synthetic.second", "short_video", instant, instant + 3000, 1, "estimate"))
+                repeat(3) { index -> dao.insertExposure(Exposure(UUID.randomUUID().toString(), otherEpisode,
+                    "synthetic.second", instant + if (index == 2) 2000 else index, index.toLong(), index + 1L,
+                    1, "estimate", 1, "synthetic", "UTC", 0, "reel")) }
+                dao.setCounterAppearance(false, false)
                 dao.advanceConfigurationRevision()
             }
             expect(dao.dayCount(marker, instant, instant + 1000) == 12L)
@@ -82,6 +89,10 @@ internal class ReelsStorageProbe(private val instrumentation: Instrumentation) {
             expect(dao.dayCategories(marker, instant, instant + 1000).associate { it.category to it.count } ==
                 mapOf("reel" to 4L, "photo" to 4L, "ad" to 4L))
             expect(dao.visitCategories(episode).sumOf { it.count } == 12L)
+            expect(dao.allAppDayCategories(instant, instant + 1000).associate { it.category to it.count } ==
+                mapOf("reel" to 6L, "photo" to 4L, "ad" to 4L))
+            expect(dao.allAppDayCategories(instant, instant + 1000).sumOf { it.count } == 14L)
+            expect(dao.overlay()?.let { !it.showIcons && !it.allAppsToday } == true)
             expect(dao.dayCount(marker, instant, instant + 1) == 1L) // Half-open range boundary.
             expect(checkNotNull(dao.metadata()).configurationRevision == 1L)
             stage = "encrypted_files"
@@ -107,6 +118,8 @@ internal class ReelsStorageProbe(private val instrumentation: Instrumentation) {
                 migrationDriver.open(database.path).use { connection ->
                     fun execute(sql: String) { connection.prepare(sql).use { it.step() } }
                     execute("ALTER TABLE Exposure DROP COLUMN category")
+                    execute("ALTER TABLE LiveOverlayConfiguration DROP COLUMN showIcons")
+                    execute("ALTER TABLE LiveOverlayConfiguration DROP COLUMN allAppsToday")
                     execute("UPDATE room_master_table SET identity_hash = 'b833294b18d888c8f6f9501a08ab743b' WHERE id = 42")
                     execute("PRAGMA user_version = 1")
                 }
@@ -117,6 +130,40 @@ internal class ReelsStorageProbe(private val instrumentation: Instrumentation) {
             expect(dao.categoryCount(marker, instant, instant + 1000, "unclassified") == 12L)
             expect(dao.categoryCount(marker, instant, instant + 1000, "ad") == 0L)
             expect(checkNotNull(dao.metadata()).generation == metadata.generation)
+            expect(dao.overlay()?.let { it.showIcons && it.allAppsToday && !it.enabled } == true)
+            expect(dao.allAppDayCategories(instant, instant + 1000).sumOf { it.count } == 14L)
+            dao.setOverlay(true)
+            dao.setCounterAppearance(false, false)
+            // Simulate the installed two-source catalog without touching retained facts or consent.
+            val catalogRevision = checkNotNull(dao.metadata()).configurationRevision
+            history.close(); history = null
+            stage = "v2_migration"
+            val v2Keys = LocalKeyEnvelope(scoped, database, alias).open()
+            val v2Literal = ("x'" + v2Keys.raw.joinToString("") { "%02x".format(it.toInt() and 255) } + "'")
+                .toByteArray(Charsets.US_ASCII)
+            v2Keys.raw.fill(0)
+            val v2Driver = try { OwnedCipherDriver(v2Literal) } finally { v2Literal.fill(0) }
+            try {
+                v2Driver.open(database.path).use { connection ->
+                    fun execute(sql: String) { connection.prepare(sql).use { it.step() } }
+                    execute("ALTER TABLE LiveOverlayConfiguration DROP COLUMN showIcons")
+                    execute("ALTER TABLE LiveOverlayConfiguration DROP COLUMN allAppsToday")
+                    execute("UPDATE room_master_table SET identity_hash = 'c4abcb9145fc71b0d014dbb5f46d3148' WHERE id = 42")
+                    execute("PRAGMA user_version = 2")
+                    execute("DELETE FROM SourceConfiguration WHERE sourceId IN ('reels.youtube', 'reels.tiktok')")
+                }
+            } finally { v2Driver.retire() }
+            history = HistoryStore.open(scoped, alias)
+            dao = history.database.data()
+            expect(dao.overlay()?.let { it.showIcons && it.allAppsToday && it.enabled } == true)
+            expect(dao.dayCount(marker, instant, instant + 1000) == 12L)
+            expect(dao.allAppDayCategories(instant, instant + 1000).sumOf { it.count } == 14L)
+            expect(checkNotNull(dao.metadata()).generation == metadata.generation)
+            expect(dao.configurations().size == 4)
+            expect(dao.configurations().filter { it.sourceId in setOf("reels.youtube", "reels.tiktok") }
+                .all { !it.enabled && !it.paused && it.consentRevision == 0L })
+            expect(checkNotNull(dao.metadata()).configurationRevision == catalogRevision + 1)
+            dao.setCounterAppearance(false, false)
             history.close(); history = null
 
             stage = "keystore_reopen"
@@ -124,6 +171,7 @@ internal class ReelsStorageProbe(private val instrumentation: Instrumentation) {
             dao = history.database.data()
             expect(dao.dayCount(marker, instant, instant + 1000) == 12L)
             expect(dao.configurations().single { it.sourceId == "reels.instagram" }.enabled)
+            expect(dao.overlay()?.let { !it.showIcons && !it.allAppsToday && it.enabled } == true)
             expect(checkNotNull(dao.metadata()).generation == metadata.generation)
             history.close(); history = null
 

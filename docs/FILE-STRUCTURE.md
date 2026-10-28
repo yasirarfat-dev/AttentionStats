@@ -1,11 +1,13 @@
 # File structure
 
-**Status:** Experimental mobile tree, pure analytics source, documentation and retained design reference exist; five-tab domain feature folders now exist; unconnected runtime features remain planned. Updated 2026-10-28.
+**Status:** Experimental mobile tree, pure analytics source, documentation and retained design reference exist; five-tab domain feature folders now exist; unconnected runtime features remain planned. Updated 2026-10-29.
 **Responsibility:** Defines file placement and ownership to avoid duplicate stores or rules.
 **Related specifications:** [Architecture](ARCHITECTURE.md), [Conventions](CONVENTIONS.md), [Development](DEVELOPMENT.md), [Agent rules](AGENT-RULES.md).
 **Unresolved feasibility:** F-03 and F-07 in [Decisions](DECISIONS.md); generated CLI layout must be reconciled after latest-version resolution.
 
 ## Current repository
+
+ADR-043 adds `policies/` for public user-facing notices and `release/PLAY-CONSOLE.md` as the reviewed source for the external release root's information file. Source and Gradle intermediates stay in this project. `C:\home\biobot\AppReleases\AttentionStats` holds store/policy copies, versioned immutable `releases/<version>+<code>/{android,metadata,notes}`, private testing material and a separate private/signing reservation. It is not a second editable application checkout. See [Release](RELEASE.md).
 
 ADR-041 adds actual `android/app/src/main/java/com/attentionstats/detectors/` packages: `SurfaceDetector.kt`/`DetectorRegistry.kt`, `social/instagram/InstagramDetector.kt` and `accessibility/StructuralSnapshotReader.kt`. The former `reels/DetectorRegistry.kt` is removed. Other platform packages remain absent until substantive work begins. See [adapter guide](SOCIAL-ADAPTERS.md); the Reels enum/source catalog/bridge still enumerate two preview candidates.
 
@@ -112,3 +114,5 @@ Feature folders own screens and view adapters, not a parallel history database. 
 Platform-specific observation adapters live in dedicated service-specific native subpackages, with their own synthetic fixtures/support records and a narrow registry interface. A Facebook detector must not reach into Instagram implementation details or share assumed selectors. Common normalized evidence/reducer contracts are reusable; per-platform feasibility, version/locale support and consent remain independent. These folders are proposed, not validated or generated detector implementations.
 
 Put contract changes in the contract spec and shared adapter types; generated Codegen output is not manually edited. Keep sensitive runtime data, captures, backups, keys and personal diagnostics outside the repository. Only synthetic fixtures belong under tests. Keep public evidence narrowly scoped to package metadata, verified compatibility reports, and anonymized aggregate test outcomes with no user histories.
+
+`src/platform/reelsSources.ts` owns the four-source presentation catalog and stable key tuple shared by strict decoding and feature consumers. Pure native `ReelApp` retains package/source identity; Android acquisition and each app-owned detector remain separate.

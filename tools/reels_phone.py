@@ -39,12 +39,14 @@ def validate_structure(raw: bytes) -> dict:
         expect(type(value) is dict and set(value) == {"scope", "targets"})
         expect(value["scope"] == "consented structural detector qualification only; no content")
         targets = value["targets"]
-        expect(type(targets) is dict and 1 <= len(targets) <= 2 and set(targets) <= {"instagram", "facebook"})
+        expect(type(targets) is dict and 1 <= len(targets) <= 4 and set(targets) <= {"instagram", "facebook", "youtube", "tiktok"})
         for target in targets.values():
             base_keys = {"version", "nodes", "bounded", "editable", "ids", "positions", "controls", "classes", "scrolls"}
             geometry_keys = {"geometryRevision", "viewport", "anchors"}
+            interface_keys = {"interfaceRevision", "interfaceLabels"}
             expect(type(target) is dict and set(target) in [base_keys, base_keys | geometry_keys,
-                                                          base_keys | geometry_keys | {"association"}])
+                                                          base_keys | geometry_keys | {"association"},
+                                                          base_keys | geometry_keys | {"association"} | interface_keys])
             expect(isinstance(target["version"], str) and re.fullmatch(r"[A-Za-z0-9._-]{1,100}", target["version"]) is not None)
             expect(type(target["nodes"]) is int and 0 <= target["nodes"] <= 192)
             expect(type(target["bounded"]) is bool and type(target["editable"]) is bool)
@@ -90,6 +92,30 @@ def validate_structure(raw: bytes) -> dict:
                         layout(ancestor, set())
                         expect(ancestor["slot"] < previous)
                         previous = ancestor["slot"]
+            if "interfaceRevision" in target:
+                expect(type(target["interfaceRevision"]) is int and target["interfaceRevision"] in {1, 2})
+                labels = target["interfaceLabels"]
+                expect(type(labels) is list and len(labels) <= 16)
+                expect(targets.get("facebook") is target or labels == [])
+                for row in labels:
+                    extended = target["interfaceRevision"] == 2
+                    expect(type(row) is dict and set(row) == {
+                        "token", "class", "left", "top", "right", "bottom", "selected", "clickable"} |
+                        ({"slot", "ancestors"} if extended else set()))
+                    tokens = {"reels", "video", "home", "close", "comments", "search", "back"}
+                    if extended:
+                        tokens |= {"like", "comment_button", "share", "home_tab", "reels_tab", "video_tab"}
+                        expect(type(row["slot"]) is int and 0 <= row["slot"] < target["nodes"])
+                        expect(type(row["ancestors"]) is list and len(row["ancestors"]) <= 3)
+                        previous = row["slot"]
+                        for ancestor in row["ancestors"]:
+                            layout(ancestor, set())
+                            expect(ancestor["slot"] < previous)
+                            previous = ancestor["slot"]
+                    expect(row["token"] in tokens)
+                    expect(ident(row["class"], 120))
+                    bounds(row)
+                    expect(type(row["selected"]) is bool and type(row["clickable"]) is bool)
             if "association" in target:
                 trace = target["association"]
                 expect(target["scrolls"] == [])  # No unrelated historical event list in this revision.
@@ -156,9 +182,13 @@ def parse_result(output: str, mode: str) -> dict[str, int]:
        [x for x in lines if x.startswith("INSTRUMENTATION_RESULT: stream=")] != ["INSTRUMENTATION_RESULT: stream=" + expected]:
         stage = re.search(r"^INSTRUMENTATION_RESULT: probe_stage=([a-z_]{1,40})$", output, re.M)
         kind = re.search(r"^INSTRUMENTATION_RESULT: stream=FAIL: ([A-Za-z]{1,80})\s*$", output, re.M)
+        location = re.search(r"^INSTRUMENTATION_RESULT: probe_location=([A-Za-z0-9_.$:;]{1,700})$", output, re.M)
+        touch = {key: int(found[0]) for key in ["touch_x", "touch_y", "own_window_focus", "screen_height"]
+                 if len(found := re.findall(rf"^INSTRUMENTATION_STATUS: {key}=(-?[0-9]{{1,6}})$", output, re.M)) == 1}
         raise RuntimeError("Reels " + mode + " probe failed; stage=" + (stage[1] if stage else "unreported") +
-                           "; type=" + (kind[1] if kind else "unreported") + "; raw phone output withheld")
-    limits = {"storage_checks": (30, 200), "detector_checks": (30, 100), "key_rejections": (3, 3), "sentinel_files": (1, 3),
+                           "; type=" + (kind[1] if kind else "unreported") +
+                           ("; location=" + location[1] if location else "") + ("; touch=" + json.dumps(touch) if touch else "") + "; raw phone output withheld")
+    limits = {"storage_checks": (30, 200), "detector_checks": (30, 160), "key_rejections": (3, 3), "sentinel_files": (1, 3),
               "fixture_removed": (1, 1)} if mode == "storage" else {"ui_checks": (20, 160), "shell_routes": (20, 20)}
     values = {}
     for key, (low, high) in limits.items():
@@ -227,7 +257,7 @@ def main() -> int:
                                    "; no health restart fallback attempted; raw output withheld")
             flags = {}
             for key in ["accessibilityEnabled", "serviceConnected", "calibrationEnabled", "overlayEnabled", "storageReady", "enabledSources", "pausedSources"]:
-                found = re.findall(rf"^INSTRUMENTATION_RESULT: {key}=([0-3])$", output, re.M)
+                found = re.findall(rf"^INSTRUMENTATION_RESULT: {key}=([0-4])$", output, re.M)
                 if len(found) != 1: raise RuntimeError("Malformed health flag; raw output withheld")
                 flags[key] = int(found[0])
             print(json.dumps(flags, indent=2))
@@ -278,7 +308,7 @@ def main() -> int:
                                 "reels-" + mode, RUNNER, timeout=180)
                 evidence[mode] = parse_result(output, mode)
                 print("PASS: Reels " + mode + " phone checks", flush=True)
-            for name in ["controls", "privacy", "reels", "facebook", "hud-collapsed", "hud-expanded",
+            for name in ["controls", "privacy", "privacy-policy", "reels", "facebook", "hud-collapsed", "hud-expanded", "hud-numbers",
                          *["shell-" + item for item in ["today", "history", "patterns", "protect", "settings", "diary",
                              "explanation", "categories", "focus", "rules", "sources", "storage", "backup",
                              "appearance", "counter", "convenience", "about", "welcome"]]]:

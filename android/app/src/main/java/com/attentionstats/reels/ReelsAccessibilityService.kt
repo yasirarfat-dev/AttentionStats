@@ -18,6 +18,8 @@ import com.attentionstats.MainActivity
 import com.attentionstats.detectors.DetectorRegistry
 import com.attentionstats.detectors.SurfaceEvidence
 import com.attentionstats.detectors.SurfaceObservation
+import com.attentionstats.detectors.LayoutBounds
+import com.attentionstats.detectors.ScrollEvidence
 import com.attentionstats.detectors.accessibility.StructuralSnapshotReader
 import com.attentionstats.detectors.accessibility.DiagnosticScrollTrace
 import org.attentionstats.reels.CounterSignal
@@ -28,7 +30,7 @@ import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 
-/** Passive, package-scoped metadata only. Never reads text/descriptions or performs node actions. */
+/** Passive package-scoped metadata. Temporary Facebook label matching is isolated under ADR-045. */
 class ReelsAccessibilityService : AccessibilityService() {
     private val main = Handler(Looper.getMainLooper())
     private val coordinator by lazy { ReelsCoordinator.get(this) }
@@ -46,8 +48,10 @@ class ReelsAccessibilityService : AccessibilityService() {
     private var lastScan = 0L
     @Volatile private var currentApp: ReelApp? = null
     @Volatile private var displayEligible = false
-    private val pages = ConcurrentHashMap<ReelApp, Long>()
+    private data class Page(val value: Long?, val window: Int, val epoch: Long, val scroll: ScrollEvidence)
+    private val pages = ConcurrentHashMap<ReelApp, Page>()
     private val scrollTrace = DiagnosticScrollTrace()
+    private val contentIdentity = com.attentionstats.detectors.accessibility.TransientContentIdentity()
     @Volatile private var calibrationStart = 0L
     private var lastConfiguration = ""
     private val tick = Runnable {
@@ -99,8 +103,17 @@ class ReelsAccessibilityService : AccessibilityService() {
                     scrollTrace.record(DiagnosticScrollTrace.Scope(app, capturedEpoch, event.windowId),
                         SystemClock.uptimeMillis(), event.eventTime, sample)
                 }
-                if (detector != null && id in detector.definition.scrollSourceIds && event.fromIndex >= 0 &&
-                    event.fromIndex == event.toIndex) pages[app] = event.fromIndex.toLong()
+                if (detector != null && safeSource) {
+                    val bounds = Rect().also { source.getBoundsInScreen(it) }
+                    val evidence = ScrollEvidence(id, StructuralSnapshotReader.role(source),
+                        LayoutBounds(bounds.left, bounds.top, bounds.right, bounds.bottom),
+                        event.fromIndex, event.toIndex, event.itemCount)
+                    if (detector.acceptsScroll(evidence)) {
+                        val page = if (event.fromIndex >= 0 && event.fromIndex == event.toIndex)
+                            event.fromIndex.toLong() else null
+                        pages[app] = Page(page, event.windowId, capturedEpoch, evidence)
+                    }
+                }
             } finally { recycleCompat(source) }
         }
         schedule(80)
@@ -114,6 +127,8 @@ class ReelsAccessibilityService : AccessibilityService() {
         if (key == lastConfiguration) return
         lastConfiguration = key
         scrollTrace.clear()
+        contentIdentity.reset()
+        pages.clear()
         serviceInfo = serviceInfo?.apply {
             packageNames = (selected.ifEmpty { listOf(packageName) }).toTypedArray()
         }
@@ -158,11 +173,18 @@ class ReelsAccessibilityService : AccessibilityService() {
             val diagnostic = coordinator.calibrationEnabled
             val ticket = if (diagnostic) scrollTrace.begin(DiagnosticScrollTrace.Scope(app, capturedEpoch, root.windowId),
                 SystemClock.uptimeMillis()) else null
-            val shape = StructuralSnapshotReader.inspect(app, root, detector, diagnostic)
+            val identity = if (detector?.usesContentIdentity == true)
+                contentIdentity.begin(app, root.windowId, capturedEpoch) else null
+            val shape = StructuralSnapshotReader.inspect(app, root, detector, diagnostic, identity)
             val association = ticket?.let { scrollTrace.finish(it, SystemClock.uptimeMillis()) }
+            val page = pages[app]?.takeIf { it.window == root.windowId && it.epoch == capturedEpoch }
+            val viewport = shape.viewport
             val observation = detector?.detect(SurfaceEvidence(shape.ids, shape.bounded, shape.editable,
-                shape.centerPage ?: pages[app])) ?: SurfaceObservation(Surface.UNKNOWN)
+                shape.identityPage ?: shape.centerPage ?: page?.value,
+                LayoutBounds(viewport.getInt("left"), viewport.getInt("top"), viewport.getInt("right"), viewport.getInt("bottom")),
+                shape.labels, page?.scroll)) ?: SurfaceObservation(Surface.UNKNOWN)
             val surface = observation.surface
+            if (surface == Surface.OUTSIDE || surface == Surface.UNKNOWN) pages.remove(app)
             val current = rootInActiveWindow
             val sameWindow = try { current != null && current.packageName?.toString() == app.packageName && current.windowId == root.windowId }
                 finally { recycleCompat(current) }
@@ -175,6 +197,7 @@ class ReelsAccessibilityService : AccessibilityService() {
                     .put("ids", JSONArray(shape.ids.toList())).put("positions", shape.positions)
                     .put("controls", shape.controls).put("association", association)
                     .put("geometryRevision", 1).put("viewport", shape.viewport).put("anchors", shape.anchors)
+                    .put("interfaceRevision", 2).put("interfaceLabels", shape.interfaceLabels)
                     .put("classes", JSONArray(shape.classes.toList())).put("scrolls", JSONArray()), capturedEpoch)
             displayEligible = surface == Surface.REELS
             if (surface != Surface.REELS) removeHud()
@@ -191,6 +214,7 @@ class ReelsAccessibilityService : AccessibilityService() {
         currentApp = null
         pages.clear()
         scrollTrace.clear()
+        contentIdentity.reset()
     }
 
     private fun renderHud() {

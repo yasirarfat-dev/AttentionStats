@@ -39,13 +39,17 @@ internal class HistoryStore private constructor(
                         data.insertMetadata(StoreMetadata(generation = keys.generation,
                             installationEpoch = keys.installationEpoch, lastRevision = 0,
                             createdAtMs = System.currentTimeMillis()))
-                        ReelApp.entries.forEach { data.insertConfiguration(SourceConfiguration(
-                            it.sourceId, false, 0, System.currentTimeMillis())) }
                         data.insertOverlay(LiveOverlayConfiguration())
                     } else {
                         check(metadata.generation == keys.generation &&
                             metadata.installationEpoch == keys.installationEpoch) { "KEY_UNAVAILABLE" }
                     }
+                    // Add catalog entries without replacing grants, consent, metadata or history.
+                    val existingSources = data.configurations().map { it.sourceId }.toSet()
+                    val missingSources = ReelApp.entries.filter { it.sourceId !in existingSources }
+                    missingSources.forEach { data.insertConfiguration(SourceConfiguration(
+                        it.sourceId, false, 0, System.currentTimeMillis())) }
+                    if (metadata != null && missingSources.isNotEmpty()) data.advanceConfigurationRevision()
                     if (data.closeInterruptedEpisodes() > 0) data.advanceRevision()
                 }
                 return HistoryStore(database, driver)

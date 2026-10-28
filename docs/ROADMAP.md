@@ -1,15 +1,19 @@
 # Roadmap
 
-**Status:** Prioritized delivery plan; no application milestones complete. Updated 2026-10-27.
+**Status:** Prioritized delivery plan; no application milestones complete. Updated 2026-10-29.
 **Responsibility:** Defines stage boundaries, admission/exit gates and sequencing.
 **Related specifications:** [Tracker](FEATURE-TRACKER.md), [Capabilities](CAPABILITY-MATRIX.md), [Product](PRODUCT.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-09 may change supported delivery scope; no dates or parity promises are implied.
 
 ## Stage 0: documentation foundation
 
+The [feature vision delivery sequence](FEATURE-VISION.md#delivery-sequence-and-exit-evidence) connects these engineering stages to useful product increments: trustworthy counters, daily diary, chosen protection, complete data ownership, then deeper independently qualified detail. ADR-047 prioritizes entry-route coverage and honest encounter/playback semantics within the existing AS-013/AS-041 work. It does not replace unresolved prerequisites.
+
 AS-001 produces the full linked source-of-truth set, root onboarding/license/agent/security material, exact latest dependency research, capability inventory, decisions, acceptance scenarios, prioritized backlog and accurate current state. Verify links and coverage, inspect public artifacts, publish to the user-designated public repository and verify remote visibility/commit. Exit: documentation prepared; application not yet implemented.
 
 ## Stage 1: feasibility and architecture proof
+
+ADR-048 makes AS-048 the immediate delivery milestone: a Facebook/Instagram/YouTube Shorts/TikTok counter MVP before broader diary/protection expansion. This replaces the two-app publishing target, while preserving each subset's feasibility, consent, data preservation, accessibility and release gates. The full-product MVP below remains a later milestone; it is not required to call a truthful, qualified four-app counter slice useful.
 
 The user's design continuation adds AS-033: a synthetic interaction study and [human-factors direction](HUMAN-FACTORS.md) before native UI implementation. This independent design artifact can be reviewed now; it does not clear platform, privacy, latest-stack or enforcement gates. AS-018 later implements native screens with this reference and device evidence.
 

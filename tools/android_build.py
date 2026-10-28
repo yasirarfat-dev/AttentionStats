@@ -16,7 +16,7 @@ def main() -> int:
     parser.add_argument("tasks", nargs="+", choices=[
         "assembleDebug", "assembleRelease", "bundleRelease", "lintDebug",
         ":app:assembleDebug", ":app:assembleRelease", ":app:assembleDebugAndroidTest", ":app:lintDebug",
-        ":app:assemblePreview", ":app:lintPreview",
+        ":app:assemblePreview", ":app:lintPreview", ":app:bundleRelease", ":app:lintRelease",
         "testDebugUnitTest", ":analytics-core:verifyAnalytics", "generateCodegenArtifactsFromSchema",
         ":collection-prototype:verifyReconciliation",
         ":reels-core:verifyReels",
@@ -27,6 +27,8 @@ def main() -> int:
     parser.add_argument("--sdk", type=Path, default=Path(default_sdk))
     parser.add_argument("--arch", default="arm64-v8a", choices=["arm64-v8a", "x86_64", "armeabi-v7a", "x86"])
     parser.add_argument("--write-locks", action="store_true", help="only for reviewed native dependency introduction/refresh")
+    parser.add_argument("--workers", type=int, choices=[1, 2, 4], default=4,
+                        help="Bound this build's concurrency without changing machine-wide Gradle state")
     args = parser.parse_args()
     sdk = args.sdk.resolve()
     if not (sdk / "platforms").is_dir():
@@ -51,7 +53,7 @@ def main() -> int:
             ], check=True, env=env)
     wrapper = ROOT / "android" / ("gradlew.bat" if os.name == "nt" else "gradlew")
     return subprocess.run([str(wrapper), *args.tasks, "--no-daemon", "--console=plain",
-                           "--max-workers=4", "-Pandroid.builder.sdkDownload=false",
+                           f"--max-workers={args.workers}", "-Pandroid.builder.sdkDownload=false",
                            f"-PreactNativeArchitectures={args.arch}", *(["--write-locks"] if args.write_locks else [])],
                           cwd=ROOT / "android", env=env).returncode
 

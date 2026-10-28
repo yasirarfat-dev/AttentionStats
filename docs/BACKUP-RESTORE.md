@@ -1,6 +1,6 @@
 # Backup and restore
 
-**Status:** Portable encrypted archives planned; direct automatic Drive integration blocked. Updated 2026-10-27.
+**Status:** Portable encrypted archives planned; direct automatic Drive integration blocked. Updated 2026-10-29.
 **Responsibility:** Defines backup experience, format requirements, transports, recovery and failure atomicity.
 **Related specifications:** [Security](SECURITY.md), [Crypto design](CRYPTO-ARCHIVE-DESIGN.md), [Privacy](PRIVACY.md), [Storage](STORAGE-AND-RETENTION.md), [Contracts](NATIVE-CONTRACTS.md), [Testing](TESTING.md).
 **Unresolved feasibility:** F-04–F-06 in [Decisions](DECISIONS.md); prototype format selected under ADR-031, but interoperability, resource behavior, provider durability and automatic-backup policy remain independently unqualified.
@@ -55,3 +55,5 @@ Sensitive history, configurations, MMKV preferences, staging, keys and tokens mu
 Android documentation warns that some manufacturers may still allow device transfer when only allowBackup is false; explicit rules and real-device tests are necessary. See [Android Auto Backup](https://developer.android.com/identity/data/autobackup). The release gate tests merged manifest, database/WAL, shared preferences, files, MMKV locations, no-backup files, cloud restore and device transfer. Unexpected transfer blocks release. OS backup is not a fallback for the blocked product feature.
 
 Acceptance B-01–B-07 and S-01 in [Testing](TESTING.md) includes fresh-device recovery, wrong credentials, corruption, interruption at each stage, format compatibility, permission reactivation and preservation of existing history. Cloud UI must clearly show blocked/unavailable today.
+
+ADR-050 lifetime history, immutable event/origin provenance, future merge/deletion semantics and rebuildable calendar summaries are defined in [Storage and retention](STORAGE-AND-RETENTION.md#lifetime-event-history-and-future-multi-origin-merging). These are design obligations; current preview storage/aggregate/restore limits remain explicit.

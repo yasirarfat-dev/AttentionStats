@@ -1,6 +1,6 @@
 # Settings specification
 
-**Status:** Planned catalog with working narrow Reels controls and experimental settings routes; broader preferences remain unimplemented. Updated 2026-10-28.
+**Status:** Planned catalog with working narrow Reels controls and experimental settings routes; broader preferences remain unimplemented. Updated 2026-10-29.
 **Responsibility:** Defines user controls, defaults, persistence owner and change effects.
 **Related specifications:** [UX](UX-SPEC.md), [Privacy](PRIVACY.md), [Protection](PROTECTION-SPEC.md), [Backup](BACKUP-RESTORE.md), [Models](DATA-MODELS.md).
 **Unresolved feasibility:** F-01–F-08 in [Decisions](DECISIONS.md); unavailable settings must state the gate rather than appear functional.
@@ -11,7 +11,7 @@ AS-043 exposes a narrow working implementation of these planned controls in the 
 
 N = native authoritative Room configuration, U = non-sensitive UI preference in MMKV, K = secure native credential/token storage. Defaults apply to new installation, never as a silent reset on update. Source/detail expansions need affirmative consent. Data mutations return native revision/success before the UI reports saved; conflict/failure keeps a visible unsaved draft. Display current defaults, effect scope and relevant capability health.
 
-AS-045 adds native Settings destinations for sources/health, local storage, backup/recovery, app appearance, floating counter, convenience and about. Read-only unavailable rows describe unimplemented controls; they do not persist fake preferences. System theme remains automatic. The compact counter is draggable for the service session and has accessible move/reset actions; full appearance profiles are not implemented. Optional completion-triggered auto-scroll is a separate disabled/unavailable convenience setting under AS-044, not a statistics/source switch.
+AS-045 adds native Settings destinations for sources/health, local storage, backup/recovery, app appearance, floating counter, convenience and about. ADR-044 adds two actual native-owned display preferences under Floating counter: optional session/Today icons (initially on) and Today across all observed apps (default on; off means current app). Plain numbers have no tilde; spoken/expanded/app explanations retain estimate and scope semantics. These preferences are saved by revision-checked native mutation without enabling access/sources/display or resetting visits. Native ownership, rather than JS MMKV, supports the counter when JS is stopped. Other read-only unavailable rows describe unimplemented controls; they do not persist fake preferences. System theme remains automatic. Position lasts for the service session with accessible move/reset actions; full appearance profiles remain planned. Optional completion-triggered auto-scroll stays separate and unavailable under AS-044.
 
 ## Catalog
 

@@ -4,6 +4,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { StyleSheet } from 'react-native-unistyles';
 import {
   NativeReels,
+  reelsSources,
   parseReelsSnapshot,
   type ReelsApp,
   type ReelsSnapshot,
@@ -11,8 +12,6 @@ import {
 import { Action } from '../../../ui/Action';
 import { Heading, Paragraph } from '../../../ui/Reading';
 import { Screen } from '../../../ui/Screen';
-
-const names = { instagram: 'Instagram', facebook: 'Facebook' };
 
 export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
   const native = NativeReels;
@@ -88,14 +87,21 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
     const module = NativeReels;
     const revision = snapshot.revision;
     const apply = () =>
-      mutate(() => module.configure(app, enabled, 2, revision));
+      mutate(() =>
+        module.configure(
+          app,
+          enabled,
+          reelsSources[app].noticeRevision,
+          revision,
+        ),
+      );
     if (!enabled) {
       apply();
       return;
     }
     Alert.alert(
-      `Observe ${names[app]} Reels?`,
-      `Attention Stats uses Android accessibility to inspect layout identifiers, roles and numeric page positions in ${names[app]} when you use it. It saves estimated settled viewer-page counts and times in encrypted storage on this device, separating recognized video layouts, photo/carousel layouts, ads and unclassified pages. Recognized ads are kept separate from video/photo counts. Layouts do not prove that every ad is recognized. Normal-feed posts are not supported yet. It does not read screen text, messages, titles, creators, search terms, photos or video, and sends no history to us. Comments do not count. Coverage can be incomplete. You can pause, disable or delete this history at any time. Accessibility access is a separate setting you enable yourself.`,
+      `Observe ${reelsSources[app].observation}?`,
+      `Attention Stats uses Android accessibility to inspect layout identifiers, roles and numeric page positions in ${reelsSources[app].name} when you use it. ${app === 'facebook' ? 'For Facebook, it also transiently compares accessibility descriptions with fixed interface labels such as Reels and Search; other descriptions are discarded immediately. No raw descriptions are saved.' : app === 'tiktok' ? 'For TikTok, it transiently reads the visible title and caption fields (text or accessibility descriptions) solely to distinguish settled encounters. It immediately discards raw values and uses keyed comparison tokens only in memory. Identical or missing captions can miss transitions; these are partial encounter estimates, not unique videos or proof of playback.' : 'Accessibility descriptions are not inspected for this source.'} It saves estimated settled viewer-page counts and times in encrypted storage on this device, separating recognized video layouts, photo/carousel layouts, ads and unclassified pages. Recognized ads are kept separate from video/photo counts. Layouts do not prove that every ad is recognized. Normal-feed posts are not supported yet. ${app === 'tiktok' ? 'It reads only the disclosed TikTok fields and no input or message text. It does not read photos or video and saves no raw text, titles, captions, creators or search terms,' : 'It does not read node text, photos or video, saves no messages, titles, creators or search terms,'} and sends no history to us. Comments do not count. Coverage can be incomplete. You can pause, disable or delete this history at any time. Accessibility access is a separate setting you enable yourself.`,
       [
         { text: 'Keep off', style: 'cancel' },
         { text: 'I agree — enable observation', onPress: apply },
@@ -226,18 +232,18 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
                           source.app === 'instagram' && styles.instagramText,
                         ]}
                       >
-                        {source.app === 'instagram' ? 'IG' : 'f'}
+                        {reelsSources[source.app].mark}
                       </Text>
                     </View>
                     <View style={styles.grow}>
                       <Text accessibilityRole="header" style={styles.appName}>
-                        {names[source.app]}
+                        {reelsSources[source.app].name}
                       </Text>
                       <Text style={styles.support}>{status}</Text>
                     </View>
                     <Switch
                       style={styles.switchTarget}
-                      accessibilityLabel={`Observe ${names[source.app]} Reels`}
+                      accessibilityLabel={`Observe ${reelsSources[source.app].observation}`}
                       value={source.enabled && source.consentCurrent}
                       disabled={busy || !source.installed}
                       onValueChange={value => consent(source.app, value)}
@@ -245,7 +251,7 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
                   </View>
                   <View style={styles.metric}>
                     <Text style={styles.count}>
-                      {available ? `~${source.today}` : '—'}
+                      {available ? source.today : '—'}
                     </Text>
                     <Text style={styles.support}>
                       {available
@@ -265,17 +271,17 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
                     <Text key={key} style={styles.support}>
                       {label}:{' '}
                       {available && source.counts[key] !== null
-                        ? `~${source.counts[key]}`
+                        ? source.counts[key]
                         : '—'}
                     </Text>
                   ))}
                   {current && source.visit !== null && (
                     <Text style={styles.support}>
-                      This visit ~{source.visit} · included in today
+                      This visit {source.visit} · included in today
                     </Text>
                   )}
                   <Action
-                    label={`Open ${names[source.app]}`}
+                    label={`Open ${reelsSources[source.app].name}`}
                     variant="tonal"
                     onPress={() => openTarget(source.app)}
                     disabled={busy || !source.installed}
@@ -289,8 +295,10 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
             completed views. Returning to an earlier page counts again; looping
             on the same page does not. Unique items and repeat breakdowns are
             unavailable. Recognized ads stay separate. Ad detection is
-            incomplete; video/photo labels describe layouts. Normal-feed posts
-            and Facebook counting are not available yet.
+            incomplete; video/photo labels describe layouts. Facebook viewer
+            pages currently stay unclassified. Normal-feed posts are not
+            available yet. YouTube Shorts and TikTok are awaiting detector
+            verification; enabling a source does not make its counts available.
           </Text>
 
           <View style={styles.panel}>
@@ -356,59 +364,62 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
             </Text>
           </View>
 
-          <View style={styles.panel}>
-            <Text accessibilityRole="header" style={styles.sectionTitle}>
-              Verify this preview
-            </Text>
-            <Text style={styles.body}>
-              {snapshot.calibrationEnabled
-                ? 'Structure check is on for up to ten minutes. You can switch apps now.'
-                : 'A temporary check helps verify the installed Instagram and Facebook layouts.'}
-            </Text>
-            <Text style={styles.support}>
-              Only layout IDs, roles and numeric positions. No text, messages,
-              images or account details. One private local file can be read by
-              the developer during this test; nothing uploads automatically.
-            </Text>
-            <Text accessibilityLiveRegion="polite" style={styles.checkStatus}>
-              {snapshot.calibrationEnabled
-                ? 'Structure check active'
-                : checkReason}
-            </Text>
-            {checkError && (
-              <View accessibilityRole="alert">
-                <Paragraph>{checkError}</Paragraph>
-              </View>
-            )}
-            <Action
-              label={
-                snapshot.calibrationEnabled
-                  ? 'Stop structure check'
-                  : 'Start structure check'
-              }
-              disabled={busy || (!snapshot.calibrationEnabled && !canCheck)}
-              variant="tonal"
-              onPress={() =>
-                snapshot.calibrationEnabled
-                  ? calibration(false)
-                  : Alert.alert(
-                      'Allow a temporary structure check?',
-                      'Only for enabled apps, for up to ten minutes. This development check saves static layout IDs, numeric positions, media/control bounds, up to three ancestor layouts, and scroll-source bounds with event sequence and relative timing in a local diagnostic file. No text, descriptions, messages or images are read. Stopping removes the file.',
-                      [
-                        { text: 'Cancel', style: 'cancel' },
-                        {
-                          text: 'Allow structure check',
-                          onPress: () => calibration(true),
-                        },
-                      ],
-                    )
-              }
-            />
-            <Text style={styles.support}>
-              Stopping removes the diagnostic file. Counting waits for detector
-              verification.
-            </Text>
-          </View>
+          {snapshot.diagnosticsAvailable && (
+            <View style={styles.panel}>
+              <Text accessibilityRole="header" style={styles.sectionTitle}>
+                Verify this preview
+              </Text>
+              <Text style={styles.body}>
+                {snapshot.calibrationEnabled
+                  ? 'Structure check is on for up to ten minutes. You can switch apps now.'
+                  : 'A temporary check helps verify the installed Instagram and Facebook layouts.'}
+              </Text>
+              <Text style={styles.support}>
+                Layout IDs, roles, positions and fixed Facebook interface-label
+                matches. No raw descriptions, messages, images or account
+                details are saved. One private local file can be read by the
+                developer during this test; nothing uploads automatically.
+              </Text>
+              <Text accessibilityLiveRegion="polite" style={styles.checkStatus}>
+                {snapshot.calibrationEnabled
+                  ? 'Structure check active'
+                  : checkReason}
+              </Text>
+              {checkError && (
+                <View accessibilityRole="alert">
+                  <Paragraph>{checkError}</Paragraph>
+                </View>
+              )}
+              <Action
+                label={
+                  snapshot.calibrationEnabled
+                    ? 'Stop structure check'
+                    : 'Start structure check'
+                }
+                disabled={busy || (!snapshot.calibrationEnabled && !canCheck)}
+                variant="tonal"
+                onPress={() =>
+                  snapshot.calibrationEnabled
+                    ? calibration(false)
+                    : Alert.alert(
+                        'Allow a temporary structure check?',
+                        'Only for enabled apps, for up to ten minutes. This development check saves static layout IDs, numeric positions, media/control bounds, up to three ancestor layouts, and scroll-source bounds with event sequence and relative timing in a local diagnostic file. On Facebook it also temporarily inspects accessibility descriptions to match exactly these fixed interface labels: Reels, Video, Home, Close, Comments, Search, Back, Like, Comment and Share, including fixed Home/Reels/Video tab-position labels. Only matched label tokens, roles, bounds and selected/clickable states and up to three ancestor layouts are saved. Other descriptions are discarded immediately. No node text, images, captions, names, messages or raw descriptions are saved or uploaded. Stopping removes the file.',
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          {
+                            text: 'Allow structure check',
+                            onPress: () => calibration(true),
+                          },
+                        ],
+                      )
+                }
+              />
+              <Text style={styles.support}>
+                Stopping removes the diagnostic file. Counting waits for
+                detector verification.
+              </Text>
+            </View>
+          )}
 
           <View style={styles.panel}>
             <Text accessibilityRole="header" style={styles.sectionTitle}>

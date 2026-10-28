@@ -4,8 +4,13 @@ import android.graphics.Rect
 import android.view.accessibility.AccessibilityNodeInfo
 import com.attentionstats.detectors.DetectorRegistry
 import com.attentionstats.detectors.SurfaceEvidence
+import com.attentionstats.detectors.NodeRole
+import com.attentionstats.detectors.InterfaceLabel
+import com.attentionstats.detectors.LayoutBounds
+import com.attentionstats.detectors.ScrollEvidence
 import com.attentionstats.detectors.accessibility.StructuralSnapshotReader
 import com.attentionstats.detectors.accessibility.DiagnosticScrollTrace
+import com.attentionstats.detectors.accessibility.InterfaceLabelMatcher
 import org.json.JSONObject
 import org.attentionstats.reels.PageCategory
 import org.attentionstats.reels.ReelApp
@@ -17,6 +22,29 @@ internal object DetectorProbe {
     fun verify(): Int {
         var checks = 0
         fun expect(value: Boolean) { check(value); checks++ }
+        checks += ContentIdentityProbe.verify()
+        val tiktok = checkNotNull(DetectorRegistry.detector(ReelApp.TIKTOK, "47.5.3"))
+        val tiktokEvidence = SurfaceEvidence(setOf("viewpager", "long_press_layout", "user_avatar", "desc"), true, false, 2)
+        expect(tiktok.detect(tiktokEvidence).let { it.surface == Surface.REELS && it.page == 2L &&
+            it.category == PageCategory.UNCLASSIFIED })
+        for (id in tiktokEvidence.ids) expect(tiktok.detect(tiktokEvidence.copy(ids = tiktokEvidence.ids - id)).surface == Surface.OUTSIDE)
+        expect(tiktok.detect(tiktokEvidence.copy(editable = true)).surface == Surface.EXCLUDED)
+        expect(tiktok.detect(tiktokEvidence.copy(bounded = false)).surface == Surface.UNKNOWN)
+        expect(tiktok.detect(tiktokEvidence.copy(settledPage = null)).page == null)
+        expect(com.attentionstats.reels.ReelsCoordinator.requiredNotice(ReelApp.TIKTOK) == 4)
+        expect(com.attentionstats.reels.ReelsCoordinator.requiredNotice(ReelApp.YOUTUBE) == 3)
+        val youtube = checkNotNull(DetectorRegistry.detector(ReelApp.YOUTUBE, "21.40.165"))
+        val youtubeIds = setOf("reel_recycler", "reel_player_page_container", "reel_time_bar")
+        val youtubeEvidence = SurfaceEvidence(youtubeIds, true, false, 1)
+        expect(youtube.detect(youtubeEvidence).let { it.surface == Surface.REELS && it.page == 1L &&
+            it.category == PageCategory.UNCLASSIFIED })
+        for (id in youtubeIds) expect(youtube.detect(youtubeEvidence.copy(ids = youtubeIds - id)).surface == Surface.OUTSIDE)
+        expect(youtube.detect(youtubeEvidence.copy(editable = true)).surface == Surface.EXCLUDED)
+        expect(youtube.detect(youtubeEvidence.copy(bounded = false)).surface == Surface.UNKNOWN)
+        expect(youtube.detect(youtubeEvidence.copy(settledPage = null)).page == null)
+        expect(youtube.detect(youtubeEvidence.copy(ids = youtubeIds + "reel_playback_loading_spinner")).page == null)
+        expect(DetectorRegistry.detector(ReelApp.YOUTUBE, "synthetic.unknown") == null)
+        expect(DetectorRegistry.detector(ReelApp.TIKTOK, "21.40.165") == null)
         val detector = checkNotNull(DetectorRegistry.detector(ReelApp.INSTAGRAM, "452.1.0.54.64"))
         expect(DetectorRegistry.detector(ReelApp.INSTAGRAM, "synthetic.unknown") == null)
         expect(DetectorRegistry.detector(ReelApp.FACEBOOK, "452.1.0.54.64") == null)
@@ -47,8 +75,78 @@ internal object DetectorProbe {
         expect(detect(viewer + video).category == PageCategory.UNCLASSIFIED)
         expect(detect(viewer + photo).category == PageCategory.UNCLASSIFIED)
 
+        val facebook = checkNotNull(DetectorRegistry.detector(ReelApp.FACEBOOK, "584.0.0.51.56"))
+        val screen = LayoutBounds(0, 0, 720, 1600)
+        val heading = InterfaceLabel("reels", NodeRole.VIEW, LayoutBounds(107, 112, 219, 144), false, false)
+        val search = InterfaceLabel("search", NodeRole.BUTTON, LayoutBounds(558, 94, 626, 162), false, true)
+        val scroll = ScrollEvidence(null, NodeRole.RECYCLER, LayoutBounds(0, 64, 720, 1405), 5, 5, 9)
+        val fb = SurfaceEvidence(emptySet(), true, false, 5, screen, listOf(heading, search), scroll)
+        expect(facebook.detect(fb).surface == Surface.REELS && facebook.detect(fb).page == 5L)
+        expect(facebook.detect(fb).category == PageCategory.UNCLASSIFIED)
+        expect(facebook.detect(fb.copy(interfaceLabels = listOf(search))).surface == Surface.OUTSIDE)
+        expect(facebook.detect(fb.copy(interfaceLabels = emptyList())).surface == Surface.OUTSIDE)
+        expect(facebook.detect(fb.copy(interfaceLabels = listOf(heading))).surface == Surface.UNKNOWN)
+        expect(facebook.detect(fb.copy(interfaceLabels = listOf(heading.copy(clickable = true), search))).surface == Surface.OUTSIDE)
+        expect(facebook.detect(fb.copy(interfaceLabels = listOf(heading, heading, search))).surface == Surface.OUTSIDE)
+        expect(facebook.detect(fb.copy(bounded = false)).surface == Surface.UNKNOWN)
+        expect(facebook.detect(fb.copy(editable = true)).surface == Surface.EXCLUDED)
+        expect(facebook.detect(fb.copy(interfaceLabels = listOf(heading, search, search.copy(token = "comments")))).surface == Surface.EXCLUDED)
+        expect(facebook.detect(fb.copy(scroll = null)).page == null)
+        expect(facebook.detect(fb.copy(scroll = scroll.copy(to = 6))).page == null)
+        expect(facebook.detect(fb.copy(scroll = scroll.copy(items = 5))).page == null)
+        expect(facebook.detect(fb.copy(scroll = scroll.copy(bounds = LayoutBounds(0, 500, 720, 900)))).page == null)
+        expect(facebook.detect(fb.copy(scroll = scroll.copy(role = NodeRole.OTHER))).page == null)
+        expect(facebook.detect(fb.copy(viewport = LayoutBounds(0, 0, 1600, 720))).surface == Surface.UNKNOWN)
+
+        val back = InterfaceLabel("back", NodeRole.BUTTON, LayoutBounds(15, 89, 60, 134), false, true)
+        val linked = fb.copy(interfaceLabels = listOf(back, search),
+            scroll = scroll.copy(bounds = LayoutBounds(0, 0, 720, 1397)))
+        expect(facebook.detect(linked).surface == Surface.REELS && facebook.detect(linked).page == 5L)
+        expect(facebook.detect(linked.copy(scroll = null)).surface == Surface.UNKNOWN)
+        val movingLinked = linked.copy(scroll = checkNotNull(linked.scroll).copy(to = 6))
+        expect(facebook.detect(movingLinked).surface == Surface.REELS)
+        expect(facebook.detect(movingLinked).page == null)
+        expect(facebook.detect(linked.copy(settledPage = 4)).page == null)
+        expect(facebook.detect(linked.copy(scroll = scroll)).surface == Surface.UNKNOWN) // Ordinary list below header.
+        expect(facebook.detect(linked.copy(scroll = scroll.copy(bounds = LayoutBounds(30, 0, 690, 1397)))).surface == Surface.UNKNOWN)
+        expect(facebook.detect(linked.copy(interfaceLabels = listOf(back))).surface == Surface.UNKNOWN)
+        expect(facebook.detect(linked.copy(interfaceLabels = listOf(back, back, search))).surface == Surface.OUTSIDE)
+        expect(facebook.detect(linked.copy(interfaceLabels = listOf(back.copy(clickable = false), search))).surface == Surface.OUTSIDE)
+        expect(facebook.detect(linked.copy(editable = true)).surface == Surface.EXCLUDED)
+        expect(facebook.detect(linked.copy(bounded = false)).surface == Surface.UNKNOWN)
+        expect(facebook.detect(linked.copy(interfaceLabels = linked.interfaceLabels + back.copy(token = "comments"))).surface == Surface.EXCLUDED)
+        expect(!facebook.acceptsScroll(scroll.copy(from = -1, to = -1, items = -1)))
+
         val node = AccessibilityNodeInfo.obtain()
         try {
+            node.packageName = ReelApp.FACEBOOK.packageName
+            node.isVisibleToUser = true
+            for ((label, token) in listOf("Reels" to "reels", "Home" to "home", "Video" to "video",
+                "Close" to "close", "Comments" to "comments", "Search" to "search", "Back" to "back")) {
+                node.contentDescription = label
+                expect(InterfaceLabelMatcher.match(ReelApp.FACEBOOK, node, true) == token)
+            }
+            node.contentDescription = "Reels"
+            expect(InterfaceLabelMatcher.match(ReelApp.FACEBOOK, node, false) == null)
+            expect(InterfaceLabelMatcher.match(ReelApp.INSTAGRAM, node, true) == null)
+            node.isEditable = true
+            expect(InterfaceLabelMatcher.match(ReelApp.FACEBOOK, node, true) == null)
+            node.isEditable = false; node.isPassword = true
+            expect(InterfaceLabelMatcher.match(ReelApp.FACEBOOK, node, true) == null)
+            node.isPassword = false; node.isVisibleToUser = false
+            expect(InterfaceLabelMatcher.match(ReelApp.FACEBOOK, node, true) == null)
+            node.isVisibleToUser = true
+            for (label in listOf("PRIVATE_SYNTHETIC_MARKER", "Reels by PRIVATE_SYNTHETIC_MARKER", "Reels ", "reels", "x".repeat(65))) {
+                node.contentDescription = label
+                expect(InterfaceLabelMatcher.match(ReelApp.FACEBOOK, node, true) == null)
+            }
+            for ((label, token) in listOf("Like" to "like", "Comment" to "comment_button", "Share" to "share",
+                "Reels, tab 2 of 6" to "reels_tab", "Home, tab 1 of 6" to "home_tab")) {
+                node.contentDescription = label
+                expect(InterfaceLabelMatcher.match(ReelApp.FACEBOOK, node, true, true) == token)
+                expect(InterfaceLabelMatcher.match(ReelApp.FACEBOOK, node, true) == null)
+            }
+            node.contentDescription = null
             node.packageName = ReelApp.INSTAGRAM.packageName
             node.isVisibleToUser = true
             node.viewIdResourceName = ReelApp.INSTAGRAM.packageName + ":id/video_container"

@@ -1,7 +1,10 @@
 package org.attentionstats.reels
 
-enum class ReelApp(val key: String, val packageName: String) {
-    INSTAGRAM("instagram", "com.instagram.android"), FACEBOOK("facebook", "com.facebook.katana");
+enum class ReelApp(val key: String, val packageName: String, val displayName: String, val observationLabel: String) {
+    INSTAGRAM("instagram", "com.instagram.android", "Instagram", "Instagram Reels"),
+    FACEBOOK("facebook", "com.facebook.katana", "Facebook", "Facebook Reels"),
+    YOUTUBE("youtube", "com.google.android.youtube", "YouTube Shorts", "YouTube Shorts"),
+    TIKTOK("tiktok", "com.zhiliaoapp.musically", "TikTok", "TikTok videos");
     val sourceId: String get() = "reels.$key"
     companion object {
         fun byKey(key: String): ReelApp? = entries.firstOrNull { it.key == key }

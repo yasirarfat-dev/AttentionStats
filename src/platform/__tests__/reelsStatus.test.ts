@@ -3,7 +3,7 @@ import { parseReelsSnapshot } from '../reelsStatus';
 const generation = '11111111-1111-4111-8111-111111111111';
 function fixture() {
   return {
-    contractVersion: 2,
+    contractVersion: 5,
     revision: generation + ':1',
     historyRevision: generation + ':1',
     generation,
@@ -13,9 +13,11 @@ function fixture() {
     serviceConnected: false,
     overlayEnabled: false,
     calibrationEnabled: false,
+    diagnosticsAvailable: false,
+    counterAppearance: { showIcons: true, allAppsToday: true },
     day: '2026-10-27',
     zone: 'UTC',
-    sources: ['instagram', 'facebook'].map(app => ({
+    sources: ['instagram', 'facebook', 'youtube', 'tiktok'].map(app => ({
       app,
       enabled: false,
       consentCurrent: false,
@@ -112,4 +114,31 @@ test('rejects normal-feed post counts while that capability is unavailable', () 
   const value = fixture();
   Object.assign(sourceAt(value, 0).counts, { post: '0' });
   expect(() => parseReelsSnapshot(JSON.stringify(value))).toThrow();
+});
+
+test('rejects a diagnostic session when the build does not allow diagnostics', () => {
+  const value = fixture();
+  value.calibrationEnabled = true;
+  expect(() => parseReelsSnapshot(JSON.stringify(value))).toThrow();
+  value.diagnosticsAvailable = true;
+  expect(parseReelsSnapshot(JSON.stringify(value)).calibrationEnabled).toBe(
+    true,
+  );
+});
+
+test('validates display preferences without changing source consent', () => {
+  const value = fixture();
+  value.counterAppearance = { showIcons: false, allAppsToday: false };
+  const result = parseReelsSnapshot(JSON.stringify(value));
+  expect(result.counterAppearance).toEqual(value.counterAppearance);
+  expect(result.sources.every(source => !source.enabled)).toBe(true);
+  for (const bad of [
+    undefined,
+    { showIcons: true },
+    { showIcons: true, allAppsToday: 'yes' },
+  ]) {
+    expect(() =>
+      parseReelsSnapshot(JSON.stringify({ ...value, counterAppearance: bad })),
+    ).toThrow();
+  }
 });

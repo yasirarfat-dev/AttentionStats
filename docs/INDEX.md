@@ -1,6 +1,6 @@
 # Documentation index
 
-**Status:** Authoritative specifications, native calculations and an integrated Android preview exist; real Reels detectors and full runtime capabilities remain unqualified. Updated 2026-10-27.
+**Status:** Authoritative specifications, native calculations and an integrated Android preview exist; real Reels detectors and full runtime capabilities remain unqualified. Updated 2026-10-29.
 **Responsibility:** Maps every source-of-truth document, reading order and ownership boundary.
 **Related specifications:** [Current state](STATE.md), [Shared rules](AGENT-RULES.md), [Tracker](FEATURE-TRACKER.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-10 in [Decisions](DECISIONS.md); specifications do not constitute source, policy or application-build verification.
@@ -34,6 +34,7 @@ AS-045 now adds an installed experimental native five-tab/20-route shell. AS-043
 |---|---|---|
 | Entry | [INDEX.md](INDEX.md) | Reading map and ownership |
 | Direction | [VISION.md](VISION.md) | Mission, audience and principles |
+| Feature vision | [FEATURE-VISION.md](FEATURE-VISION.md) | Enriched portfolio, experience intentions, measurement promises and staged delivery |
 | Product | [PRODUCT.md](PRODUCT.md) | Scope, journeys, non-goals, acceptance |
 | Inventory | [CAPABILITY-MATRIX.md](CAPABILITY-MATRIX.md) | Every capability's source/access/controls/limits/phase/evidence/scenario |
 | Detailed diary | [ANALYTICS-SPEC.md](ANALYTICS-SPEC.md) | Duration conservation, interactions, network accounting, exploration and summaries |

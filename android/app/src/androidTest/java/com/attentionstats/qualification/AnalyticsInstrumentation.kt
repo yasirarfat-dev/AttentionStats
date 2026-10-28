@@ -9,10 +9,14 @@ import org.attentionstats.reels.main as verifyReels
 /** Synthetic APK qualifications; the default mode preserves the original analytics suite. */
 class AnalyticsInstrumentation : Instrumentation() {
     private var qualification: String? = null
+    private var operatorAuthorized = false
+    private var progressApp = "instagram"
 
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
         qualification = arguments?.getString("qualification")
+        progressApp = arguments?.getString("progress_app") ?: "instagram"
+        operatorAuthorized = arguments?.getString("operator_authorized") == "adb-reels-structure"
         start()
     }
 
@@ -50,10 +54,26 @@ class AnalyticsInstrumentation : Instrumentation() {
                     result.putInt("shell_routes", ui.routes)
                     result.putString("stream", "PASS: own-window React Native preview screens\n")
                 }
+                "reels-operator-structure" -> {
+                    check(operatorAuthorized)
+                    val coordinator = com.attentionstats.reels.ReelsCoordinator.get(targetContext)
+                    check(!coordinator.calibrationEnabled)
+                    try {
+                        ui = ReelsUiProbe(this)
+                        ui.operatorStartStructure()
+                        check(coordinator.calibrationEnabled)
+                        sendStatus(0, Bundle().apply { putInt("diagnostic_ready", 1) })
+                        android.os.SystemClock.sleep(60_000)
+                        result.putString("stream", "PASS: authorized own-window structure controls\n")
+                    } finally { coordinator.setCalibration(false) }
+                }
                 "reels-live-progress" -> {
                     // Explicitly operator-authorized trial only. No source/grant changes or target reads/actions.
                     val coordinator = com.attentionstats.reels.ReelsCoordinator.get(targetContext)
-                    coordinator.setCalibration(false) // End the completed temporary metadata trial.
+                    val alreadyStopped = !coordinator.calibrationEnabled
+                    val previousEpoch = coordinator.epoch()
+                    coordinator.setCalibration(false) // End an active trial; an already-stopped check is idempotent.
+                    check(!alreadyStopped || coordinator.epoch() == previousEpoch)
                     fun snapshot(): org.json.JSONObject {
                         val done = java.util.concurrent.CountDownLatch(1)
                         var value: org.json.JSONObject? = null
@@ -61,13 +81,14 @@ class AnalyticsInstrumentation : Instrumentation() {
                         check(done.await(15, java.util.concurrent.TimeUnit.SECONDS))
                         return checkNotNull(value)
                     }
-                    fun instagram(value: org.json.JSONObject): org.json.JSONObject {
+                    check(org.attentionstats.reels.ReelApp.byKey(progressApp) != null)
+                    fun selectedSource(value: org.json.JSONObject): org.json.JSONObject {
                         val sources = value.getJSONArray("sources")
                         return (0 until sources.length()).map { sources.getJSONObject(it) }
-                            .single { it.getString("app") == "instagram" }
+                            .single { it.getString("app") == progressApp }
                     }
                     val before = snapshot()
-                    val source = instagram(before)
+                    val source = selectedSource(before)
                     check(before.getBoolean("accessibilityEnabled") && before.getBoolean("serviceConnected") &&
                         before.getBoolean("overlayEnabled") && before.getString("storage") == "ready" &&
                         source.getBoolean("enabled") && source.getBoolean("consentCurrent") &&
@@ -77,7 +98,7 @@ class AnalyticsInstrumentation : Instrumentation() {
                     val after = snapshot()
                     check(before.getString("revision") == after.getString("revision") &&
                         before.getString("day") == after.getString("day"))
-                    val final = instagram(after)
+                    val final = selectedSource(after)
                     val delta = final.getString("today").toLong() - source.getString("today").toLong()
                     check(delta in 0..10)
                     val categories = final.getJSONObject("counts")
@@ -126,6 +147,15 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             finish(Activity.RESULT_OK, result)
         } catch (failure: Throwable) {
+            // Bounded code locations only: never exception messages, target values or arbitrary logs.
+            if (ui != null) {
+                val locations = failure.stackTrace.filter {
+                    it.className.startsWith("com.attentionstats.qualification.") ||
+                        it.className.startsWith("android.")
+                }.take(8).joinToString(";") { "${it.className}.${it.methodName}:${it.lineNumber}" }
+                result.putString("probe_location", locations)
+                result.putInt("probe_interactive", if (targetContext.getSystemService(android.os.PowerManager::class.java).isInteractive) 1 else 0)
+            }
             ui?.let { result.putString("probe_stage", it.stage) }
             reels?.let { result.putString("probe_stage", it.stage) }
             probe?.let {

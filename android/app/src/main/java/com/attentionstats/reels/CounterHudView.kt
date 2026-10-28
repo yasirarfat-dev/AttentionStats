@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.LinearLayout
+import android.widget.TextView
 import org.attentionstats.reels.PageCategory
 
 /** One bounded overlay: icon/count glance, tap for committed visit/day category projections. */
@@ -24,6 +25,13 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     private val details = LinearLayout(context)
     private val visit = number()
     private val today = number()
+    private val sessionIcon = icon("session")
+    private val todayIcon = icon("today")
+    private val periods = TextView(context).apply {
+        setTextColor(iconColor); textSize = 12f; gravity = Gravity.CENTER
+        setPadding(dp(8), dp(4), dp(8), dp(4))
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+    }
     private val categoryRows = mutableMapOf<PageCategory, Triple<LinearLayout, ScrollingCountView, ScrollingCountView>>()
     var expanded = false
         private set
@@ -44,11 +52,11 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
             setPadding(dp(14), 0, dp(14), 0)
             isClickable = true; isFocusable = true
             accessibilityLiveRegion = ACCESSIBILITY_LIVE_REGION_NONE
-            addView(icon("session"), LayoutParams(dp(20), dp(20)))
+            addView(sessionIcon, LayoutParams(dp(20), dp(20)))
             addView(visit, LayoutParams(LayoutParams.WRAP_CONTENT, dp(48)).apply { marginStart = dp(6) })
             addView(View(context).apply { setBackgroundColor(Color.rgb(73, 85, 104)) },
                 LayoutParams(dp(1), dp(18)).apply { marginStart = dp(12); marginEnd = dp(12) })
-            addView(icon("today"), LayoutParams(dp(20), dp(20)))
+            addView(todayIcon, LayoutParams(dp(20), dp(20)))
             addView(today, LayoutParams(LayoutParams.WRAP_CONTENT, dp(48)).apply { marginStart = dp(6) })
             setOnClickListener { setExpanded(!expanded) }
             var downX = 0f; var downY = 0f; var lastX = 0f; var lastY = 0f
@@ -100,6 +108,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
             orientation = VERTICAL; visibility = GONE
             setPadding(dp(8), 0, dp(8), dp(6))
         }
+        details.addView(periods, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
         val icons = mapOf(PageCategory.REEL to "video", PageCategory.PHOTO to "photo",
             PageCategory.AD to "ad", PageCategory.UNCLASSIFIED to "unknown")
         for ((category, symbol) in icons) {
@@ -147,9 +156,19 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     }
 
     fun update(state: ReelsCoordinator.OverlaySnapshot) {
+        sessionIcon.visibility = if (state.showIcons) VISIBLE else GONE
+        todayIcon.visibility = if (state.showIcons) VISIBLE else GONE
+        for (number in listOf(visit, today)) {
+            val params = number.layoutParams as LayoutParams
+            val gap = if (state.showIcons) dp(6) else 0
+            if (params.marginStart != gap) { params.marginStart = gap; number.layoutParams = params }
+        }
+        val scopeLabel = if (state.allAppsToday) "All observed apps today" else
+            "${state.app.displayName} today"
+        periods.text = "This visit | $scopeLabel"
         visit.update(state.visit, state.scrollBack)
         today.update(state.today, state.scrollBack)
-        header.contentDescription = "Estimated viewer pages including ads. This visit ${state.visit}. Today ${state.today}. Tap to expand or collapse statistics."
+        header.contentDescription = "Estimated viewer pages including ads. This visit ${state.visit}. $scopeLabel ${state.today}. Tap to expand or collapse statistics."
         for (item in state.categories) categoryRows[item.category]?.let { (row, sessionValue, dayValue) ->
             sessionValue.update(item.visit, state.scrollBack); dayValue.update(item.today, state.scrollBack)
             val label = when (item.category) {
@@ -158,7 +177,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
                 PageCategory.AD -> "Recognized image ads"
                 else -> "Unclassified pages"
             }
-            row.contentDescription = "$label. This visit ${item.visit}. Today ${item.today}. Partial estimates."
+            row.contentDescription = "$label. This visit ${item.visit}. $scopeLabel ${item.today}. Partial estimates."
         }
     }
 

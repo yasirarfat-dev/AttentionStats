@@ -1,6 +1,6 @@
 # Local development
 
-**Status:** Experimental mobile scaffold and tooling commands exist; native build/live acceptance tracked in State. Updated 2026-10-28.
+**Status:** Experimental mobile scaffold and tooling commands exist; native build/live acceptance tracked in State. Updated 2026-10-29.
 **Responsibility:** Defines local setup, reproducible commands, isolation and debugging.
 **Related specifications:** [Dependencies](DEPENDENCIES.md), [Testing](TESTING.md), [Structure](FILE-STRUCTURE.md), [Agent rules](AGENT-RULES.md).
 **Unresolved feasibility:** F-02–F-04 in [Decisions](DECISIONS.md); attempted builds are not accepted binaries; see current evidence.
@@ -149,6 +149,10 @@ The separate [Tink fixture](../native/archive-qualification/README.md) uses the 
 
 ## Debugging procedure
 
+### AS-046 release preparation
+
+`python tools/release_candidate.py prepare` creates/refreshes the separate requested release-root listing, permission-plan, store-text and public-policy copies without copying source. Reviewed ARM64 inspection builds use `python tools/android_build.py :app:assembleRelease :app:bundleRelease :app:lintRelease --arch arm64-v8a --workers 2`; project-local metaspace is 1 GiB after the combined 512-MiB lint run exhausted it. This changes no machine-wide configuration. Run `python -m unittest discover -s tools/tests -p test_release_candidate.py` for manifest/admission/archive-preservation guards. `archive` requires the reviewed bundletool hash and exact initial package/version, validates the AAB/decoded manifest/compiled resources/backup exclusions and static ZIP/ELF alignment, and refuses an existing version directory. It archives only unsigned investigation files, never signs/installs/uploads or starts a workflow. Dirty-source provenance is explicit; these are not uploadable clean release artifacts. See [Play information](../release/PLAY-CONSOLE.md) for signing and actual rollout gates.
+
 ### AS-043 self-contained Android preview
 
 The category preview uses Room schema 2 with an explicit 1→2 auto-migration, retaining old exposures as unclassified. Snapshot contract 2 and observation notice revision 2 accompany ADR-034; old source choices do not silently authorize category recording. Review the updated in-app notice manually before a live trial. The Instagram candidate is version-pinned; Facebook and normal-feed posts remain unavailable. Totals/HUD count viewer pages including ads, not a qualified short-video metric. Keep package changes and instrumentation outside active ten-minute diagnostic sessions.
@@ -166,3 +170,5 @@ ADR-042 subsequently authorizes the developer to operate already-disclosed debug
 Start with native capability status and last-success time, compare consent/configuration revision to current grant, then inspect bounded redacted local reason codes. Distinguish UI stale cache, missing source events, native process stop, Android force-stop and unsupported detector versions. Test with JS deliberately stopped to prove native independence. Use synthetic fixture apps/node structures; do not capture personal app trees.
 
 Reproduce clock/DST/reboot/revocation failures using injected clocks and dedicated emulators/test devices. Do not change the shared machine timezone, kill shared Node/Java processes, reset shared adb state or alter other repositories. If an emulator/device is in use by another agent, select an isolated target and explicit serial. Keep diagnostics, profiles, traces and real-device captures outside Git. Privacy and data-loss verification takes precedence over making a demo look complete.
+
+For AS-048, do not clear the development app when updating from the two-source preview: schema 3 and the existing package identity are retained. The four-source catalog seeds only missing disabled rows. Bundled preview and test APKs must be rebuilt from a stable source tree before phone qualification; tests from an earlier artifact do not qualify a changed binary.

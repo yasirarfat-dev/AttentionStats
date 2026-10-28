@@ -1,6 +1,6 @@
 # Detailed personal activity diary
 
-**Status:** Expanded mobile specification; AS-035 pure Kotlin calculation slice implemented, collectors and screens unimplemented. Updated 2026-10-28.
+**Status:** Expanded mobile specification; AS-035 pure Kotlin calculation slice implemented, collectors and screens unimplemented. Updated 2026-10-29.
 **Responsibility:** Defines detailed app/activity analytics, evidence accounting, diary exploration, comparisons and summary semantics.
 **Related specifications:** [Metric catalog](METRIC-CATALOG.md), [Tracking](TRACKING-SPEC.md), [Social](SOCIAL-MEDIA-SPEC.md), [Models](DATA-MODELS.md), [Storage](STORAGE-AND-RETENTION.md), [UX](UX-SPEC.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-01/F-02/F-08/F-09 and F-10; no social-platform detector or network collector has device qualification. A calculation fixture is not source verification.
@@ -70,3 +70,5 @@ Optional time equivalents use a user-chosen activity and session length. Four co
 [Kotlin core](../native/analytics-core/README.md) implements pure, bounded projections over synthetic normalized inputs: interval conservation; civil-day/calendar boundaries; exposure identity deduplication; interaction evidence separation; canonical byte-bucket aggregation; additive rollup previews; and time-equivalent arithmetic. It reads no Android API, performs no collection/persistence/pruning/encryption and provides no mobile UI. Callers remain responsible for source admission, consent fences, complete eligible coverage partitions, provenance and transactional store integration. F-01/F-02/F-03/F-04/F-08/F-09/F-10 remain open.
 
 T-17–T-23 and D-04–D-06 in [Testing](TESTING.md) specify the expanded scenarios. Fixture passing establishes only the named calculation subset. AS-035 does not clear any app/detector/store/backup release gate. AS-036–AS-040 track remaining native collection, metric screens, durable compaction, supported archive import and optional time reflection.
+
+ADR-050 lifetime history, immutable event/origin provenance, future merge/deletion semantics and rebuildable calendar summaries are defined in [Storage and retention](STORAGE-AND-RETENTION.md#lifetime-event-history-and-future-multi-origin-merging). These are design obligations; current preview storage/aggregate/restore limits remain explicit.

@@ -13,3 +13,5 @@ Entries:
 
 - [2026-10-27 — documentation foundation](2026-10-27.md).
 - [2026-10-28 — category migration, native shell and scrolling counter](2026-10-28.md).
+
+- [2026-10-29 — interrupted counter recovery and four-source admission](2026-10-29.md).

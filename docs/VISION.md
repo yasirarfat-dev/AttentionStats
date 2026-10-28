@@ -1,11 +1,13 @@
 # Vision
 
-**Status:** Accepted product direction; application unimplemented. Updated 2026-10-26.
+**Status:** Accepted product direction; experimental Android preview exists. Updated 2026-10-29.
 **Responsibility:** Defines mission, audience, values, and long-term boundaries.
 **Related specifications:** [Product](PRODUCT.md), [Privacy](PRIVACY.md), [Roadmap](ROADMAP.md).
 **Unresolved feasibility:** F-01, F-07, F-09 in [Decisions](DECISIONS.md); breadth depends on platform access, not ambition alone.
 
 ## Mission
+
+The [complete feature vision](FEATURE-VISION.md) connects this mission to a rich, staged feature portfolio. Keep count, understand, change a routine and protect time are equally valid intentions; users need not adopt all of them.
 
 Give people a trustworthy account of their digital routines and practical control over what happens next. Attention Stats aims to understand every digital behavior that platforms expose and users choose to track. Completeness is an evolving goal; the app must state what it cannot see.
 

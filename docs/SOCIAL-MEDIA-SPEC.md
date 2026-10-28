@@ -1,6 +1,6 @@
 # Social surfaces and optional context
 
-**Status:** Expanded experimental detector design; no app/version/locale qualified. Updated 2026-10-28.
+**Status:** Expanded experimental detector design; no app/version/locale qualified. Updated 2026-10-29.
 **Responsibility:** Defines transparent app/surface identification, short-video counts, optional metadata and detector qualification.
 **Related specifications:** [Tracking](TRACKING-SPEC.md), [Intelligence](BEHAVIOR-INTELLIGENCE.md), [Privacy](PRIVACY.md), [Protection](PROTECTION-SPEC.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-01 and F-08 in [Decisions](DECISIONS.md). No private implementation or universal detector is assumed.
@@ -21,7 +21,7 @@ ADR-034 adds separate preview categories: `reel` (recognized single-video layout
 
 The experimental Instagram definition is pinned to the consented installed version and requires its viewer/media/action-container IDs plus a centered pager row. Feed/profile/comment trials and 110 controlled swipe attempts establish candidate structure; no content was read. Recognized image ads and photo-carousel layouts have distinct markers. Video-ad fidelity and broader lifecycle/accuracy remain open. Facebook exposes useful settled indices in the manually confirmed viewer, but generic classes also occur elsewhere; no Facebook definition is admitted yet. Disclosure revision 2 is required before new recording.
 
-AS-043 maps the canonical installed candidates `com.instagram.android` and `com.facebook.katana` to independent preview sources. Mapping package identity does not qualify a Reels surface. The bounded passive adapter and 500 ms pure reducer never infer Reels from a generic scroll event; synthetic reducer checks are not per-app detector evidence. Optional ten-minute local structural qualification reads no node text/descriptions or target screenshots and requires separate consent. The current category implementation and phone acceptance are recorded in State; neither application has full detector/metric acceptance.
+AS-043 maps the canonical installed candidates `com.instagram.android` and `com.facebook.katana` to independent preview sources. Mapping package identity does not qualify a Reels surface. The bounded passive adapter and 500 ms pure reducer never infer Reels from a generic scroll event; synthetic reducer checks are not per-app detector evidence. Optional ten-minute local structural qualification requires separate consent and reads no node text or target screenshots. ADR-045 permits transient exact Facebook interface-description matching; ADR-046 adopts the same bounded labels for the Facebook viewer candidate under source notice 3. Raw descriptions are never retained. The current category implementation and phone acceptance are recorded in State; neither application has full detector/metric acceptance.
 
 | Adapter key | Intended surface | Must distinguish | Current status |
 |---|---|---|---|
@@ -36,6 +36,16 @@ These target services are observation targets, not reference implementations. Do
 Each adapter record includes package variants, version range, Android range, locale range, structural surface predicates, transient item identity mechanism, unsupported contexts, bounded work budget, calibration thresholds, detector revision and last test date. Ship reviewed detector definitions with application releases; no remote executable selectors or silent support expansion.
 
 ## Counting state machine
+
+### Entry routes and the four-app counter milestone
+
+ADR-048 prioritizes Facebook, Instagram, YouTube Shorts and TikTok as the initial counter MVP. Admission is per app/version/locale **and entry route**: a dedicated tab, Home suggested-video row, inline Home video, page/profile and shared entry can produce different layouts. AS-048 must evolve the two-app catalog, bridge and source controls before additional adapters become available. The broader diary follows this milestone.
+
+For the current Facebook version, the dedicated candidate uses a Reels heading plus Search and a full-width viewer list. The Home-opened candidate instead requires top Back/Search controls plus a list starting at the viewport's top, spanning its full width and more than four-fifths of its height while ending above the system bottom. Valid settled equal indices identify a candidate page; moving ranges withhold counts. Negative-index nested list events must not replace qualified page evidence. This is an experimental version-specific combination, not universal player recognition; comments, editable/truncated contexts and invalid geometry withhold observation. Phone entry/negative/idle/return trials govern admission.
+
+A video encounter can count after settled evidence while still visible; scrolling away is not the trigger. The current reducer's first-page uncertainty suppression prevents an unsupported count after restoration. Player presence, autoplay, a seek bar or a transient player popup alone never establishes watched time or completion. Adding playback metrics needs a separate signal, definition and acceptance evidence. Existing viewer-page history retains its meaning.
+
+### Reducer rules
 
 States: OUTSIDE → CANDIDATE → ACTIVE(item) → TRANSITION → ACTIVE(next), with UNKNOWN and PAUSED reachable at any point. OUTSIDE requires no retained item context. CANDIDATE requires an allowlisted package, confirmed visible surface, interactive device, and stable evidence across observations. The initial candidate dwell threshold is 500 ms; this is a calibration default, not a viewing-completion definition.
 
@@ -76,3 +86,13 @@ Qualification must measure false positives and false negatives separately using 
 The user-facing “How tracking works” view shows enabled adapter, supported range, metadata fields inspected, data retained, last verified revision, count meaning, coverage, and a disable/delete action. Developer diagnostics contain reason codes, not content. Tests T-06, T-07, T-10, T-11 and T-15 govern admission. Unsupported surfaces must be visibly unknown, never zero and never silently counted by a generic scroll heuristic.
 
 The optional AS-041 developer Home check uses the [bounded geometry/event-association contract](SOCIAL-ADAPTERS.md#home-feed-diagnostic-increment), independently of source consent. Its event sequence bracket can reject intervening delivered scrolls and cross-window/epoch carryover; it cannot establish an atomic tree, complete event delivery, media-group identity or a qualified exposure. No Home detector/count is enabled by this diagnostic increment.
+
+AS-048 source admission currently enumerates Instagram, Facebook, YouTube Shorts and TikTok independently. Catalog presence and affirmative source consent are separate from detector support. Unknown versions/routes remain unavailable; source additions preserve retained viewer-page semantics and cannot turn an encounter into playback/completion evidence.
+
+AS-048 YouTube candidate: installed version 21.40.165 exposes `reel_recycler`, `reel_player_page_container` and `reel_time_bar`, with centered collection rows changing 0→1→0 during the bounded forward/return trial. The exact-version predicate requires all three IDs, rejects editable/truncated trees, withholds pages during the loading spinner, and leaves categories unclassified. This is encounter evidence only; comments, ordinary watch/Home, ads, broader routes and lifecycle still require independent negative/live tests before acceptance.
+
+## Transient TikTok matching under ADR-049
+
+The user expressly authorizes the developer to choose effective on-device mechanisms after the content-matching tradeoff is explained. TikTok 47.5.3 source notice 4 separately discloses reading only visible, noneditable/nonpassword `title`/`desc` fields as text, with description fallback. Processing is local collection even though no raw field is retained. All other sources keep notice 3. Existing TikTok notice-3 enablement is insufficient; a fresh affirmative notice precedes acquisition.
+
+The acquisition-owned helper streams at most 4096 UTF-16 code units per field into a freshly keyed HMAC-SHA256 comparison. Fixed field framing/order avoids order/concatenation ambiguity. Only keyed digests, a random in-memory key and the previous comparison state survive the scan; no raw-value conversion, log, database, diagnostic or bridge token is permitted. Duplicate, blank, oversized, editable, invisible, foreign-package, missing-caption and incomplete scans withhold identity. Keys/comparison state reset on app/window/consent epoch changes, outside-app/keyguard and service teardown; an invalidated collector cannot commit. Only a monotonically increasing encounter ordinal enters the existing numeric page/count path. Tokens are not durable content identities. Repeated/missing captions can undercount; caption changes can misidentify transitions. Playback, completion, distinct counts and full target accuracy remain unavailable until independently qualified.

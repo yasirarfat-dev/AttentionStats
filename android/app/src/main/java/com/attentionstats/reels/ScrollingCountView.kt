@@ -36,7 +36,7 @@ internal class ScrollingCountView(context: Context) : TextSwitcher(context) {
     }
 
     fun update(value: Long, scrollBack: Boolean) {
-        val text = "~$value"
+        val text = value.toString()
         val previous = (currentView as TextView).text
         if (previous.toString() == text) return
         val animate = previous.isNotEmpty() && isShown &&

@@ -102,11 +102,11 @@ android {
         androidTest.java.srcDir('../../native/reels-core/src/test/kotlin')
     }
     defaultConfig {
-        applicationId "com.attentionstats"
+        applicationId "attention.stats"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "0.1.0"
         testInstrumentationRunner "com.attentionstats.qualification.AnalyticsInstrumentation"
     }
     signingConfigs {
@@ -141,6 +141,16 @@ android {
     }
 }
 
+// Keep the installed development identity/history while the permanent Play ID
+// is attention.stats. Namespace is a source-code detail, not the store identity.
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        if (variant.buildType in ["debug", "preview"]) {
+            variant.applicationId.set("com.attentionstats.debug")
+        }
+    }
+}
+
 dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation project(':analytics-core')
@@ -163,3 +173,8 @@ dependencies {
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 
 dependencyLocking { lockAllConfigurations() }
+
+// Keep SDK caches, private research and non-shipping fixtures out of bundle input scans.
+tasks.withType(com.facebook.react.tasks.BundleHermesCTask).configureEach {
+    sources.exclude(".cache/**", "design/**", "native/**", "tools/**", "**/__tests__/**")
+}

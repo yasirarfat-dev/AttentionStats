@@ -32,7 +32,11 @@ data class SourceConfiguration(
 )
 
 @Entity
-data class LiveOverlayConfiguration(@PrimaryKey val id: Int = 1, val enabled: Boolean = false)
+data class LiveOverlayConfiguration(
+    @PrimaryKey val id: Int = 1, val enabled: Boolean = false,
+    @ColumnInfo(defaultValue = "1") val showIcons: Boolean = true,
+    @ColumnInfo(defaultValue = "1") val allAppsToday: Boolean = true,
+)
 
 @Entity(indices = [Index("sourceId", "atMs")])
 data class ConsentRecord(
@@ -108,6 +112,8 @@ interface AttentionDao {
     @Insert suspend fun insertOverlay(value: LiveOverlayConfiguration)
     @Query("UPDATE LiveOverlayConfiguration SET enabled = :enabled WHERE id = 1")
     suspend fun setOverlay(enabled: Boolean)
+    @Query("UPDATE LiveOverlayConfiguration SET showIcons = :showIcons, allAppsToday = :allAppsToday WHERE id = 1")
+    suspend fun setCounterAppearance(showIcons: Boolean, allAppsToday: Boolean)
     @Insert suspend fun insertConsent(value: ConsentRecord)
     @Insert suspend fun insertEpisode(value: SurfaceEpisode)
     @Query("UPDATE SurfaceEpisode SET endMs = :at WHERE id = :id AND endMs IS NULL")
@@ -121,6 +127,8 @@ interface AttentionDao {
     suspend fun categoryCount(appId: String, start: Long, end: Long, category: String): Long
     @Query("SELECT category, COUNT(*) AS count FROM Exposure WHERE appId = :appId AND occurredAtMs >= :start AND occurredAtMs < :end GROUP BY category")
     suspend fun dayCategories(appId: String, start: Long, end: Long): List<CategoryTotal>
+    @Query("SELECT category, COUNT(*) AS count FROM Exposure WHERE occurredAtMs >= :start AND occurredAtMs < :end GROUP BY category")
+    suspend fun allAppDayCategories(start: Long, end: Long): List<CategoryTotal>
     @Query("SELECT category, COUNT(*) AS count FROM Exposure WHERE surfaceEpisodeId = :id GROUP BY category")
     suspend fun visitCategories(id: String): List<CategoryTotal>
     @Query("SELECT MAX(noticeRevision) FROM ConsentRecord WHERE sourceId = :sourceId AND decision = 'allow'")
@@ -141,7 +149,7 @@ data class CategoryTotal(val category: String, val count: Long)
 
 @Database(entities = [StoreMetadata::class, SourceConfiguration::class, LiveOverlayConfiguration::class,
     ConsentRecord::class, SurfaceEpisode::class, Exposure::class, CoverageInterval::class],
-    version = 2, autoMigrations = [AutoMigration(from = 1, to = 2)], exportSchema = true)
+    version = 3, autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3)], exportSchema = true)
 abstract class AttentionDatabase : RoomDatabase() {
     abstract fun data(): AttentionDao
 }

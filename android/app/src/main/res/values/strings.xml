@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Attention Stats</string>
     <string name="reels_accessibility_label">Attention Stats Reels counter</string>
-    <string name="reels_accessibility_description">Estimates Reels exposures in apps you explicitly enable, using layout identifiers and scroll positions. Does not read screen text, messages, titles, photos or video. Counts stay in encrypted storage on this device. Optional counter display has its own switch. Disable observation at any time in Attention Stats.</string>
+    <string name="reels_accessibility_description">Estimates short-video viewer-page encounters in apps you explicitly enable, using layout identifiers and scroll positions. Facebook additionally uses exact fixed interface-description matches; unmatched descriptions are discarded. TikTok optionally compares visible title/caption fields transiently using in-memory keyed tokens; raw values are discarded. Does not read input or message text, photos or video. Counts stay in encrypted storage on this device. Optional counter display has its own switch. Disable observation at any time in Attention Stats.</string>
 </resources>
