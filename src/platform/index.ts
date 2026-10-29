@@ -6,6 +6,10 @@ export const getBootstrapStatus = () =>
   readBootstrapStatus(NativeBootstrap ?? null);
 
 export { default as NativeReels } from './specs/NativeReels';
+export {
+  parseAutoScrollStatus,
+  type AutoScrollStatus,
+} from './autoScrollStatus';
 export { reelsSources, reelsSourceKeys } from './reelsSources';
 export {
   parseReelsSnapshot,

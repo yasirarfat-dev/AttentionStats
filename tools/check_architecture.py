@@ -164,7 +164,16 @@ def main() -> int:
         if re.search(rf"\b(?:node|root|source|event)\s*\??\.\s*(?:{forbidden})\b", source_text):
             errors.append(f"{path.relative_to(ROOT)}: counter must not read captured text/descriptions")
         if re.search(r"\b(?:performGlobalAction|performAction|dispatchGesture)\s*\(", source_text):
-            errors.append(f"{path.relative_to(ROOT)}: counter must remain passive")
+            errors.append(f"{path.relative_to(ROOT)}: platform actions belong only in the opt-in auto-scroll dispatcher")
+    auto_source = ROOT / "android/app/src/main/java/com/attentionstats/autoscroll"
+    for path in auto_source.rglob("*.kt"):
+        text = path.read_text(encoding="utf-8")
+        if re.search(r"\b(?:performGlobalAction|performAction)\s*\(", text):
+            errors.append(f"{path.relative_to(ROOT)}: auto-scroll must not perform taps or global actions")
+        if re.search(r"\bdispatchGesture\s*\(", text) and path.name != "AutoScrollGestureDispatcher.kt":
+            errors.append(f"{path.relative_to(ROOT)}: gesture dispatch must remain isolated")
+        if "domain" in path.relative_to(auto_source).parts and re.search(r"\b(?:android\.|org\.json\.|com\.facebook\.|java\.)", text):
+            errors.append(f"{path.relative_to(ROOT)}: auto-scroll domain must remain pure")
     app_build = (ROOT / "android/app/build.gradle").read_text(encoding="utf-8")
     if "collection-prototype" in app_build:
         errors.append("Application must not depend on the collection prototype")
@@ -184,7 +193,7 @@ def main() -> int:
         return 1
     print(f"PASS: {len(paths)} Kotlin source files; package paths and declared domain import boundaries")
     print(f"PASS: {len(prototype_paths)} collection prototype source files; pure boundary and no app dependency")
-    print(f"PASS: {len(reels_paths)} Reels domain source files; pure boundary and passive metadata-only source guard")
+    print(f"PASS: {len(reels_paths)} Reels domain source files; pure boundary and isolated opt-in auto-scroll action guard")
     print(f"PASS: {detector_count} detector files; registry, per-platform adapters and Android acquisition boundaries")
     print("PASS: standalone storage/archive qualification excluded from product settings/dependencies/source")
     print(f"PASS: {mobile_count} mobile TypeScript files; relative imports, feature public APIs and layer direction")

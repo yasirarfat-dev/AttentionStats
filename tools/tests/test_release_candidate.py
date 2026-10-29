@@ -10,7 +10,8 @@ SPEC.loader.exec_module(release)
 MANIFEST = '''<manifest xmlns:android="http://schemas.android.com/apk/res/android"
  package="attention.stats" android:versionCode="1" android:versionName="0.1.0">
  <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="37"/>
- <queries><package android:name="com.instagram.android"/><package android:name="com.facebook.katana"/></queries>
+ <queries><package android:name="com.instagram.android"/><package android:name="com.facebook.katana"/>
+ <package android:name="com.google.android.youtube"/><package android:name="com.zhiliaoapp.musically"/></queries>
  <application android:allowBackup="false" android:usesCleartextTraffic="false"
   android:fullBackupContent="@xml/backup_rules" android:dataExtractionRules="@xml/data_extraction_rules">
   <activity android:name="com.attentionstats.MainActivity" android:exported="true"/>
@@ -42,6 +43,8 @@ class ReleaseAdmission(unittest.TestCase):
         for changed in [
             MANIFEST.replace('<queries>', '<uses-permission android:name="android.permission.INTERNET"/><queries>'),
             MANIFEST.replace('<queries>', '<queries><intent><action android:name="fixture"/></intent>'),
+            MANIFEST.replace('<queries>', '<queries><package android:name="example.unrelated"/>'),
+            MANIFEST.replace('<package android:name="com.google.android.youtube"/>', ''),
         ]:
             with self.assertRaises(ValueError):
                 release.audit_manifest(changed)

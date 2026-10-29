@@ -139,3 +139,9 @@ All three injected boundaries and validated aggregate measurements now pass on t
 The AS-043 internal overlay projection also carries a transient backward-position animation hint (ADR-040). It is derived from settled numeric pager positions, is not persisted or exposed as content identity, and changes neither bridge contract 2 nor committed totals. The renderer scrolls retained old/new values in a clipped viewport; unchanged snapshots do not restart motion.
 
 ADR-049 keeps snapshot contract 5 and Room schema 3. Configure validates the source-specific notice: TikTok 4, other sources 3. Old TikTok consent cannot authorize content comparison. Comparison tokens never cross the bridge; temporary TikTok page values are used only by the reducer and are not stored; saved exposure ordinals enumerate committed visit encounters, not content identity.
+
+## Experimental auto-scroll session contract
+
+AS-044 adds NativeReels.getAutoScrollSnapshot(), configureAutoScroll(enabled, noticeRevision) and stopAutoScroll(). The independent response contract 1 contains exactly contract, enabled, running, reason, sessionOnly and four unique known sources with app/candidate flags. TypeScript rejects missing/duplicate/unknown/expanded payloads, invalid booleans, running while disabled and oversized responses. The count snapshot remains contract 5 and Room remains schema 3.
+
+The switch is a native memory-only convenience session, not a history/source mutation. Notice revision 1 is required to allow controls; restart clears allow/run. Start can occur only through a fresh qualified viewer HUD with a visible Stop, supported profile and numeric playback. No bridge start command bypasses those checks. stopAutoScroll prevents further dispatches; an already-dispatched bounded swipe may finish. A compact HUD toggle opens the app's consent route if needed, never grants source/OS access or collects a new history metric.

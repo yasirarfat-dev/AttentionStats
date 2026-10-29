@@ -73,7 +73,11 @@ const Tabs = createBottomTabNavigator<TabRoutes>();
 const linking: LinkingOptions<TabRoutes> = {
   prefixes: ['attentionstats://'],
   config: {
-    screens: { TodayTab: { screens: { Today: 'today', Reels: 'reels' } } },
+    screens: {
+      TodayTab: {
+        screens: { Today: 'today', Reels: 'reels', Convenience: 'convenience' },
+      },
+    },
   },
 };
 const tabs: {
@@ -221,9 +225,12 @@ function FeatureStack({
       </Stack.Screen>
       <Stack.Screen
         name="Convenience"
-        component={ConvenienceScreen}
         options={{ title: 'Convenience features' }}
-      />
+      >
+        {({ navigation }) => (
+          <ConvenienceScreen onPrivacy={() => navigation.navigate('Privacy')} />
+        )}
+      </Stack.Screen>
       <Stack.Screen name="About" options={{ title: 'About Attention Stats' }}>
         {({ navigation }) => (
           <AboutScreen

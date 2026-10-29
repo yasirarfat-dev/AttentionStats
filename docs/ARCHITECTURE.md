@@ -1,6 +1,6 @@
 # Architecture
 
-**Status:** Mobile architecture accepted; pure analytics slice and experimental mobile composition/bootstrap source exist; runtime integration unaccepted. Updated 2026-10-27.
+**Status:** Mobile architecture accepted; pure analytics slice and experimental mobile composition/bootstrap source exist; runtime integration unaccepted. Updated 2026-10-29.
 **Responsibility:** Owns subsystem boundaries, runtime lifecycle, data flow and future adapters.
 **Related specifications:** [Contracts](NATIVE-CONTRACTS.md), [Models](DATA-MODELS.md), [Structure](FILE-STRUCTURE.md), [Dependencies](DEPENDENCIES.md), [Security](SECURITY.md).
 **Unresolved feasibility:** F-02–F-04, F-07 and F-08 in [Decisions](DECISIONS.md); service strategy, full toolchain and product encryption integration remain unqualified; isolated store build/phone evidence is scoped below.
@@ -27,7 +27,7 @@ ADR-031 selects [Room 3/SQLCipherDriver and Tink archive prototypes](CRYPTO-ARCH
 
 ## Domain-oriented modular design
 
-ADR-041 and [Adding social-app support](SOCIAL-ADAPTERS.md) make the incremental boundary concrete: `detectors/social/<service>` owns versioned predicates, `detectors/accessibility` owns Android acquisition, and the registry composes implementations. Adapters receive structural values and cannot access Android nodes, storage, UI or actions. Counting, consent, writes and presentation remain shared. The preview's two-source enum/bridge/catalog still need additive evolution for other apps; YouTube/TikTok/Reddit support is not implemented.
+ADR-041 and [Adding social-app support](SOCIAL-ADAPTERS.md) make the incremental boundary concrete: `detectors/social/<service>` owns versioned predicates, `detectors/accessibility` owns Android acquisition, and the registry composes implementations. Adapters receive structural values and cannot access Android nodes, storage, UI or actions. Counting, consent, writes and presentation remain shared. AS-048 now supplies a four-source enum/bridge/catalog with Instagram, Facebook, YouTube and TikTok candidates; admission remains independently qualified by installed version and route. Reddit and regional variants remain future work.
 
 Use a **modular monolith on the device** with domain-driven boundaries. The enterprise-style requirement means clear ownership, stable interfaces, testability and disciplined change; it does not require a backend, microservices or a distributed system. Domain language and invariants live with their domain. Do not scatter business rules through screens or create one global services/utils folder.
 
@@ -48,6 +48,8 @@ Dependency direction: app composition → feature application/presentation → d
 Boundary checks, strict types, native compilation, unit/property/scenario tests, schema/contract checks, immutable revisions, migrations, cancellation/backpressure, bounded queries, error taxonomies, least-privilege controls and reproducible locked builds are required. [Conventions](CONVENTIONS.md) and [Testing](TESTING.md) define executable checks and completion evidence. A pattern is adopted to solve an actual problem; speculative abstractions must not obscure the data path.
 
 Every implemented screen and behavior must be exercised on this machine's authorized debug phone or a dedicated emulator before it is accepted. Desktop/browser screenshots do not meet that condition. Record build/commit, route/state, test environment, steps, outcome and remaining gaps; API-sensitive collectors also need real physical-device evidence. AS-035's synthetic ART execution, if passing, validates calculations only and cannot approve UI, sensors, accessibility or lifecycle behavior.
+
+AS-044 keeps optional scrolling in a separate `autoscroll` module: a pure playback-loop decision, memory-only session controller, app-specific numeric progress resolver and one isolated gesture dispatcher. Counting adapters/reducers cannot dispatch actions. The service revalidates source consent, window/page/epoch, grant, lock and visible Stop before dispatch; late/cancelled work is fenced by the session revision. Allow/Start/Stop do not mutate statistics or storage. [Auto-scroll specification](AUTOSCROLL-SPEC.md) defines the experimental qualification boundary.
 
 ## Data flow
 

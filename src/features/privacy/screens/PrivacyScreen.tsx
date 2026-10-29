@@ -31,6 +31,16 @@ export function PrivacyScreen() {
         unique videos or playback.
       </Paragraph>
       <Paragraph>
+        Optional experimental auto-scroll is a separate session-only choice in
+        Convenience features. Allowing it does not start scrolling. Start on the
+        floating counter permits numeric playback-progress inspection and one
+        upward swipe after a complete observed playback loop in a supported
+        viewer. Progress stays in memory. Stop remains visible; leaving the
+        viewer, locking, pausing observation or hiding the counter stops future
+        swipes. A swipe already dispatched may finish. Service restart turns the
+        choice off. Unqualified apps and ambiguous progress remain unavailable.
+      </Paragraph>
+      <Paragraph>
         Development previews also offer a separately chosen, temporary structure
         check. It saves only layout identifiers, numeric scroll positions, media
         and ancestor bounds, and scroll-source bounds with event sequence and
@@ -56,7 +66,7 @@ export function PrivacyScreen() {
       />
       <Paragraph>
         Pause stops new observations and removes the live display. Deleting
-        Reels history disables observation and removes saved counts for both
+        Reels history disables observation and removes saved counts for all
         apps. Export, restore, protection and broader history remain
         unavailable.
       </Paragraph>

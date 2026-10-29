@@ -1,9 +1,9 @@
 {
   "reviewedDate": "2026-10-29",
-  "recordedAtUtc": "2026-10-28T19:49:55.858803+00:00",
-  "task": "AS-013/AS-043/AS-045/AS-046/AS-048",
+  "recordedAtUtc": "2026-10-29T06:27:13.328953+00:00",
+  "task": "AS-013/AS-043/AS-044/AS-045/AS-046/AS-048",
   "status": "experimental",
-  "scope": "Experimental four-source Android counter candidates, source-specific disclosure, preserved history and native display controls. Full fidelity/lifecycle/release acceptance remains open.",
+  "scope": "Experimental four-source counter, separately consented session-only playback-loop auto-scroll candidates, and visit-only HUD hiding. Full source/action/accessibility/lifecycle/Play qualification remains open.",
   "nativeStableResolutions": [
     {
       "coordinate": "androidx.room3:room3-runtime",
@@ -124,7 +124,15 @@
     },
     {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt",
-      "sha256Lf": "d6ce62a4df75a6615f68f77f63665415f4ef54719c4e858a4990dfbedf0ec774"
+      "sha256Lf": "475f0b153c1d90f0a8d7ca6776bc12723e2cf25f2e87da1805ccc52474c4bac4"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/attentionstats/qualification/AutoRuntimeProbe.kt",
+      "sha256Lf": "0f481aacb1c54a1a2351b0462326b006f56eb33f21d7b0bec10d193d800d0b1a"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/attentionstats/qualification/AutoScrollProbe.kt",
+      "sha256Lf": "2c0fffa053b2abe4e879c9d5878946fe40845f90afc7ba417ea2a879ef52afa0"
     },
     {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/ContentIdentityProbe.kt",
@@ -135,12 +143,24 @@
       "sha256Lf": "6abd135cc6be20da586387d7b76a8eb8e7d045334d6ead8bc33531556676c10a"
     },
     {
+      "path": "android/app/src/androidTest/java/com/attentionstats/qualification/MediaPlaybackProbe.kt",
+      "sha256Lf": "2707abfd75c14135a3d5a4a2c1e0696643d6d0dede4c8b8df309f0bf2247acae"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/attentionstats/qualification/NumericPlaybackProbe.kt",
+      "sha256Lf": "a1ca438e2464a0a4a843f4ededb85c67bb2442869d4bbb3a10212d3b54232ae4"
+    },
+    {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/ReelsStorageProbe.kt",
       "sha256Lf": "c40983152d60437ebc81c15c8ed9255efa4d4d4361d019a5bdc62e5faa4a5d9b"
     },
     {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/ReelsUiProbe.kt",
-      "sha256Lf": "c18eea7145e3294b128515b7e888dc372e40e396604d3b1c67f3b34010dc4c7a"
+      "sha256Lf": "f99f73bf7ba17a45dabd090b78ac509cd6e44b0733da8f109a968f953e454071"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/attentionstats/qualification/ServiceRestoreProbe.kt",
+      "sha256Lf": "54bc3d38f1b4405edd6f505edc7c881307e7d311f987fad6a4e29a711e22f89a"
     },
     {
       "path": "android/app/src/main/AndroidManifest.xml",
@@ -151,12 +171,36 @@
       "sha256Lf": "af05d26746c2352982a296d45908b144c716bcaad6da9adf324408e06cfd174c"
     },
     {
+      "path": "android/app/src/main/java/com/attentionstats/autoscroll/AutoScrollGestureDispatcher.kt",
+      "sha256Lf": "058c492ebf7051f79f8f15370c7ae2f697f879e2306e4716e25de8fd03e9ba2e"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/autoscroll/AutoScrollSession.kt",
+      "sha256Lf": "d2aa6cb331030313573857ed8757340ab0e395a3f911f66db30031ff962393da"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/autoscroll/PlaybackPositionResolver.kt",
+      "sha256Lf": "8dbf82b9abc6195618beb141ab550fe4cfe29e81456017a3bff90c53fd1288db"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/autoscroll/PlaybackProgressReader.kt",
+      "sha256Lf": "9db08351579b1a6ec3e20ef00e8f1a9e46f283b34f5587bd30446093c7dcf0f1"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/autoscroll/PlaybackTimeParser.kt",
+      "sha256Lf": "1cee5e7f89e3ce20e2b26bb84878f541cdf9f53b035e962cbf80024e22fecb4d"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/autoscroll/domain/CompletionGate.kt",
+      "sha256Lf": "e54b2012907e9ea801b2e574a95b2e712e7811390bcfaabe7bcdcafa350823b9"
+    },
+    {
       "path": "android/app/src/main/java/com/attentionstats/bridge/BootstrapPackage.kt",
       "sha256Lf": "815d2713c2bd64053e4cbba03e71d5f117755aa65c1225fae02bf9cd8ba25661"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/bridge/ReelsModule.kt",
-      "sha256Lf": "a6e557d29f3c703d8ed93992083d10d1ab751f1310f73c8a2557905d01679b6a"
+      "sha256Lf": "382127fb47ca0e26c645b8b18473110d7276b5fbec3645f34610787e8b6182aa"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/detectors/DetectorRegistry.kt",
@@ -164,7 +208,7 @@
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/detectors/SurfaceDetector.kt",
-      "sha256Lf": "b3b554d33d5ed83cea4a571b389eda035d5bd443eac057b1cb4d61fa218da4f3"
+      "sha256Lf": "90b0baa2feb9a7016255a1406c4028b6783064747c56a5a331523a394af148b5"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/detectors/accessibility/DiagnosticScrollTrace.kt",
@@ -176,7 +220,7 @@
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/detectors/accessibility/StructuralSnapshotReader.kt",
-      "sha256Lf": "5a0fc79e0cae9cbb146a4fc780d0b763f40469fa49560657bd2961e53e601c18"
+      "sha256Lf": "5afeaa4eac4c2685a9cd88fdb3ddfaad55b6ccc7e4d23525dc928dc687a6d2bb"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/detectors/accessibility/TransientContentIdentity.kt",
@@ -200,11 +244,11 @@
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/reels/CounterHudView.kt",
-      "sha256Lf": "5ceb11c845e679308604fd402cd411f15aeef82083ef918491adffbfae4ed545"
+      "sha256Lf": "9629aae920e8e26ab9ee4e0b512ac7e11ed305967fdbfbc761d6710965c7ae4f"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/reels/ReelsAccessibilityService.kt",
-      "sha256Lf": "f8faa726a6037fdf86ae3826b5e1d4153598e546dd90da18f3779b3b278bc05b"
+      "sha256Lf": "9aa3c25b4f942dd4a9722681f5da3ddd5a8c884a6b24c75f685e39c1fee01daa"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/reels/ReelsCoordinator.kt",
@@ -213,6 +257,10 @@
     {
       "path": "android/app/src/main/java/com/attentionstats/reels/ScrollingCountView.kt",
       "sha256Lf": "cb731c6fd83cc7f2c0b5dde5f50b1e205496cb320578e39c12058150d1a112c0"
+    },
+    {
+      "path": "android/app/src/main/java/com/attentionstats/reels/VisitHudVisibility.kt",
+      "sha256Lf": "03ccd6f2c1b4cfac067a89540ae65f150279f7faea878ee9bcd77233bf56da42"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/storage/AttentionDatabase.kt",
@@ -232,11 +280,11 @@
     },
     {
       "path": "android/app/src/main/res/values/strings.xml",
-      "sha256Lf": "fafb251589bb77ba132763c6b42eef8c7b58eef2cb810d6d8ec92156c7388af2"
+      "sha256Lf": "d32483010e2a9f94c3bb020608af6aea859c3158ca5677ac52baba96d7465ae3"
     },
     {
       "path": "android/app/src/main/res/xml/reels_accessibility_service.xml",
-      "sha256Lf": "e4bc6b6fc5159e973a9a2f5d4831990ebf88bb782047ac89d34354842f1ed6a3"
+      "sha256Lf": "d221d40c16712f3514894412e8a7254b6810b55a98196618b2edf397b760b4ff"
     },
     {
       "path": "android/app/src/preview/AndroidManifest.xml",
@@ -280,7 +328,7 @@
     },
     {
       "path": "src/app/App.tsx",
-      "sha256Lf": "3f8fa2183e46fd713d238a5d5b2c2da675ec52d0fd1158b22061741d9ca92498"
+      "sha256Lf": "b4beb28d23f7d306f8ab59f61c80998fc139a8661977177f27bedf691c8c6321"
     },
     {
       "path": "src/features/appearance/index.ts",
@@ -308,7 +356,7 @@
     },
     {
       "path": "src/features/convenience/screens/ConvenienceScreen.tsx",
-      "sha256Lf": "e85991c79e28e8b4448ca3ee53004bdf3da44c5fc60a1b7f536f446a6c3716f3"
+      "sha256Lf": "7e71e5dfa8baa89876c80845b6ad289e8a7f50aa9f7cc604095ebe4f929c40e1"
     },
     {
       "path": "src/features/history/index.ts",
@@ -332,7 +380,7 @@
     },
     {
       "path": "src/features/privacy/screens/PrivacyScreen.tsx",
-      "sha256Lf": "6ecbbe95560afdc93c27f76b15364696a3f75dc6faeb6136d8f0baaf9446995e"
+      "sha256Lf": "fa59bafbb2582414b8a0c767a518db6916fc6a874bf4504a7e4333d9c9e786fc"
     },
     {
       "path": "src/features/protection/index.ts",
@@ -387,12 +435,20 @@
       "sha256Lf": "e6f16f132ea5fd44245211bfcf0bf626e09d1ca8f2624a58edfdeb618385ce6e"
     },
     {
+      "path": "src/platform/__tests__/autoScrollStatus.test.ts",
+      "sha256Lf": "95289905b8e3f73eb661e09840467af8842a58cb73388c4dce40f978c1787258"
+    },
+    {
       "path": "src/platform/__tests__/reelsStatus.test.ts",
       "sha256Lf": "9accc84d0feed7e675e46c0ca17539b76c97e3b060d48eaf14809e7fbf115126"
     },
     {
+      "path": "src/platform/autoScrollStatus.ts",
+      "sha256Lf": "18f08b28b66acb2dd0ef1a3ed5de6e4eef7aefbd27f35b65a055a37cfd02d51c"
+    },
+    {
       "path": "src/platform/index.ts",
-      "sha256Lf": "80ec4688738fb7cde6f4789ef74aa59dedea83ba60671177087ec2598c4f54cd"
+      "sha256Lf": "c28e380039ca3293ca7d1f9f84388cc475e03aa3bf32d363169a111b7afe3a3f"
     },
     {
       "path": "src/platform/reelsSources.ts",
@@ -404,7 +460,7 @@
     },
     {
       "path": "src/platform/specs/NativeReels.ts",
-      "sha256Lf": "3df9ff548ff2a20175bcf16ea59957284632ad5eab1021ddf9632fa3d2719a3d"
+      "sha256Lf": "6e69737fdf3e3fde355161c880a0d1aa2f8c96017641a373cdf8eb02978a795c"
     },
     {
       "path": "src/ui/Action.tsx",
@@ -432,7 +488,7 @@
     },
     {
       "path": "tools/check_architecture.py",
-      "sha256Lf": "7cc9b9b4f09f7cbfc8a4cf0d0f2d093ea8ae2187a81c405a80468ef229927992"
+      "sha256Lf": "9e305c25d8a1b764e30f888ee40030d2c4018d3241cd451e2ff0c927f08ee8d9"
     },
     {
       "path": "tools/check_docs.py",
@@ -440,11 +496,11 @@
     },
     {
       "path": "tools/reels_phone.py",
-      "sha256Lf": "8110f2080ee2bc8bdc71db42061e0d5f613337766162043aed1351468217bff0"
+      "sha256Lf": "1c5f36419f691e0d89366d7142b41447c44b5515a71554762c6d7f696429deb2"
     },
     {
       "path": "tools/release_candidate.py",
-      "sha256Lf": "0c5d22b50c7a2d00d9f519ec1379adc67543b91b1b954bccda68e016f4492842"
+      "sha256Lf": "f07fd013744215b4a0bebbc770df553384ed22b5db11fe4a66ba842fa7bdb766"
     },
     {
       "path": "tools/tests/test_architecture.py",
@@ -452,22 +508,22 @@
     },
     {
       "path": "tools/tests/test_reels_phone.py",
-      "sha256Lf": "24c1c527b8235f1ef8e87d509b8d967293a1f3fb3dfab903321e2766c3d68c2c"
+      "sha256Lf": "d57cdef1a0a53666fb6c4fb2e8174fdec9c2068983342e0bd6af7f9afa839f86"
     },
     {
       "path": "tools/tests/test_release_candidate.py",
-      "sha256Lf": "a5c4e2faf63cc4e9b76120ce2f437c793e4ee5efcf08e4997c2619ee4ffb04f5"
+      "sha256Lf": "434f76700d07ad4ba3ae6fdd5c729d9ac8b7deedca3446309183b72f14fb37ba"
     }
   ],
   "sourceHashNormalization": "UTF-8 tracked text normalized to LF; excludes generated build/cache/binary/phone captures.",
   "installedPreview": {
-    "sha256": "44d87fa1582e475a42aa929f37526cd522fb83432a2818b6e1c352716f628e6b",
-    "size": 81087258
+    "sha256": "a6b9aef3a434f0834cc19bec1dd2c857b1b05175b83e8a59277d190c8c65bef6",
+    "size": 81088896
   },
   "bundledJavaScript": {
     "pathInsideApk": "assets/index.android.bundle",
-    "sha256": "05583e7f1bd6f346584ea0dcaea8a9968bdb33cc0cdf02287f438008b7c6e2ed",
-    "size": 2415676,
+    "sha256": "a53f539736e9e88ce691af97cab12d94466b4ad7f19e5e15523a39cafefe17e6",
+    "size": 2422448,
     "development": false
   },
   "phoneChecks": {
@@ -475,12 +531,12 @@
     "api": 36,
     "abi": "arm64-v8a",
     "previewArtifact": {
-      "sha256": "44d87fa1582e475a42aa929f37526cd522fb83432a2818b6e1c352716f628e6b",
-      "size": 81087258
+      "sha256": "a6b9aef3a434f0834cc19bec1dd2c857b1b05175b83e8a59277d190c8c65bef6",
+      "size": 81088896
     },
     "testArtifact": {
-      "sha256": "3949a0ed47007714f79e2b0c26a2f953e7aaa3622cffc09c39bc7c45e8804b50",
-      "size": 192113
+      "sha256": "1bb1775a5c944ac8db24df8c59bf74733574bd27834bfe947f651da0e0ce7160",
+      "size": 223874
     },
     "storage": {
       "storage_checks": 61,
@@ -489,22 +545,19 @@
       "sentinel_files": 3,
       "fixture_removed": 1
     },
-    "reducerArtChecks": 38,
+    "autoscroll": {
+      "autoscroll_checks": 118
+    },
     "dashboard": {
-      "ui_checks": 140,
+      "ui_checks": 145,
       "shell_routes": 20
     },
     "testPackageRemoved": true,
-    "scope": "Isolated encrypted storage/migrations/catalog and artificial detector/acquisition fixtures; own-Activity dispatched touches test native view routing, separately from OS input/overlay delivery.",
-    "artifactCollectionRecovery": {
-      "remainingOwnCapturesCopied": 17,
-      "allExpectedCapturesFreshForBuild": true,
-      "scope": "Tests already passed; only interrupted own-artifact transfer resumed"
-    }
+    "scope": "Isolated encrypted storage/migrations/catalog, artificial detector/acquisition and auto-scroll decisions/runtime (fake dispatcher), own-window HUD/native route controls. These do not qualify actual playback signals or action fidelity."
   },
   "localChecks": {
     "reducerJvmChecks": 38,
-    "jestCases": 27,
+    "jestCases": 37,
     "hostOwnershipAndSanitizerCases": 18,
     "textContrastPairs": 22,
     "minimumTextContrast": 5.03,
@@ -512,12 +565,12 @@
     "lintAndArchitecture": true,
     "format": true,
     "previewLintErrors": 0,
-    "previewLintWarnings": 19,
-    "mobileTypeScriptFiles": 43,
+    "previewLintWarnings": 20,
+    "mobileTypeScriptFiles": 45,
     "documentation": true,
     "mobileDependencyAudit": true,
     "adapterBoundaryCases": 3,
-    "pythonHostSuiteCases": 68
+    "pythonHostSuiteCases": 71
   },
   "packaging": {
     "arm64Only": true,
@@ -543,7 +596,7 @@
         {
           "name": "lib/arm64-v8a/libappmodules.so",
           "minLoadAlignment": 16384,
-          "sha256": "28570103340de880dedaa6dce410bdd00f8b20a7bb0bfde5220f18e2e714da25"
+          "sha256": "b44b9543e2b3a7a6dd58246e18e651a8610411a5ac7bce400838cb4c193b4acc"
         },
         {
           "name": "lib/arm64-v8a/libc++_shared.so",
@@ -647,7 +700,9 @@
         }
       ],
       "scope": "Static ZIP/ELF checks only; no 16-KiB runtime-device claim"
-    }
+    },
+    "accessibilityGestureCapability": true,
+    "accessibilityTool": false
   },
   "detectors": {
     "instagram": {
@@ -676,7 +731,8 @@
     "No playback/completion/unique-video claim; identical/missing/dynamic captions can misidentify TikTok transitions",
     "No Home-feed post counting, actual app/viewer duration, complete ads, broad lifecycle or full accessibility qualification",
     "No per-event origin envelope, durable calendar aggregate table, extension or merge/sync implementation",
-    "No release signing, Play rollout, remote workflow or binary publication"
+    "No release signing, Play rollout, remote workflow or binary publication",
+    "AS-044 action candidates and visit-hide controls have separate scoped evidence; historical live-counter results do not qualify these builds or auto-scroll."
   ],
   "previousInstalledPreviewEvidence": {
     "installedPreview": {
@@ -1087,6 +1143,45 @@
           "shell_routes": 20
         }
       }
+    },
+    {
+      "label": "Four-source counter before AS-044 auto-scroll",
+      "previewArtifact": {
+        "sha256": "44d87fa1582e475a42aa929f37526cd522fb83432a2818b6e1c352716f628e6b",
+        "size": 81087258
+      },
+      "phoneChecks": {
+        "physical": true,
+        "api": 36,
+        "abi": "arm64-v8a",
+        "previewArtifact": {
+          "sha256": "44d87fa1582e475a42aa929f37526cd522fb83432a2818b6e1c352716f628e6b",
+          "size": 81087258
+        },
+        "testArtifact": {
+          "sha256": "3949a0ed47007714f79e2b0c26a2f953e7aaa3622cffc09c39bc7c45e8804b50",
+          "size": 192113
+        },
+        "storage": {
+          "storage_checks": 61,
+          "detector_checks": 152,
+          "key_rejections": 3,
+          "sentinel_files": 3,
+          "fixture_removed": 1
+        },
+        "reducerArtChecks": 38,
+        "dashboard": {
+          "ui_checks": 140,
+          "shell_routes": 20
+        },
+        "testPackageRemoved": true,
+        "scope": "Isolated encrypted storage/migrations/catalog and artificial detector/acquisition fixtures; own-Activity dispatched touches test native view routing, separately from OS input/overlay delivery.",
+        "artifactCollectionRecovery": {
+          "remainingOwnCapturesCopied": 17,
+          "allExpectedCapturesFreshForBuild": true,
+          "scope": "Tests already passed; only interrupted own-artifact transfer resumed"
+        }
+      }
     }
   ],
   "sourceCatalog": {
@@ -1247,5 +1342,119 @@
       "extension",
       "Google synchronization"
     ]
+  },
+  "autoScroll": {
+    "reviewedDate": "2026-10-29",
+    "task": "AS-044",
+    "status": "experimental",
+    "previewArtifact": {
+      "sha256": "a6b9aef3a434f0834cc19bec1dd2c857b1b05175b83e8a59277d190c8c65bef6",
+      "size": 81088896
+    },
+    "testArtifact": {
+      "sha256": "1bb1775a5c944ac8db24df8c59bf74733574bd27834bfe947f651da0e0ce7160",
+      "size": 223874
+    },
+    "build": {
+      "passed": true,
+      "duration": "5m 24s"
+    },
+    "phone": {
+      "physical": true,
+      "api": 36,
+      "abi": "arm64-v8a",
+      "artificialDecisionRuntimeChecks": 118,
+      "ownWindowChecks": 145,
+      "nativeRoutes": 20,
+      "ownedTestPackageRemoved": true
+    },
+    "sourceBindings": "reels-preview.json sourceHashes (UTF-8 LF)",
+    "liveOperatorTrials": [
+      {
+        "source": "tiktok",
+        "passed": false,
+        "testRemoved": true,
+        "artifacts": {
+          "preview": "a6b9aef3a434f0834cc19bec1dd2c857b1b05175b83e8a59277d190c8c65bef6",
+          "test": "1bb1775a5c944ac8db24df8c59bf74733574bd27834bfe947f651da0e0ce7160"
+        },
+        "auto_attempts": 1,
+        "auto_confirmed": 1,
+        "auto_exposures_added": 0,
+        "auto_source_choices_preserved": 1,
+        "probe_stage": "operator_own_dialog",
+        "auto_last_reason": "playback_unavailable",
+        "navigationSamples": 95,
+        "ownAllowPassed": true,
+        "ownStartPressed": true,
+        "runningObserved": true,
+        "viewerSamples": 93,
+        "numericRangeSamples": 93
+      }
+    ],
+    "limits": [
+      "Artificial fixtures use an in-memory fake dispatcher, never a social-app gesture.",
+      "Instagram/Facebook/TikTok are exact-version candidates; a numeric slider does not establish full action qualification.",
+      "YouTube completion is unavailable; its sampled media metadata reports zero duration/position.",
+      "No watched/completed statistic, timer fallback, auto-start, history schema change or new source grant.",
+      "Full source safety/negative/lifecycle/accessibility/Play checks remain open."
+    ],
+    "controls": {
+      "separateSessionAllow": true,
+      "explicitViewerStart": true,
+      "visibleCollapsedStop": true,
+      "noAutomaticRestart": true,
+      "hideUntilConfirmedAppDeparture": true,
+      "countingIndependentOfHiddenHud": true,
+      "singleRevalidatedSwipe": true,
+      "missingOrLatePageDeadlineMs": 2500
+    },
+    "numericMetadataInvestigation": {
+      "artifacts": {
+        "preview": "bf683d92610430d065067facd5225f6a43b5d1279942e25452cfccbcb26153e0",
+        "test": "a9ec263973f41723552ab37bf3df10d7c758f691bc55d5e39da684369afca741"
+      },
+      "operatorPassed": true,
+      "ownedTestPackageRemoved": true,
+      "youtube": {
+        "mediaSamples": 20,
+        "sessionSamples": 20,
+        "durationValues": [
+          0
+        ],
+        "positionValues": [
+          0
+        ],
+        "stateValues": [
+          0
+        ],
+        "numericSamples": 19
+      },
+      "tiktok": {
+        "mediaSamples": 41,
+        "sessionSamples": 0,
+        "numericSamples": 40
+      },
+      "scope": "Temporary shell identity, selected foreground source only, no production media/notification access; metadata values do not establish a completion signal."
+    },
+    "signals": {
+      "screenshots": false,
+      "targetUiChangedForDetection": false,
+      "numericCandidates": [
+        "instagram",
+        "facebook",
+        "tiktok"
+      ],
+      "unavailable": [
+        "youtube"
+      ],
+      "tiktok": {
+        "version": "47.5.3",
+        "playerRangeId": "vt6",
+        "rangeMin": 0,
+        "rangeMax": 10000,
+        "hiddenRangesAccepted": false
+      }
+    }
   }
 }

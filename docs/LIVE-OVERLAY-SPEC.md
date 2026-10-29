@@ -84,3 +84,13 @@ AS-043 now contains an experimental top-center `TYPE_ACCESSIBILITY_OVERLAY` rend
 AS-033 demonstrates this interaction in a synthetic feed with explicit next-item and duplicate-callback controls. AS-034 implements native live display only after AS-013/AS-007 qualification and native store/consent prerequisites. C-32 remains experimental; there is no enabled production renderer or supported version list.
 
 X-08 covers live updates, dedup, visit/day separation, gaps, pause/hide and large-type interaction. X-09 covers native midnight/timezone/reboot/generation/secure-context/touch/policy/battery behavior. Scoped native fixtures and own-overlay interaction/persistence trials are recorded in State; full X-08/X-09 acceptance remains open. Optional content-topic interpretation is later, separately consented C-15; it should not clutter this minimal awareness display.
+
+## Visit-only hiding and compact convenience access
+
+ADR-052 changes the HUD Hide action to display-only hiding for the current app visit. It must not write the persistent display preference, pause sources or change committed counts. Keep it hidden across Reels pages, comments, missing roots, window transitions and transient system UI in that app. A confirmed different foreground package ends the hiding interval; returning can show the counter if its separate saved setting remains enabled. Service restart clears temporary hiding. The app's Floating counter setting remains the persistent off/on control.
+
+The separate Pause counting action stops new observations until resumed; hiding never substitutes for it. Hiding, permanent display off or observation pause also stops future auto-scroll actions because the visible Stop control is required.
+
+Expanded HUD options expose a compact auto-scroll toggle and explicit Start/Stop where qualified. Explanations and consent remain in the app; no disclosure text, multi-step wizard or large consent panel is added to the HUD. If consent is needed, the toggle opens Convenience features. Once allowed for the service session, later HUD toggles work directly. Stop remains visible in collapsed state during a run. [Auto-scroll](AUTOSCROLL-SPEC.md) owns playback/action qualification; display and counting do not prove it.
+
+Temporary hiding keeps a root-ownership-only departure check active through transient system UI; foreign app descendants are never inspected. This prevents missing the eventual departure when selected-source callbacks are absent. A missing root or system overlay alone does not end the hidden interval.

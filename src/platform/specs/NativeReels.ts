@@ -20,6 +20,12 @@ export interface Spec extends TurboModule {
   openAccessibilitySettings(): Promise<boolean>;
   openTarget(app: string): Promise<boolean>;
   setCalibration(enabled: boolean): Promise<boolean>;
+  getAutoScrollSnapshot(): Promise<string>;
+  configureAutoScroll(
+    enabled: boolean,
+    noticeRevision: number,
+  ): Promise<string>;
+  stopAutoScroll(): Promise<string>;
 }
 
 export default TurboModuleRegistry.get<Spec>('NativeReels');

@@ -31,6 +31,7 @@ class ReelsPhoneSafety(unittest.TestCase):
                     if args == ["shell", "getprop", "ro.kernel.qemu"]: output = "0\n"
                     elif args == ["shell", "getprop", "ro.product.cpu.abi"]: output = "arm64-v8a\n"
                     elif args == ["shell", "getprop", "ro.build.version.sdk"]: output = "36\n"
+                    elif args == ["shell", "am", "get-current-user"]: output = "0\n"
                     elif args[:4] == ["shell", "pm", "list", "packages"]: output = ""
                     elif args == ["exec-out", "run-as", probe.APP, "cat", "no_backup/reels-structure.json"]:
                         output = json.dumps(value).encode()
@@ -54,7 +55,7 @@ class ReelsPhoneSafety(unittest.TestCase):
             probe.main()
         run.assert_not_called()
 
-    def run_failure(self, existing=False, install_failure=False):
+    def run_failure(self, existing=False, install_failure=False, active_user="0"):
         calls = []
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -75,6 +76,7 @@ class ReelsPhoneSafety(unittest.TestCase):
                     if args == ["shell", "getprop", "ro.kernel.qemu"]: output = "0\n"
                     elif args == ["shell", "getprop", "ro.product.cpu.abi"]: output = "arm64-v8a\n"
                     elif args == ["shell", "getprop", "ro.build.version.sdk"]: output = "36\n"
+                    elif args == ["shell", "am", "get-current-user"]: output = active_user + "\n"
                     elif args[:4] == ["shell", "pm", "list", "packages"]:
                         output = "package:" + probe.TEST + "\n" if existing else ""
                     elif args[:2] == ["install", str(test)]:
@@ -102,6 +104,16 @@ class ReelsPhoneSafety(unittest.TestCase):
         self.assertFalse(any(call[0] in ["install", "uninstall"] for call in calls))
         self.assertIsNone(evidence)
 
+    def test_package_check_is_scoped_to_active_profile(self):
+        calls, _ = self.run_failure(existing=True, active_user="12")
+        self.assertIn(["shell", "pm", "list", "packages", "--user", "12", probe.TEST], calls)
+        self.assertFalse(any(call[:4] == ["shell", "pm", "list", "packages"] and "--user" not in call for call in calls))
+
+    def test_unknown_profile_never_falls_back_or_installs(self):
+        calls, evidence = self.run_failure(active_user="unavailable")
+        self.assertFalse(any(call[0] in ["install", "uninstall"] for call in calls))
+        self.assertIsNone(evidence)
+
     def test_failed_probe_removes_only_test_package_and_leaves_preview(self):
         calls, evidence = self.run_failure()
         self.assertEqual([call for call in calls if call[0] == "uninstall"], [["uninstall", probe.TEST]])
@@ -121,6 +133,18 @@ class ReelsPhoneSafety(unittest.TestCase):
         self.assertEqual(probe.parse_result(output, "ui"), {"ui_checks": 120, "shell_routes": 20})
         for extra in ["INSTRUMENTATION_CODE: 0", "INSTRUMENTATION_RESULT: ui_checks=120", "INSTRUMENTATION_RESULT: shell_routes=19"]:
             with self.assertRaises(RuntimeError): probe.parse_result(output + "\n" + extra, "ui")
+
+    def test_autoscroll_requires_its_own_complete_success_receipt(self):
+        output = "\n".join([
+            "INSTRUMENTATION_RESULT: stream=PASS: synthetic auto-scroll decision safety",
+            "INSTRUMENTATION_RESULT: autoscroll_checks=100", "INSTRUMENTATION_CODE: -1"])
+        self.assertEqual(probe.parse_result(output, "autoscroll"), {"autoscroll_checks": 100})
+        for changed in [output.replace("=100", "=0"), output.replace("=100", "=201"),
+                        output.replace("INSTRUMENTATION_CODE: -1", "INSTRUMENTATION_CODE: 0"),
+                        output + "\nINSTRUMENTATION_RESULT: autoscroll_checks=100",
+                        output.replace("synthetic auto-scroll decision safety", "own-window React Native preview screens")]:
+            with self.subTest(changed=changed), self.assertRaises(RuntimeError):
+                probe.parse_result(changed, "autoscroll")
 
     def structure(self):
         return {"scope": "consented structural detector qualification only; no content", "targets": {

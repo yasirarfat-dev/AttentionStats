@@ -2,6 +2,10 @@
 
 Prepared 28 October 2026. **Draft for the 0.1.0 closed-test candidate, not a submitted listing.** Permanent package name: **attention.stats**. Keep this source under review and copy the current version to `C:\home\biobot\AppReleases\AttentionStats\PLAY-CONSOLE.md`. No Play account access, policy approval, uploaded bundle or testing start is implied.
 
+## Current implementation warning — 29 October 2026
+
+This document retains historical listing/reviewer text below; it is not ready for submission. ADR-051 adds separately disclosed experimental auto-scroll with session Allow, explicit viewer Start, visible Stop, transient numeric playback inspection and a single bounded upward swipe. The service now declares gesture capability. The older passive-only, no-scroll and no-text statements below do not describe this preview: TikTok also has separately disclosed transient visible-field matching, and Facebook fixed interface-description matching. Rewrite the final listing, Data safety answers, declaration and demonstration against the exact qualified release artifact. Four-app counters and source-specific automation remain experimental; no Play approval or release readiness is claimed.
+
 ## Create app
 
 | Field | Value / action |

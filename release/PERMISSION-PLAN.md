@@ -1,12 +1,12 @@
 # Attention Stats permission and declaration plan
 
-Reviewed 28 October 2026. Package: **attention.stats**. This covers the known roadmap so no access requirement is overlooked. It is not a request to grant unimplemented features access now.
+Reviewed 29 October 2026. Package: **attention.stats**. This covers the known roadmap so no access requirement is overlooked. It is not a request to grant unimplemented features access now.
 
 Google permits sensitive permissions/APIs only for implemented current features promoted in the listing, with incremental in-context requests and consent. Future features can add declarations in later updates; they do not need speculative preapproval in the first closed test. [Google Play policy](https://support.google.com/googleplay/android-developer/answer/9888170), [Android permission workflow](https://developer.android.com/training/permissions/requesting).
 
 | Access / mechanism | Current counter | Later feature and publication gate |
 |---|---|---|
-| AccessibilityService protected by BIND_ACCESSIBILITY_SERVICE | Present; selected-package structure only, separate disclosure/source choice then Android settings. The binding permission protects the service; it is not a runtime permission grant. canPerformGestures=false, isAccessibilityTool=false | Every changed accessibility purpose needs reviewed implementation, revised disclosure/consent where applicable and updated Play declaration/video. No preauthorized future actions |
+| AccessibilityService protected by BIND_ACCESSIBILITY_SERVICE | Present; bounded selected-source observation with separate disclosures/source choices and Android settings. Optional session-only auto-scroll additionally requires Allow then explicit viewer Start. canPerformGestures=true, isAccessibilityTool=false; the binding permission protects the service, not a runtime grant | ADR-051 supersedes the passive-only service. Numeric progress and one revalidated upward swipe are separate from counting; visible Stop and context/lock/revocation fences are required. Source-specific action qualification and the updated Play declaration/video remain pending |
 | Package visibility: four counter targets | Present; explicit four-package discovery, not universal app inventory | Add the narrowest supported discovery for actual new adapters. Do not request QUERY_ALL_PACKAGES for hypothetical app selection |
 | Accessibility overlay | Optional display using the enabled service; separate in-app display choice | No SYSTEM_ALERT_WINDOW needed for this renderer. Reassess if a different implemented renderer genuinely requires application-overlay access |
 | PACKAGE_USAGE_STATS / Usage Access special settings | Absent, not requested | Real app/device usage and independently selected network-statistics features; implement collectors, disclosure, denial/revoke and phone/lifecycle tests first. Usage Access does not count Reels |

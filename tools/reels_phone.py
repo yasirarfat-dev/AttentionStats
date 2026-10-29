@@ -176,6 +176,7 @@ def audit_apks() -> None:
 
 def parse_result(output: str, mode: str) -> dict[str, int]:
     expected = {"storage": "PASS: synthetic main-app Reels storage checks",
+                "autoscroll": "PASS: synthetic auto-scroll decision safety",
                 "ui": "PASS: own-window React Native preview screens"}[mode]
     lines = output.splitlines()
     if [x for x in lines if x.startswith("INSTRUMENTATION_CODE:")] != ["INSTRUMENTATION_CODE: -1"] or \
@@ -190,6 +191,7 @@ def parse_result(output: str, mode: str) -> dict[str, int]:
                            ("; location=" + location[1] if location else "") + ("; touch=" + json.dumps(touch) if touch else "") + "; raw phone output withheld")
     limits = {"storage_checks": (30, 200), "detector_checks": (30, 160), "key_rejections": (3, 3), "sentinel_files": (1, 3),
               "fixture_removed": (1, 1)} if mode == "storage" else {"ui_checks": (20, 160), "shell_routes": (20, 20)}
+    if mode == "autoscroll": limits = {"autoscroll_checks": (60, 200)}
     values = {}
     for key, (low, high) in limits.items():
         found = re.findall(rf"^INSTRUMENTATION_RESULT: {key}=([0-9]{{1,6}})$", output, re.M)
@@ -201,7 +203,7 @@ def parse_result(output: str, mode: str) -> dict[str, int]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["qualify", "ui", "health", "show-counter", "install", "structure", "own-failure-image"])
+    parser.add_argument("action", choices=["qualify", "ui", "autoscroll", "health", "show-counter", "install", "structure", "own-failure-image"])
     parser.add_argument("--label", choices=["reels-entry", "reels-next", "reels-return", "feed", "comments", "ad", "profile", "inbox", "outside"], default="reels-entry")
     parser.add_argument("--user-authorized-display", action="store_true",
                         help="Required for show-counter; use only after the person explicitly requests display")
@@ -210,7 +212,7 @@ def main() -> int:
     args = parser.parse_args()
     if args.action == "show-counter" and not args.user_authorized_display:
         parser.error("show-counter requires explicit user display authorization; sources/grants stay separate")
-    if not args.adb.is_file() or not PREVIEW.is_file() or (args.action in ["qualify", "ui"] and not TEST_APK.is_file()):
+    if not args.adb.is_file() or not PREVIEW.is_file() or (args.action in ["qualify", "ui", "autoscroll"] and not TEST_APK.is_file()):
         raise RuntimeError("Existing adb and built preview/test APKs required")
     with zipfile.ZipFile(PREVIEW) as archive:
         if not archive.read("assets/index.android.bundle") or any(
@@ -237,7 +239,10 @@ def main() -> int:
     api = int(device("shell", "getprop", "ro.build.version.sdk").strip())
     if api < 26:
         raise RuntimeError("Own-window UI qualification requires API 26 or newer")
-    if "package:" + TEST in device("shell", "pm", "list", "packages", TEST).splitlines():
+    active_user = device("shell", "am", "get-current-user").strip()
+    if not active_user.isdigit():
+        raise RuntimeError("Active Android user unavailable; no profile fallback")
+    if "package:" + TEST in device("shell", "pm", "list", "packages", "--user", active_user, TEST).splitlines():
         raise RuntimeError("Existing test package preserved; resolve ownership before qualification")
     if args.action in ["health", "show-counter"]:
         if api < 31: raise RuntimeError("Non-restarting health probe requires API 31 or newer")
@@ -299,19 +304,19 @@ def main() -> int:
         if "Success" not in device("install", "-r", str(PREVIEW), timeout=180):
             raise RuntimeError("Preview installation did not report success; no app data reset attempted")
         evidence["installed"] = True
-        if args.action in ["qualify", "ui"]:
+        if args.action in ["qualify", "ui", "autoscroll"]:
             if "Success" not in device("install", str(TEST_APK), timeout=180):
                 raise RuntimeError("Test installation did not report success")
             installed_test = True
-            for mode in (["storage", "ui"] if args.action == "qualify" else ["ui"]):
+            for mode in (["storage", "autoscroll", "ui"] if args.action == "qualify" else [args.action]):
                 output = device("shell", "am", "instrument", "-w", "-r", "-e", "qualification",
                                 "reels-" + mode, RUNNER, timeout=180)
                 evidence[mode] = parse_result(output, mode)
                 print("PASS: Reels " + mode + " phone checks", flush=True)
-            for name in ["controls", "privacy", "privacy-policy", "reels", "facebook", "hud-collapsed", "hud-expanded", "hud-numbers",
+            for name in ([] if args.action == "autoscroll" else ["controls", "privacy", "privacy-policy", "reels", "facebook", "hud-collapsed", "hud-expanded", "hud-numbers",
                          *["shell-" + item for item in ["today", "history", "patterns", "protect", "settings", "diary",
                              "explanation", "categories", "focus", "rules", "sources", "storage", "backup",
-                             "appearance", "counter", "convenience", "about", "welcome"]]]:
+                             "appearance", "counter", "convenience", "about", "welcome"]]]):
                 relative = "no_backup/reels-ui-" + name + ".png"
                 data = device("exec-out", "run-as", APP, "cat", relative, binary=True)
                 if not data.startswith(b"\x89PNG\r\n\x1a\n") or len(data) > 16 * 1024 * 1024:
@@ -332,7 +337,7 @@ def main() -> int:
             if evidence["installed"]:
                 device("shell", "am", "start", "-n", APP + "/com.attentionstats.MainActivity")
         finally:
-            (CACHE / "phone-result.json").write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
+            (CACHE / ("autoscroll-result.json" if args.action == "autoscroll" else "phone-result.json")).write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(evidence, indent=2))
     return 0
 

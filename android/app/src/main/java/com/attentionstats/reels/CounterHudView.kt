@@ -17,12 +17,38 @@ import org.attentionstats.reels.PageCategory
 
 /** One bounded overlay: icon/count glance, tap for committed visit/day category projections. */
 internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () -> Unit,
-    onHide: () -> Unit) : LinearLayout(context) {
+    onHide: () -> Unit, onAutoScroll: (() -> Unit)? = null,
+    onToggleAutoScroll: (() -> Unit)? = null) : LinearLayout(context) {
     private val density = resources.displayMetrics.density
     private fun dp(value: Int) = (value * density).toInt()
     private val iconColor = Color.rgb(216, 226, 244)
     private val header = LinearLayout(context)
     private val details = LinearLayout(context)
+    private val autoScrollOption = TextView(context).apply {
+        textSize = 14f; setTextColor(Color.WHITE); gravity = Gravity.CENTER
+        minHeight = dp(48); setPadding(dp(12), dp(8), dp(12), dp(8))
+        isClickable = true; isFocusable = true; visibility = GONE
+        setOnClickListener { onToggleAutoScroll?.invoke() }
+        accessibilityDelegate = object : View.AccessibilityDelegate() {
+            @Suppress("DEPRECATION") // Boolean checked state is required on supported API 24-36.
+            override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo) {
+                super.onInitializeAccessibilityNodeInfo(host, info)
+                info.className = "android.widget.Switch"
+                info.isCheckable = true; info.isChecked = isSelected
+            }
+        }
+    }
+    private val autoScroll = TextView(context).apply {
+        textSize = 14f; setTextColor(Color.WHITE); gravity = Gravity.CENTER
+        minHeight = dp(48); setPadding(dp(16), dp(8), dp(16), dp(8))
+        isClickable = true; isFocusable = true; visibility = GONE
+        setOnClickListener { onAutoScroll?.invoke() }
+        accessibilityDelegate = object : View.AccessibilityDelegate() {
+            override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo) {
+                super.onInitializeAccessibilityNodeInfo(host, info); info.className = "android.widget.Button"
+            }
+        }
+    }
     private val visit = number()
     private val today = number()
     private val sessionIcon = icon("session")
@@ -127,7 +153,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
         }
         val actions = LinearLayout(context).apply { gravity = Gravity.CENTER }
         for ((symbol, label, action) in listOf(Triple("dashboard", "Open dashboard", onOpen),
-                Triple("pause", "Pause observation", onPause), Triple("hide", "Hide counter; keep observation on", onHide))) {
+                Triple("pause", "Pause counting until resumed", onPause), Triple("hide", "Hide counter for this visit; keep counting", onHide))) {
             actions.addView(icon(symbol).apply {
                 isClickable = true; isFocusable = true
                 importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
@@ -137,10 +163,26 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
             }, LayoutParams(dp(48), dp(48)))
         }
         details.addView(actions)
+        details.addView(autoScrollOption, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+        addView(autoScroll, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
         addView(details, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
     }
 
     private fun number() = ScrollingCountView(context)
+
+    fun setAutoScrollOption(supported: Boolean, enabled: Boolean) {
+        autoScrollOption.visibility = VISIBLE
+        autoScrollOption.isEnabled = supported
+        autoScrollOption.text = if (!supported) "Auto-scroll unavailable" else if (enabled) "Auto-scroll controls: on" else "Auto-scroll controls: off"
+        autoScrollOption.contentDescription = autoScrollOption.text
+        autoScrollOption.isSelected = enabled && supported
+    }
+
+    fun setAutoScrollControl(visible: Boolean, running: Boolean, ready: Boolean) {
+        autoScroll.visibility = if (visible) VISIBLE else GONE
+        autoScroll.text = if (running) "Stop auto-scroll" else if (ready) "Start auto-scroll" else "Auto-scroll: waiting for playback"
+        autoScroll.isEnabled = running || ready
+    }
 
     private fun icon(symbol: String) = SymbolView(context, symbol, iconColor).apply {
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO

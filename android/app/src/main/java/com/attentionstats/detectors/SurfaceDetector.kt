@@ -26,6 +26,8 @@ internal data class LayoutBounds(val left: Int, val top: Int, val right: Int, va
     val width: Int get() = right - left
     val height: Int get() = bottom - top
 }
+internal data class NumericRange(val id: String?, val role: String, val min: Double,
+    val max: Double, val current: Double, val bounds: LayoutBounds)
 internal enum class NodeRole { VIEW, BUTTON, RECYCLER, OTHER }
 internal data class InterfaceLabel(val token: String, val role: NodeRole, val bounds: LayoutBounds,
     val selected: Boolean, val clickable: Boolean)

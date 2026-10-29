@@ -46,5 +46,22 @@ class ReelsModule(private val context: ReactApplicationContext) : NativeReelsSpe
         try { coordinator.setCalibration(enabled); promise.resolve(true) }
         catch (_: RuntimeException) { fail(promise, "CONSENT_REQUIRED") }
     }
+    private fun autoScrollSnapshot() = com.attentionstats.autoscroll.AutoScrollSession.snapshot { coordinator.installedVersion(it) }
+    override fun getAutoScrollSnapshot(promise: Promise) {
+        context.runOnUiQueueThread { promise.resolve(autoScrollSnapshot()) }
+    }
+    override fun configureAutoScroll(enabled: Boolean, noticeRevision: Double, promise: Promise) {
+        if (noticeRevision != 1.0) { fail(promise, "INVALID_ARGUMENT"); return }
+        context.runOnUiQueueThread {
+            com.attentionstats.autoscroll.AutoScrollSession.configure(enabled, 1)
+            promise.resolve(autoScrollSnapshot())
+        }
+    }
+    override fun stopAutoScroll(promise: Promise) {
+        context.runOnUiQueueThread {
+            com.attentionstats.autoscroll.AutoScrollSession.stop()
+            promise.resolve(autoScrollSnapshot())
+        }
+    }
     companion object { const val NAME = "NativeReels" }
 }

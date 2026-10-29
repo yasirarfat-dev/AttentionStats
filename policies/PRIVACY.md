@@ -41,3 +41,11 @@ Store release builds do not offer the temporary structure check. Separately iden
 This testing candidate is intended for adults and is not designed for children. It offers no medical advice, diagnosis or treatment. We will update this policy when actual behavior changes. New observation fields or purposes require a revised in-app disclosure and affirmative choice before collection expands.
 
 For privacy questions, use the contact mechanism in [support](SUPPORT.md), identifying Attention Stats and the app version without sharing sensitive information. You can inspect the [source code](https://github.com/yasirarfat-dev/AttentionStats) and [known test limits](CLOSED-TEST.md).
+
+## Optional finish-and-swipe controls
+
+Experimental auto-scroll is a separate convenience choice, off initially. The app explains it before you allow controls. You then press Start on the floating counter in a supported viewer; allowing controls alone starts nothing and enables no source. It inspects numeric playback progress in memory and can perform one upward swipe after an observed complete playback loop. It does not use a fixed timer or automatically like, follow, comment, message or share. Progress is not saved in history or uploaded.
+
+Stop stays visible while running, including when the counter is collapsed. Leaving the viewer, locking, pausing observation, hiding the counter, missing/ambiguous progress or service restart stops future swipes; a swipe already dispatched may finish. The choice and run reset when the accessibility service restarts. The compact HUD toggle opens the app for consent when needed; no large disclosure is displayed on top of the social app. Apps/versions without a qualified end signal remain unavailable.
+
+Hiding the counter from its HUD is temporary until you leave that app and does not stop counting. The in-app Floating counter switch saves your persistent display choice. Pause counting is a separate action that stops new observations until resumed.

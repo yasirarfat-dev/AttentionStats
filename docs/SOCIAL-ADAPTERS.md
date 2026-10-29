@@ -28,7 +28,7 @@ Paths beginning with `detectors/`, `reels/` and `storage/` are relative to `andr
 
 ## Current limits
 
-AS-048 adds Instagram, Facebook, YouTube Shorts (`com.google.android.youtube`) and TikTok (`com.zhiliaoapp.musically`) to the enum, narrow package visibility, native initialization, contract 5, strict decoder and mobile controls. New rows are disabled without consent, preserving existing history and grants. YouTube/TikTok detectors remain absent until separately qualified; these entries alone do not supply counters. Regional variants and Reddit remain future independent admissions.
+AS-048 adds Instagram, Facebook, YouTube Shorts (`com.google.android.youtube`) and TikTok (`com.zhiliaoapp.musically`) to the enum, narrow package visibility, native initialization, contract 5, strict decoder and mobile controls. New rows are disabled without consent, preserving existing history and grants. Exact-version YouTube and TikTok detector candidates now exist, with the bounded trials described below. These entries and narrow trials do not establish full route coverage. Regional variants and Reddit remain future independent admissions.
 
 One registry entrypoint per admitted app/version may compose that app's surface classifiers as they become qualified. No Home-feed classifier is admitted now. New surfaces need their own metric/episode scope and explicit disclosure; do not relabel mixed posts as Reels or merge totals silently. A numeric pager position is transient location evidence, not a durable content identity.
 

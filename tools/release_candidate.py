@@ -63,7 +63,7 @@ def audit_manifest(text):
          "Unexpected permission in release")
     queries = manifest.find("queries")
     need(queries is not None and {x.get(ANDROID + "name") for x in queries} ==
-         {"com.instagram.android", "com.facebook.katana"} and
+         {"com.instagram.android", "com.facebook.katana", "com.google.android.youtube", "com.zhiliaoapp.musically"} and
          all(x.tag == "package" for x in queries), "Unexpected package visibility")
     exported = set()
     for component in app:
@@ -187,8 +187,8 @@ def archive(dest):
             raise ValueError("Missing or ambiguous compiled XML resource")
         return call(sdk / "aapt.exe", "dump", "xmltree", apk, matches[0])
     service = compiled_xml("reels_accessibility_service")
-    for key in ["canPerformGestures", "isAccessibilityTool"]:
-        if not re.search(re.escape(key) + r'\([^)]*\)=\(type 0x12\)0x0\b', service):
+    for key, expected in [("canPerformGestures", "ffffffff"), ("isAccessibilityTool", "0")]:
+        if not re.search(re.escape(key) + r'\([^)]*\)=\(type 0x12\)0x' + expected + r'\b', service):
             raise ValueError("Unexpected accessibility action/tool declaration")
     if compiled_xml("backup_rules").count("E: exclude") != 5 or \
        compiled_xml("data_extraction_rules").count("E: exclude") != 18:

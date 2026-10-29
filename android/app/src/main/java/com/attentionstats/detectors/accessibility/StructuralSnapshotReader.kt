@@ -7,6 +7,7 @@ import com.attentionstats.detectors.SurfaceDetector
 import com.attentionstats.detectors.NodeRole
 import com.attentionstats.detectors.InterfaceLabel
 import com.attentionstats.detectors.LayoutBounds
+import com.attentionstats.detectors.NumericRange
 import org.attentionstats.reels.ReelApp
 import org.json.JSONArray
 import org.json.JSONObject
@@ -19,6 +20,7 @@ internal object StructuralSnapshotReader {
         val classes: Set<String>, val viewport: JSONObject, val anchors: JSONArray,
         val interfaceLabels: JSONArray, val labels: List<InterfaceLabel>,
         val identityPage: Long? = null,
+        val numericRanges: List<NumericRange> = emptyList(),
     )
 
     private data class Layout(val slot: Int, val id: String, val bounds: Rect, val row: Int, val column: Int) {
@@ -28,7 +30,8 @@ internal object StructuralSnapshotReader {
     }
 
     fun inspect(app: ReelApp, root: AccessibilityNodeInfo, detector: SurfaceDetector?, diagnostics: Boolean,
-        identity: TransientContentIdentity.Collector? = null): Shape {
+        identity: TransientContentIdentity.Collector? = null,
+        collectNumericRanges: Boolean = false): Shape {
         val ids = linkedSetOf<String>()
         val classes = linkedSetOf<String>()
         val positions = JSONArray()
@@ -36,6 +39,7 @@ internal object StructuralSnapshotReader {
         val anchors = JSONArray()
         val interfaceLabels = JSONArray()
         val labels = mutableListOf<InterfaceLabel>()
+        val numericRanges = mutableListOf<NumericRange>()
         val inspectLabels = diagnostics || detector?.usesInterfaceLabels == true
         var nodes = 0
         var editable = false
@@ -58,6 +62,15 @@ internal object StructuralSnapshotReader {
                     if (node.isEditable || node.isPassword) { editable = true; continue }
                     if (diagnostics && classes.size < 24) className(node).takeIf { it.isNotEmpty() }?.let { classes.add(it) }
                     val id = resourceId(app, node.viewIdResourceName)
+                    if (collectNumericRanges && numericRanges.size < 8) {
+                        node.rangeInfo?.let { range ->
+                            if (range.min.isFinite() && range.max.isFinite() && range.current.isFinite()) {
+                                val rect = Rect().also { node.getBoundsInScreen(it) }
+                                numericRanges.add(NumericRange(id, className(node), range.min.toDouble(), range.max.toDouble(),
+                                    range.current.toDouble(), LayoutBounds(rect.left, rect.top, rect.right, rect.bottom)))
+                            }
+                        }
+                    }
                     identity?.add(id, node)
                     if (id != null && ids.size < 96) ids.add(id)
                     val item = node.collectionItemInfo
@@ -105,7 +118,8 @@ internal object StructuralSnapshotReader {
             return Shape(ids, nodes, queue.isEmpty() && !truncated, editable, positions, controls, centerPage, classes,
                 JSONObject().put("left", screen.left).put("top", screen.top).put("right", screen.right)
                     .put("bottom", screen.bottom), anchors, interfaceLabels, labels,
-                identity?.finish(queue.isEmpty() && !truncated && !editable))
+                identity?.finish(queue.isEmpty() && !truncated && !editable),
+                numericRanges)
         } finally { queue.forEach { if (it.owned) recycleCompat(it.node) } }
     }
 

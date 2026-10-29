@@ -44,6 +44,7 @@ AS-045 now adds an installed experimental native five-tab/20-route shell. AS-043
 | Surfaces | [SOCIAL-MEDIA-SPEC.md](SOCIAL-MEDIA-SPEC.md) | App versus surface detection, exposures, safe optional metadata |
 | App adapters | [SOCIAL-ADAPTERS.md](SOCIAL-ADAPTERS.md) | Per-app isolation, shared domains, new-source admission and bounded Home-feed diagnostics |
 | In-context awareness | [LIVE-OVERLAY-SPEC.md](LIVE-OVERLAY-SPEC.md) | Optional visit/day counters, native snapshots, renderer safety and permission boundaries |
+| Optional scrolling | [AUTOSCROLL-SPEC.md](AUTOSCROLL-SPEC.md) | Separate session consent, playback-loop evidence, visible stop and bounded actions |
 | Interpretation | [BEHAVIOR-INTELLIGENCE.md](BEHAVIOR-INTELLIGENCE.md) | Categories, patterns, predictions, optional topics and confidence |
 | Protection | [PROTECTION-SPEC.md](PROTECTION-SPEC.md) | Limits, focus, schedules, conflicts, overrides and safe enforcement |
 | Experience | [UX-SPEC.md](UX-SPEC.md) | Screen inventory, onboarding, charts, errors and accessibility |

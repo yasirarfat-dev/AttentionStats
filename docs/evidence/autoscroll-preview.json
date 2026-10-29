@@ -1,0 +1,114 @@
+{
+  "reviewedDate": "2026-10-29",
+  "task": "AS-044",
+  "status": "experimental",
+  "previewArtifact": {
+    "sha256": "a6b9aef3a434f0834cc19bec1dd2c857b1b05175b83e8a59277d190c8c65bef6",
+    "size": 81088896
+  },
+  "testArtifact": {
+    "sha256": "1bb1775a5c944ac8db24df8c59bf74733574bd27834bfe947f651da0e0ce7160",
+    "size": 223874
+  },
+  "build": {
+    "passed": true,
+    "duration": "5m 24s"
+  },
+  "phone": {
+    "physical": true,
+    "api": 36,
+    "abi": "arm64-v8a",
+    "artificialDecisionRuntimeChecks": 118,
+    "ownWindowChecks": 145,
+    "nativeRoutes": 20,
+    "ownedTestPackageRemoved": true
+  },
+  "sourceBindings": "reels-preview.json sourceHashes (UTF-8 LF)",
+  "liveOperatorTrials": [
+    {
+      "source": "tiktok",
+      "passed": false,
+      "testRemoved": true,
+      "artifacts": {
+        "preview": "a6b9aef3a434f0834cc19bec1dd2c857b1b05175b83e8a59277d190c8c65bef6",
+        "test": "1bb1775a5c944ac8db24df8c59bf74733574bd27834bfe947f651da0e0ce7160"
+      },
+      "auto_attempts": 1,
+      "auto_confirmed": 1,
+      "auto_exposures_added": 0,
+      "auto_source_choices_preserved": 1,
+      "probe_stage": "operator_own_dialog",
+      "auto_last_reason": "playback_unavailable",
+      "navigationSamples": 95,
+      "ownAllowPassed": true,
+      "ownStartPressed": true,
+      "runningObserved": true,
+      "viewerSamples": 93,
+      "numericRangeSamples": 93
+    }
+  ],
+  "limits": [
+    "Artificial fixtures use an in-memory fake dispatcher, never a social-app gesture.",
+    "Instagram/Facebook/TikTok are exact-version candidates; a numeric slider does not establish full action qualification.",
+    "YouTube completion is unavailable; its sampled media metadata reports zero duration/position.",
+    "No watched/completed statistic, timer fallback, auto-start, history schema change or new source grant.",
+    "Full source safety/negative/lifecycle/accessibility/Play checks remain open."
+  ],
+  "controls": {
+    "separateSessionAllow": true,
+    "explicitViewerStart": true,
+    "visibleCollapsedStop": true,
+    "noAutomaticRestart": true,
+    "hideUntilConfirmedAppDeparture": true,
+    "countingIndependentOfHiddenHud": true,
+    "singleRevalidatedSwipe": true,
+    "missingOrLatePageDeadlineMs": 2500
+  },
+  "numericMetadataInvestigation": {
+    "artifacts": {
+      "preview": "bf683d92610430d065067facd5225f6a43b5d1279942e25452cfccbcb26153e0",
+      "test": "a9ec263973f41723552ab37bf3df10d7c758f691bc55d5e39da684369afca741"
+    },
+    "operatorPassed": true,
+    "ownedTestPackageRemoved": true,
+    "youtube": {
+      "mediaSamples": 20,
+      "sessionSamples": 20,
+      "durationValues": [
+        0
+      ],
+      "positionValues": [
+        0
+      ],
+      "stateValues": [
+        0
+      ],
+      "numericSamples": 19
+    },
+    "tiktok": {
+      "mediaSamples": 41,
+      "sessionSamples": 0,
+      "numericSamples": 40
+    },
+    "scope": "Temporary shell identity, selected foreground source only, no production media/notification access; metadata values do not establish a completion signal."
+  },
+  "signals": {
+    "screenshots": false,
+    "targetUiChangedForDetection": false,
+    "numericCandidates": [
+      "instagram",
+      "facebook",
+      "tiktok"
+    ],
+    "unavailable": [
+      "youtube"
+    ],
+    "tiktok": {
+      "version": "47.5.3",
+      "playerRangeId": "vt6",
+      "rangeMin": 0,
+      "rangeMax": 10000,
+      "hiddenRangesAccepted": false
+    }
+  }
+}

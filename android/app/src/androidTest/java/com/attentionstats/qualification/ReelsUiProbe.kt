@@ -104,6 +104,41 @@ internal class ReelsUiProbe(private val instrumentation: Instrumentation) {
         awaitText("Structure check active", scrollSearch = true)
     }
 
+    fun operatorAllowAutoScroll() {
+        stage = "operator_auto_resume"
+        resumeOperatorActivity()
+        awaitText("Your Reels")
+        tap("Settings")
+        awaitText("Make it yours.")
+        awaitText("Convenience features", scrollSearch = true); tap("Convenience features")
+        awaitText("Extras, only if you want them.")
+        if (!com.attentionstats.autoscroll.AutoScrollSession.enabled) {
+            awaitText("Allow experimental auto-scroll this app session", scrollSearch = true)
+            tap("Allow experimental auto-scroll this app session")
+            acceptOwnDialog("Allow controls")
+        }
+        awaitText("Controls allowed for this app session. Press Start on the floating counter inside a supported viewer.", scrollSearch = true)
+        check(com.attentionstats.autoscroll.AutoScrollSession.enabled && !com.attentionstats.autoscroll.AutoScrollSession.running)
+    }
+
+    fun operatorAutoControlBounds(label: String): IntArray? {
+        var result: IntArray? = null
+        instrumentation.runOnMainSync {
+            for (root in android.view.inspector.WindowInspector.getGlobalWindowViews()) {
+                if (root !is CounterHudView || root.context.packageName != instrumentation.targetContext.packageName) continue
+                val found = allViews(root).filterIsInstance<TextView>().singleOrNull {
+                    it.isShown && it.isEnabled && it.text.toString() == label
+                } ?: continue
+                val bounds = Rect()
+                if (found.getLocalVisibleRect(bounds) && !bounds.isEmpty) {
+                    val screen = IntArray(2); found.getLocationOnScreen(screen)
+                    result = intArrayOf(screen[0] + bounds.centerX(), screen[1] + bounds.centerY())
+                }
+            }
+        }
+        return result
+    }
+
     private fun acceptOwnDialog(button: String) {
         stage = "operator_own_dialog"
         check(android.os.Build.VERSION.SDK_INT >= 29)
@@ -236,6 +271,7 @@ internal class ReelsUiProbe(private val instrumentation: Instrumentation) {
         tap("Today"); awaitText("Your day, at a glance.", atTop = true)
     }
 
+    @Suppress("DEPRECATION") // Verify the checked accessibility state on supported API 24-36.
     private fun verifyCounterButton() {
         stage = "counter_button"
         val actions = mutableListOf<String>()
@@ -246,7 +282,8 @@ internal class ReelsUiProbe(private val instrumentation: Instrumentation) {
                 ReelsCoordinator.OverlayCategory(PageCategory.AD, 1, 3),
                 ReelsCoordinator.OverlayCategory(PageCategory.UNCLASSIFIED, 1, 2)))
         instrumentation.runOnMainSync {
-            view = CounterHudView(activity, { actions.add("dashboard") }, { actions.add("pause") }, { actions.add("hide") })
+            view = CounterHudView(activity, { actions.add("dashboard") }, { actions.add("pause") }, { actions.add("hide") },
+                { actions.add("auto") }, { actions.add("toggle") })
             view.update(state)
             (activity.window.decorView as FrameLayout).addView(view,
                 FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -259,6 +296,26 @@ internal class ReelsUiProbe(private val instrumentation: Instrumentation) {
         }
         try {
             capture("hud-collapsed")
+            instrumentation.runOnMainSync {
+                view.setAutoScrollOption(true, true)
+                view.setAutoScrollControl(true, true, false)
+                val stop = allViews(view).filterIsInstance<TextView>().single { it.text == "Stop auto-scroll" }
+                check(!view.expanded && stop.isShown && stop.isEnabled && stop.performClick()); checks++
+                view.getChildAt(0).performClick()
+                val option = allViews(view).filterIsInstance<TextView>().single { it.text == "Auto-scroll controls: on" }
+                val info = option.createAccessibilityNodeInfo()
+                check(info.isCheckable && info.isChecked && option.isShown && option.performClick()); checks++
+                view.getChildAt(0).performClick()
+                view.setAutoScrollControl(true, false, false)
+                val waiting = allViews(view).filterIsInstance<TextView>().single { it.text == "Auto-scroll: waiting for playback" }
+                check(waiting.isShown && !waiting.isEnabled && !view.expanded); checks++
+                view.setAutoScrollControl(true, false, true)
+                val start = allViews(view).filterIsInstance<TextView>().single { it.text == "Start auto-scroll" }
+                check(start.isShown && start.isEnabled && start.performClick()); checks++
+                check(actions == listOf("auto", "toggle", "auto")); checks++
+                actions.clear()
+                view.setAutoScrollControl(false, false, false)
+            }
             instrumentation.runOnMainSync {
                 val header = view.getChildAt(0)
                 check(header.contentDescription.toString().contains("This visit 8. All observed apps today 21."))
@@ -295,7 +352,7 @@ internal class ReelsUiProbe(private val instrumentation: Instrumentation) {
                 verticalMotion(false)
                 view.update(state.copy(visit = 10, today = 23, scrollBack = true))
                 verticalMotion(true)
-                for (label in listOf("Open dashboard", "Pause observation", "Hide counter; keep observation on"))
+                for (label in listOf("Open dashboard", "Pause counting until resumed", "Hide counter for this visit; keep counting"))
                     check(allViews(view).single { it.contentDescription == label }.performClick())
                 check(actions == listOf("dashboard", "pause", "hide")); checks++
                 view.getChildAt(0).performClick()
