@@ -13,11 +13,13 @@ enum class ReelApp(val key: String, val packageName: String, val displayName: St
 }
 
 enum class Surface { REELS, EXCLUDED, OUTSIDE, UNKNOWN }
+enum class ReelRoute(val key: String) { VIEWER("reels_viewer"), HOME("home_video") }
 enum class PageCategory(val key: String) {
     REEL("reel"), PHOTO("photo"), POST("post"), AD("ad"), UNCLASSIFIED("unclassified");
 }
 data class CounterSignal(val elapsedMs: Long, val surface: Surface, val page: Long?, val windowId: Int,
-    val category: PageCategory = PageCategory.UNCLASSIFIED)
+    val category: PageCategory = PageCategory.UNCLASSIFIED,
+    val route: ReelRoute = ReelRoute.VIEWER, val freshEntry: Boolean = false)
 data class ExposureProposal(val sequence: Long, val page: Long, val elapsedMs: Long,
     val category: PageCategory = PageCategory.UNCLASSIFIED, val scrollBack: Boolean = false)
 

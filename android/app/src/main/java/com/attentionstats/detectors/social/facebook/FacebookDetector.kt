@@ -6,14 +6,37 @@ import com.attentionstats.detectors.ScrollEvidence
 import com.attentionstats.detectors.SurfaceDetector
 import com.attentionstats.detectors.SurfaceEvidence
 import com.attentionstats.detectors.SurfaceObservation
+import com.attentionstats.detectors.InlineAnchor
+import com.attentionstats.detectors.InlineSelection
 import org.attentionstats.reels.ReelApp
 import org.attentionstats.reels.Surface
 
 /** Exact-version English viewer candidate. Generic feed scrolling never admits a surface. */
 internal object FacebookDetector : SurfaceDetector {
-    override val definition = DetectorDefinition(ReelApp.FACEBOOK, "584.0.0.51.56", 2, emptySet())
+    override val definition = DetectorDefinition(ReelApp.FACEBOOK, "584.0.0.51.56", 3, emptySet())
     override val diagnosticAnchorIds = emptySet<String>()
     override val usesInterfaceLabels = true
+    override fun acceptsInlineScroll(evidence: ScrollEvidence): Boolean =
+        evidence.role == NodeRole.RECYCLER && evidence.bounds.width > 0 && evidence.bounds.height > evidence.bounds.width
+
+    override fun inlineSelection(evidence: SurfaceEvidence): InlineSelection? {
+        if (!evidence.bounded || evidence.editable || !evidence.inlineComplete ||
+            evidence.interfaceLabels.any { it.token in setOf("back", "close", "comments") }) return null
+        val home = evidence.interfaceLabels.any { it.token == "home_tab" && it.selected }
+        if (!home && !evidence.inlineContext) return null
+        val screen = evidence.viewport
+        if (screen.width <= 0 || screen.height <= screen.width) return null
+        val candidates = evidence.interfaceLabels.filter { it.token == "reel" && it.clickable && it.role == NodeRole.BUTTON &&
+            it.bounds.left >= screen.left && it.bounds.right <= screen.right && it.bounds.width >= screen.width * 0.9 &&
+            it.bounds.top >= screen.top && it.bounds.bottom <= screen.bottom && it.bounds.height >= screen.height / 5 }
+        val center = (screen.top + screen.bottom) / 2
+        val item = candidates.minByOrNull { kotlin.math.abs((it.bounds.top + it.bounds.bottom) / 2 - center) }
+            ?: return InlineSelection(null, null)
+        if (kotlin.math.abs((item.bounds.top + item.bounds.bottom) / 2 - center) > screen.height / 3)
+            return InlineSelection(null, null)
+        val anchor = InlineAnchor("reel", item.key, item.bounds, false)
+        return InlineSelection(anchor, anchor)
+    }
     override fun acceptsScroll(evidence: ScrollEvidence): Boolean =
         evidence.role == NodeRole.RECYCLER &&
             evidence.bounds.width > 0 && evidence.bounds.height > evidence.bounds.width &&

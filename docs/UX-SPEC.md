@@ -9,14 +9,14 @@
 
 The experience should provide peace of mind, understandable evidence and user-owned boundaries. [Human factors](HUMAN-FACTORS.md) governs the supportive voice and evaluation. The [interactive study](../design/prototype/README.md) makes that direction reviewable with synthetic states; it does not replace native implementation.
 
-Today opens with covered app time, a coverage explanation, one optional focus action, one finite descriptive pattern and selected app totals. Detail is available on demand. Show an explicit stopping point, not an infinite feed. Avoid repeated permission prompting, streak pressure, composite wellness scores or emotional dependency. Recreation is not automatically a problem. Every reflection can end with no change.
+ADR-055/AS-050 makes Today lead with concise per-app statistics: Reels encounters, Reels time and separate whole-app duration. Source health belongs in Settings; detailed explanations are available on demand. History shows saved counts and timer history; Patterns explicitly says it is being built until actual analysis exists. Protect supplies disabled-by-default configurable count/time reminders. These integrations remain planned at this checkpoint. Detail is available on demand. Show an explicit stopping point, not an infinite feed. Avoid repeated permission prompting, streak pressure, composite wellness scores or emotional dependency. Recreation is not automatically a problem. Every reflection can end with no change.
 
 | Screen | Primary content/action | Required states |
 |---|---|---|
 | Welcome and privacy | Local-first explanation, open-source link, choose observation/protection goals | Fresh install, resumed onboarding, skip |
 | Source selection | Each source, retained fields, app selection, exclusions and detail | All off, selected, unsupported, sensitive-detail opt-in |
 | Permission disclosure and return | Separate explanation, grant navigation, actual recheck | Declined, settings cancelled, partial grant, granted-but-disabled |
-| Home | Covered device/app summary, active focus, source health, chosen dashboard cards | No consent, no events, partial coverage, stale, error |
+| Home | Per-app Reels counts/time and separate whole-app duration; concise statistical cards | No consent, no events, partial coverage, stale, error |
 | History | Calendar/range, sessions, opens, device activity, filters and provenance | Loading, empty-known, unknown gaps, paginated, storage failure |
 | App detail | Duration/opens, sessions, surface summary, category, rule shortcut | Untracked/excluded, removed app, unsupported surface |
 | Social summary / surface detail | App totals versus confirmed surface time/exposures; count explanation | Experimental disabled, supported range, unknown item count |

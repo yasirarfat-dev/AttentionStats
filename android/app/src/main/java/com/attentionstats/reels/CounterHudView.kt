@@ -61,6 +61,8 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     private val categoryRows = mutableMapOf<PageCategory, Triple<LinearLayout, ScrollingCountView, ScrollingCountView>>()
     var expanded = false
         private set
+    private var autoControlAvailable = false
+    private var autoControlRunning = false
     var moveCounter: (Float, Float) -> Unit = { _, _ -> }
     var resetPosition: () -> Unit = {}
 
@@ -153,7 +155,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
         }
         val actions = LinearLayout(context).apply { gravity = Gravity.CENTER }
         for ((symbol, label, action) in listOf(Triple("dashboard", "Open dashboard", onOpen),
-                Triple("pause", "Pause counting until resumed", onPause), Triple("hide", "Hide counter for this visit; keep counting", onHide))) {
+                Triple("pause", "Pause counting until resumed", onPause), Triple("hide", "Hide for this session; keep counting", onHide))) {
             actions.addView(icon(symbol).apply {
                 isClickable = true; isFocusable = true
                 importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
@@ -171,7 +173,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     private fun number() = ScrollingCountView(context)
 
     fun setAutoScrollOption(supported: Boolean, enabled: Boolean) {
-        autoScrollOption.visibility = VISIBLE
+        autoScrollOption.visibility = if (supported) VISIBLE else GONE
         autoScrollOption.isEnabled = supported
         autoScrollOption.text = if (!supported) "Auto-scroll unavailable" else if (enabled) "Auto-scroll controls: on" else "Auto-scroll controls: off"
         autoScrollOption.contentDescription = autoScrollOption.text
@@ -179,9 +181,15 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     }
 
     fun setAutoScrollControl(visible: Boolean, running: Boolean, ready: Boolean) {
-        autoScroll.visibility = if (visible) VISIBLE else GONE
+        autoControlAvailable = visible
+        autoControlRunning = running
+        updateAutoVisibility()
         autoScroll.text = if (running) "Stop auto-scroll" else if (ready) "Start auto-scroll" else "Auto-scroll: waiting for playback"
         autoScroll.isEnabled = running || ready
+    }
+
+    private fun updateAutoVisibility() {
+        autoScroll.visibility = if (autoControlAvailable && (expanded || autoControlRunning)) VISIBLE else GONE
     }
 
     private fun icon(symbol: String) = SymbolView(context, symbol, iconColor).apply {
@@ -191,6 +199,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     fun setExpanded(value: Boolean) {
         expanded = value
         details.visibility = if (value) VISIBLE else GONE
+        updateAutoVisibility()
         (background as GradientDrawable).setColor(Color.argb(if (value) 214 else 163, 18, 24, 34))
         header.isSelected = value
         if (android.os.Build.VERSION.SDK_INT >= 30)

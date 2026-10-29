@@ -27,6 +27,8 @@ def main() -> int:
     parser.add_argument("--sdk", type=Path, default=Path(default_sdk))
     parser.add_argument("--arch", default="arm64-v8a", choices=["arm64-v8a", "x86_64", "armeabi-v7a", "x86"])
     parser.add_argument("--write-locks", action="store_true", help="only for reviewed native dependency introduction/refresh")
+    parser.add_argument("--reuse-daemon", action="store_true",
+                        help="Reuse only this repository's Gradle-cache daemon for native iteration; idle timeout ten minutes")
     parser.add_argument("--workers", type=int, choices=[1, 2, 4], default=4,
                         help="Bound this build's concurrency without changing machine-wide Gradle state")
     args = parser.parse_args()
@@ -52,7 +54,8 @@ def main() -> int:
                 "-dname", "CN=Android Debug,O=Android,C=US",
             ], check=True, env=env)
     wrapper = ROOT / "android" / ("gradlew.bat" if os.name == "nt" else "gradlew")
-    return subprocess.run([str(wrapper), *args.tasks, "--no-daemon", "--console=plain",
+    return subprocess.run([str(wrapper), *args.tasks,
+                           *(["--daemon", "-Dorg.gradle.daemon.idletimeout=600000"] if args.reuse_daemon else ["--no-daemon"]), "--console=plain",
                            f"--max-workers={args.workers}", "-Pandroid.builder.sdkDownload=false",
                            f"-PreactNativeArchitectures={args.arch}", *(["--write-locks"] if args.write_locks else [])],
                           cwd=ROOT / "android", env=env).returncode

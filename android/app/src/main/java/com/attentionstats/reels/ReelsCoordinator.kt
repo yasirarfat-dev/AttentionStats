@@ -27,6 +27,7 @@ import org.attentionstats.reels.CounterSignal
 import org.attentionstats.reels.ReelApp
 import org.attentionstats.reels.Surface
 import org.attentionstats.reels.PageCategory
+import org.attentionstats.reels.ReelRoute
 import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
@@ -46,6 +47,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
     private val listeners = CopyOnWriteArraySet<() -> Unit>()
     private val reducers = mutableMapOf<ReelApp, CounterReducer>()
     private val visits = mutableMapOf<ReelApp, String>()
+    private val routes = mutableMapOf<ReelApp, ReelRoute>()
     private val structures = JSONObject()
     private val calibrationExpiry = Runnable { setCalibration(false) }
     private var lastStructureBytes: ByteArray? = null
@@ -66,7 +68,8 @@ internal class ReelsCoordinator private constructor(private val context: Context
     data class OverlayCategory(val category: PageCategory, val visit: Long, val today: Long)
     data class OverlaySnapshot(val app: ReelApp, val visit: Long, val today: Long, val epoch: Long,
         val categories: List<OverlayCategory> = emptyList(), val scrollBack: Boolean = false,
-        val showIcons: Boolean = true, val allAppsToday: Boolean = true)
+        val showIcons: Boolean = true, val allAppsToday: Boolean = true,
+        val route: ReelRoute = ReelRoute.VIEWER)
 
     init {
         scope.launch { for (job in jobs) job() }
@@ -105,6 +108,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
                 try { store?.close() } catch (_: Exception) { }
                 store = null
                 visits.clear()
+                routes.clear()
                 reducers.clear()
                 invalidate()
                 onError("STORAGE_UNAVAILABLE")
@@ -281,6 +285,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
     private suspend fun closeVisits(history: HistoryStore, only: ReelApp? = null) {
         for (app in ReelApp.entries.filter { only == null || it == only }) {
             visits.remove(app)?.let { history.database.data().closeEpisode(it, System.currentTimeMillis()) }
+            routes.remove(app)
             reducers[app]?.reset()
         }
     }
@@ -324,9 +329,19 @@ internal class ReelsCoordinator private constructor(private val context: Context
         observedAtMs: Long = System.currentTimeMillis(), observedZoneId: String = ZoneId.systemDefault().id) = enqueue {
         if (capturedEpoch != epoch.get() || !allowed(app) || !grantEnabled()) return@enqueue
         val history = opened()
+        if (signal.surface == Surface.REELS && signal.page != null && routes[app] != signal.route) {
+            visits.remove(app)?.let { id -> history.database.withWriteTransaction {
+                history.database.data().closeEpisode(id, System.currentTimeMillis())
+                history.database.data().advanceRevision()
+            } }
+            if (signal.route == ReelRoute.HOME) reducers[app] = CounterReducer(!signal.freshEntry && history.database.data().hasExposure(app.key))
+            else if (routes[app] != null) reducers[app]?.reset()
+            routes[app] = signal.route
+        }
         val reducer = checkNotNull(reducers[app])
         val proposal = reducer.observe(signal)
         if (signal.surface == Surface.OUTSIDE || signal.surface == Surface.UNKNOWN) {
+            routes.remove(app)
             visits.remove(app)?.let { id -> history.database.withWriteTransaction {
                 history.database.data().closeEpisode(id, System.currentTimeMillis())
                 history.database.data().advanceRevision()
@@ -341,11 +356,11 @@ internal class ReelsCoordinator private constructor(private val context: Context
                 if (capturedEpoch != epoch.get() || !allowed(app) || !grantEnabled()) throw ObservationInvalidated()
                 val dao = history.database.data()
                 val detectorRevision = checkNotNull(DetectorRegistry.detector(app, installedVersion(app))).definition.revision
-                if (visits[app] == null) dao.insertEpisode(SurfaceEpisode(id, app.key, "reels_viewer", now,
+                if (visits[app] == null) dao.insertEpisode(SurfaceEpisode(id, app.key, signal.route.key, now,
                     null, detectorRevision, "estimate"))
                 dao.insertExposure(Exposure(UUID.randomUUID().toString(), id, app.key, now,
                     proposal.elapsedMs, Math.addExact(dao.visitCount(id), 1), detectorRevision, "estimate",
-                    config.consentRevision, "settled_page_transition", observedZoneId,
+                    config.consentRevision, if (signal.route == ReelRoute.HOME) "settled_home_video" else "settled_page_transition", observedZoneId,
                     Instant.ofEpochMilli(now).atZone(ZoneId.of(observedZoneId)).offset.totalSeconds, proposal.category.key))
                 dao.advanceRevision()
                 if (capturedEpoch != epoch.get() || !allowed(app) || !grantEnabled()) throw ObservationInvalidated()
@@ -375,12 +390,16 @@ internal class ReelsCoordinator private constructor(private val context: Context
         liveOverlay = OverlaySnapshot(app, visitCategories.values.sum(), todayCategories.values.sum(), capturedEpoch,
             PageCategory.entries.filter { it != PageCategory.POST }.map {
                 OverlayCategory(it, visitCategories[it.key] ?: 0, todayCategories[it.key] ?: 0)
-            }, scrollBack, showCounterIcons, allAppsToday)
+            }, scrollBack, showCounterIcons, allAppsToday, routes[app] ?: ReelRoute.VIEWER)
     }
 
     companion object {
         const val NOTICE_REVISION = 3
-        fun requiredNotice(app: ReelApp): Int = if (app == ReelApp.TIKTOK) 4 else NOTICE_REVISION
+        fun requiredNotice(app: ReelApp): Int = when (app) {
+            ReelApp.INSTAGRAM, ReelApp.FACEBOOK -> 5
+            ReelApp.TIKTOK -> 4
+            ReelApp.YOUTUBE -> NOTICE_REVISION
+        }
         @Volatile private var instance: ReelsCoordinator? = null
         fun get(context: Context): ReelsCoordinator = instance ?: synchronized(this) {
             instance ?: ReelsCoordinator(context.applicationContext).also { instance = it }

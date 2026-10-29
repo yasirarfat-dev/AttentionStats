@@ -1,0 +1,199 @@
+{
+  "reviewedDate": "2026-10-29",
+  "task": "AS-013/AS-041/AS-044/AS-048",
+  "status": "experimental",
+  "previewArtifact": {
+    "sha256": "1f6c6696d9980957041f14a8706e17f8fb25e9d10936ff9971c2cd853e5e3411",
+    "size": 81088896
+  },
+  "testArtifact": {
+    "sha256": "09a1fb473a078136f90b23c89aa2d1c6dbe4430ea5d14bb9681e9e66b7ec641d",
+    "size": 234133
+  },
+  "build": {
+    "passed": true,
+    "duration": "9m45s",
+    "tasks": 533,
+    "executed": 42
+  },
+  "phone": {
+    "scope": "main-app bundled preview; synthetic encrypted storage and own-window UI only",
+    "api": 36,
+    "abi": "arm64-v8a",
+    "installed": true,
+    "passed": true,
+    "testPackageRemoved": true,
+    "artifacts": {
+      "preview": {
+        "sha256": "1f6c6696d9980957041f14a8706e17f8fb25e9d10936ff9971c2cd853e5e3411",
+        "size": 81088896
+      },
+      "test": {
+        "sha256": "09a1fb473a078136f90b23c89aa2d1c6dbe4430ea5d14bb9681e9e66b7ec641d",
+        "size": 234133
+      }
+    },
+    "storage": {
+      "storage_checks": 61,
+      "detector_checks": 192,
+      "key_rejections": 3,
+      "sentinel_files": 3,
+      "fixture_removed": 1
+    },
+    "autoscroll": {
+      "autoscroll_checks": 118
+    },
+    "ui": {
+      "ui_checks": 146,
+      "shell_routes": 20
+    }
+  },
+  "syntheticHomeChecks": 40,
+  "instagramContinuous": {
+    "passed": true,
+    "artifacts": {
+      "preview": "1f6c6696d9980957041f14a8706e17f8fb25e9d10936ff9971c2cd853e5e3411",
+      "test": "09a1fb473a078136f90b23c89aa2d1c6dbe4430ea5d14bb9681e9e66b7ec641d"
+    },
+    "phases": [
+      {
+        "phase": "find",
+        "added": 1,
+        "committedAtStart": false,
+        "homeAtEnd": true,
+        "committedAtEnd": true,
+        "categoriesConserved": true
+      },
+      {
+        "phase": "idle",
+        "added": 0,
+        "committedAtStart": true,
+        "homeAtEnd": true,
+        "committedAtEnd": true,
+        "categoriesConserved": true
+      },
+      {
+        "phase": "small",
+        "added": 0,
+        "committedAtStart": true,
+        "homeAtEnd": true,
+        "committedAtEnd": true,
+        "categoriesConserved": true
+      },
+      {
+        "phase": "outside",
+        "added": 0,
+        "committedAtStart": true,
+        "homeAtEnd": false,
+        "committedAtEnd": false,
+        "categoriesConserved": true
+      },
+      {
+        "phase": "return",
+        "added": 1,
+        "committedAtStart": false,
+        "homeAtEnd": true,
+        "committedAtEnd": true,
+        "categoriesConserved": true
+      }
+    ],
+    "ownedTestRemoved": true,
+    "interruptedForEditableContext": false
+  },
+  "facebookContinuous": {
+    "passed": false,
+    "artifacts": {
+      "preview": "1f6c6696d9980957041f14a8706e17f8fb25e9d10936ff9971c2cd853e5e3411",
+      "test": "09a1fb473a078136f90b23c89aa2d1c6dbe4430ea5d14bb9681e9e66b7ec641d"
+    },
+    "phases": [],
+    "ownedTestRemoved": true,
+    "interruptedForEditableContext": true
+  },
+  "facebookEarlierNarrow": {
+    "passed": true,
+    "artifacts": {
+      "preview": "e02b519c16e0eb9b1a3ecb3604c547ebbadb7f264370e3bb467587fb18746eb9",
+      "test": "f4bab90eec54a7430c3eb1e971a2c016eb07c284f0e7b6db80f7f68cf872914b"
+    },
+    "phases": [
+      {
+        "after_home_route": 0,
+        "before_home_route": 0,
+        "before_home_visit_committed": 0,
+        "category_totals_conserved": 1,
+        "controlled_exposures_added": 0,
+        "kind": "find",
+        "manualSwipes": 3,
+        "ready": true,
+        "operatorPassed": true
+      },
+      {
+        "after_home_route": 1,
+        "before_home_route": 0,
+        "before_home_visit_committed": 0,
+        "category_totals_conserved": 1,
+        "controlled_exposures_added": 1,
+        "kind": "find",
+        "manualSwipes": 2,
+        "ready": true,
+        "operatorPassed": true
+      },
+      {
+        "after_home_route": 1,
+        "before_home_route": 1,
+        "before_home_visit_committed": 1,
+        "category_totals_conserved": 1,
+        "controlled_exposures_added": 0,
+        "kind": "idle",
+        "manualSwipes": 0,
+        "ready": true,
+        "operatorPassed": true
+      },
+      {
+        "after_home_route": 1,
+        "before_home_route": 1,
+        "before_home_visit_committed": 1,
+        "category_totals_conserved": 1,
+        "controlled_exposures_added": 0,
+        "kind": "small-scroll",
+        "manualSwipes": 2,
+        "ready": true,
+        "operatorPassed": true
+      },
+      {
+        "after_home_route": 0,
+        "before_home_route": 1,
+        "before_home_visit_committed": 1,
+        "category_totals_conserved": 1,
+        "controlled_exposures_added": 0,
+        "kind": "outside",
+        "manualSwipes": 0,
+        "ready": true,
+        "operatorPassed": true
+      }
+    ],
+    "ownedTestRemoved": true
+  },
+  "limits": [
+    "Exact-version candidates only; no broad precision/recall, lifecycle or release acceptance.",
+    "Facebook earlier narrow pass does not qualify its final continuous build; final run interrupted for editable context.",
+    "The wellbeing-shield trial and unavailable reference behavior provide no fidelity evidence.",
+    "Layout keys are bounded in-memory only, never durable identifiers or content identity.",
+    "No screen capture, OCR, image saving/upload, new grant or provider UI manipulation for progress detection.",
+    "App/Reels duration collectors, timer-history integration, reminder enforcement and AS-049 onboarding remain unimplemented."
+  ],
+  "controls": {
+    "autoScrollDedicatedViewerOnly": true,
+    "inactiveAutoScrollInExpandedHudOnly": true,
+    "runningStopVisibleCollapsed": true,
+    "hudHideSessionOnly": true,
+    "persistentHudOffInApp": true
+  },
+  "cleanup": {
+    "ownedInstrumentationActive": false,
+    "ownedTestPackagePresent": false,
+    "ownAccessibilitySelected": true,
+    "phoneUiInputPerformed": false
+  }
+}

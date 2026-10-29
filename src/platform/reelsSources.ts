@@ -3,13 +3,13 @@ export const reelsSources = {
     name: 'Instagram',
     observation: 'Instagram Reels',
     mark: 'IG',
-    noticeRevision: 3,
+    noticeRevision: 5,
   },
   facebook: {
     name: 'Facebook',
     observation: 'Facebook Reels',
     mark: 'f',
-    noticeRevision: 3,
+    noticeRevision: 5,
   },
   youtube: {
     name: 'YouTube Shorts',

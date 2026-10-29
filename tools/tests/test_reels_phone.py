@@ -208,6 +208,7 @@ class ReelsPhoneSafety(unittest.TestCase):
             changed = copy.deepcopy(value)
             mutate(changed["targets"]["facebook"])
             with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(changed).encode())
+
         value["targets"]["instagram"] = value["targets"].pop("facebook")
         with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(value).encode())
 
@@ -229,6 +230,14 @@ class ReelsPhoneSafety(unittest.TestCase):
             changed = copy.deepcopy(value)
             mutate(changed["targets"]["facebook"])
             with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(changed).encode())
+
+        target["interfaceRevision"] = 3
+        target["interfaceLabels"][0]["token"] = "play_video"
+        self.assertEqual(probe.validate_structure(json.dumps(value).encode()), value)
+        value["targets"]["instagram"] = value["targets"].pop("facebook")
+        self.assertEqual(probe.validate_structure(json.dumps(value).encode()), value)
+        target["interfaceLabels"][0]["token"] = "PRIVATE_SYNTHETIC_MARKER"
+        with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(value).encode())
 
     def test_geometry_rejects_content_extra_fields_and_invalid_revision(self):
         for change in [lambda t: t.update(geometryRevision=2),

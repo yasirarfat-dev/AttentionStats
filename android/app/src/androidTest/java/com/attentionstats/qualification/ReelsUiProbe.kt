@@ -126,6 +126,7 @@ internal class ReelsUiProbe(private val instrumentation: Instrumentation) {
         instrumentation.runOnMainSync {
             for (root in android.view.inspector.WindowInspector.getGlobalWindowViews()) {
                 if (root !is CounterHudView || root.context.packageName != instrumentation.targetContext.packageName) continue
+                if (label == "Start auto-scroll" && !root.expanded) root.getChildAt(0).performClick()
                 val found = allViews(root).filterIsInstance<TextView>().singleOrNull {
                     it.isShown && it.isEnabled && it.text.toString() == label
                 } ?: continue
@@ -308,10 +309,13 @@ internal class ReelsUiProbe(private val instrumentation: Instrumentation) {
                 view.getChildAt(0).performClick()
                 view.setAutoScrollControl(true, false, false)
                 val waiting = allViews(view).filterIsInstance<TextView>().single { it.text == "Auto-scroll: waiting for playback" }
-                check(waiting.isShown && !waiting.isEnabled && !view.expanded); checks++
+                check(!waiting.isShown && !waiting.isEnabled && !view.expanded); checks++
                 view.setAutoScrollControl(true, false, true)
                 val start = allViews(view).filterIsInstance<TextView>().single { it.text == "Start auto-scroll" }
-                check(start.isShown && start.isEnabled && start.performClick()); checks++
+                check(!start.isShown && start.isEnabled); checks++
+                view.getChildAt(0).performClick()
+                check(start.isShown && start.performClick()); checks++
+                view.getChildAt(0).performClick()
                 check(actions == listOf("auto", "toggle", "auto")); checks++
                 actions.clear()
                 view.setAutoScrollControl(false, false, false)
@@ -352,7 +356,7 @@ internal class ReelsUiProbe(private val instrumentation: Instrumentation) {
                 verticalMotion(false)
                 view.update(state.copy(visit = 10, today = 23, scrollBack = true))
                 verticalMotion(true)
-                for (label in listOf("Open dashboard", "Pause counting until resumed", "Hide counter for this visit; keep counting"))
+                for (label in listOf("Open dashboard", "Pause counting until resumed", "Hide for this session; keep counting"))
                     check(allViews(view).single { it.contentDescription == label }.performClick())
                 check(actions == listOf("dashboard", "pause", "hide")); checks++
                 view.getChildAt(0).performClick()

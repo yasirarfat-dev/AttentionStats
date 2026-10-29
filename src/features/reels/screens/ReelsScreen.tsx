@@ -101,7 +101,7 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
     }
     Alert.alert(
       `Observe ${reelsSources[app].observation}?`,
-      `Attention Stats uses Android accessibility to inspect layout identifiers, roles and numeric page positions in ${reelsSources[app].name} when you use it. ${app === 'facebook' ? 'For Facebook, it also transiently compares accessibility descriptions with fixed interface labels such as Reels and Search; other descriptions are discarded immediately. No raw descriptions are saved.' : app === 'tiktok' ? 'For TikTok, it transiently reads the visible title and caption fields (text or accessibility descriptions) solely to distinguish settled encounters. It immediately discards raw values and uses keyed comparison tokens only in memory. Identical or missing captions can miss transitions; these are partial encounter estimates, not unique videos or proof of playback.' : 'Accessibility descriptions are not inspected for this source.'} It saves estimated settled viewer-page counts and times in encrypted storage on this device, separating recognized video layouts, photo/carousel layouts, ads and unclassified pages. Recognized ads are kept separate from video/photo counts. Layouts do not prove that every ad is recognized. Normal-feed posts are not supported yet. ${app === 'tiktok' ? 'It reads only the disclosed TikTok fields and no input or message text. It does not read photos or video and saves no raw text, titles, captions, creators or search terms,' : 'It does not read node text, photos or video, saves no messages, titles, creators or search terms,'} and sends no history to us. Comments do not count. Coverage can be incomplete. You can pause, disable or delete this history at any time. Accessibility access is a separate setting you enable yourself.`,
+      `Attention Stats uses Android accessibility to inspect layout identifiers, roles and numeric page positions in ${reelsSources[app].name} when you use it. ${app === 'facebook' ? 'For Facebook, it also transiently compares accessibility descriptions with fixed interface labels such as Reel, Reels, Search and selected Home tabs; other descriptions are discarded immediately. No raw descriptions are saved.' : app === 'tiktok' ? 'For TikTok, it transiently reads the visible title and caption fields (text or accessibility descriptions) solely to distinguish settled encounters. It immediately discards raw values and uses keyed comparison tokens only in memory. Identical or missing captions can miss transitions; these are partial encounter estimates, not unique videos or proof of playback.' : 'Accessibility descriptions are not inspected for this source.'} It saves estimated settled encounters and times in encrypted storage on this device, separating recognized video layouts, photo/carousel layouts, ads and unclassified pages. Recognized ads are kept separate from video/photo counts. Layouts do not prove that every ad is recognized. ${app === 'instagram' || app === 'facebook' ? 'Recognized Home-feed reels are included as a separate Home-video route. Layout-node keys are used only in memory to follow a visible item through scrolling. Ordinary posts and uncertain media are not counted there. Home never auto-scrolls.' : 'Normal-feed posts are not supported yet.'} ${app === 'tiktok' ? 'It reads only the disclosed TikTok fields and no input or message text. It does not read photos or video and saves no raw text, titles, captions, creators or search terms,' : 'It does not read node text, photos or video, saves no messages, titles, creators or search terms,'} and sends no history to us. Comments do not count. Coverage can be incomplete. You can pause, disable or delete this history at any time. Accessibility access is a separate setting you enable yourself.`,
       [
         { text: 'Keep off', style: 'cancel' },
         { text: 'I agree — enable observation', onPress: apply },
@@ -291,14 +291,15 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
             })}
           </View>
           <Text style={styles.support}>
-            Separate estimates of settled viewer pages, not unique items or
+            Separate estimates of settled encounters, not unique items or
             completed views. Returning to an earlier page counts again; looping
             on the same page does not. Unique items and repeat breakdowns are
             unavailable. Recognized ads stay separate. Ad detection is
             incomplete; video/photo labels describe layouts. Facebook viewer
-            pages currently stay unclassified. Normal-feed posts are not
-            available yet. YouTube Shorts and TikTok are awaiting detector
-            verification; enabling a source does not make its counts available.
+            pages currently stay unclassified. Supported Instagram and Facebook
+            Home reels are counted separately by route. Ordinary Home posts and
+            uncertain media are unavailable. Coverage depends on the installed
+            app version and layout.
           </Text>
 
           <View style={styles.panel}>
@@ -403,7 +404,7 @@ export function ReelsScreen({ onPrivacy }: { onPrivacy: () => void }) {
                     ? calibration(false)
                     : Alert.alert(
                         'Allow a temporary structure check?',
-                        'Only for enabled apps, for up to ten minutes. This development check saves static layout IDs, numeric positions, media/control bounds, up to three ancestor layouts, and scroll-source bounds with event sequence and relative timing in a local diagnostic file. On Facebook it also temporarily inspects accessibility descriptions to match exactly these fixed interface labels: Reels, Video, Home, Close, Comments, Search, Back, Like, Comment and Share, including fixed Home/Reels/Video tab-position labels. Only matched label tokens, roles, bounds and selected/clickable states and up to three ancestor layouts are saved. Other descriptions are discarded immediately. No node text, images, captions, names, messages or raw descriptions are saved or uploaded. Stopping removes the file.',
+                        'Only for enabled apps, for up to ten minutes. This development check saves static layout IDs, numeric positions, media/control bounds, up to three ancestor layouts, and scroll-source bounds with event sequence and relative timing in a local diagnostic file. On Facebook and Instagram it also temporarily inspects accessibility descriptions to match exactly these fixed interface labels: Reels, Video, Home, Close, Comments, Search, Back, Like, Comment, Share, Reel, Play, Pause, Play video, Pause video, Watch reel, Watch again and Watch more, including fixed Home/Reels/Video tab-position labels. Only matched label tokens, roles, bounds and selected/clickable states and up to three ancestor layouts are saved. Other descriptions are discarded immediately. No node text, images, captions, names, messages or raw descriptions are saved or uploaded. Stopping removes the file.',
                         [
                           { text: 'Cancel', style: 'cancel' },
                           {

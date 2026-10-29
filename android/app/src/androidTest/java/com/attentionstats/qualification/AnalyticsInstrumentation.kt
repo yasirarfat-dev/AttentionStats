@@ -14,11 +14,15 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var autoScrollAuthorized = false
     private var restoreAuthorized = false
     private var progressApp = "instagram"
+    private var comparisonPackage: String? = null
 
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
         qualification = arguments?.getString("qualification")
         progressApp = arguments?.getString("progress_app") ?: "instagram"
+        comparisonPackage = arguments?.getString("comparison_package")?.also {
+            check(Regex("[A-Za-z][A-Za-z0-9_]*(?:\\.[A-Za-z][A-Za-z0-9_]*){1,8}").matches(it))
+        }
         operatorAuthorized = arguments?.getString("operator_authorized") == "adb-reels-structure"
         playbackAuthorized = arguments?.getString("operator_authorized") == "adb-reels-playback"
         autoScrollAuthorized = arguments?.getString("operator_authorized") == "adb-reels-autoscroll"
@@ -33,6 +37,10 @@ class AnalyticsInstrumentation : Instrumentation() {
         var ui: ReelsUiProbe? = null
         try {
             when (qualification) {
+                "reels-home-session-operator" -> {
+                    check(operatorAuthorized && com.attentionstats.BuildConfig.DEBUG)
+                    result.putAll(HomeSessionProbe.verify(this, progressApp))
+                }
                 "reels-media-session-operator" -> {
                     check(playbackAuthorized && com.attentionstats.BuildConfig.DEBUG)
                     val automation = getUiAutomation(android.app.UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
@@ -217,7 +225,17 @@ class AnalyticsInstrumentation : Instrumentation() {
                         ui.operatorStartStructure()
                         check(coordinator.calibrationEnabled)
                         sendStatus(0, Bundle().apply { putInt("diagnostic_ready", 1) })
-                        android.os.SystemClock.sleep(60_000)
+                        val comparison = comparisonPackage?.let {
+                            CounterComparisonProbe(getUiAutomation(android.app.UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES), it)
+                        }
+                        if (comparison == null) android.os.SystemClock.sleep(60_000)
+                        else {
+                            val until = android.os.SystemClock.elapsedRealtime() + 120_000
+                            while (android.os.SystemClock.elapsedRealtime() < until) {
+                                sendStatus(0, Bundle().apply { putString("comparison", comparison.inspect().toString()) })
+                                android.os.SystemClock.sleep(750)
+                            }
+                        }
                         result.putString("stream", "PASS: authorized own-window structure controls\n")
                     } finally { coordinator.setCalibration(false) }
                 }
@@ -248,7 +266,14 @@ class AnalyticsInstrumentation : Instrumentation() {
                         source.getBoolean("enabled") && source.getBoolean("consentCurrent") &&
                         source.getBoolean("supported") && !source.getBoolean("paused"))
                     sendStatus(0, Bundle().apply { putInt("progress_ready", 1) })
-                    android.os.SystemClock.sleep(12_000) // Host performs separately authorized test gestures.
+                    result.putInt("before_home_route", if (coordinator.liveOverlay?.route == org.attentionstats.reels.ReelRoute.HOME) 1 else 0)
+                    result.putInt("before_home_visit_committed", if (coordinator.liveOverlay?.route == org.attentionstats.reels.ReelRoute.HOME &&
+                        (source.optString("visit", "0").toLongOrNull() ?: 0) > 0) 1 else 0)
+                    val progressUntil = android.os.SystemClock.elapsedRealtime() + 12_000
+                    while (android.os.SystemClock.elapsedRealtime() < progressUntil) {
+                        sendStatus(0, Bundle().apply { putString("home_scan", com.attentionstats.reels.ReelsAccessibilityService.inspectHomeForOperator().toString()) })
+                        android.os.SystemClock.sleep(1_000)
+                    }
                     val after = snapshot()
                     check(before.getString("revision") == after.getString("revision") &&
                         before.getString("day") == after.getString("day"))
@@ -260,6 +285,7 @@ class AnalyticsInstrumentation : Instrumentation() {
                     check(sum == final.getString("today").toLong())
                     result.putInt("controlled_exposures_added", delta.toInt())
                     result.putInt("category_totals_conserved", 1)
+                    result.putInt("after_home_route", if (coordinator.liveOverlay?.route == org.attentionstats.reels.ReelRoute.HOME) 1 else 0)
                     result.putString("stream", "PASS: authorized live aggregate progress check\n")
                 }
                 "reels-health", "reels-show-counter" -> {

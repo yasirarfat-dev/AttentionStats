@@ -1,9 +1,9 @@
 {
   "reviewedDate": "2026-10-29",
-  "recordedAtUtc": "2026-10-29T06:27:13.328953+00:00",
+  "recordedAtUtc": "2026-10-29T11:21:32.926727+00:00",
   "task": "AS-013/AS-043/AS-044/AS-045/AS-046/AS-048",
   "status": "experimental",
-  "scope": "Experimental four-source counter, separately consented session-only playback-loop auto-scroll candidates, and visit-only HUD hiding. Full source/action/accessibility/lifecycle/Play qualification remains open.",
+  "scope": "Experimental four-source counters including bounded Instagram/Facebook Home candidates; dedicated-only auto-scroll and session HUD controls. Home evidence is separately scoped; timers/reminders remain unimplemented.",
   "nativeStableResolutions": [
     {
       "coordinate": "androidx.room3:room3-runtime",
@@ -124,7 +124,7 @@
     },
     {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt",
-      "sha256Lf": "475f0b153c1d90f0a8d7ca6776bc12723e2cf25f2e87da1805ccc52474c4bac4"
+      "sha256Lf": "70f3ec44346e9c54c8d5bfd77bd4cce8ebd94de289805378bec643aa7150c25a"
     },
     {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/AutoRuntimeProbe.kt",
@@ -139,8 +139,20 @@
       "sha256Lf": "607828804c04ea9e01a75f3a702e04ac3627927a379cf2f987e34301a78a1e94"
     },
     {
+      "path": "android/app/src/androidTest/java/com/attentionstats/qualification/CounterComparisonProbe.kt",
+      "sha256Lf": "7d0bbf12fe2d88c69a474821aae4ab970b6c94e484f9e4302767fb93c6e400c9"
+    },
+    {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/DetectorProbe.kt",
-      "sha256Lf": "6abd135cc6be20da586387d7b76a8eb8e7d045334d6ead8bc33531556676c10a"
+      "sha256Lf": "0413f3348da30d0cb6291f689414a8cab59a6150c248f264ce553d028a0d50ef"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/attentionstats/qualification/HomeSessionProbe.kt",
+      "sha256Lf": "c52c9043b7823c2f98c5136a77d2d46edb7df0ff9a87496bf5dc85a6dda0c752"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/attentionstats/qualification/InlineEncounterProbe.kt",
+      "sha256Lf": "be13ca68ec36d590169d4ad9c4998961d3095dc4c90bd289761cf5c51ba3bdf6"
     },
     {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/MediaPlaybackProbe.kt",
@@ -156,7 +168,7 @@
     },
     {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/ReelsUiProbe.kt",
-      "sha256Lf": "f99f73bf7ba17a45dabd090b78ac509cd6e44b0733da8f109a968f953e454071"
+      "sha256Lf": "2fe78472cff67c6530e510c32bafadf977632e7290d40b1ca266014949fc58b9"
     },
     {
       "path": "android/app/src/androidTest/java/com/attentionstats/qualification/ServiceRestoreProbe.kt",
@@ -207,8 +219,12 @@
       "sha256Lf": "98ab4aed4e7952df38db672ffaacbaeedafb6aca13340451421cb430463cceaf"
     },
     {
+      "path": "android/app/src/main/java/com/attentionstats/detectors/InlineEncounterTracker.kt",
+      "sha256Lf": "5b0ad97a13947030fdd4e769770cbb06dadee70e9e48bd7388adc6af7c0c66d9"
+    },
+    {
       "path": "android/app/src/main/java/com/attentionstats/detectors/SurfaceDetector.kt",
-      "sha256Lf": "90b0baa2feb9a7016255a1406c4028b6783064747c56a5a331523a394af148b5"
+      "sha256Lf": "502e1cda5487d6bbf55b9a02e661edb6b125b41e31bfeb7b568beebb6c04b040"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/detectors/accessibility/DiagnosticScrollTrace.kt",
@@ -216,11 +232,11 @@
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/detectors/accessibility/InterfaceLabelMatcher.kt",
-      "sha256Lf": "a8869f065a5e425d7fb438667aa9a4e802d7add3cb1a13c00d07b8b86569d2b5"
+      "sha256Lf": "af82c2ed7ed568e50b5db25df969d88a7d3b8762909ad3555d6669e8dee1e57c"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/detectors/accessibility/StructuralSnapshotReader.kt",
-      "sha256Lf": "5afeaa4eac4c2685a9cd88fdb3ddfaad55b6ccc7e4d23525dc928dc687a6d2bb"
+      "sha256Lf": "438c7f20f75e74f2b7e583f6ffb5fd28d37bfebae5877224841f474579834d3e"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/detectors/accessibility/TransientContentIdentity.kt",
@@ -228,11 +244,11 @@
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/detectors/social/facebook/FacebookDetector.kt",
-      "sha256Lf": "7b0c55a24ddebe203ef9358dac6ed36eaf265b038d0c69127214f48dd511ea26"
+      "sha256Lf": "687684530b01264ce3b0a60aa212650d6d39f3fb329f621af793764e2167dc0b"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/detectors/social/instagram/InstagramDetector.kt",
-      "sha256Lf": "0a03e0d79297bf392554f7d9ed3a92c54e8654d1ff1f62ea1adf2be8777fb137"
+      "sha256Lf": "29e1b7993a168aea8e164dbadd719b33aff4752f5ba58149dd35640acf7728bb"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/detectors/social/tiktok/TikTokDetector.kt",
@@ -244,15 +260,15 @@
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/reels/CounterHudView.kt",
-      "sha256Lf": "9629aae920e8e26ab9ee4e0b512ac7e11ed305967fdbfbc761d6710965c7ae4f"
+      "sha256Lf": "1ce323797f3a24ce9f346c55add234fca43069a693295e166c5b4d461400f25d"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/reels/ReelsAccessibilityService.kt",
-      "sha256Lf": "9aa3c25b4f942dd4a9722681f5da3ddd5a8c884a6b24c75f685e39c1fee01daa"
+      "sha256Lf": "175a19d8daf6fc3e882bfc758912f8523805f74333d3ee3500c8addbe044cae4"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/reels/ReelsCoordinator.kt",
-      "sha256Lf": "aeb4f84d8286a4ba6f6773c4e432f687878c9c05ce6fd065532eb93c0f74bb18"
+      "sha256Lf": "83217ef502cfc857a430934ab6937caf4ce0e5560da4a657cdd63cd2387a3b7d"
     },
     {
       "path": "android/app/src/main/java/com/attentionstats/reels/ScrollingCountView.kt",
@@ -320,7 +336,7 @@
     },
     {
       "path": "native/reels-core/src/main/kotlin/org/attentionstats/reels/CounterReducer.kt",
-      "sha256Lf": "fc38a258b740f937cd7aa58634a7180590ca0da07f646b7ba89ee010dc70f180"
+      "sha256Lf": "4b84cb73ebf3d174aa6c98d55d6a5e3fca4666ec873993a6ab8555336ec6c7a7"
     },
     {
       "path": "native/reels-core/src/test/kotlin/org/attentionstats/reels/ReelsTests.kt",
@@ -400,7 +416,7 @@
     },
     {
       "path": "src/features/reels/screens/ReelsScreen.tsx",
-      "sha256Lf": "e7084e549b486a2e51c9db89fe9d3af56befa793856afe25acc51f8fcf8d0907"
+      "sha256Lf": "f81941d715aae8a5e7a1b6d8a882a62999c14705a6d49acc41c31f43a3fe6db0"
     },
     {
       "path": "src/features/settings/index.ts",
@@ -452,7 +468,7 @@
     },
     {
       "path": "src/platform/reelsSources.ts",
-      "sha256Lf": "16fd99a958406bf9e4413fc08fc2d53b270facd54acab681116de44744be69dc"
+      "sha256Lf": "dfb2949af3be5f2d715c70e698297865ada17e6c7bc1b9fbb13ed1889922f72c"
     },
     {
       "path": "src/platform/reelsStatus.ts",
@@ -484,7 +500,7 @@
     },
     {
       "path": "tools/android_build.py",
-      "sha256Lf": "ffb16c85f6fad624987c9e0a7983390c39f53b303205baadb32c9fa962102cdf"
+      "sha256Lf": "a8bb793177e1398bb78e367cf75bae48f8ae71361cad666c1d3dd77aff821a87"
     },
     {
       "path": "tools/check_architecture.py",
@@ -496,7 +512,7 @@
     },
     {
       "path": "tools/reels_phone.py",
-      "sha256Lf": "1c5f36419f691e0d89366d7142b41447c44b5515a71554762c6d7f696429deb2"
+      "sha256Lf": "d251a90cdaf94a282cc5074127b0ae70f09d0b20480c1b2604a8dbf951751652"
     },
     {
       "path": "tools/release_candidate.py",
@@ -508,7 +524,7 @@
     },
     {
       "path": "tools/tests/test_reels_phone.py",
-      "sha256Lf": "d57cdef1a0a53666fb6c4fb2e8174fdec9c2068983342e0bd6af7f9afa839f86"
+      "sha256Lf": "c3145675f921f1897c226edf5a9dd2acd69bcf7327e49ab6b14ab98b836c4cb6"
     },
     {
       "path": "tools/tests/test_release_candidate.py",
@@ -517,13 +533,13 @@
   ],
   "sourceHashNormalization": "UTF-8 tracked text normalized to LF; excludes generated build/cache/binary/phone captures.",
   "installedPreview": {
-    "sha256": "a6b9aef3a434f0834cc19bec1dd2c857b1b05175b83e8a59277d190c8c65bef6",
+    "sha256": "1f6c6696d9980957041f14a8706e17f8fb25e9d10936ff9971c2cd853e5e3411",
     "size": 81088896
   },
   "bundledJavaScript": {
     "pathInsideApk": "assets/index.android.bundle",
-    "sha256": "a53f539736e9e88ce691af97cab12d94466b4ad7f19e5e15523a39cafefe17e6",
-    "size": 2422448,
+    "sha256": "a68ea8fa9daee27a84e656bf2cf44d4d74e639c150661d3409fe4da3973e2d9a",
+    "size": 2422884,
     "development": false
   },
   "phoneChecks": {
@@ -531,16 +547,16 @@
     "api": 36,
     "abi": "arm64-v8a",
     "previewArtifact": {
-      "sha256": "a6b9aef3a434f0834cc19bec1dd2c857b1b05175b83e8a59277d190c8c65bef6",
+      "sha256": "1f6c6696d9980957041f14a8706e17f8fb25e9d10936ff9971c2cd853e5e3411",
       "size": 81088896
     },
     "testArtifact": {
-      "sha256": "1bb1775a5c944ac8db24df8c59bf74733574bd27834bfe947f651da0e0ce7160",
-      "size": 223874
+      "sha256": "09a1fb473a078136f90b23c89aa2d1c6dbe4430ea5d14bb9681e9e66b7ec641d",
+      "size": 234133
     },
     "storage": {
       "storage_checks": 61,
-      "detector_checks": 152,
+      "detector_checks": 192,
       "key_rejections": 3,
       "sentinel_files": 3,
       "fixture_removed": 1
@@ -549,11 +565,11 @@
       "autoscroll_checks": 118
     },
     "dashboard": {
-      "ui_checks": 145,
+      "ui_checks": 146,
       "shell_routes": 20
     },
     "testPackageRemoved": true,
-    "scope": "Isolated encrypted storage/migrations/catalog, artificial detector/acquisition and auto-scroll decisions/runtime (fake dispatcher), own-window HUD/native route controls. These do not qualify actual playback signals or action fidelity."
+    "scope": "Synthetic isolated storage/acquisition/decisions and own-window routes; source behavior is separately scoped in home-preview.json."
   },
   "localChecks": {
     "reducerJvmChecks": 38,
@@ -707,13 +723,13 @@
   "detectors": {
     "instagram": {
       "version": "452.1.0.54.64",
-      "notice": 3,
-      "status": "experimental structural viewer candidate; earlier artifact-bound live progression retained below"
+      "notice": 5,
+      "status": "Experimental exact-version viewer and bounded Home candidate; independently artifact-bound Home trials in home-preview.json; broad negative/lifecycle fidelity remains unqualified."
     },
     "facebook": {
       "version": "584.0.0.51.56",
-      "notice": 3,
-      "status": "experimental fixed-interface-label and bounded pager candidate; categories unclassified; broad route/negative fidelity unqualified"
+      "notice": 5,
+      "status": "Experimental exact-version viewer and bounded Home candidate; independently artifact-bound Home trials in home-preview.json; broad negative/lifecycle fidelity remains unqualified."
     },
     "youtube": {
       "version": "21.40.165",
@@ -732,7 +748,8 @@
     "No Home-feed post counting, actual app/viewer duration, complete ads, broad lifecycle or full accessibility qualification",
     "No per-event origin envelope, durable calendar aggregate table, extension or merge/sync implementation",
     "No release signing, Play rollout, remote workflow or binary publication",
-    "AS-044 action candidates and visit-hide controls have separate scoped evidence; historical live-counter results do not qualify these builds or auto-scroll."
+    "AS-044 action candidates and visit-hide controls have separate scoped evidence; historical live-counter results do not qualify these builds or auto-scroll.",
+    "Home/menu artifact has separate home-preview.json evidence; autoScroll/live counter historical trials retain their original artifact bindings."
   ],
   "previousInstalledPreviewEvidence": {
     "installedPreview": {
@@ -1182,6 +1199,42 @@
           "scope": "Tests already passed; only interrupted own-artifact transfer resumed"
         }
       }
+    },
+    {
+      "label": "Numeric auto-scroll before Home/menu increment",
+      "previewArtifact": {
+        "sha256": "a6b9aef3a434f0834cc19bec1dd2c857b1b05175b83e8a59277d190c8c65bef6",
+        "size": 81088896
+      },
+      "phoneChecks": {
+        "physical": true,
+        "api": 36,
+        "abi": "arm64-v8a",
+        "previewArtifact": {
+          "sha256": "a6b9aef3a434f0834cc19bec1dd2c857b1b05175b83e8a59277d190c8c65bef6",
+          "size": 81088896
+        },
+        "testArtifact": {
+          "sha256": "1bb1775a5c944ac8db24df8c59bf74733574bd27834bfe947f651da0e0ce7160",
+          "size": 223874
+        },
+        "storage": {
+          "storage_checks": 61,
+          "detector_checks": 152,
+          "key_rejections": 3,
+          "sentinel_files": 3,
+          "fixture_removed": 1
+        },
+        "autoscroll": {
+          "autoscroll_checks": 118
+        },
+        "dashboard": {
+          "ui_checks": 145,
+          "shell_routes": 20
+        },
+        "testPackageRemoved": true,
+        "scope": "Isolated encrypted storage/migrations/catalog, artificial detector/acquisition and auto-scroll decisions/runtime (fake dispatcher), own-window HUD/native route controls. These do not qualify actual playback signals or action fidelity."
+      }
     }
   ],
   "sourceCatalog": {
@@ -1196,8 +1249,8 @@
     "newEntriesDisabledWithoutConsent": true,
     "preservesExistingHistory": true,
     "sourceNoticeRevisions": {
-      "instagram": 3,
-      "facebook": 3,
+      "instagram": 5,
+      "facebook": 5,
       "youtube": 3,
       "tiktok": 4
     }
@@ -1368,7 +1421,7 @@
       "nativeRoutes": 20,
       "ownedTestPackageRemoved": true
     },
-    "sourceBindings": "reels-preview.json sourceHashes (UTF-8 LF)",
+    "sourceBindings": "Historical commit d6a08157f14cdf8ee87ce04d222f52e700f981b6: docs/evidence/reels-preview.json sourceHashes (UTF-8 LF). Later Home/menu builds have separate evidence.",
     "liveOperatorTrials": [
       {
         "source": "tiktok",
@@ -1456,5 +1509,13 @@
         "hiddenRangesAccepted": false
       }
     }
+  },
+  "homeInlineQualification": {
+    "evidence": "home-preview.json",
+    "instagramFinalContinuous": true,
+    "facebookFinalContinuous": false,
+    "facebookEarlierNarrow": true,
+    "noticeRevision": 5,
+    "autoScrollOnHome": false
   }
 }

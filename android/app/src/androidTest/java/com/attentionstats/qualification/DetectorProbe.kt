@@ -23,6 +23,7 @@ internal object DetectorProbe {
         var checks = 0
         fun expect(value: Boolean) { check(value); checks++ }
         checks += ContentIdentityProbe.verify()
+        checks += InlineEncounterProbe.verify()
         val tiktok = checkNotNull(DetectorRegistry.detector(ReelApp.TIKTOK, "47.5.3"))
         val tiktokEvidence = SurfaceEvidence(setOf("viewpager", "long_press_layout", "user_avatar", "desc"), true, false, 2)
         expect(tiktok.detect(tiktokEvidence).let { it.surface == Surface.REELS && it.page == 2L &&
@@ -144,7 +145,7 @@ internal object DetectorProbe {
                 "Reels, tab 2 of 6" to "reels_tab", "Home, tab 1 of 6" to "home_tab")) {
                 node.contentDescription = label
                 expect(InterfaceLabelMatcher.match(ReelApp.FACEBOOK, node, true, true) == token)
-                expect(InterfaceLabelMatcher.match(ReelApp.FACEBOOK, node, true) == null)
+                expect(InterfaceLabelMatcher.match(ReelApp.FACEBOOK, node, true) == if (token == "home_tab") token else null)
             }
             node.contentDescription = null
             node.packageName = ReelApp.INSTAGRAM.packageName

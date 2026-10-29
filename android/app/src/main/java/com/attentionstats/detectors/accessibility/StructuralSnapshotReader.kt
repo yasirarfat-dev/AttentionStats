@@ -8,6 +8,7 @@ import com.attentionstats.detectors.NodeRole
 import com.attentionstats.detectors.InterfaceLabel
 import com.attentionstats.detectors.LayoutBounds
 import com.attentionstats.detectors.NumericRange
+import com.attentionstats.detectors.InlineAnchor
 import org.attentionstats.reels.ReelApp
 import org.json.JSONArray
 import org.json.JSONObject
@@ -21,6 +22,9 @@ internal object StructuralSnapshotReader {
         val interfaceLabels: JSONArray, val labels: List<InterfaceLabel>,
         val identityPage: Long? = null,
         val numericRanges: List<NumericRange> = emptyList(),
+        val inlineAnchors: List<InlineAnchor> = emptyList(),
+        val inlineComplete: Boolean = true,
+        val inlineRootPage: Int? = null,
     )
 
     private data class Layout(val slot: Int, val id: String, val bounds: Rect, val row: Int, val column: Int) {
@@ -40,6 +44,9 @@ internal object StructuralSnapshotReader {
         val interfaceLabels = JSONArray()
         val labels = mutableListOf<InterfaceLabel>()
         val numericRanges = mutableListOf<NumericRange>()
+        val inlineAnchors = mutableListOf<InlineAnchor>()
+        var inlineComplete = true
+        var inlineRootPage: Int? = null
         val inspectLabels = diagnostics || detector?.usesInterfaceLabels == true
         var nodes = 0
         var editable = false
@@ -74,14 +81,23 @@ internal object StructuralSnapshotReader {
                     identity?.add(id, node)
                     if (id != null && ids.size < 96) ids.add(id)
                     val item = node.collectionItemInfo
-                    val bounds = if (diagnostics || inspectLabels || item != null) Rect().also { node.getBoundsInScreen(it) } else null
+                    val inlineAnchor = id != null && id in (detector?.inlineAnchorIds ?: emptySet())
+                    val bounds = if (diagnostics || inspectLabels || item != null || inlineAnchor) Rect().also { node.getBoundsInScreen(it) } else null
+                    if (inlineAnchor) {
+                        if (inlineAnchors.size >= 32) inlineComplete = false
+                        else {
+                            val rect = checkNotNull(bounds)
+                            inlineAnchors.add(InlineAnchor(checkNotNull(id), node.hashCode().toLong(),
+                                LayoutBounds(rect.left, rect.top, rect.right, rect.bottom), node.isSelected))
+                        }
+                    }
                     val layout = if (diagnostics) Layout(slot, id ?: "", checkNotNull(bounds),
                         item?.rowIndex ?: -1, item?.columnIndex ?: -1) else null
                     if (inspectLabels && labels.size < 16) {
                         InterfaceLabelMatcher.match(app, node, true, diagnostics)?.let { token ->
                             val rect = checkNotNull(bounds)
                             labels.add(InterfaceLabel(token, role(node),
-                                LayoutBounds(rect.left, rect.top, rect.right, rect.bottom), node.isSelected, node.isClickable))
+                                LayoutBounds(rect.left, rect.top, rect.right, rect.bottom), node.isSelected, node.isClickable, node.hashCode().toLong()))
                             if (diagnostics) interfaceLabels.put(JSONObject().put("token", token).put("class", className(node))
                                 .put("left", checkNotNull(bounds).left).put("top", bounds.top)
                                 .put("right", bounds.right).put("bottom", bounds.bottom)
@@ -98,10 +114,13 @@ internal object StructuralSnapshotReader {
                         anchors.put(checkNotNull(layout).json().put("ancestors",
                             JSONArray(pending.ancestors.map { it.json() })))
                     }
-                    val owner = if (id != null && (id in scrollIds || node.isScrollable)) id else pending.owner
+                    val owner = if (id != null && (id in scrollIds || id in (detector?.inlineRootPagerIds ?: emptySet()) || node.isScrollable)) id else pending.owner
                     if (item != null && positionCount < 12) {
                         positionCount++
                         val centered = checkNotNull(bounds).contains(screen.centerX(), screen.centerY())
+                        if (inlineRootPage == null && centered && owner in (detector?.inlineRootPagerIds ?: emptySet()) &&
+                            bounds.width() >= screen.width() * 0.9 && bounds.height() >= screen.height() * 0.8 && item.columnIndex >= 0)
+                            inlineRootPage = item.columnIndex
                         if (diagnostics && positions.length() < 12) positions.put(JSONObject().put("id", id ?: "")
                             .put("owner", owner ?: "").put("row", item.rowIndex).put("column", item.columnIndex)
                             .put("centered", centered))
@@ -119,7 +138,7 @@ internal object StructuralSnapshotReader {
                 JSONObject().put("left", screen.left).put("top", screen.top).put("right", screen.right)
                     .put("bottom", screen.bottom), anchors, interfaceLabels, labels,
                 identity?.finish(queue.isEmpty() && !truncated && !editable),
-                numericRanges)
+                numericRanges, inlineAnchors, inlineComplete, inlineRootPage)
         } finally { queue.forEach { if (it.owned) recycleCompat(it.node) } }
     }
 

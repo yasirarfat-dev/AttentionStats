@@ -23,7 +23,7 @@
     "nativeRoutes": 20,
     "ownedTestPackageRemoved": true
   },
-  "sourceBindings": "reels-preview.json sourceHashes (UTF-8 LF)",
+  "sourceBindings": "Historical commit d6a08157f14cdf8ee87ce04d222f52e700f981b6: docs/evidence/reels-preview.json sourceHashes (UTF-8 LF). Later Home/menu builds have separate evidence.",
   "liveOperatorTrials": [
     {
       "source": "tiktok",

@@ -93,12 +93,13 @@ def validate_structure(raw: bytes) -> dict:
                         expect(ancestor["slot"] < previous)
                         previous = ancestor["slot"]
             if "interfaceRevision" in target:
-                expect(type(target["interfaceRevision"]) is int and target["interfaceRevision"] in {1, 2})
+                expect(type(target["interfaceRevision"]) is int and target["interfaceRevision"] in {1, 2, 3})
                 labels = target["interfaceLabels"]
                 expect(type(labels) is list and len(labels) <= 16)
-                expect(targets.get("facebook") is target or labels == [])
+                expect(targets.get("facebook") is target or
+                       (target["interfaceRevision"] >= 3 and targets.get("instagram") is target) or labels == [])
                 for row in labels:
-                    extended = target["interfaceRevision"] == 2
+                    extended = target["interfaceRevision"] >= 2
                     expect(type(row) is dict and set(row) == {
                         "token", "class", "left", "top", "right", "bottom", "selected", "clickable"} |
                         ({"slot", "ancestors"} if extended else set()))
@@ -112,6 +113,8 @@ def validate_structure(raw: bytes) -> dict:
                             layout(ancestor, set())
                             expect(ancestor["slot"] < previous)
                             previous = ancestor["slot"]
+                    if target["interfaceRevision"] >= 3:
+                        tokens |= {"play", "pause", "play_video", "pause_video", "reel", "watch_reel", "watch_again", "watch_more"}
                     expect(row["token"] in tokens)
                     expect(ident(row["class"], 120))
                     bounds(row)
@@ -189,7 +192,7 @@ def parse_result(output: str, mode: str) -> dict[str, int]:
         raise RuntimeError("Reels " + mode + " probe failed; stage=" + (stage[1] if stage else "unreported") +
                            "; type=" + (kind[1] if kind else "unreported") +
                            ("; location=" + location[1] if location else "") + ("; touch=" + json.dumps(touch) if touch else "") + "; raw phone output withheld")
-    limits = {"storage_checks": (30, 200), "detector_checks": (30, 160), "key_rejections": (3, 3), "sentinel_files": (1, 3),
+    limits = {"storage_checks": (30, 200), "detector_checks": (30, 240), "key_rejections": (3, 3), "sentinel_files": (1, 3),
               "fixture_removed": (1, 1)} if mode == "storage" else {"ui_checks": (20, 160), "shell_routes": (20, 20)}
     if mode == "autoscroll": limits = {"autoscroll_checks": (60, 200)}
     values = {}
