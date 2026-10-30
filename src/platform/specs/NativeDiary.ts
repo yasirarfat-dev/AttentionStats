@@ -14,5 +14,6 @@ export interface Spec extends TurboModule {
   openAppSettings(): Promise<boolean>;
   getAppIcons(packages: string[]): Promise<string>;
   openBatterySettings(): Promise<boolean>;
+  pinWidget(): Promise<boolean>;
 }
 export default TurboModuleRegistry.get<Spec>('NativeDiary');

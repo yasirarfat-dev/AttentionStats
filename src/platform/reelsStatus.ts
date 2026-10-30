@@ -49,6 +49,7 @@ const schema = z
       showIcons: z.boolean(),
       allAppsToday: z.boolean(),
     }),
+    storageBytes: count,
     session: z.strictObject({ count }),
     device: z.strictObject({
       model: z.string().max(200),

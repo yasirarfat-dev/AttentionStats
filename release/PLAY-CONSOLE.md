@@ -13,8 +13,9 @@ Everything to paste into Play Console for **attention.stats** 1.0.0 (versionCode
 | Free or paid | Free (no in-app purchases, no ads) |
 | Category | Productivity (alternative: Health & Fitness) |
 | Tags | Digital wellbeing, Productivity, Self-improvement |
-| Email | consciousbiobot@gmail.com |
-| Website | https://github.com/yasirarfat-dev/AttentionStats |
+| Email | consciousbiobot@gmail.com (replace with a dedicated Convenience Labs support inbox when created) |
+| Developer / account | Convenience Labs (https://play.google.com/store/apps/developer?id=Convenience+Labs) |
+| Website | https://yasirarfat.com (creator's site; the source link is in the description) |
 | Privacy policy | https://github.com/yasirarfat-dev/AttentionStats/blob/main/policies/PRIVACY.md |
 
 ## Store listing

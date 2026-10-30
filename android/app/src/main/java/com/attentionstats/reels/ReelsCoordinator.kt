@@ -293,6 +293,8 @@ internal class ReelsCoordinator private constructor(private val context: Context
             .put("overlayEnabled", overlayEnabled).put("calibrationEnabled", false)
             .put("diagnosticsAvailable", false)
             .put("counterAppearance", JSONObject().put("showIcons", showCounterIcons).put("allAppsToday", allAppsToday))
+            .put("storageBytes", listOf("attention-history.db", "attention-history.db-wal", "attention-history.db-shm")
+                .sumOf { java.io.File(context.noBackupFilesDir, it).length() }.toString())
             .put("session", JSONObject().put("count", headline(unlockSession.counts()).toString()))
             .put("device", JSONObject().put("model", android.os.Build.MODEL).put("manufacturer", android.os.Build.MANUFACTURER)
                 .put("sdk", android.os.Build.VERSION.SDK_INT).put("release", android.os.Build.VERSION.RELEASE)
@@ -517,11 +519,33 @@ internal class ReelsCoordinator private constructor(private val context: Context
     fun refreshWidget(force: Boolean = true) = enqueue {
         val now = SystemClock.elapsedRealtime()
         if (!force && now - widgetAt < 20_000) return@enqueue
+        val manager = android.appwidget.AppWidgetManager.getInstance(context)
+        if (manager.getAppWidgetIds(android.content.ComponentName(context, com.attentionstats.widget.TodayWidget::class.java)).isEmpty())
+            return@enqueue // No widget placed: skip the work entirely.
         widgetAt = now
         val history = opened()
         refreshTodayCounts(history)
-        val top = ReelApp.entries.map { it.displayName to (todayCounts[it] ?: 0L) }.sortedByDescending { it.second }
-        com.attentionstats.widget.TodayWidget.render(context, todayCounts.values.sum(), headline(unlockSession.counts()), top)
+        // A widget problem must never take counting down with it.
+        try { renderWidget(history) } catch (failure: Exception) { android.util.Log.w("AttentionStats", "widget refresh failed", failure) }
+    }
+
+    private suspend fun renderWidget(history: HistoryStore) {
+        val day = JSONObject(diary.snapshot(history, 1, blockingAvailable = ::blockingAvailable))
+            .getJSONArray("days").getJSONObject(0)
+        val apps = day.getJSONArray("apps")
+        var watching = 0L; var screen = 0L; var top: Pair<String, Long>? = null
+        for (index in 0 until apps.length()) {
+            val app = apps.getJSONObject(index)
+            watching += app.optString("reelsMs").toLongOrNull() ?: 0
+            val ms = app.optString("appMs").toLongOrNull() ?: 0
+            screen += ms
+            if (ms > (top?.second ?: 0) && app.optString("packageName") != context.packageName) top = app.getString("name") to ms
+        }
+        val interventions = day.getJSONObject("interventions")
+        val breaks = interventions.keys().asSequence().filter { it.startsWith("break.") }.sumOf { interventions.getLong(it) }
+        val videoApps = ReelApp.entries.map { it.displayName to (todayCounts[it] ?: 0L) }.sortedByDescending { it.second }
+        com.attentionstats.widget.TodayWidget.render(context, com.attentionstats.widget.WidgetData(
+            todayCounts.values.sum(), headline(unlockSession.counts()), watching, screen, breaks, videoApps, top))
     }
 
     private fun headline(values: Map<String, Long>): Long = values.filterKeys { key ->

@@ -16,6 +16,7 @@ function fixture() {
     calibrationEnabled: false,
     diagnosticsAvailable: false,
     counterAppearance: { showIcons: true, allAppsToday: true },
+    storageBytes: '4096',
     session: { count: '0' },
     device: {
       model: 'Fixture',

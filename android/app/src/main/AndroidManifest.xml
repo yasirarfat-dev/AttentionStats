@@ -32,6 +32,13 @@
         <intent-filter><action android:name="android.accessibilityservice.AccessibilityService" /></intent-filter>
         <meta-data android:name="android.accessibilityservice" android:resource="@xml/reels_accessibility_service" />
       </service>
+      <activity
+        android:name=".widget.WidgetConfigureActivity"
+        android:exported="true"
+        android:label="@string/widget_configure"
+        android:theme="@android:style/Theme.Material.NoActionBar">
+        <intent-filter><action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" /></intent-filter>
+      </activity>
       <receiver
         android:name=".widget.TodayWidget"
         android:label="@string/widget_title"

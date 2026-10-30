@@ -52,4 +52,6 @@ Bug reports from real phones are the most valuable contribution: if counting mis
 
 Security reports: [SECURITY.md](SECURITY.md). Product vision: [VISION](docs/VISION.md) and [feature vision](docs/FEATURE-VISION.md). Current status: [STATE](docs/STATE.md).
 
+Created by **[Yasir Arfat](https://yasirarfat.com)** and published on Google Play by Convenience Labs ([Google Play listing](https://play.google.com/store/apps/details?id=attention.stats): currently in closed testing, so the page opens for enrolled testers until public launch).
+
 Licensed under [Apache-2.0](LICENSE). Copyright 2026 Attention Stats contributors.

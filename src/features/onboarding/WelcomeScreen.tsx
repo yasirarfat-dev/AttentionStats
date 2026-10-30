@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Linking, ScrollView, Text, View } from 'react-native';
+import { Image, Linking, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { reelsSources, reelsSourceKeys } from '../../platform';
@@ -101,9 +101,12 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
       {step === 0 && (
         <View style={styles.body}>
           <View style={styles.hero}>
-            <View style={styles.badge}>
-              <Icon name="shield" color={theme.onHero} size={40} />
-            </View>
+            <Image
+              source={require('../../assets/app-icon.png')}
+              style={styles.logo}
+              accessibilityIgnoresInvertColors
+              accessibilityLabel="Attention Stats"
+            />
             <Text accessibilityRole="header" style={styles.headline}>
               Your attention,{'\n'}counted. Never collected.
             </Text>
@@ -313,6 +316,7 @@ const styles = StyleSheet.create(theme => ({
   dotOn: { width: 24, backgroundColor: theme.accent },
   body: { flex: 1, gap: 14 },
   hero: { alignItems: 'center', gap: 12, paddingVertical: 8 },
+  logo: { width: 96, height: 96, borderRadius: 26 },
   badge: {
     width: 76,
     height: 76,

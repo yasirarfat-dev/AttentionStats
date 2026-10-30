@@ -23,6 +23,7 @@ import {
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
 import { useAppIcons, useDiary } from '../diary';
+import { useDeleteHistory } from './DeleteHistory';
 import { useReels } from '../sources';
 
 const REPO = 'https://github.com/yasirarfat-dev/AttentionStats';
@@ -95,20 +96,11 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
     );
   }
 
-  function confirmDelete() {
-    Alert.alert(
-      'Delete all history?',
-      'This permanently removes every count, timer and setting stored by Attention Stats on this phone. It cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete everything',
-          style: 'destructive',
-          onPress: () => void reels.deleteAll(),
-        },
-      ],
-    );
-  }
+  const deleter = useDeleteHistory({
+    onPause: () => reels.setPaused(true),
+    onDelete: () => reels.deleteAll(),
+    storageBytes: Number(snapshot?.storageBytes ?? 0),
+  });
 
   return (
     <Screen title="Settings">
@@ -254,6 +246,22 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         />
       </Card>
 
+      <Card padded={false}>
+        <Row
+          icon="layers"
+          title="Add a home-screen widget"
+          detail="Pick what it shows: short videos, session, watching time, screen time or breaks."
+          onPress={async () => {
+            const ok = await NativeDiary?.pinWidget();
+            if (!ok)
+              Alert.alert(
+                'Add it from your home screen',
+                'Long-press an empty spot on your home screen, choose Widgets, then find Attention Stats.',
+              );
+          }}
+        />
+      </Card>
+
       <SectionTitle>Help & feedback</SectionTitle>
       <Card padded={false}>
         <Row
@@ -297,20 +305,54 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
           detail="Apache-2.0 on GitHub"
           onPress={() => Linking.openURL(REPO)}
         />
+      </Card>
+
+      <SectionTitle>Your data</SectionTitle>
+      <Card padded={false}>
+        <Row
+          icon="info"
+          title="Stored only on this phone"
+          detail="Encrypted, never uploaded, not backed up anywhere. Pausing keeps it safe."
+        />
         <Divider />
         <Row
           icon="trash"
-          title="Delete all history"
-          detail="Remove every count, timer and setting"
-          onPress={confirmDelete}
+          title="Erase history"
+          detail="Permanent. Three confirmations."
+          onPress={deleter.start}
         />
       </Card>
+      {deleter.dialog}
 
       <View style={styles.footer}>
         <Text style={styles.brand}>
           Attention Stats {snapshot?.device.appVersion ?? ''}
         </Text>
         <Caption>No servers · No ads · No tracking · Open source</Caption>
+        <Text style={styles.maker}>
+          Made with care by{' '}
+          <Text
+            accessibilityRole="link"
+            onPress={() => Linking.openURL('https://yasirarfat.com')}
+            style={styles.link}
+          >
+            Yasir Arfat
+          </Text>
+        </Text>
+        <Text style={styles.publisher}>
+          Published by{' '}
+          <Text
+            accessibilityRole="link"
+            onPress={() =>
+              Linking.openURL(
+                'https://play.google.com/store/apps/developer?id=Convenience+Labs',
+              )
+            }
+            style={styles.link}
+          >
+            Convenience Labs
+          </Text>
+        </Text>
       </View>
       {reels.error ? <Body muted>{reels.error}</Body> : null}
       {snapshot && !snapshot.accessibilityEnabled && (
@@ -326,4 +368,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
 const styles = StyleSheet.create(theme => ({
   footer: { alignItems: 'center', gap: 4, paddingVertical: 16 },
   brand: { color: theme.muted, fontSize: 14, fontWeight: '700' },
+  maker: { color: theme.muted, fontSize: 13, fontWeight: '600', marginTop: 8 },
+  link: { color: theme.accent, fontWeight: '700' },
+  publisher: { color: theme.faint, fontSize: 12 },
 }));

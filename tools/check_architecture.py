@@ -67,7 +67,7 @@ def check_mobile_source(source: Path, errors: list[str]) -> int:
                 errors.append(f"{label}: source import leaves src: {imported}")
                 continue
             target = next((candidate for candidate in [
-                base.with_suffix(".ts"), base.with_suffix(".tsx"),
+                base if base.suffix in {".png", ".jpg", ".webp"} else base.with_suffix(".ts"), base.with_suffix(".tsx"),
                 base / "index.ts", base / "index.tsx",
             ] if candidate.is_file()), None)
             if target is None:

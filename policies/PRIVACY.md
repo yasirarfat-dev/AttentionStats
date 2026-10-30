@@ -2,7 +2,7 @@
 
 Last updated: 30 October 2026 · App: **Attention Stats** (`attention.stats`), version 1.0.0 and later · Contact: **consciousbiobot@gmail.com**
 
-Attention Stats is a free, open-source digital wellbeing app. Its [source code](https://github.com/yasirarfat-dev/AttentionStats) is public, so anyone can verify everything below.
+Attention Stats is a free, open-source digital wellbeing app created by Yasir Arfat ([yasirarfat.com](https://yasirarfat.com)) and published on Google Play by Convenience Labs. Its [source code](https://github.com/yasirarfat-dev/AttentionStats) is public, so anyone can verify everything below.
 
 ## The short version
 
