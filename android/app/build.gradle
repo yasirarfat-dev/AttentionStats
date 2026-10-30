@@ -105,7 +105,7 @@ android {
         applicationId "attention.stats"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        versionCode 2
         versionName "0.1.0"
         testInstrumentationRunner "com.attentionstats.qualification.AnalyticsInstrumentation"
     }
@@ -116,6 +116,16 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        // Optional local upload key. Credentials arrive only in the build process environment.
+        // Google Play retains the separate app-signing key used for delivered installs.
+        if (System.getenv('ATTENTION_UPLOAD_KEYSTORE')) {
+            upload {
+                storeFile file(System.getenv('ATTENTION_UPLOAD_KEYSTORE'))
+                storePassword System.getenv('ATTENTION_UPLOAD_STORE_PASSWORD')
+                keyAlias System.getenv('ATTENTION_UPLOAD_ALIAS')
+                keyPassword System.getenv('ATTENTION_UPLOAD_KEY_PASSWORD')
+            }
+        }
     }
     buildTypes {
         debug {
@@ -123,9 +133,10 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            // Unsigned; distribution credentials must be supplied by a release maintainer.
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
+            // Without explicit upload credentials this remains an unsigned inspection build.
+            if (System.getenv('ATTENTION_UPLOAD_KEYSTORE')) {
+                signingConfig signingConfigs.upload
+            }
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }

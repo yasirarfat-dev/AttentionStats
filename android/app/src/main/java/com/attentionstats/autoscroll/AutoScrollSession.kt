@@ -33,12 +33,9 @@ internal object AutoScrollSession {
         private set
     var onChanged: () -> Unit = {}
 
-    fun candidate(app: ReelApp, version: String): Boolean = when (app) {
-        ReelApp.INSTAGRAM -> version == "452.1.0.54.64"
-        ReelApp.FACEBOOK -> version == "584.0.0.51.56"
-        ReelApp.TIKTOK -> version == "47.5.3"
-        else -> false
-    }
+    /** Any source qualifies; a session only starts when the player exposes numeric progress. */
+    @Suppress("UNUSED_PARAMETER")
+    fun candidate(app: ReelApp, version: String): Boolean = true
     fun configure(value: Boolean, notice: Int) {
         require(!value || notice == 1)
         stop(if (value) "ready" else "off")

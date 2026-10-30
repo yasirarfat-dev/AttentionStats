@@ -3,11 +3,12 @@ import { parseReelsSnapshot } from '../reelsStatus';
 const generation = '11111111-1111-4111-8111-111111111111';
 function fixture() {
   return {
-    contractVersion: 5,
+    contractVersion: 6,
     revision: generation + ':1',
     historyRevision: generation + ':1',
     generation,
     storage: 'ready',
+    noticeRevision: 6,
     accessibilityEnabled: false,
     accessibilitySelected: false,
     serviceConnected: false,
@@ -15,20 +16,37 @@ function fixture() {
     calibrationEnabled: false,
     diagnosticsAvailable: false,
     counterAppearance: { showIcons: true, allAppsToday: true },
+    session: { count: '0' },
+    device: {
+      model: 'Fixture',
+      manufacturer: 'Synthetic',
+      sdk: 36,
+      release: '16',
+      appVersion: '1.0.0',
+    },
     day: '2026-10-27',
     zone: 'UTC',
-    sources: ['instagram', 'facebook', 'youtube', 'tiktok'].map(app => ({
-      app,
-      enabled: false,
-      consentCurrent: false,
-      paused: false,
-      installed: true,
-      version: 'fixture-only',
-      supported: false,
-      today: '0',
-      visit: null,
-      counts: { reel: '0', photo: '0', post: null, ad: '0', unclassified: '0' },
-    })),
+    sources: ['instagram', 'facebook', 'youtube', 'tiktok', 'snapchat'].map(
+      app => ({
+        app,
+        enabled: false,
+        consentCurrent: false,
+        paused: false,
+        installed: true,
+        version: 'fixture-only',
+        supported: false,
+        lastRecognizedMs: null as string | null,
+        today: '0',
+        visit: null,
+        counts: {
+          reel: '0',
+          photo: '0',
+          post: null,
+          ad: '0',
+          unclassified: '0',
+        },
+      }),
+    ),
   };
 }
 function sourceAt(value: ReturnType<typeof fixture>, index: number) {

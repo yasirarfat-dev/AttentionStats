@@ -6,10 +6,12 @@ const status = {
   enabled: false,
   running: false,
   reason: 'off',
-  sources: ['instagram', 'facebook', 'youtube', 'tiktok'].map(app => ({
-    app,
-    candidate: false,
-  })),
+  sources: ['instagram', 'facebook', 'youtube', 'tiktok', 'snapchat'].map(
+    app => ({
+      app,
+      candidate: false,
+    }),
+  ),
 };
 test('accepts a complete four-app session status', () => {
   expect(parseAutoScrollStatus(JSON.stringify(status)).enabled).toBe(false);
@@ -18,11 +20,11 @@ test.each([
   { ...status, running: true },
   { ...status, sessionOnly: false },
   { ...status, sources: status.sources.slice(1) },
-  { ...status, sources: [status.sources[0], ...status.sources.slice(0, 3)] },
+  { ...status, sources: [status.sources[0], ...status.sources.slice(0, 4)] },
   {
     ...status,
     sources: [
-      ...status.sources.slice(0, 3),
+      ...status.sources.slice(0, 4),
       { app: 'unknown', candidate: true },
     ],
   },

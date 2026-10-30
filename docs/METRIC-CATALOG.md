@@ -20,7 +20,7 @@ Phase: M = MVP; E = expansion; C = continuous evolution. For A/H rows, F-01 and 
 | Metric | Meaning / source and access | Controls | Accuracy / restriction | Phase / status | Scenario |
 |---|---|---|---|---|---|
 | M-001 App interactive duration | Union of covered app intervals / U | B | Reconstructed visibility, not gaze; overlap/gaps explicit | M / planned | T-01, T-17 |
-| M-002 App foreground entries | Confirmed package-entry episodes / U | B | Activity resume is not always a new open | M / planned | T-02 |
+| M-002 App foreground entries | Observed package-entry estimate, including returns / U | B | ADR-062 suppresses same-app activity handoffs; incomplete OS events/lookback and equal-time dedup limit identity. Not cold launches | M / experimental | T-02 |
 | M-003 Session count | Normalized foreground sessions / U | B | Gap-grouping revision changes definition | M / planned | T-01 |
 | M-004 Session length distribution | Count/sum/min/max and selected histogram / L(U) | D | Censored sessions separate; no exact median after lossy rollup | M / planned | T-17, D-04 |
 | M-005 Longest covered session | Max known contiguous session / L(U) | D | Gap never bridged | M / planned | L-01, T-17 |

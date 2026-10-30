@@ -10,7 +10,9 @@ SPEC.loader.exec_module(release)
 MANIFEST = '''<manifest xmlns:android="http://schemas.android.com/apk/res/android"
  package="attention.stats" android:versionCode="1" android:versionName="0.1.0">
  <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="37"/>
- <queries><package android:name="com.instagram.android"/><package android:name="com.facebook.katana"/>
+ <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"/>
+ <queries><intent><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent>
+ <package android:name="com.instagram.android"/><package android:name="com.facebook.katana"/>
  <package android:name="com.google.android.youtube"/><package android:name="com.zhiliaoapp.musically"/></queries>
  <application android:allowBackup="false" android:usesCleartextTraffic="false"
   android:fullBackupContent="@xml/backup_rules" android:dataExtractionRules="@xml/data_extraction_rules">
@@ -55,6 +57,25 @@ class ReleaseAdmission(unittest.TestCase):
             MANIFEST.replace('android.permission.BIND_ACCESSIBILITY_SERVICE', 'fixture.permission'),
         ]:
             with self.assertRaises(ValueError):
+                release.audit_manifest(changed)
+
+    def test_usage_access_keeps_other_sensitive_permissions_rejected(self):
+        self.assertIn("android.permission.PACKAGE_USAGE_STATS", release.audit_manifest(MANIFEST)["permissions"])
+        for permission in ["QUERY_ALL_PACKAGES", "READ_EXTERNAL_STORAGE", "REQUEST_IGNORE_BATTERY_OPTIMIZATIONS", "POST_NOTIFICATIONS"]:
+            with self.subTest(permission=permission), self.assertRaises(ValueError):
+                release.audit_manifest(MANIFEST.replace('<queries>', f'<uses-permission android:name="android.permission.{permission}"/><queries>'))
+        with self.assertRaises(ValueError):
+            release.audit_manifest(MANIFEST.replace('<uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"/>', ''))
+
+    def test_launcher_visibility_is_exact(self):
+        for changed in [
+            MANIFEST.replace('android.intent.action.MAIN', 'android.intent.action.VIEW'),
+            MANIFEST.replace('android.intent.category.LAUNCHER', 'android.intent.category.DEFAULT'),
+            MANIFEST.replace('</intent>', '<data android:scheme="https"/></intent>'),
+            MANIFEST.replace('<intent>', '<intent><category android:name="fixture"/>'),
+            MANIFEST.replace('<intent>', '<intent android:label="fixture">'),
+        ]:
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
                 release.audit_manifest(changed)
 
     def test_profile_receiver_requires_privileged_binding(self):

@@ -1,10 +1,12 @@
 # Attention Stats — Google Play Console information
 
-Prepared 28 October 2026. **Draft for the 0.1.0 closed-test candidate, not a submitted listing.** Permanent package name: **attention.stats**. Keep this source under review and copy the current version to `C:\home\biobot\AppReleases\AttentionStats\PLAY-CONSOLE.md`. No Play account access, policy approval, uploaded bundle or testing start is implied.
+Prepared 29 October 2026. **Draft for the 0.1.0 closed-test candidate, not a submitted listing.** Permanent package name: **attention.stats**. Keep this source under review and copy the current version to `C:\home\biobot\AppReleases\AttentionStats\PLAY-CONSOLE.md`. No Play account access, policy approval, uploaded bundle or testing start is implied.
 
 ## Current implementation warning — 29 October 2026
 
-This document retains historical listing/reviewer text below; it is not ready for submission. ADR-051 adds separately disclosed experimental auto-scroll with session Allow, explicit viewer Start, visible Stop, transient numeric playback inspection and a single bounded upward swipe. The service now declares gesture capability. The older passive-only, no-scroll and no-text statements below do not describe this preview: TikTok also has separately disclosed transient visible-field matching, and Facebook fixed interface-description matching. Rewrite the final listing, Data safety answers, declaration and demonstration against the exact qualified release artifact. Four-app counters and source-specific automation remain experimental; no Play approval or release readiness is claimed.
+This draft describes the current experimental MVP scope and must be checked against the exact qualified release artifact before submission. Four-source route fidelity, lifecycle and source-specific auto-scroll acceptance remain open. No Play approval or release readiness is claimed.
+
+AS-050/AS-051 add separately consented Usage Access timing, Reels occupancy, optional reminders/blocking, unlock-session counts and recognized-ad choices. The source declares PACKAGE_USAGE_STATS and accessibility gesture capability. The authorized progress-bar-pixel investigation is test-only; production capture is absent. If a production fallback is admitted, update the disclosure, policy, declaration and demo before release. Local release signing is not provisioned. No uploaded AAB or Console-state verification is implied.
 
 ## Create app
 
@@ -13,7 +15,7 @@ This document retains historical listing/reviewer text below; it is not ready fo
 | App name | Attention Stats |
 | Default language | English (United States), en-US |
 | App or game | App |
-| Free or paid | Free for this closed-test candidate; confirm pricing before creation |
+| Free or paid | Free; no subscription, paywall or payment features |
 | Package name | attention.stats — exactly these two lowercase words and one dot |
 | Developer name | Pending maintainer's public name; must match the Console account and policy |
 | Declarations | Account owner must read and accept Play policies, export-law and App Signing terms in Console |
@@ -26,7 +28,9 @@ The dashboard labels and ordering can vary. These are prepared answers, with own
 
 Attention Stats has no sign-in, registration, subscription, payment or reviewer credentials. Its own screens can be opened without a grant. Observation requires a voluntary source choice and Android accessibility access. To exercise the cross-app detector, a reviewer needs a separately installed, supported Instagram version and their own access to that service. Do not supply the maintainer's personal social account. If Console asks whether any functionality is restricted, disclose this external-app dependency and provide the steps below rather than claiming unrestricted access to every function.
 
-Reviewer instructions: Open Attention Stats → Reels & short videos. Read the separate observation disclosure and enable Instagram if desired. Enable Attention Stats in Android accessibility settings, then independently enable the live counter. Open Instagram's dedicated Reels viewer. Saved totals represent settled page exposures including return visits; loops/redraws should not increment. Home feed and unsupported target versions are unavailable. Facebook is not qualified. Pause, source off and Delete Reels history are available in the Reels screen. The app has no automated accessibility actions.
+Reviewer instructions: Complete or skip the introduction. In Settings → Reels sources & access, review each separate source notice and choose supported installed sources. Follow Android Accessibility → Downloaded apps/Installed services → Attention Stats → Use service, then return and check actual connection. The four version-pinned candidates are Instagram 452.1.0.54.64, Facebook 584.0.0.51.56, YouTube 21.40.165 and TikTok 47.5.3. Unsupported versions stay unavailable. Independently enable the floating counter if desired. Open a dedicated Reels/Shorts viewer; the first qualified encounter should appear before swiping. Encounters include return visits and are separate from unique videos or completed plays. Home-feed support is independently qualified for Facebook/Instagram; see the final artifact's source matrix.
+
+For app time, use Settings → Whole-app time, accept its separate notice and choose Attention Stats in Android Usage Access. Today/History show measured app intervals separately from estimated Reels-surface occupancy. Disable access to verify that new collection stops. Optional reminder thresholds and per-source Reels blocking default off. Blocking covers only recognized dedicated viewers, offers immediate Allow/Open app, and can leave audio playing. For optional auto-scroll, review and Allow it in the app, open a supported dedicated viewer, tap the HUD to expand its menu and press Start. Stop stays visible while active. Missing progress/context stops it; no Home-feed automation. Pause, source off, session HUD hiding and local deletion remain available. No social credentials are provided by the developer.
 
 ### Ads
 
@@ -60,19 +64,19 @@ There is no server account to delete; describe local deletion using the policy a
 
 ### AccessibilityService declaration
 
-Declare **uses AccessibilityService** and **not an accessibility tool** (`isAccessibilityTool=false`). Purpose: app functionality, specifically the user-selected local Reels exposure counter and optional in-context display. No advertisements, marketing, account management, remote analytics, autonomous actions or accessibility gestures.
+Declare **uses AccessibilityService** and **not an accessibility tool** (`isAccessibilityTool=false`). Purposes: user-selected local Reels encounter/occupancy statistics, optional in-context display, explicitly enabled reminders/viewer blocking and optional deterministic completion-triggered scrolling. No advertisements, account management, remote analytics or autonomous planning. The service declares `canPerformGestures=true` for a single revalidated upward swipe after separate Allow and Start.
 
-Suggested explanation: “After a separate in-app affirmative disclosure and a user-selected Android accessibility grant, Attention Stats inspects bounded layout identifiers, roles, visibility and numeric page positions for selected supported apps. It estimates settled viewer-page exposures and saves counts, times, categories and coverage in encrypted local storage. For Facebook it transiently compares accessibility descriptions with fixed interface labels and immediately discards nonmatches; raw descriptions are never saved. It does not read node text, images or video, perform clicks/scrolls, or send observation history to a server. It retains no messages or typed input. Users can pause, revoke access or delete history. Unsupported versions and contexts remain unavailable.”
+Suggested explanation: After separate in-app affirmative notices and Android accessibility access, Attention Stats inspects bounded identifiers, roles, visibility and numeric positions in selected supported apps. It stores encounter/category counts and estimated surface occupancy in encrypted local storage. Facebook descriptions are compared only with fixed interface labels. With its source notice accepted, TikTok visible title/caption fields are processed transiently using memory-only keyed comparisons; raw fields and matching tokens are never saved or uploaded. Messages, typed input, editable/password contexts and unsupported layouts are excluded. Separately enabled reminders and dedicated-viewer covers remain immediately dismissible. Optional auto-scroll uses numeric playback evidence and one bounded upward gesture after session Allow and viewer Start; Stop is visible and context/access loss ends the run. No observation data is sent to a server.
 
-The declaration's data question links to Google's off-device collection definition. Answer it using the exact artifact and current form; **do not conceal local sensitive-data access** even if an off-device collection answer is No. Provide a reviewer video showing first launch → separate disclosure and affirmative choice → Android accessibility enablement → counter use → pause/revocation. **Video pending.** Use a dedicated non-personal test account/content with permission; do not record the user's personal social content. Approval is pending and not guaranteed. Update the declaration if API use changes.
+The declaration's data question links to Google's off-device collection definition. Answer using the exact artifact and current form; **do not conceal local sensitive-data access** when off-device collection is No. Provide a reviewer video showing first launch, separate notices/choices, Android accessibility and Usage Access setup, first-encounter counter, Today/History, optional reminder/block/bypass, auto-scroll Allow/Start/Stop, pause and revocation. **Video pending.** Use non-personal test content with permission; do not film the user's personal social content. Approval is pending. Update the declaration if capture or another API use changes.
 
 ### Other app-content declarations
 
 [The full permission plan](PERMISSION-PLAN.md) maps every known future access need to its actual feature gate. Current-build permissions alone are declared/requested; later implemented features can update the manifest and Console forms. Requesting sensitive access for unimplemented features violates [Google's current-feature requirement](https://support.google.com/googleplay/android-developer/answer/9888170). The initial candidate does not request speculative future grants.
 
-No news publishing, government affiliation, financial services, lending, cryptocurrency, VPN, foreground service, exact alarms, broad package inventory, photo/video-library permission or advertising ID is present in this candidate. Mark not applicable/No only when that is the actual question; do not pre-answer unrelated questionnaires. Package visibility is limited to the four named counter targets. Android accessibility binding is separate from a runtime “draw over apps” grant; do not request unrelated grants. Recheck Console's current required declarations before submission.
+No news publishing, government affiliation, financial services, lending, cryptocurrency, VPN, foreground service, exact alarms, QUERY_ALL_PACKAGES, photo/video-library permission or advertising ID is present. Mark not applicable/No only for the actual question. Package visibility comprises four named counter targets plus the launcher-app query used to label app-time rows. Android accessibility binding is separate from a runtime draw-over-apps grant. Recheck Console's current declarations before submission.
 
-## Main store listing — ready to paste
+## Main store listing — candidate copy pending qualification
 
 **App name** (15 / 30):
 
@@ -80,10 +84,10 @@ No news publishing, government affiliation, financial services, lending, cryptoc
 Attention Stats
 ```
 
-**Short description** (69 / 80):
+**Short description** (maximum 80 characters):
 
 ```text
-Understand your Reels viewing with private, on-device exposure counts
+Understand your app time and Reels habits. Free, open source, on your device.
 ```
 
 **Full description** (maximum 4,000 characters; validate with release tooling):
@@ -91,27 +95,33 @@ Understand your Reels viewing with private, on-device exposure counts
 ```text
 Notice how you spend time with short videos, one deliberate choice at a time.
 
-Attention Stats is an open-source personal digital wellbeing app. This early testing version estimates settled page exposures in supported Instagram Reels viewers and keeps your saved history on your device.
+Attention Stats is a free, open-source digital wellbeing app. This early testing version keeps your usage history on your device and gives you optional ways to interrupt endless scrolling.
 
 WHAT YOU CAN TRY
-• See saved exposure totals and recognized video, photo/carousel, image-ad and unclassified layout counts.
-• Choose an optional compact counter while you use a supported Reels viewer.
-• Pause observation, turn a source off, hide the counter independently or delete your saved Reels history.
+• See app usage time and observed opens, Reels encounters and separate Reels-surface time on Today and History.
+• Compare per-app figures for supported Instagram Reels, Facebook Reels, YouTube Shorts and TikTok versions.
+• Choose a compact floating counter. Its session count follows the observed unlocked-phone interval across selected apps.
+• Choose whether recognized ads contribute to Reels totals; separate recognized-ad counts remain available.
+• Set optional count/time reminders or cover selected dedicated Reels viewers, with an immediate bypass.
+• Start optional auto-scroll in qualified dedicated viewers, with a visible Stop control.
+• Pause tracking, turn sources off, hide the counter for an app visit or delete local history.
 
 YOUR CHOICE, YOUR DEVICE
-Observation starts only after a separate in-app disclosure, your source choice and Android accessibility access. Attention Stats uses the AccessibilityService API to inspect bounded layout identifiers, roles and numeric page positions for supported selected apps. It does not read screen text, messages, typed input, titles, creators, photos or video, and it does not click or scroll for you.
+Reels observation requires a separate in-app disclosure, your source choice and Android accessibility access. Whole-app timing independently requires its notice and Android Usage Access. AccessibilityService inspects bounded layout structure and numeric positions. Facebook fixed interface labels and separately disclosed, transient TikTok title/caption matching help recognize surfaces or transitions. Raw matching fields are not saved. Messages and typed input are excluded.
+
+Reminders, Reels blocking and auto-scroll are optional. Auto-scroll requires Allow in the app and Start in the viewer; it uses playback progress to request one upward swipe at a time. It stops when progress or the viewing context becomes unavailable. Blocking covers the viewer rather than stopping playback, so audio can continue.
 
 There is no Attention Stats account, advertising, remote analytics or automatic history upload. Observation records are stored in an encrypted local database. Export and recovery are unavailable in this testing version; clearing app storage or uninstalling can permanently remove history.
 
 KNOW THE LIMITS
-Counts estimate settled viewer-page exposures, including return visits. They are not unique videos, completed views or watch-time measurements. Layout and ad recognition can be incomplete. Support depends on the installed target-app version. Unsupported coverage is shown as unavailable.
+Counts estimate settled encounters, including return visits. They are not unique videos or completed views. Reels time estimates time on recognized surfaces, not uninterrupted playback. App time estimates observed foreground intervals. Gaps, layout/ad recognition and installed app versions can affect results; unknown coverage is shown as unavailable. Home-feed recognition is separate from dedicated-viewer support. Auto-scroll is limited to qualified dedicated viewers.
 
-Facebook counting and normal Home-feed counting are not available yet. Broader time tracking, protection, predictions, backup and restore remain unavailable. This testing version is intended for adults and provides no medical advice or diagnosis.
+Patterns are being built. Per-app budgets/locking, individual weekly drill-down, backup and restore are not included. This testing version is intended for adults and provides no medical advice or diagnosis. Every included feature is free.
 
-Attention Stats is independent of Instagram, Facebook and Meta. It is not affiliated with or endorsed by them.
+Attention Stats is independent of the social platforms named here and is not affiliated with or endorsed by them.
 ```
 
-Do not add Facebook support to this listing until its independent detector and real trials pass. Revisit this copy for each candidate; the future full app's features are not current store claims.
+This copy targets the agreed MVP. Do not submit it until each advertised feature has exact-release evidence. In particular, four-source route qualification and completion-triggered scrolling remain release blockers. Any admitted pixel fallback requires an accurate disclosure and copy update before submission.
 
 ## Store settings and graphics
 
@@ -136,8 +146,8 @@ Never publish personal totals or target-app screenshots. Use truthful app-only v
 | Field | Value / action |
 |---|---|
 | Track | Closed testing; suggested track name: early-access |
-| Release name | 0.1.0 (1) — early counter candidate |
-| versionName / versionCode | 0.1.0 / 1; reserve code 1 locally, verify Console has never used it before upload |
+| Release name | 0.1.0 (1) — wellbeing MVP closed test |
+| versionName / versionCode | 0.1.0 / 2; code 1 remains in the historical unsigned archive; verify Console has never used code 2 before upload |
 | Bundle package | attention.stats; no suffix or additional words |
 | Architecture | Initial locally built candidate is ARM64 only; do not claim other ABIs/minimum-API qualification |
 | Play App Signing | Proposed: let Google generate/hold the app-signing key; maintainer controls a distinct upload key and encrypted backup |
@@ -150,7 +160,7 @@ Never publish personal totals or target-app screenshots. Use truthful app-only v
 Proposed release notes (under 500 characters):
 
 ```text
-Early counter test: optional local Instagram Reels page-exposure counts, saved category totals, pause/delete controls and a compact live display. Support depends on the installed Instagram version. Return visits count again; unique videos and watch time are unavailable. Facebook and Home feeds are not supported yet. Please report reproducible issues without personal history or content.
+Closed-test MVP: local app-time and Reels statistics, Today/History, optional floating counter, recognized-ad choices, reminders, dedicated-Reels blocking and supported-viewer auto-scroll. Features require separate choices and supported app versions. Counts include return encounters; surface time is not completed playback. Please report reproducible issues without personal history or content.
 ```
 
 ## What still blocks upload / rollout

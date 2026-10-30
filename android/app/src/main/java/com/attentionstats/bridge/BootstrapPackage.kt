@@ -11,6 +11,7 @@ class BootstrapPackage : BaseReactPackage() {
         when (name) {
             BootstrapModule.NAME -> BootstrapModule(reactContext)
             ReelsModule.NAME -> ReelsModule(reactContext)
+            DiaryModule.NAME -> DiaryModule(reactContext)
             else -> null
         }
 
@@ -20,6 +21,8 @@ class BootstrapPackage : BaseReactPackage() {
             false, false, false, true,
         ), ReelsModule.NAME to ReactModuleInfo(
             ReelsModule.NAME, ReelsModule.NAME, false, false, false, true,
+        ), DiaryModule.NAME to ReactModuleInfo(
+            DiaryModule.NAME, DiaryModule.NAME, false, false, false, true,
         ))
     }
 }

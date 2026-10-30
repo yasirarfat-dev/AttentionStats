@@ -11,5 +11,6 @@ tasks.register<JavaExec>("verifyReels") {
     dependsOn(tasks.testClasses)
     classpath = sourceSets.test.get().runtimeClasspath
     mainClass.set("org.attentionstats.reels.ReelsTestsKt")
+    systemProperty("fixtures", file("../../native/reels-core/src/test/resources/fixtures").absolutePath)
 }
 tasks.check { dependsOn("verifyReels") }

@@ -1517,5 +1517,8 @@
     "facebookEarlierNarrow": true,
     "noticeRevision": 5,
     "autoScrollOnHome": false
-  }
+  },
+  "historicalArtifact": true,
+  "artifactSourceCommit": "e449f7dcd05f62aa188359d094f9097604fdcb79",
+  "newerIncrementEvidence": "diary-preview.json"
 }

@@ -151,6 +151,8 @@ The separate [Tink fixture](../native/archive-qualification/README.md) uses the 
 
 ### AS-046 release preparation
 
+The separately authorized upload-key path uses `python tools/release_signing.py provision`, followed by release-only `tools/android_build.py` tasks with `--signing-config` pointing outside the source tree. The existing unsigned archive command remains unsigned-only and must not be used to relabel a signed candidate. See [Release](RELEASE.md#android-release-ownership) for key ownership/recovery and remaining admission gates.
+
 `python tools/release_candidate.py prepare` creates/refreshes the separate requested release-root listing, permission-plan, store-text and public-policy copies without copying source. Reviewed ARM64 inspection builds use `python tools/android_build.py :app:assembleRelease :app:bundleRelease :app:lintRelease --arch arm64-v8a --workers 2`; project-local metaspace is 1 GiB after the combined 512-MiB lint run exhausted it. This changes no machine-wide configuration. Run `python -m unittest discover -s tools/tests -p test_release_candidate.py` for manifest/admission/archive-preservation guards. `archive` requires the reviewed bundletool hash and exact initial package/version, validates the AAB/decoded manifest/compiled resources/backup exclusions and static ZIP/ELF alignment, and refuses an existing version directory. It archives only unsigned investigation files, never signs/installs/uploads or starts a workflow. Dirty-source provenance is explicit; these are not uploadable clean release artifacts. See [Play information](../release/PLAY-CONSOLE.md) for signing and actual rollout gates.
 
 ### AS-043 self-contained Android preview

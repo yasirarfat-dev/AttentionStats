@@ -35,6 +35,7 @@ internal class HistoryStore private constructor(
                 val data = database.data()
                 database.withWriteTransaction {
                     val metadata = data.metadata()
+                    if (data.diary() == null) data.putDiary(DiaryConfiguration())
                     if (metadata == null) {
                         data.insertMetadata(StoreMetadata(generation = keys.generation,
                             installationEpoch = keys.installationEpoch, lastRevision = 0,

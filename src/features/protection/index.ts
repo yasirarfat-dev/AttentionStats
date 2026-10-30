@@ -1,5 +1,1 @@
-export {
-  ProtectScreen,
-  FocusScreen,
-  RulesScreen,
-} from './screens/ProtectScreen';
+export { ProtectScreen } from './ProtectScreen';

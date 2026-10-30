@@ -4,7 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
 import android.graphics.Path
 import android.os.Handler
-import com.attentionstats.detectors.LayoutBounds
+import org.attentionstats.detection.LayoutBounds
 
 /** Sole platform action location. Caller must freshly revalidate the viewer before this bounded swipe. */
 internal object AutoScrollGestureDispatcher {

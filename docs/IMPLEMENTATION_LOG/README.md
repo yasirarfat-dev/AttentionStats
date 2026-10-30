@@ -15,3 +15,4 @@ Entries:
 - [2026-10-28 — category migration, native shell and scrolling counter](2026-10-28.md).
 
 - [2026-10-29 — interrupted counter recovery and four-source admission](2026-10-29.md).
+- [2026-10-30 — resumed MVP verification and upload signing](2026-10-30.md).

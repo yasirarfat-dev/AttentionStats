@@ -9,6 +9,11 @@ export interface Spec extends TurboModule {
     noticeRevision: number,
     expectedRevision: string,
   ): Promise<string>;
+  configureAll(
+    enabled: boolean,
+    noticeRevision: number,
+    expectedRevision: string,
+  ): Promise<string>;
   setPaused(paused: boolean, expectedRevision: string): Promise<string>;
   setOverlay(enabled: boolean, expectedRevision: string): Promise<string>;
   setCounterAppearance(

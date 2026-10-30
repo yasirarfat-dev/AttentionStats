@@ -176,6 +176,14 @@ class ReelsPhoneSafety(unittest.TestCase):
             data["targets"]["instagram"][key] = value
             with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(data).encode())
 
+    def test_dense_tiktok_budget_does_not_expand_other_sources(self):
+        data = self.structure()
+        data['targets']['tiktok'] = data['targets'].pop('instagram')
+        data['targets']['tiktok']['nodes'] = 384
+        self.assertEqual(probe.validate_structure(json.dumps(data).encode()), data)
+        data['targets']['tiktok']['nodes'] = 385
+        with self.assertRaises(RuntimeError): probe.validate_structure(json.dumps(data).encode())
+
     def geometry(self):
         value = self.structure()
         target = value["targets"]["instagram"]

@@ -37,14 +37,14 @@ def call(*args):
     return result.stdout
 
 
-def audit_manifest(text):
+def audit_manifest(text, version_code=1):
     """Audit the decoded AAB manifest, not source intent."""
     manifest = ET.fromstring(text)
     def need(condition, message):
         if not condition:
             raise ValueError(message)
     need(manifest.get("package") == PACKAGE, "Wrong production package")
-    need(manifest.get(ANDROID + "versionCode") == "1", "Unexpected version code")
+    need(manifest.get(ANDROID + "versionCode") == str(version_code), "Unexpected version code")
     need(manifest.get(ANDROID + "versionName") == "0.1.0", "Unexpected version name")
     sdk = manifest.find("uses-sdk")
     need(sdk is not None and sdk.get(ANDROID + "minSdkVersion") == "24" and
@@ -59,12 +59,20 @@ def audit_manifest(text):
          app.get(ANDROID + "dataExtractionRules") is not None, "Missing backup exclusions")
     need(manifest.find("instrumentation") is None, "Test instrumentation in release")
     permissions = sorted(x.get(ANDROID + "name") for x in manifest.findall("uses-permission"))
-    need(set(permissions) <= {PACKAGE + ".DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"},
+    need("android.permission.PACKAGE_USAGE_STATS" in permissions and
+         set(permissions) <= {PACKAGE + ".DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+                              "android.permission.PACKAGE_USAGE_STATS"},
          "Unexpected permission in release")
     queries = manifest.find("queries")
-    need(queries is not None and {x.get(ANDROID + "name") for x in queries} ==
+    need(queries is not None and {x.get(ANDROID + "name") for x in queries.findall("package")} ==
          {"com.instagram.android", "com.facebook.katana", "com.google.android.youtube", "com.zhiliaoapp.musically"} and
-         all(x.tag == "package" for x in queries), "Unexpected package visibility")
+         len(queries.findall("package")) == 4 and len(queries) == 5, "Unexpected package visibility")
+    intents = queries.findall("intent")
+    need(len(intents) == 1 and len(intents[0]) == 2 and
+         len(intents[0].findall("action")) == 1 and len(intents[0].findall("category")) == 1 and
+         intents[0].find("action").attrib == {ANDROID + "name": "android.intent.action.MAIN"} and
+         intents[0].find("category").attrib == {ANDROID + "name": "android.intent.category.LAUNCHER"} and
+         not intents[0].attrib, "Unexpected launcher visibility query")
     exported = set()
     for component in app:
         if component.tag in {"activity", "activity-alias", "service", "receiver", "provider"}:
@@ -80,7 +88,7 @@ def audit_manifest(text):
                     x.get(ANDROID + "name") == "com.attentionstats.reels.ReelsAccessibilityService"), None)
     need(service is not None and service.get(ANDROID + "permission") ==
          "android.permission.BIND_ACCESSIBILITY_SERVICE", "Unprotected accessibility service")
-    return {"package": PACKAGE, "versionName": "0.1.0", "versionCode": 1,
+    return {"package": PACKAGE, "versionName": "0.1.0", "versionCode": version_code,
             "minSdk": 24, "targetSdk": 37, "debuggable": False, "testOnly": False,
             "backupDisabled": True, "permissions": permissions,
             "exportedComponents": sorted(exported)}
@@ -139,7 +147,7 @@ def prepare(dest):
         "each `releases/<version>+<code>` archive is immutable. Gradle output stays in the source project. "
         "Unsigned candidates are not uploadable. No Console rollout or test-period start is implied.\n\n"
         "`private/signing` is reserved for private upload-key material and its recovery plan; never publish "
-        "it or mix it with artifacts. No keys have been provisioned. `testing` is for private feedback and "
+        "it or mix it with artifacts. See the local recovery instructions for provisioning status. `testing` is for private feedback and "
         "actual Console dates, never fabricated engagement.\n", encoding="utf-8")
     print("Prepared release folders, root PLAY-CONSOLE.md, policy copies and bounded store text")
 

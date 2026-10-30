@@ -40,7 +40,7 @@ def validate_structure(raw: bytes) -> dict:
         expect(value["scope"] == "consented structural detector qualification only; no content")
         targets = value["targets"]
         expect(type(targets) is dict and 1 <= len(targets) <= 4 and set(targets) <= {"instagram", "facebook", "youtube", "tiktok"})
-        for target in targets.values():
+        for app, target in targets.items():
             base_keys = {"version", "nodes", "bounded", "editable", "ids", "positions", "controls", "classes", "scrolls"}
             geometry_keys = {"geometryRevision", "viewport", "anchors"}
             interface_keys = {"interfaceRevision", "interfaceLabels"}
@@ -48,7 +48,7 @@ def validate_structure(raw: bytes) -> dict:
                                                           base_keys | geometry_keys | {"association"},
                                                           base_keys | geometry_keys | {"association"} | interface_keys])
             expect(isinstance(target["version"], str) and re.fullmatch(r"[A-Za-z0-9._-]{1,100}", target["version"]) is not None)
-            expect(type(target["nodes"]) is int and 0 <= target["nodes"] <= 192)
+            expect(type(target["nodes"]) is int and 0 <= target["nodes"] <= (384 if app == "tiktok" else 192))
             expect(type(target["bounded"]) is bool and type(target["editable"]) is bool)
             for key, limit, length in [("ids", 96, 80), ("classes", 24, 120)]:
                 expect(type(target[key]) is list and len(target[key]) <= limit and all(ident(x, length) for x in target[key]))
@@ -172,7 +172,7 @@ def audit_apks() -> None:
         if apk == PREVIEW:
             permissions = local(str(aapt), "dump", "permissions", str(apk))
             used = re.findall(r"^uses-permission: name='([^']+)'", permissions, re.M)
-            if set(used) - {APP + ".DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"}:
+            if set(used) - {APP + ".DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "android.permission.PACKAGE_USAGE_STATS"}:
                 raise RuntimeError("Unexpected preview permission; installation stopped")
     if len(set(certificates)) != 1: raise RuntimeError("Preview/test signer mismatch")
 
@@ -193,7 +193,7 @@ def parse_result(output: str, mode: str) -> dict[str, int]:
                            "; type=" + (kind[1] if kind else "unreported") +
                            ("; location=" + location[1] if location else "") + ("; touch=" + json.dumps(touch) if touch else "") + "; raw phone output withheld")
     limits = {"storage_checks": (30, 200), "detector_checks": (30, 240), "key_rejections": (3, 3), "sentinel_files": (1, 3),
-              "fixture_removed": (1, 1)} if mode == "storage" else {"ui_checks": (20, 160), "shell_routes": (20, 20)}
+              "fixture_removed": (1, 1)} if mode == "storage" else {"ui_checks": (20, 300), "shell_routes": (20, 20)}
     if mode == "autoscroll": limits = {"autoscroll_checks": (60, 200)}
     values = {}
     for key, (low, high) in limits.items():

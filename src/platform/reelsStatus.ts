@@ -20,6 +20,7 @@ const source = z.strictObject({
   installed: z.boolean(),
   version: z.string().max(100),
   supported: z.boolean(),
+  lastRecognizedMs: count.nullable(),
   today: count,
   visit: count.nullable(),
   counts: z.strictObject({
@@ -32,11 +33,12 @@ const source = z.strictObject({
 });
 const schema = z
   .strictObject({
-    contractVersion: z.literal(5),
+    contractVersion: z.literal(6),
     revision: z.string().regex(/^[0-9a-f-]{36}:[0-9]{1,19}$/),
     historyRevision: z.string().regex(/^[0-9a-f-]{36}:[0-9]{1,19}$/),
     generation: z.string().uuid(),
     storage: z.enum(['starting', 'ready', 'storage_unavailable', 'busy']),
+    noticeRevision: z.number().int(),
     accessibilityEnabled: z.boolean(),
     accessibilitySelected: z.boolean(),
     serviceConnected: z.boolean(),
@@ -46,6 +48,14 @@ const schema = z
     counterAppearance: z.strictObject({
       showIcons: z.boolean(),
       allAppsToday: z.boolean(),
+    }),
+    session: z.strictObject({ count }),
+    device: z.strictObject({
+      model: z.string().max(200),
+      manufacturer: z.string().max(200),
+      sdk: z.number().int(),
+      release: z.string().max(50),
+      appVersion: z.string().max(100),
     }),
     day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     zone: z.string().min(1).max(100),
@@ -63,7 +73,7 @@ const schema = z
 export type ReelsSnapshot = Zod.infer<typeof schema>;
 export type ReelsApp = ReelsSnapshot['sources'][number]['app'];
 export function parseReelsSnapshot(payload: unknown): ReelsSnapshot {
-  if (typeof payload !== 'string' || payload.length > 8192)
+  if (typeof payload !== 'string' || payload.length > 16384)
     throw new Error('Counter unavailable');
   try {
     const result = schema.safeParse(JSON.parse(payload));

@@ -16,8 +16,12 @@ class ReelsModule(private val context: ReactApplicationContext) : NativeReelsSpe
     override fun getSnapshot(promise: Promise) = coordinator.snapshot({ promise.resolve(it) }, { fail(promise, it) })
     override fun configure(app: String, enabled: Boolean, noticeRevision: Double, expectedRevision: String, promise: Promise) {
         val selected = ReelApp.byKey(app)
-        if (selected == null || noticeRevision != ReelsCoordinator.requiredNotice(selected).toDouble() || expectedRevision.length !in 38..60) { fail(promise, "INVALID_ARGUMENT"); return }
+        if (selected == null || noticeRevision != ReelsCoordinator.NOTICE_REVISION.toDouble() || expectedRevision.length !in 38..60) { fail(promise, "INVALID_ARGUMENT"); return }
         coordinator.configure(app, enabled, expectedRevision, { promise.resolve(it) }, { fail(promise, it) })
+    }
+    override fun configureAll(enabled: Boolean, noticeRevision: Double, expectedRevision: String, promise: Promise) {
+        if (noticeRevision != ReelsCoordinator.NOTICE_REVISION.toDouble() || expectedRevision.length !in 38..60) { fail(promise, "INVALID_ARGUMENT"); return }
+        coordinator.configureAll(enabled, expectedRevision, { promise.resolve(it) }, { fail(promise, it) })
     }
     override fun setPaused(paused: Boolean, expectedRevision: String, promise: Promise) =
         coordinator.setPaused(paused, expectedRevision, { promise.resolve(it) }, { fail(promise, it) })
@@ -43,8 +47,7 @@ class ReelsModule(private val context: ReactApplicationContext) : NativeReelsSpe
         } catch (_: RuntimeException) { promise.resolve(false) }
     }
     override fun setCalibration(enabled: Boolean, promise: Promise) {
-        try { coordinator.setCalibration(enabled); promise.resolve(true) }
-        catch (_: RuntimeException) { fail(promise, "CONSENT_REQUIRED") }
+        promise.resolve(false) // Retired: detection no longer needs structure checks.
     }
     private fun autoScrollSnapshot() = com.attentionstats.autoscroll.AutoScrollSession.snapshot { coordinator.installedVersion(it) }
     override fun getAutoScrollSnapshot(promise: Promise) {

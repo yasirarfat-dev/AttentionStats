@@ -10,7 +10,12 @@ export {
   parseAutoScrollStatus,
   type AutoScrollStatus,
 } from './autoScrollStatus';
-export { reelsSources, reelsSourceKeys } from './reelsSources';
+export {
+  reelsSources,
+  reelsSourceKeys,
+  NOTICE_REVISION,
+  type ReelsSourceKey,
+} from './reelsSources';
 export {
   parseReelsSnapshot,
   type ReelsSnapshot,

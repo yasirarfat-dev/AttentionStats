@@ -27,6 +27,8 @@ def main() -> int:
     parser.add_argument("--sdk", type=Path, default=Path(default_sdk))
     parser.add_argument("--arch", default="arm64-v8a", choices=["arm64-v8a", "x86_64", "armeabi-v7a", "x86"])
     parser.add_argument("--write-locks", action="store_true", help="only for reviewed native dependency introduction/refresh")
+    parser.add_argument("--signing-config", type=Path,
+                        help="External current-user-protected upload-key configuration; release tasks only")
     parser.add_argument("--reuse-daemon", action="store_true",
                         help="Reuse only this repository's Gradle-cache daemon for native iteration; idle timeout ten minutes")
     parser.add_argument("--workers", type=int, choices=[1, 2, 4], default=4,
@@ -38,6 +40,15 @@ def main() -> int:
     env = os.environ.copy()
     env.update(ANDROID_HOME=str(sdk), ANDROID_SDK_ROOT=str(sdk),
                GRADLE_USER_HOME=str(ROOT / ".cache/gradle-user-home"))
+    if args.signing_config:
+        release_tasks = {"assembleRelease", "bundleRelease", ":app:assembleRelease", ":app:bundleRelease", ":app:lintRelease"}
+        if not set(args.tasks) <= release_tasks:
+            parser.error("Upload signing is limited to release tasks")
+        from release_signing import signing_environment
+        try:
+            env.update(signing_environment(args.signing_config))
+        except (OSError, ValueError, RuntimeError):
+            parser.error("Upload-signing configuration could not be opened; secrets withheld")
     if "JAVA_HOME" not in env:
         java = shutil.which("java")
         if java:

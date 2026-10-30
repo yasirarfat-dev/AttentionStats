@@ -36,7 +36,7 @@ internal class ScrollingCountView(context: Context) : TextSwitcher(context) {
     }
 
     fun update(value: Long, scrollBack: Boolean) {
-        val text = value.toString()
+        val text = compact(value)
         val previous = (currentView as TextView).text
         if (previous.toString() == text) return
         val animate = previous.isNotEmpty() && isShown &&
@@ -65,5 +65,16 @@ internal class ScrollingCountView(context: Context) : TextSwitcher(context) {
     override fun onDetachedFromWindow() {
         for (index in 0 until childCount) getChildAt(index).clearAnimation()
         super.onDetachedFromWindow()
+    }
+
+    companion object {
+        fun compact(value: Long): String {
+            if (value < 1_000_000_000L) return value.toString()
+            val units = listOf(1_000_000_000_000_000_000L to "E", 1_000_000_000_000_000L to "Q",
+                1_000_000_000_000L to "T", 1_000_000_000L to "B")
+            val (scale, suffix) = units.first { value >= it.first }
+            val tenth = value % scale / (scale / 10)
+            return "${value / scale}${if (tenth == 0L) "" else ".$tenth"}$suffix"
+        }
     }
 }

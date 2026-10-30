@@ -130,41 +130,45 @@ def main() -> int:
                 errors.append(f"{label}: non-domain prototype dependency {imported}")
         if re.search(r"\b(?:android\.|androidx\.|java\.(?:io|net|sql)\.|com\.facebook\.|kotlinx\.coroutines\.)", text):
             errors.append(f"{label}: platform/storage/side-effect dependency in prototype")
-    # The experimental JVM module is deliberately absent from application dependencies.
+    # Pure JVM domain: counting rules (org.attentionstats.reels) and version-independent
+    # detection adapters (org.attentionstats.detection), testable against screen fixtures.
     reels = ROOT / "native/reels-core/src/main/kotlin"
     reels_paths = sorted(reels.rglob("*.kt"))
+    detector_count = 0
     if not reels_paths:
         errors.append("No Reels domain source found")
     for path in reels_paths:
         source_text = path.read_text(encoding="utf-8")
+        label = path.relative_to(ROOT).as_posix()
         expected = ".".join(path.parent.relative_to(reels).parts)
-        if not re.search(rf"^package {re.escape(expected)}$", source_text, re.M) or expected != "org.attentionstats.reels":
-            errors.append(f"{path.relative_to(ROOT)}: invalid Reels domain package")
+        if not re.search(rf"^package {re.escape(expected)}$", source_text, re.M) or not (
+                expected == "org.attentionstats.reels" or expected.startswith("org.attentionstats.detection")):
+            errors.append(f"{label}: invalid Reels/detection package")
         for imported in re.findall(r"^import ([\w.*]+)$", source_text, re.M):
-            if not imported.startswith(("kotlin.", "org.attentionstats.reels.")):
-                errors.append(f"{path.relative_to(ROOT)}: infrastructure import in Reels domain")
-        # A package identifier used as data (e.g. YouTube) is not a platform dependency.
-        # Only plain identifier literals are skipped; interpolation and imports remain checked.
+            if not imported.startswith(("kotlin.", "org.attentionstats.reels.", "org.attentionstats.detection.", "java.security.")):
+                errors.append(f"{label}: infrastructure import in pure domain")
         code = re.sub(r'"[A-Za-z0-9_.]+"', '""', source_text)
-        if re.search(r"\b(?:android\.|androidx\.|java\.(?:io|net|sql|security)\.|com\.facebook\.react\.|kotlinx\.|javax\.crypto\.)", code):
-            errors.append(f"{path.relative_to(ROOT)}: side effect dependency in Reels domain")
-    counter_source = ROOT / "android/app/src/main/java/com/attentionstats/reels"
-    detector_source = ROOT / "android/app/src/main/java/com/attentionstats/detectors"
-    detector_count = check_detectors(detector_source, errors)
-    if not detector_count:
-        errors.append("No isolated social detector adapters found")
-    for path in [*counter_source.rglob("*.kt"), *detector_source.rglob("*.kt")]:
+        if re.search(r"(?:android\.|androidx\.|java\.(?:io|net|sql)\.|com\.facebook\.react\.|kotlinx\.|javax\.)", code):
+            errors.append(f"{label}: side effect dependency in pure domain")
+        parts = path.relative_to(reels).parts
+        if "social" in parts:
+            detector_count += 1
+            platform = parts[parts.index("social") + 1]
+            for target in re.findall(r"org\.attentionstats\.detection\.social\.(\w+)", source_text):
+                if target != platform:
+                    errors.append(f"{label}: only the registry may reference another social adapter")
+    if detector_count < 5:
+        errors.append("Expected one isolated adapter per supported source")
+    app_source = ROOT / "android/app/src/main/java/com/attentionstats"
+    reader = app_source / "detection/SnapshotReader.kt"
+    action_owners = {app_source / "reels/ReelsAccessibilityService.kt", app_source / "autoscroll/AutoScrollGestureDispatcher.kt"}
+    for path in app_source.rglob("*.kt"):
         source_text = path.read_text(encoding="utf-8")
-        # Only this reviewed acquisition helper may inspect descriptions, behind its own gates.
-        description_helper = detector_source / "accessibility/InterfaceLabelMatcher.kt"
-        identity_helper = detector_source / "accessibility/TransientContentIdentity.kt"
-        forbidden = "beforeText|getBeforeText" if path == identity_helper else "text|beforeText|getText|getBeforeText"
-        if path not in [description_helper, identity_helper]:
-            forbidden += "|contentDescription|getContentDescription"
-        if re.search(rf"\b(?:node|root|source|event)\s*\??\.\s*(?:{forbidden})\b", source_text):
-            errors.append(f"{path.relative_to(ROOT)}: counter must not read captured text/descriptions")
-        if re.search(r"\b(?:performGlobalAction|performAction|dispatchGesture)\s*\(", source_text):
-            errors.append(f"{path.relative_to(ROOT)}: platform actions belong only in the opt-in auto-scroll dispatcher")
+        # Only the snapshot reader touches live node text; it copies labels into memory-only values.
+        if path != reader and re.search(r"(?:node|root|source|event)\s*\??\.\s*(?:text|contentDescription|getText|getContentDescription)", source_text):
+            errors.append(f"{path.relative_to(ROOT)}: only SnapshotReader may read on-screen labels")
+        if path not in action_owners and re.search(r"(?:performGlobalAction|performAction|dispatchGesture)\s*\(", source_text):
+            errors.append(f"{path.relative_to(ROOT)}: platform actions belong only to user-chosen blocks/breaks and auto-scroll")
     auto_source = ROOT / "android/app/src/main/java/com/attentionstats/autoscroll"
     for path in auto_source.rglob("*.kt"):
         text = path.read_text(encoding="utf-8")
@@ -193,8 +197,7 @@ def main() -> int:
         return 1
     print(f"PASS: {len(paths)} Kotlin source files; package paths and declared domain import boundaries")
     print(f"PASS: {len(prototype_paths)} collection prototype source files; pure boundary and no app dependency")
-    print(f"PASS: {len(reels_paths)} Reels domain source files; pure boundary and isolated opt-in auto-scroll action guard")
-    print(f"PASS: {detector_count} detector files; registry, per-platform adapters and Android acquisition boundaries")
+    print(f"PASS: {len(reels_paths)} pure Reels/detection files; {detector_count} isolated source adapters; label reading and actions confined")
     print("PASS: standalone storage/archive qualification excluded from product settings/dependencies/source")
     print(f"PASS: {mobile_count} mobile TypeScript files; relative imports, feature public APIs and layer direction")
     print("Static checks do not establish native compilation, UI or runtime source support.")

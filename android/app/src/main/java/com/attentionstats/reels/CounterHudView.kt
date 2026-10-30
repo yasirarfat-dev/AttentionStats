@@ -216,10 +216,11 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
         }
         val scopeLabel = if (state.allAppsToday) "All observed apps today" else
             "${state.app.displayName} today"
-        periods.text = "This visit | $scopeLabel"
+        periods.text = "This unlock · all apps | $scopeLabel"
         visit.update(state.visit, state.scrollBack)
         today.update(state.today, state.scrollBack)
-        header.contentDescription = "Estimated viewer pages including ads. This visit ${state.visit}. $scopeLabel ${state.today}. Tap to expand or collapse statistics."
+        val adScope = if (state.includeRecognizedAds) "Recognized ads included." else "Recognized ads counted separately."
+        header.contentDescription = "Estimated viewer pages. $adScope This unlock session across all observed apps ${state.visit}. $scopeLabel ${state.today}. Tap to expand or collapse statistics."
         for (item in state.categories) categoryRows[item.category]?.let { (row, sessionValue, dayValue) ->
             sessionValue.update(item.visit, state.scrollBack); dayValue.update(item.today, state.scrollBack)
             val label = when (item.category) {
@@ -228,7 +229,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
                 PageCategory.AD -> "Recognized image ads"
                 else -> "Unclassified pages"
             }
-            row.contentDescription = "$label. This visit ${item.visit}. $scopeLabel ${item.today}. Partial estimates."
+            row.contentDescription = "$label. This unlock session across all observed apps ${item.visit}. $scopeLabel ${item.today}. Partial estimates."
         }
     }
 

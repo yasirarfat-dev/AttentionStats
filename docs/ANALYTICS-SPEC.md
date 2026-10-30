@@ -1,6 +1,6 @@
 # Detailed personal activity diary
 
-**Status:** Expanded mobile specification; AS-035 pure Kotlin calculation slice implemented, collectors and screens unimplemented. Updated 2026-10-29.
+**Status:** Expanded specification; AS-035 calculations implemented and AS-050 timing/screens are experimental candidates. Updated 2026-10-29.
 **Responsibility:** Defines detailed app/activity analytics, evidence accounting, diary exploration, comparisons and summary semantics.
 **Related specifications:** [Metric catalog](METRIC-CATALOG.md), [Tracking](TRACKING-SPEC.md), [Social](SOCIAL-MEDIA-SPEC.md), [Models](DATA-MODELS.md), [Storage](STORAGE-AND-RETENTION.md), [UX](UX-SPEC.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-01/F-02/F-08/F-09 and F-10; no social-platform detector or network collector has device qualification. A calculation fixture is not source verification.
@@ -14,6 +14,8 @@ Supported output can grow to include per-app sessions/opens, primary activities,
 No website, web app, extension or WebView is added. The completed browser study is not expanded for this request. Android-native collectors and React Native mobile screens remain the delivery architecture.
 
 ## Meaning and dimensions
+
+AS-050 adds a bounded foreground-event estimator and a separately observed Reels-surface timer. Reels intervals accrue only between consecutive valid same-app/route/window checks no more than two seconds apart, with a wall/elapsed-clock consistency fence; gaps and service/source changes do not accrue. Saved timer endpoints and monotonic duration survive reopening. Positive dedicated-viewer occupancy can include unclassified/photo/ad pages; Home occupancy requires its admitted Home-video predicate. It is neither playback nor attention. Today/History show separate observed estimates and saved viewer encounters (including the existing category distinctions available in details). They do not claim a conserved composition of measured app duration: partial independent sources may disagree. Full intersection/composition and device-union metrics remain gated by the normative conservation rules below. Null time is displayed as unavailable, never measured zero. Initial daily/last-seven/last-31-day views use device-zone calendar boundaries; older facts are retained.
 
 ADR-036 explicitly separates **whole-app time** from **Reels-viewer time** and preserves per-session, calendar-day, week and month counts/time in the app. The floating control shows only the current session and today. Viewer occupancy is a subset of app occupancy, never an extra additive duration or proof of completed viewing. Periods carry zone/coverage and use half-open bounds; unavailable collectors do not become zero time. The AS-043 preview currently supplies viewer-page counts only; whole-app/Reels duration and weekly/monthly runtime views await AS-011/AS-013/AS-014/AS-037. Optional auto-scroll is an independent bonus (AS-044), not a prerequisite or implicit statistics consent.
 
@@ -73,4 +75,4 @@ T-17–T-23 and D-04–D-06 in [Testing](TESTING.md) specify the expanded scenar
 
 ADR-050 lifetime history, immutable event/origin provenance, future merge/deletion semantics and rebuildable calendar summaries are defined in [Storage and retention](STORAGE-AND-RETENTION.md#lifetime-event-history-and-future-multi-origin-merging). These are design obligations; current preview storage/aggregate/restore limits remain explicit.
 
-ADR-055/AS-050 prioritizes actual all-app usage intervals and separate per-social-app Reels occupancy/counts for Today and saved History. Reels time is a subset of app time and must not be added to app totals; neither proves playback completion. Grant/coverage gaps remain unavailable, with no estimated timer substituted from encounter counts. Duration collection and timer-history integration are not implemented at this checkpoint.
+ADR-055/AS-050 supplies experimental all-app usage intervals and independent per-social-app Reels occupancy/counts for Today and History. Do not add Reels time to app time or claim a conserved intersection of the current partial sources; neither proves playback completion. Grant/coverage gaps remain unavailable, with no timer substituted from encounter counts. ADR-062 adds observed app opens below each whole-app row name, separate from the final Reels encounters label. Day/week/month entry counts sum observed timestamp bins; exact cold launches and full-device coverage remain unqualified.
