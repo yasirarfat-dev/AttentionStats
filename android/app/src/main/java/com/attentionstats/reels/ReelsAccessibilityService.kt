@@ -50,6 +50,8 @@ class ReelsAccessibilityService : AccessibilityService() {
 
     private val scrollSequence = ConcurrentHashMap<ReelApp, AtomicLong>()
     @Volatile private var currentApp: ReelApp? = null
+    /** Source app in front while counting is paused: show the resume pill, count nothing. */
+    @Volatile private var pausedApp: ReelApp? = null
     @Volatile private var displayEligible = false
     @Volatile private var lastFrame: AdapterFrame? = null
     private data class Seen(val app: ReelApp, val window: Int, val atMs: Long, val frame: AdapterFrame)
@@ -112,7 +114,7 @@ class ReelsAccessibilityService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null || destroyed) return
         val app = ReelApp.byPackage(event.packageName?.toString() ?: "") ?: return
-        if (!coordinator.allowed(app)) return
+        if (!coordinator.allowed(app)) { if (coordinator.pausedSource(app)) schedule(300); return }
         when (event.eventType) {
             AccessibilityEvent.TYPE_VIEW_SCROLLED -> {
                 scrollSequence.getOrPut(app) { AtomicLong() }.incrementAndGet()
@@ -146,6 +148,13 @@ class ReelsAccessibilityService : AccessibilityService() {
             val foreground = root.packageName?.toString()
             visitHudVisibility.foreground(foreground)
             val app = ReelApp.byPackage(foreground ?: "")
+            if (app != null && coordinator.pausedSource(app)) {
+                if (currentApp != app) outside(true)
+                currentApp = app; pausedApp = app; displayEligible = false
+                main.post { renderOverlays() }
+                schedule(1_500); return
+            }
+            pausedApp = null
             if (app == null || !coordinator.allowed(app)) {
                 // System UI (notification shade, volume) is not a departure.
                 outside(foreground != "com.android.systemui" && foreground != packageName); return
@@ -194,7 +203,7 @@ class ReelsAccessibilityService : AccessibilityService() {
         displayEligible = false
         block = null
         lastFrame = null
-        if (departed) { lastReels = null; currentApp = null; coordinator.pauseDiarySurface() }
+        if (departed) { lastReels = null; currentApp = null; pausedApp = null; coordinator.pauseDiarySurface() }
         app?.let {
             coordinator.observe(it, AdapterFrame.OUTSIDE, ItemFrame(SystemClock.elapsedRealtime(), Surface.OUTSIDE,
                 ReelRoute.VIEWER, null, emptySet(), org.attentionstats.reels.PageCategory.REEL, 0), 0, coordinator.epoch())
@@ -241,9 +250,9 @@ class ReelsAccessibilityService : AccessibilityService() {
                 { decide("continued"); breakQuietUntil = SystemClock.elapsedRealtime() + 5_000; coordinator.dismissReminder() })
             else -> InterventionOverlay(this, InterventionOverlay.Mode.BLOCK,
                 if (wanted == "limit") "Daily limit reached" else "${current.observationLabel} are off",
-                if (wanted == "limit") "You chose ${decision?.limit} short videos a day on ${current.displayName}. " +
+                if (wanted == "limit") "You chose ${decision?.limit} short videos a day on ${current.displayName}.\n" +
                     "Everything else in the app still works." else
-                    "You chose to block them. Everything else in ${current.displayName} still works.",
+                    "You chose to turn them off.\nEverything else in ${current.displayName} still works.",
                 coordinator.breakSeconds, "Okay", "Allow 5 minutes",
                 { decide("left"); blockActedAt = 0; removeIntervention() },
                 { decide("allowed"); coordinator.allowFor(current, 5); removeIntervention(); schedule(0) })
@@ -270,11 +279,11 @@ class ReelsAccessibilityService : AccessibilityService() {
         } catch (_: RuntimeException) { intervention = null; interventionKind = null }
     }
 
+    /** Service contexts often report empty window insets, so fall back to the system dimension. */
     private fun navigationBarHeight(): Int {
-        if (Build.VERSION.SDK_INT >= 30) {
-            return getSystemService(WindowManager::class.java).currentWindowMetrics.windowInsets
-                .getInsetsIgnoringVisibility(android.view.WindowInsets.Type.navigationBars()).bottom
-        }
+        val fromInsets = if (Build.VERSION.SDK_INT >= 30) getSystemService(WindowManager::class.java).currentWindowMetrics
+            .windowInsets.getInsetsIgnoringVisibility(android.view.WindowInsets.Type.navigationBars()).bottom else 0
+        if (fromInsets > 0) return fromInsets
         @android.annotation.SuppressLint("InternalInsetResource", "DiscouragedApi")
         val id = resources.getIdentifier("navigation_bar_height", "dimen", "android")
         return if (id > 0) resources.getDimensionPixelSize(id) else 0
@@ -323,12 +332,24 @@ class ReelsAccessibilityService : AccessibilityService() {
     private fun renderHud() {
         val state = coordinator.liveOverlay
         val active = currentApp
+        val pausedHere = pausedApp != null && pausedApp == active && coordinator.overlayEnabled && intervention == null &&
+            !visitHudVisibility.hiddenFor(checkNotNull(active)) && interactive()
+        if (pausedHere) { ensureHud(); hud?.setPausedState(true); return }
         if (!displayEligible || intervention != null || !coordinator.overlayEnabled || state == null || active != state.app ||
             visitHudVisibility.hiddenFor(state.app) || state.epoch != coordinator.epoch() || !coordinator.allowed(state.app) ||
             !interactive()) {
             if (AutoScrollSession.running && intervention == null) AutoScrollSession.stop("viewer_unavailable")
             removeHud(); return
         }
+        ensureHud()
+        hud?.setPausedState(false)
+        hud?.update(state)
+        val viewer = state.route == ReelRoute.VIEWER
+        hud?.setAutoScrollControl(viewer && AutoScrollSession.enabled, AutoScrollSession.running, AutoScrollSession.canStart())
+        hud?.setAutoScrollOption(viewer, AutoScrollSession.enabled)
+    }
+
+    private fun ensureHud() {
         if (hud == null) {
             val density = resources.displayMetrics.density
             val view = CounterHudView(this, ::openDashboard, ::pauseObservation, ::hideCounterThisVisit, {
@@ -358,13 +379,17 @@ class ReelsAccessibilityService : AccessibilityService() {
             view.addOnLayoutChangeListener { _, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
                 if (right - left != oldRight - oldLeft || bottom - top != oldBottom - oldTop) moveCounter(0f, 0f)
             }
+            view.onResume = ::resumeObservation
             try { hud = view; hudParams = params; getSystemService(WindowManager::class.java).addView(view, params) }
             catch (_: RuntimeException) { hud = null; hudParams = null; return }
         }
-        hud?.update(state)
-        val viewer = state.route == ReelRoute.VIEWER
-        hud?.setAutoScrollControl(viewer && AutoScrollSession.enabled, AutoScrollSession.running, AutoScrollSession.canStart())
-        hud?.setAutoScrollOption(viewer, AutoScrollSession.enabled)
+    }
+
+    private fun resumeObservation() {
+        coordinator.snapshot({ value ->
+            val revision = org.json.JSONObject(value).getString("revision")
+            coordinator.setPaused(false, revision, { main.post { hud?.setPausedState(false); schedule(0) } }, { })
+        }, { })
     }
 
     // ---- Auto-scroll (optional convenience) ------------------------------------------------
@@ -436,7 +461,7 @@ class ReelsAccessibilityService : AccessibilityService() {
     private fun pauseObservation() {
         coordinator.snapshot({ value ->
             val revision = org.json.JSONObject(value).getString("revision")
-            coordinator.setPaused(true, revision, { main.post { removeHud() } }, { main.post { openDashboard() } })
+            coordinator.setPaused(true, revision, { main.post { renderOverlays(); schedule(0) } }, { main.post { openDashboard() } })
         }, { main.post { openDashboard() } })
     }
 

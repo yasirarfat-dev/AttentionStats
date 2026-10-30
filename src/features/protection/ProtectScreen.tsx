@@ -132,8 +132,8 @@ export function ProtectScreen() {
               }}
             />
             <Body muted>
-              Counts restart each time you unlock your phone. A break repeats
-              after every run.
+              A run starts over when you lock your phone or spend 5 minutes away
+              from short videos. After a break, the next run begins.
             </Body>
           </View>
         )}

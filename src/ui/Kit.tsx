@@ -103,7 +103,7 @@ export function Row({
           </View>
         ))}
       <View style={styles.rowText}>
-        <Text style={styles.rowTitle} numberOfLines={1}>
+        <Text style={styles.rowTitle} numberOfLines={2}>
           {title}
         </Text>
         {detail ? (
@@ -174,6 +174,8 @@ export function ToggleRow({
       leading={leading}
       title={title}
       detail={detail}
+      onPress={disabled ? undefined : () => onChange(!value)}
+      accessibilityLabel={`${title}, ${value ? 'on' : 'off'}`}
       trailing={
         <Switch
           accessibilityLabel={title}

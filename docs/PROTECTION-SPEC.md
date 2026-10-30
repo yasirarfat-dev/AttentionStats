@@ -1,5 +1,7 @@
 # Protection specification
 
+> **Current behavior (1.0.0):** [ADR-066](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30) supersedes version-pinned detectors, per-app notices 3–5, structure-check diagnostics and the five-tab preview described below where they conflict. See [State](STATE.md) and the public [privacy policy](../policies/PRIVACY.md).
+
 **Status:** Rule engine planned; enforcement mechanisms require Android and policy validation. Updated 2026-10-26.
 **Responsibility:** Defines deterministic rules, conflict resolution, interventions, exceptions and safe failure.
 **Related specifications:** [Native contracts](NATIVE-CONTRACTS.md), [Permissions](PERMISSIONS.md), [Settings](SETTINGS-SPEC.md), [Testing](TESTING.md).

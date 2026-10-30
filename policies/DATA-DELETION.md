@@ -1,11 +1,13 @@
 # Delete Attention Stats data
 
-Attention Stats, Android package **attention.stats**, has no app account or developer-hosted history.
+Attention Stats (`attention.stats`) has no account and no server, so all data lives only on your phone and only you can delete it.
 
-1. Open **Attention Stats → Reels & short videos → Delete saved usage history** and confirm. This disables app/Reels collection and reminders, hides the counter and removes all saved exposure/visit, app-event/timer, coverage and consent history. Minimal configuration and database metadata remain.
-2. To remove all remaining app data, open **Android Settings → Apps → Attention Stats → Storage → Clear storage**, or uninstall Attention Stats. Wording varies by device. Revoking accessibility alone stops access and does not erase saved history.
-3. If you independently sent a support report, contact the recipient or use GitHub's controls to manage that report. Clearing local app data cannot remove external copies.
+1. **In the app:** open **Settings → Delete all history** and confirm. This permanently removes every short-video count, timer, app-usage event, break/block event and consent record, turns counting off and hides the counter.
+2. **Everything else:** open **Android Settings → Apps → Attention Stats → Storage → Clear storage**, or uninstall the app. Wording varies by phone.
+3. Turning off the accessibility service or usage access stops new data but does not erase what is already saved.
 
-Data loss is permanent: export and recovery are unavailable in this candidate. Logical deletion is not a guarantee of forensic flash erasure.
+If you sent us an email or a GitHub issue, ask us at **consciousbiobot@gmail.com** to delete the email, or delete the issue on GitHub.
+
+Deletion is permanent; there is no backup on any server.
 
 [Privacy policy](PRIVACY.md) · [Support](SUPPORT.md)

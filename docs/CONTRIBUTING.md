@@ -11,6 +11,10 @@ Read [Index](INDEX.md), [State](STATE.md) and the relevant domain specifications
 
 Use respectful, specific feedback. Do not shame users for behavior or medicalize screen use. Do not post harassment, discriminatory content or another person's private information. Maintainers may remove harmful material and restrict participation; no dedicated external conduct-report address is fabricated. Use a minimal contact request when a private channel is needed.
 
+## Most valuable contribution: a missed screen
+
+Apps change their layouts often. If a short video is not counted (or something is counted that should not be), capture that screen with `adb shell uiautomator dump`, sanitize it with `tools/sanitize_fixture.py`, add an expectation in `FixtureTests.kt`, and fix the adapter until `python tools/android_build.py :reels-core:verifyReels` passes. The [adapter guide](SOCIAL-ADAPTERS.md#turning-a-report-into-a-fixture) has the exact steps. Never attach raw dumps or screenshots containing other people's content.
+
 ## Issues and pull requests
 
 Bug reports include commit/version, relevant platform/API/OEM class without device identifiers, source/grant states, synthetic reproduction, expected/actual result and redacted reason codes. Detection issues name supported target/version/locale and describe surface confusion using synthetic structures, not account screenshots or raw accessibility dumps. Security vulnerabilities follow [private reporting](../SECURITY.md), not a public bug template.

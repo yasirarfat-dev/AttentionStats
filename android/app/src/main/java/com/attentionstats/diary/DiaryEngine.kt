@@ -50,6 +50,9 @@ internal class DiaryEngine(private val context: Context) {
     val fence = AtomicLong()
     @Volatile var reminder: Reminder? = null
         private set
+    /** 0..1 progress toward the next mindful break, or -1 when breaks are off. Drives the HUD ring. */
+    @Volatile var breakProgress = -1f
+        private set
     data class Reminder(val app: ReelApp, val count: Int, val durationMs: Long, val reason: String)
     private data class Sample(val app: ReelApp, val route: String, val window: Int, val wall: Long, val elapsed: Long)
     private var sample: Sample? = null
@@ -58,6 +61,8 @@ internal class DiaryEngine(private val context: Context) {
     private var sessionCount = 0
     private var sessionDuration = 0L
     private var lastQueryElapsed = 0L
+    /** Last time a short-video surface was on screen; a long gap starts a new run toward the next break. */
+    private var lastEligibleElapsed = 0L
     var usageStatus = "disabled"
         private set
 
@@ -65,9 +70,9 @@ internal class DiaryEngine(private val context: Context) {
     fun usageGranted(): Boolean = context.getSystemService(AppOpsManager::class.java)
         .checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), context.packageName) == AppOpsManager.MODE_ALLOWED
 
-    fun resetLive() { sample = null; timer = null; sessionApp = null; dismiss() }
+    fun resetLive() { sample = null; timer = null; sessionApp = null; lastEligibleElapsed = 0L; dismiss() }
     fun pauseSurface() { sample = null; timer = null }
-    fun dismiss() { reminder = null; sessionCount = 0; sessionDuration = 0 }
+    fun dismiss() { reminder = null; sessionCount = 0; sessionDuration = 0; if (breakProgress > 0) breakProgress = 0f }
 
     suspend fun configure(history: HistoryStore, action: String, enabled: Boolean, count: Int, minutes: Int,
         expected: Long): Boolean {
@@ -191,6 +196,11 @@ internal class DiaryEngine(private val context: Context) {
         if (!permitted()) { resetLive(); return }
         val eligible = signal.surface == Surface.REELS
         if (!eligible) { sample = null; timer = null; return }
+        // A "stretch" ends after a real pause away from short videos (screen still unlocked).
+        if (lastEligibleElapsed != 0L && signal.elapsedMs - lastEligibleElapsed > RUN_GAP_MS && reminder == null) {
+            sessionCount = 0; sessionDuration = 0; if (breakProgress > 0) breakProgress = 0f
+        }
+        lastEligibleElapsed = signal.elapsedMs
         if (sessionApp != app) {
             pauseSurface(); sessionApp = app
             reminder = reminder?.copy(app = app)
@@ -216,9 +226,11 @@ internal class DiaryEngine(private val context: Context) {
         } else timer = null
         sample = next
         val config = checkNotNull(history.database.data().diary())
-        if (!config.reminderEnabled) { dismiss(); return }
+        if (!config.reminderEnabled) { dismiss(); breakProgress = -1f; return }
         if (counted && (includeRecognizedAds || signal.category != org.attentionstats.reels.PageCategory.AD)) sessionCount++
         sessionDuration += delta
+        breakProgress = maxOf(sessionCount.toFloat() / maxOf(1, config.reminderCount),
+            sessionDuration.toFloat() / maxOf(1L, config.reminderMinutes * 60_000L)).coerceIn(0f, 1f)
         if (reminder == null && (sessionCount >= config.reminderCount || sessionDuration >= config.reminderMinutes * 60_000L)) {
             reminder = Reminder(app, sessionCount, sessionDuration, if (sessionCount >= config.reminderCount) "count" else "time")
         }
@@ -307,4 +319,9 @@ internal class DiaryEngine(private val context: Context) {
     private fun label(pkg: String): String = try {
         context.packageManager.getApplicationLabel(context.packageManager.getApplicationInfo(pkg, 0)).toString().take(100)
     } catch (_: android.content.pm.PackageManager.NameNotFoundException) { pkg.take(100) }
+
+    companion object {
+        /** Minutes away from short videos after which a break countdown starts over. */
+        const val RUN_GAP_MS = 5 * 60_000L
+    }
 }

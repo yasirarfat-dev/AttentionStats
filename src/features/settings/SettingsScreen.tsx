@@ -138,7 +138,20 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
                 title={reelsSources[key].observation}
                 detail={detail}
                 value={!!source?.enabled && !!source.consentCurrent}
-                onChange={value => reels.setSource(key, value)}
+                onChange={value => {
+                  if (!value) return void reels.setSource(key, false);
+                  Alert.alert(
+                    `Count ${reelsSources[key].observation}?`,
+                    `Attention Stats will use Android Accessibility to read ${reelsSources[key].name}'s screen layout and labels in memory while it is open, only to recognise short videos and tell them apart. Nothing you watch, type or message is saved or sent. Counts stay encrypted on this phone.`,
+                    [
+                      { text: 'Not now', style: 'cancel' },
+                      {
+                        text: 'I agree',
+                        onPress: () => void reels.setSource(key, true),
+                      },
+                    ],
+                  );
+                }}
                 disabled={!snapshot}
               />
             </View>

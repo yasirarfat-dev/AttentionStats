@@ -1,5 +1,7 @@
 # Permissions and capability access
 
+> **Current behavior (1.0.0):** [ADR-066](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30) supersedes version-pinned detectors, per-app notices 3–5, structure-check diagnostics and the five-tab preview described below where they conflict. See [State](STATE.md) and the public [privacy policy](../policies/PRIVACY.md).
+
 **Status:** Experimental accessibility/source/display and separately consented Usage Access flows exist; broader grants remain planned. Updated 2026-10-29.
 **Responsibility:** Defines Android declarations, user grants, disclosures, revocation and safe degradation.
 **Related specifications:** [Capabilities](CAPABILITY-MATRIX.md), [UX](UX-SPEC.md), [Privacy](PRIVACY.md), [Architecture](ARCHITECTURE.md).

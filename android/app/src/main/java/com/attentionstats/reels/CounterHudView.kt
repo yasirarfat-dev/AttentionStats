@@ -53,9 +53,20 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     private val today = number()
     private val sessionIcon = icon("session")
     private val todayIcon = icon("today")
+    private val unlockHeading = TextView(context).apply {
+        setTextColor(iconColor); textSize = 11f; text = "Session"; gravity = Gravity.CENTER
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+    }
+    /** Shown instead of the counts while counting is paused; tapping resumes. */
+    private val pausedLabel = TextView(context).apply {
+        text = "Paused · tap to resume"; textSize = 14f; setTextColor(Color.WHITE); visibility = GONE
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+    }
+    var onResume: () -> Unit = {}
+    var paused = false
+        private set
     private val periods = TextView(context).apply {
-        setTextColor(iconColor); textSize = 12f; gravity = Gravity.CENTER
-        setPadding(dp(8), dp(4), dp(8), dp(4))
+        setTextColor(iconColor); textSize = 11f; gravity = Gravity.CENTER; maxLines = 1
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
     private val categoryRows = mutableMapOf<PageCategory, Triple<LinearLayout, ScrollingCountView, ScrollingCountView>>()
@@ -86,7 +97,8 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
                 LayoutParams(dp(1), dp(18)).apply { marginStart = dp(12); marginEnd = dp(12) })
             addView(todayIcon, LayoutParams(dp(20), dp(20)))
             addView(today, LayoutParams(LayoutParams.WRAP_CONTENT, dp(48)).apply { marginStart = dp(6) })
-            setOnClickListener { setExpanded(!expanded) }
+            addView(pausedLabel, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply { marginStart = dp(8) })
+            setOnClickListener { if (paused) onResume() else setExpanded(!expanded) }
             var downX = 0f; var downY = 0f; var lastX = 0f; var lastY = 0f
             var dragging = false
             val slop = ViewConfiguration.get(context).scaledTouchSlop
@@ -131,27 +143,41 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
                 }
             }
         }
-        addView(header, LayoutParams(LayoutParams.WRAP_CONTENT, dp(48)))
+        addView(header, LayoutParams(LayoutParams.WRAP_CONTENT, dp(48)).apply { gravity = Gravity.CENTER_HORIZONTAL })
         details.apply {
             orientation = VERTICAL; visibility = GONE
-            setPadding(dp(8), 0, dp(8), dp(6))
+            setPadding(dp(8), dp(4), dp(8), dp(6))
         }
-        details.addView(periods, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
-        val icons = mapOf(PageCategory.REEL to "video", PageCategory.PHOTO to "photo",
-            PageCategory.AD to "ad", PageCategory.UNCLASSIFIED to "unknown")
-        for ((category, symbol) in icons) {
+        // Column headings aligned with the number columns of each row below.
+        val headings = LinearLayout(context).apply {
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(8), dp(2), dp(8), 0)
+            importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+            addView(View(context), LayoutParams(0, 1, 1f))
+            addView(unlockHeading, LayoutParams(dp(COLUMN), LayoutParams.WRAP_CONTENT))
+            addView(periods, LayoutParams(dp(COLUMN), LayoutParams.WRAP_CONTENT))
+        }
+        details.addView(headings, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+        val icons = mapOf(PageCategory.REEL to Pair("video", "Videos"), PageCategory.PHOTO to Pair("photo", "Photos"),
+            PageCategory.AD to Pair("ad", "Ads"))
+        for ((category, entry) in icons) {
+            val (symbol, name) = entry
             val sessionValue = number(); val dayValue = number()
             val row = LinearLayout(context).apply {
-                gravity = Gravity.CENTER_VERTICAL; minimumHeight = dp(40)
+                gravity = Gravity.CENTER_VERTICAL; minimumHeight = dp(36)
                 importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
                 isFocusable = true
                 setPadding(dp(8), 0, dp(8), 0)
                 addView(icon(symbol), LayoutParams(dp(20), dp(20)))
-                addView(sessionValue, LayoutParams(0, dp(40), 1f).apply { marginStart = dp(8) })
-                addView(dayValue, LayoutParams(0, dp(40), 1f))
+                addView(TextView(context).apply {
+                    text = name; textSize = 12f; setTextColor(iconColor)
+                    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+                }, LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f).apply { marginStart = dp(8) })
+                addView(sessionValue, LayoutParams(dp(COLUMN), dp(36)))
+                addView(dayValue, LayoutParams(dp(COLUMN), dp(36)))
             }
             categoryRows[category] = Triple(row, sessionValue, dayValue)
-            details.addView(row, LayoutParams(LayoutParams.MATCH_PARENT, dp(40)))
+            details.addView(row, LayoutParams(LayoutParams.MATCH_PARENT, dp(36)))
         }
         val actions = LinearLayout(context).apply { gravity = Gravity.CENTER }
         for ((symbol, label, action) in listOf(Triple("dashboard", "Open dashboard", onOpen),
@@ -196,8 +222,22 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
+    /** Paused pill: hides the counts and the detail panel; the session icon shows a pause state. */
+    fun setPausedState(value: Boolean) {
+        if (paused == value) return
+        paused = value
+        if (value && expanded) setExpanded(false)
+        for (child in listOf(visit, today, todayIcon)) child.visibility = if (value) GONE else VISIBLE
+        (header.getChildAt(2))?.visibility = if (value) GONE else VISIBLE // divider
+        pausedLabel.visibility = if (value) VISIBLE else GONE
+        alpha = if (value) 0.85f else 1f
+        header.contentDescription = if (value) "Counting paused. Double tap to resume." else header.contentDescription
+    }
+
     fun setExpanded(value: Boolean) {
         expanded = value
+        // The overlay window wraps its content; widen the whole counter so both columns fit.
+        minimumWidth = if (value) dp(268) else 0
         details.visibility = if (value) VISIBLE else GONE
         updateAutoVisibility()
         (background as GradientDrawable).setColor(Color.argb(if (value) 214 else 163, 18, 24, 34))
@@ -207,7 +247,8 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     }
 
     fun update(state: ReelsCoordinator.OverlaySnapshot) {
-        sessionIcon.visibility = if (state.showIcons) VISIBLE else GONE
+        sessionIcon.progress = state.breakProgress
+        sessionIcon.visibility = if (state.showIcons || state.breakProgress >= 0) VISIBLE else GONE
         todayIcon.visibility = if (state.showIcons) VISIBLE else GONE
         for (number in listOf(visit, today)) {
             val params = number.layoutParams as LayoutParams
@@ -216,13 +257,17 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
         }
         val scopeLabel = if (state.allAppsToday) "All observed apps today" else
             "${state.app.displayName} today"
-        periods.text = "This unlock · all apps | $scopeLabel"
+        periods.text = if (state.allAppsToday) "Today" else "${state.app.displayName}"
         visit.update(state.visit, state.scrollBack)
         today.update(state.today, state.scrollBack)
         val adScope = if (state.includeRecognizedAds) "Recognized ads included." else "Recognized ads counted separately."
         header.contentDescription = "Estimated viewer pages. $adScope This unlock session across all observed apps ${state.visit}. $scopeLabel ${state.today}. Tap to expand or collapse statistics."
+        val unclassified = state.categories.firstOrNull { it.category == PageCategory.UNCLASSIFIED }
         for (item in state.categories) categoryRows[item.category]?.let { (row, sessionValue, dayValue) ->
-            sessionValue.update(item.visit, state.scrollBack); dayValue.update(item.today, state.scrollBack)
+            // "Videos" includes items whose kind the adapter could not tell apart.
+            val extraVisit = if (item.category == PageCategory.REEL) unclassified?.visit ?: 0 else 0
+            val extraToday = if (item.category == PageCategory.REEL) unclassified?.today ?: 0 else 0
+            sessionValue.update(item.visit + extraVisit, state.scrollBack); dayValue.update(item.today + extraToday, state.scrollBack)
             val label = when (item.category) {
                 PageCategory.REEL -> "Video layouts"
                 PageCategory.PHOTO -> "Photo or carousel pages"
@@ -234,6 +279,15 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     }
 
     private class SymbolView(context: Context, private val symbol: String, color: Int) : View(context) {
+        /** -1 hides the ring; 0..1 fills it toward the next mindful break. */
+        var progress = -1f
+            set(value) { if (field != value) { field = value; invalidate() } }
+        private val track = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.STROKE; strokeWidth = 2.4f; this.color = Color.argb(70, 255, 255, 255)
+        }
+        private val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.STROKE; strokeWidth = 2.4f; strokeCap = Paint.Cap.ROUND
+        }
         override fun getAccessibilityClassName(): CharSequence =
             if (isClickable) android.widget.Button::class.java.name else super.getAccessibilityClassName()
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -254,7 +308,13 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
                 canvas.drawPath(p, paint)
             }
             when (symbol) {
-                "session" -> { canvas.drawArc(4f, 4f, 20f, 20f, -65f, 300f, false, paint)
+                "session" -> if (progress >= 0f) {
+                    // Ring toward the next break: mint, warming to amber in the last fifth.
+                    fill.color = if (progress >= 0.8f) Color.rgb(242, 194, 122) else Color.rgb(143, 224, 187)
+                    canvas.drawCircle(12f, 12f, 10f, track)
+                    canvas.drawArc(2f, 2f, 22f, 22f, -90f, 360f * progress.coerceIn(0.02f, 1f), false, fill)
+                    path(12f, 7f, 12f, 12f, 15.5f, 14f)
+                } else { canvas.drawArc(4f, 4f, 20f, 20f, -65f, 300f, false, paint)
                     path(3f, 5f, 4f, 10f, 9f, 9f); path(12f, 7f, 12f, 12f, 16f, 14f) }
                 "today" -> { canvas.drawRoundRect(4f, 5f, 20f, 21f, 3f, 3f, paint)
                     line(8f, 3f, 8f, 7f); line(16f, 3f, 16f, 7f); line(4f, 10f, 20f, 10f)
@@ -272,5 +332,10 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
             }
             canvas.restore()
         }
+    }
+
+    private companion object {
+        /** Width of each number column (Unlock, Today) so headings and counts share one centre line. */
+        const val COLUMN = 64
     }
 }

@@ -1,35 +1,55 @@
 # Attention Stats
 
-An open-source personal digital wellbeing application built around **observe → track → categorize → predict → protect**.
+**See where your attention goes. Counted on your phone, never collected.**
 
-**Mobile clients only: Android first, iOS later.** The product is not a website, web app, PWA or desktop app. A possible Chrome extension is deferred until mobile work is complete and separately authorized; no extension is being developed.
+Attention Stats is a free, open-source digital wellbeing app for Android. It counts the short videos you watch (Instagram Reels, Facebook Reels, YouTube Shorts, TikTok and Snapchat Spotlight), shows how long you spend in every app, and offers gentle tools you choose: mindful breaks, daily limits and per-app blocks.
 
-**An experimental Android preview is built and installed for development.** Its five native tabs—Today, History, Patterns, Protect and Settings—connect 20 routes with actual saved Reels summaries and clear unavailable states for features still being built. React Native Community CLI/TypeScript owns the main UI; Kotlin supplies passive accessibility, encrypted Room/SQLCipher/Keystore storage and a draggable icon/count overlay with vertical count transitions. Instagram has an experimental version-specific viewer candidate; Facebook, Home-feed counting and distinct/repeat breakdowns remain unqualified. This is not the complete MVP. [Current state](docs/STATE.md) separates phone verification from remaining gates. No protection or archive flow is implemented. Future iPhone contributions will use explicit platform adapters; the generated iOS project is untested.
+No account. No servers. No ads. No analytics. The app does not even request the Internet permission. Everything stays encrypted on your phone, and every line is here for you to read.
 
-The goal is to help you understand the digital behavior your device exposes and you choose to track, then act on that knowledge. Observation-only use is welcome. History stays on your device; limits and interventions are your choice. Predictions will be local and explainable. The project will not claim to measure dopamine, diagnose addiction, or read your attention state.
+## What it does
 
-The [complete feature vision](docs/FEATURE-VISION.md) maps the ad-free personal diary, richer counters, intentional protection, local insights and user-owned history to staged work. Encountering a video, observing playback and confirming completion are different metrics; the preview counts settled viewer-page encounters.
+| | |
+|---|---|
+| **Counts every short video** | Reels, Shorts, TikToks and Spotlight, however you reach them: the dedicated tab, a video tapped in Home, Explore, a profile, a shared link, plus inline videos in Instagram and Facebook feeds. Each video counts once; going back to one is a revisit, not a new count. Ads and photos are tallied separately. |
+| **Live counter** | A small, see-through count on top of short videos: this unlock and today. A ring fills toward your next break. Drag it anywhere; tap for details. |
+| **Screen time** | Time and opens per app (with Usage Access), time spent in short videos, an hour-by-hour rhythm and 7/30-day trends. |
+| **Mindful breaks** | After the number of videos or minutes you choose, a calm full-screen pause with a breathing animation. "Keep watching" unlocks after a few seconds; "I'm done" takes you home. |
+| **Blocks you choose** | Per app: off, a daily limit, or always. A block leaves the short-video player and pauses playback; the rest of the app keeps working. |
+| **Home-screen widget** | Today's count and where it came from, at a glance. |
 
-Start with the [documentation index](docs/INDEX.md), [product scope](docs/PRODUCT.md), [capability inventory](docs/CAPABILITY-MATRIX.md), and [current state](docs/STATE.md). Android APIs and distribution policies impose real limits: supported social surfaces and short-video counts must be verified, and automatic personal Google-account backup remains blocked pending policy clarification. Portable encrypted export and restore are separately planned.
+## How detection works (and why it keeps working after app updates)
 
-The detailed [digital diary](docs/ANALYTICS-SPEC.md) and [64-metric catalog](docs/METRIC-CATALOG.md) cover candidate app/activity/short-video/interaction/network statistics, evidence limits and flexible day/week/month/year summaries. Every platform/metric requires qualification; unknown stays unknown. Tracking remains explicitly chosen and local.
+Social apps change constantly, so Attention Stats does not depend on exact app versions. Each app has a small adapter (`native/reels-core/src/main/kotlin/org/attentionstats/detection/social/`) that:
 
-Development uses **pnpm** and resolves new direct packages with `package@latest`. [Dependency evidence](docs/DEPENDENCIES.md) separates historical candidates, installed scaffold packages and isolated Kotlin tools. The [native analytics core](native/analytics-core/README.md) passed 37 synthetic calculation checks on a host JVM and connected Android ART; this does not verify collection or UI.
+1. prefers stable view IDs where an app exposes them (for example Instagram's clips pager or YouTube's Shorts recycler), and
+2. falls back to geometry every short-video viewer shares: a full-screen vertical pager with a contiguous action rail on the right.
 
-The broader social-app scope includes Instagram, Facebook, YouTube, TikTok, Reddit and other relevant apps, introduced as independently verified subsets. [The adapter guide](docs/SOCIAL-ADAPTERS.md) explains app-specific detectors, shared domains and remaining source-catalog work. Additional app support is not implemented yet.
+The focused item's on-screen metadata is turned into an in-memory fingerprint to tell one video from the next; raw text is never stored. Detection is tested on the JVM against **real screen layouts** captured from phones and sanitized of all personal content (`native/reels-core/src/test/resources/fixtures`). If an app update breaks something, one `uiautomator dump` plus `tools/sanitize_fixture.py` turns it into a regression test. See the [adapter guide](docs/SOCIAL-ADAPTERS.md).
 
-Application source uses domain-owned root `src/features`, a typed bootstrap adapter and a separate pure Kotlin analytics module. Full native contracts and infrastructure modules remain planned. See [architecture](docs/ARCHITECTURE.md#domain-oriented-modular-design) and [file structure](docs/FILE-STRUCTURE.md). Every implemented screen/behavior must be verified on a live authorized debug phone or dedicated emulator.
+## Privacy by construction
 
-A completed [interaction study](design/prototype/README.md) is retained solely as a non-shipping mobile-design reference. Its browser preview is not the product or a web implementation track. Mobile screens will use React Native components and native platform adapters. [Human factors](docs/HUMAN-FACTORS.md) governs the experience; next development follows the native tasks in the [tracker](docs/FEATURE-TRACKER.md).
+- Accessibility reads only the five supported apps, only while they are on screen, and only in memory.
+- Stored: counts, times, categories and your choices, in an SQLCipher database keyed by the Android Keystore, excluded from cloud backup.
+- No Internet permission, no third-party SDKs that receive data, no crash uploads.
+- Read the plain-language [privacy policy](policies/PRIVACY.md).
 
-The app uses the standard Community CLI commands `pnpm start`, `pnpm android`, `pnpm build` and `pnpm run android:release`. See [local setup](docs/DEVELOPMENT.md#application-setup-as-004) for isolated SDK requirements. Python supplies repository validators and synthetic native tooling; it is not the mobile runtime.
+## Build it
 
-Run documentation checks with Python 3.11 or newer:
+Requirements: Node 26 + pnpm, JDK 17, Android SDK (see [development setup](docs/DEVELOPMENT.md)).
 
 ```powershell
-python tools/check_docs.py
+pnpm install
+pnpm typecheck; pnpm lint; pnpm test                     # TypeScript, architecture boundaries, unit tests
+python tools/android_build.py :reels-core:verifyReels      # encounter rules + real-layout detection fixtures
+python tools/android_build.py :app:assemblePreview         # installable preview APK
 ```
 
-Contributions: [contributor guide](CONTRIBUTING.md). Security reports: [security entrypoint](SECURITY.md). Agents and humans follow [the same rules](docs/AGENT-RULES.md). All fixtures and examples must be synthetic.
+Project layout: `src/` (React Native UI, one folder per feature), `android/app` (Kotlin accessibility service, overlays, encrypted storage), `native/reels-core` (pure Kotlin counting and detection, unit-tested), `native/analytics-core` (pure rollups).
 
-Public repository: [yasirarfat-dev/AttentionStats](https://github.com/yasirarfat-dev/AttentionStats). Licensed under [Apache-2.0](LICENSE). Copyright 2026 Attention Stats contributors.
+## Contribute
+
+Bug reports from real phones are the most valuable contribution: if counting misses something, use **Settings → Report a problem** in the app (it attaches your phone model and app versions, never your history). Code, translations and new app adapters are welcome; see the [contributor guide](CONTRIBUTING.md). An iPhone port is open for contributors ([guide](docs/IOS-CONTRIBUTION-GUIDE.md)).
+
+Security reports: [SECURITY.md](SECURITY.md). Product vision: [VISION](docs/VISION.md) and [feature vision](docs/FEATURE-VISION.md). Current status: [STATE](docs/STATE.md).
+
+Licensed under [Apache-2.0](LICENSE). Copyright 2026 Attention Stats contributors.

@@ -1,5 +1,7 @@
 # User experience
 
+> **Current behavior (1.0.0):** [ADR-066](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30) supersedes version-pinned detectors, per-app notices 3–5, structure-check diagnostics and the five-tab preview described below where they conflict. See [State](STATE.md) and the public [privacy policy](../policies/PRIVACY.md).
+
 **Status:** AS-045 implements an experimental native five-tab shell; most domain features remain unavailable. Updated 2026-10-28.
 **Responsibility:** Defines journeys, screen states, permissions, chart semantics and accessible interactions.
 **Related specifications:** [Human factors](HUMAN-FACTORS.md), [Navigation](NAVIGATION.md), [Design](DESIGN-SYSTEM.md), [Settings](SETTINGS-SPEC.md), [Product](PRODUCT.md), [Privacy](PRIVACY.md).

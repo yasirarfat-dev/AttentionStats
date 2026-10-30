@@ -89,7 +89,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
         val categories: List<OverlayCategory> = emptyList(), val scrollBack: Boolean = false,
         val showIcons: Boolean = true, val allAppsToday: Boolean = true,
         val route: ReelRoute = ReelRoute.VIEWER, val includeRecognizedAds: Boolean = true,
-        val sessionMs: Long = 0)
+        val sessionMs: Long = 0, val breakProgress: Float = -1f)
     data class BlockDecision(val app: ReelApp, val kind: String, val today: Long, val limit: Int)
 
     init {
@@ -109,6 +109,9 @@ internal class ReelsCoordinator private constructor(private val context: Context
     fun epoch(): Long = epoch.get()
     fun allowed(app: ReelApp): Boolean = health == "ready" && app.sourceId in currentNotices &&
         configuration[app.sourceId]?.let { it.enabled && !it.paused } == true
+    /** Consented and switched on, but paused by the person (HUD shows a resume pill). */
+    fun pausedSource(app: ReelApp): Boolean = health == "ready" && app.sourceId in currentNotices &&
+        configuration[app.sourceId]?.let { it.enabled && it.paused } == true
     fun anyAllowed(): Boolean = ReelApp.entries.any { allowed(it) }
     fun grantEnabled(): Boolean {
         val expected = ComponentName(context, ReelsAccessibilityService::class.java)
@@ -479,6 +482,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
             }
             if (!encounter.revisit) unlockSession.record(app, encounter.category)
             refreshTodayCounts(history)
+            if (SystemClock.elapsedRealtime() - widgetAt > 20_000) refreshWidget(force = false)
         }
         val counted = encounter != null && !encounter.revisit && encounter.category != PageCategory.PHOTO
         val signal = CounterSignal(item.atMs, item.surface, null, windowId, item.category, item.route)
@@ -508,6 +512,18 @@ internal class ReelsCoordinator private constructor(private val context: Context
         }
     }
 
+    @Volatile private var widgetAt = 0L
+    /** Home-screen widget refresh; throttled so scrolling never floods the launcher. */
+    fun refreshWidget(force: Boolean = true) = enqueue {
+        val now = SystemClock.elapsedRealtime()
+        if (!force && now - widgetAt < 20_000) return@enqueue
+        widgetAt = now
+        val history = opened()
+        refreshTodayCounts(history)
+        val top = ReelApp.entries.map { it.displayName to (todayCounts[it] ?: 0L) }.sortedByDescending { it.second }
+        com.attentionstats.widget.TodayWidget.render(context, todayCounts.values.sum(), headline(unlockSession.counts()), top)
+    }
+
     private fun headline(values: Map<String, Long>): Long = values.filterKeys { key ->
         val category = PageCategory.byKey(key)
         category.video || (category == PageCategory.AD && diary.includeRecognizedAds)
@@ -528,7 +544,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
             PageCategory.entries.filter { it != PageCategory.POST }.map {
                 OverlayCategory(it, visitCategories[it.key] ?: 0, todayCategories[it.key] ?: 0)
             }, scrollBack, showCounterIcons, allAppsToday, routes[app] ?: ReelRoute.VIEWER, diary.includeRecognizedAds,
-            reminder?.durationMs ?: 0)
+            reminder?.durationMs ?: 0, diary.breakProgress)
     }
 
     companion object {

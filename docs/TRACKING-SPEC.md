@@ -1,5 +1,7 @@
 # Tracking specification
 
+> **Current behavior (1.0.0):** [ADR-066](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30) supersedes version-pinned detectors, per-app notices 3–5, structure-check diagnostics and the five-tab preview described below where they conflict. See [State](STATE.md) and the public [privacy policy](../policies/PRIVACY.md).
+
 **Status:** Normative design; experimental app-event collector candidate under AS-050, broader lifecycle qualification remains open. Updated 2026-10-29.
 **Responsibility:** Defines event meaning, collection lifecycle, session accounting, and coverage.
 **Related specifications:** [Capabilities](CAPABILITY-MATRIX.md), [Social](SOCIAL-MEDIA-SPEC.md), [Models](DATA-MODELS.md), [Permissions](PERMISSIONS.md), [Tests](TESTING.md).

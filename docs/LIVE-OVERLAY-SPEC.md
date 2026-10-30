@@ -1,5 +1,7 @@
 # Live awareness overlay
 
+> **Current behavior (1.0.0):** [ADR-066](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30) supersedes version-pinned detectors, per-app notices 3–5, structure-check diagnostics and the five-tab preview described below where they conflict. See [State](STATE.md) and the public [privacy policy](../policies/PRIVACY.md).
+
 **Status:** Experimental native compact draggable counter and installed-version viewer candidate exist; broader safety/accuracy qualification remains open. Updated 2026-10-29.
 **Responsibility:** Defines optional in-context visit/day counters, permission boundaries, snapshot semantics, safety and humane behavior.
 **Related specifications:** [Social detection](SOCIAL-MEDIA-SPEC.md), [Tracking](TRACKING-SPEC.md), [Human factors](HUMAN-FACTORS.md), [Permissions](PERMISSIONS.md), [Contracts](NATIVE-CONTRACTS.md), [Models](DATA-MODELS.md), [Protection](PROTECTION-SPEC.md), [Settings](SETTINGS-SPEC.md), [Testing](TESTING.md).

@@ -1,9 +1,11 @@
 # Feature tracker
 
-**Status:** Foundation/reference/calculations implemented; AS-004 experimental mobile scaffold active; collectors and accepted product screens unimplemented. Updated 2026-10-29.
+**Status:** MVP 1.0.0 implemented: short-video counting on five sources (ADR-066), app time, live counter, mindful breaks, blocks/daily limits, onboarding, Today/Insights/Protect/Settings and widget; export/restore, patterns beyond charts and iOS remain planned. Updated 2026-10-30.
 **Responsibility:** Owns stable task IDs, priorities, dependencies, capability mapping and completion evidence.
 **Related specifications:** [Roadmap](ROADMAP.md), [State](STATE.md), [Capabilities](CAPABILITY-MATRIX.md), [Tests](TESTING.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-10 gate relevant tasks; dependencies below are required, not optional recommendations.
+
+**1.0.0 summary (2026-10-30).** Implemented with evidence in [State](STATE.md#verification-2026-10-30): Reels counting on Instagram, Facebook, YouTube, TikTok (+ regional/lite) and Snapchat Spotlight via version-independent adapters; feed videos on Instagram/Facebook; app time and opens; live counter with break ring; mindful breaks; per-app blocks and daily limits; intervention history; trust-first onboarding; Today/Insights/Protect/Settings; feedback/bug reports; home-screen widget. Older task rows below keep their historical evidence; where they conflict, ADR-066 and State win.
 
 Status vocabulary: **planned** = specified future work; **experimental** = feasibility/evidence required; **blocked** = explicit unmet gate; **implemented** = code/artifact and acceptance evidence recorded. Active work is described in State; experimental scaffold source does not establish an accepted app capability. Priority P0 precedes P1; order within a dependency-ready priority is the listed order. Documentation status does not imply an installable product.
 

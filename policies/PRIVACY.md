@@ -1,59 +1,59 @@
 # Attention Stats privacy policy
 
-Last updated: 29 October 2026. Applies to the Android closed-test candidate, package **attention.stats**, version 0.1.0, and the separately identified development preview. A closed test has not yet launched.
+Last updated: 30 October 2026 · App: **Attention Stats** (`attention.stats`), version 1.0.0 and later · Contact: **consciousbiobot@gmail.com**
 
-Attention Stats is an open-source personal digital wellbeing app maintained by the [Attention Stats project](https://github.com/yasirarfat-dev/AttentionStats). Privacy contact: **consciousbiobot@gmail.com**. This policy describes the current counter candidate. Planned features do not change how this version handles data.
+Attention Stats is a free, open-source digital wellbeing app. Its [source code](https://github.com/yasirarfat-dev/AttentionStats) is public, so anyone can verify everything below.
 
-The revised temporary development check additionally recognizes exact Like, Comment and Share controls and fixed Home/Reels/Video tab-position labels. It retains only their fixed tokens and up to three ancestor layouts, within the existing 16-match and 32-KiB limits (interface revision 2). These extra labels are diagnostic-only and never become observation signals without separate qualification. A fresh diagnostic notice describes the fields before each trial.
+## The short version
 
-## Data used on your device
+- **Nothing leaves your phone.** There is no account, no server, no analytics, no ads and no crash reporting. The app does not request the Internet permission, so it cannot send data anywhere.
+- **We never see your data.** Your history is stored only on your device, encrypted.
+- **You are in control.** Every feature is optional, and you can pause counting or delete everything at any time.
 
-Whole-app timing is a separate opt-in source. With your Android Usage Access grant, Attention Stats saves package names, timestamps and numeric foreground-activity/screen/keyguard transitions in encrypted history to estimate time and observed opens per app. Opens includes observed returns from another app or unlocking, while activity navigation within the same app stays one entry; it is not an exact cold-launch count. Collection begins at the in-app choice, with no earlier backfill. Turning it off stops collection and keeps existing history. Native requests reconcile up to seven days of OS events; Android retention, missing events, multi-window and service/process restrictions can leave gaps. Successful queries do not promise complete coverage. No activity names, input or app content are recorded by this source.
+## What the app uses, and why
 
-Enabled Reels sources also save visible surface intervals between consecutive validated checks. Time in a Reels viewer can include photo/ad/unclassified pages and does not prove playback or attention. App time and Reels time use separate partial sources. Optional visit reminders are off by default and require a separate choice: a dismissible Attention Stats overlay appears at the configured encounter/time threshold, with immediate continuation. Reminders do not close or navigate the social app, and release outside recognized Reels or on locking. These features upload no history.
+### Accessibility service (short-video counting)
 
-Observation is off until you agree to the separate in-app accessibility disclosure, select an app, and enable Attention Stats in Android accessibility settings. A system grant alone does not enable observation. The optional counter display is a separate choice.
+When you turn it on, Attention Stats uses Android's Accessibility service **only while Instagram, Facebook, YouTube, TikTok or Snapchat is on screen**. It reads the layout of the screen and its on-screen labels (for example a video's caption or author name) **in memory** to:
 
-For a selected, supported app, the counter inspects bounded accessibility layout identifiers, roles, visibility, bounds and numeric page/scroll positions. For Facebook, it also transiently compares accessibility descriptions with fixed English interface labels: Reels, Video, Home, Close, Comments, Search, Back, Reel and selected Home tab-position labels. Unmatched descriptions are immediately discarded and no raw description is saved. Instagram observation does not inspect descriptions. It uses these signals to estimate settled Reels viewer-page exposures and recognized Home-feed video encounters under source notice 5 for Instagram/Facebook. Home continuity uses layout bounds, scroll displacement and scope-local layout-node keys only in memory; keys never enter saved history. Home episodes retain their own surface provenance, and ordinary or uncertain feed posts do not count as videos. It saves exposure times, app/surface and layout category, visits, source choices, consent records, pause/display settings and coverage information locally. Categories include recognized video layouts, photo/carousel layouts, recognized image ads and unclassified pages. Counts include repeated visits to a page; they are not unique videos, completed views or an exact measure of watch time. Recognition and ad classification can be incomplete. Unsupported versions and contexts do not become measured zeroes.
+- recognise when a short-video player (Reels, Shorts, TikTok, Spotlight) or a video in a feed is on screen; and
+- tell one video from the next, so each video is counted once.
 
-Except for the separately disclosed TikTok matching fields below, the counter does not read node text. It does not capture screenshots, photos, video, audio, contacts, location or advertising identifiers. It saves no raw descriptions, typed input, private messages, passwords, search terms, titles or creator identities. For TikTok 47.5.3 only, affirmative source notice 4 permits transient matching of the visible title/caption fields (node text or descriptions). Raw values are discarded immediately after a keyed on-device comparison; keyed tokens remain only in memory for the active app/window/consent scope and are cleared on app/window/consent changes, device lock or service teardown. Tokens and raw text are never saved in history, diagnostics, backups or uploads. History saves an event UUID, app/visit provenance, encounter ordinal and observation times; the matcher’s temporary page value is not stored. Identical, absent or changing captions can miss or misidentify transitions; no unique-video or playback accuracy is claimed. YouTube retains notice 3; Instagram/Facebook use notice 5 without gaining TikTok text matching. Counting remains passive; separately allowed auto-scroll is described below and is limited to dedicated viewers. Recognized Home video layouts are experimental candidates; general Home-post counting remains unavailable. Facebook viewer support is experimental, limited to the tested version and English interface; its pages remain unclassified.
+The labels are turned into an irreversible fingerprint in memory and then discarded. The app **does not save, record or send** what you watch, captions, names, messages, what you type, passwords, screenshots, audio or video. It does not read any other app.
 
-## Storage and security
+The accessibility service also draws the optional floating counter, and, **only if you turn these features on**, it shows mindful-break screens, presses Back to leave a short-video player you chose to block, or swipes to the next video (auto-scroll). It never likes, comments, follows, messages or buys anything.
 
-Counts and related observation records use an encrypted database in private app storage, with a database key protected by an installation-specific Android Keystore key. This reduces ordinary unauthorized access; it is not a guarantee against a compromised or unlocked device and has not received an independent security audit. Android automatic backup and device-transfer rules exclude this app's data. Backup, export and restore are unavailable in this candidate, so uninstalling, clearing app storage or losing the device/key can make history unrecoverable.
+### Usage access (optional screen time)
 
-## Transfers and other services
+If you allow Usage Access, the app reads Android's app-usage events (app package names and times) to show how long you spend in each app and how often you open it.
 
-There is no Attention Stats account, developer backend, advertising SDK, remote analytics, session replay or automatic crash/diagnostic upload. The release candidate declares no Internet permission. Your observation history is not sent to us, sold or shared with other organizations. Local data access and recording still occur when you enable observation.
+## What is stored on your device
 
-Opening a policy, source-code or support link leaves the app and contacts the chosen website through your browser. GitHub, Google Play, your browser and the social apps you independently use have their own privacy practices. They may receive normal website/store information under their own policies; Attention Stats does not attach your history to those links.
+- For each short video counted: time, app, whether it was in a full-screen player or a feed, its kind (video, photo or ad), how long it stayed on screen, whether you had already seen it in this unlock session, the app version, and a random key derived on your device so repeat views can be recognised. No caption, name or other content is stored.
+- Time spent in short videos and, if allowed, time and opens per app.
+- Break and block events, and what you chose (for example "took a break").
+- Your settings and consent choices.
 
-If you voluntarily contact support, we receive what you choose to send. Do not send personal history, account details, screenshots of other apps, device identifiers, passwords or keys. Public GitHub reports are public. See [support](SUPPORT.md) for the current contact mechanism. We use voluntary reports to answer requests and fix issues. Private support correspondence may remain in the maintainer's email account while resolving and following up on the request; you can ask the privacy contact to delete it. Public reports remain under GitHub's retention and deletion controls. There is no automatic support submission or promised deletion of other people's copies.
+This data is kept in an encrypted database in the app's private storage, protected by a key in the Android Keystore. It is excluded from Android cloud backup and device transfer. It stays until you delete it.
 
-## Your choices, retention and deletion
+## Sharing
 
-You can decline access, disable an individual source, pause observation, hide the counter independently, or revoke Attention Stats accessibility access in Android settings. Pause or withdrawal stops new observation; it does not delete previously saved history.
+We do not collect, sell or share any personal data. No third-party SDKs receive data. If you tap a link (for example to this policy, GitHub or Google Play), your browser or that service handles it under its own policy.
 
-Saved history remains locally until you choose **Reels & short videos → Delete saved usage history**, clear Attention Stats storage through Android settings, or uninstall the app. There is no automatic retention deadline in this candidate. The confirmed in-app deletion disables both collectors and reminders, hides the counter and removes exposure/visit, app-event/timer, coverage and consent history; minimal local configuration/database metadata remain. Clearing app storage or uninstalling removes the app's remaining private data under Android's controls. Logical deletion cannot promise forensic flash erasure. We cannot delete copies of information you independently sent to someone else. There is no server account or server history to request deletion of. See [data deletion](DATA-DELETION.md).
+If you contact us or open a GitHub issue, we receive only what you choose to send. The in-app "Report a problem" form pre-fills your phone model, Android version and app versions so we can fix detection; it never includes your history. You can edit it before sending.
 
-## Development-only checks
+## Your choices and deletion
 
-Store release builds do not offer the temporary structure check. Development builds retain an operator-only instrumentation check, started only for an explicitly authorized debug-phone test. It has no normal app-screen control and is never enabled by default. For enabled apps, it saves a bounded private file containing static layout/control identifiers, roles, numeric positions, media/control bounds, up to three ancestor layouts, and scroll-source bounds with event sequence and relative timing. On Facebook only, the revised check also transiently inspects accessibility descriptions to match exactly the fixed interface labels Reels, Video, Home, Close, Comments, Search and Back. Only fixed matched tokens, roles, bounds and selected/clickable states are saved, up to 16 matches. Other descriptions are discarded immediately without logging, hashing or retention. No node text, raw descriptions, captions, names, messages, images, account details or raw accessibility trees are saved. The check lasts at most ten minutes; stopping, expiry, history deletion or a fresh process removes its diagnostic file. An authorized developer can read that file locally during the test. It is never uploaded automatically and is separate from exposure history. The diagnostic has its own affirmative choice, independent of source observation and the optional live display.
+- Turn counting on or off per app, pause everything, or hide the counter at any time.
+- Turn off the accessibility service or usage access in Android settings at any time.
+- **Settings → Delete all history** permanently removes every count, timer, event and setting. Uninstalling the app or clearing its storage also removes all data.
 
-## Children, changes and questions
+## Children
 
-This testing candidate is intended for adults and is not designed for children. It offers no medical advice, diagnosis or treatment. We will update this policy when actual behavior changes. New observation fields or purposes require a revised in-app disclosure and affirmative choice before collection expands.
+Attention Stats is intended for people aged 13 and over and is not directed at children. It does not provide medical advice.
 
-For privacy questions, use the contact mechanism in [support](SUPPORT.md), identifying Attention Stats and the app version without sharing sensitive information. You can inspect the [source code](https://github.com/yasirarfat-dev/AttentionStats) and [known test limits](CLOSED-TEST.md).
+## Changes
 
-## Optional finish-and-swipe controls
+If the app's data handling ever changes, we will update this policy and ask for your agreement in the app before anything new is used.
 
-Experimental auto-scroll is a separate convenience choice, off initially. The app explains it before you allow controls. You then press Start on the floating counter in a supported viewer; allowing controls alone starts nothing and enables no source. It inspects numeric playback progress in memory and can perform one upward swipe after an observed complete playback loop. It does not use a fixed timer or automatically like, follow, comment, message or share. Progress is not saved in history or uploaded.
-
-Stop stays visible while running, including when the counter is collapsed. Leaving the viewer, locking, pausing observation, hiding the counter, missing/ambiguous progress or service restart stops future swipes; a swipe already dispatched may finish. The choice and run reset when the accessibility service restarts. The compact HUD toggle opens the app for consent when needed; no large disclosure is displayed on top of the social app. Apps/versions without a qualified end signal remain unavailable.
-
-Hiding the counter from its HUD is temporary until you leave that app and does not stop counting. The in-app Floating counter switch saves your persistent display choice. Pause counting is a separate action that stops new observations until resumed.
-
-The revised temporary development check uses interface revision 3. It can match fixed Reel/Play/Pause/Watch labels on Instagram/Facebook in addition to the earlier fixed tokens. Raw descriptions remain discarded; the 192-node/16-label/32-KiB limits remain. Promoted Facebook Reel/Home-navigation matches require renewed source notice 5. No screenshots or pixel reader are implemented in this build.
-
-Optional per-app Reels blocking covers recognized dedicated viewers with an Attention Stats accessibility overlay. It has an immediate bypass and does not pause media/audio or control the other app. Observation and blocking are separate choices. While covered, Reels counting and timing pause. Screen/lock state also bounds the in-memory cross-app session counter. You can include or exclude recognized ads from headline counts while retaining a separate ad count; unidentified ads remain unclassified. These choices do not add content reading or developer transfers.
+Questions: **consciousbiobot@gmail.com** · [Data deletion](DATA-DELETION.md) · [Support](SUPPORT.md)

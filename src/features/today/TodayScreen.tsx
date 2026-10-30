@@ -126,7 +126,7 @@ export function TodayScreen({
           <Stat
             inverse
             value={exactCount(String(session))}
-            label="Since unlock"
+            label="This session"
           />
           <Stat inverse value={duration(reelsMs)} label="Watching" />
           <Stat

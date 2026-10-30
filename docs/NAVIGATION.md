@@ -1,5 +1,7 @@
 # Navigation
 
+> **Current behavior (1.0.0):** [ADR-066](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30) supersedes version-pinned detectors, per-app notices 3–5, structure-check diagnostics and the five-tab preview described below where they conflict. See [State](STATE.md) and the public [privacy policy](../policies/PRIVACY.md).
+
 **Status:** Experimental native five-tab shell and 20 routes are implemented; all 20 routes pass own-window physical-phone traversal; broader accessibility/performance qualification remains open. Updated 2026-10-28.
 **Responsibility:** Defines route ownership, hierarchy, parameters, back behavior and external entrypoints.
 **Related specifications:** [UX](UX-SPEC.md), [Design](DESIGN-SYSTEM.md), [Contracts](NATIVE-CONTRACTS.md), [Settings](SETTINGS-SPEC.md).

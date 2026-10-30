@@ -105,8 +105,8 @@ android {
         applicationId "attention.stats"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "0.1.0"
+        versionCode 10
+        versionName "1.0.0"
         testInstrumentationRunner "com.attentionstats.qualification.AnalyticsInstrumentation"
     }
     signingConfigs {

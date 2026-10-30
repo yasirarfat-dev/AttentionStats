@@ -27,6 +27,9 @@ internal object AutoScrollSession {
     private var target: CompletionGate.Context? = null
     private var waitingUntil = 0L
     private var scrollSettlingUntil = 0L
+    /** When the current item has no playback progress (photo, image ad): when it arrived. */
+    private var stillSince = 0L
+    private const val STILL_ITEM_MS = 5_000L
     @Volatile var attempts = 0
         private set
     @Volatile var confirmedTransitions = 0
@@ -48,7 +51,7 @@ internal object AutoScrollSession {
         val frame = latest ?: return false
         val key = frame.key() ?: return false
         if (!enabled || !usable(frame)) return false
-        gate.reset(); target = key; waitingUntil = 0; scrollSettlingUntil = 0; running = true; revision++
+        gate.reset(); target = key; waitingUntil = 0; scrollSettlingUntil = 0; stillSince = 0; running = true; revision++
         attempts = 0; confirmedTransitions = 0
         reason = "waiting_for_cycle"; onChanged(); return true
     }
@@ -89,14 +92,23 @@ internal object AutoScrollSession {
                 confirmedTransitions++
                 target = key; waitingUntil = 0; scrollSettlingUntil = value.atMs + 750
                 // The page transition and readiness to scroll again are separate facts.
-                // A photo or a player without progress can confirm arrival, then stop.
-                if (value.position == null) { stop("playback_unavailable"); return }
-                gate.reset(); reason = "waiting_for_cycle"; onChanged()
+                // A photo or image ad has no progress: show it briefly, then move on.
+                gate.reset()
+                if (value.position == null) { stillSince = value.atMs; reason = "still_item" } else { stillSince = 0; reason = "waiting_for_cycle" }
+                onChanged()
+            }
+            return
+        }
+        if (key != null && key != previous) { stop("manual_page_change"); return }
+        if (key != null && value.position == null && stillSince > 0 && value.eligible && fresh(value)) {
+            if (value.atMs - stillSince >= STILL_ITEM_MS) {
+                attempts++; stillSince = 0
+                waitingUntil = value.atMs + 2_500; reason = "advancing"; onChanged()
+                next(value, revision)
             }
             return
         }
         if (key == null || value.position == null || !usable(value)) { stop("playback_unavailable"); return }
-        if (key != previous) { stop("manual_page_change"); return }
         if (gate.sample(key, value.atMs, value.position, true)) {
             attempts++
             waitingUntil = value.atMs + 2_500; reason = "advancing"; onChanged()

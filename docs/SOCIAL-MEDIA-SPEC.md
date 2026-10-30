@@ -1,5 +1,7 @@
 # Social surfaces and optional context
 
+> **Current behavior (1.0.0):** [ADR-066](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30) supersedes version-pinned detectors, per-app notices 3–5, structure-check diagnostics and the five-tab preview described below where they conflict. See [State](STATE.md) and the public [privacy policy](../policies/PRIVACY.md).
+
 **Status:** Expanded experimental detector design; no app/version/locale qualified. Updated 2026-10-29.
 **Responsibility:** Defines transparent app/surface identification, short-video counts, optional metadata and detector qualification.
 **Related specifications:** [Tracking](TRACKING-SPEC.md), [Intelligence](BEHAVIOR-INTELLIGENCE.md), [Privacy](PRIVACY.md), [Protection](PROTECTION-SPEC.md), [Tests](TESTING.md).
@@ -85,7 +87,7 @@ Qualification must measure false positives and false negatives separately using 
 
 The user-facing “How tracking works” view shows enabled adapter, supported range, metadata fields inspected, data retained, last verified revision, count meaning, coverage, and a disable/delete action. Developer diagnostics contain reason codes, not content. Tests T-06, T-07, T-10, T-11 and T-15 govern admission. Unsupported surfaces must be visibly unknown, never zero and never silently counted by a generic scroll heuristic.
 
-The optional AS-041 developer Home check uses the [bounded geometry/event-association contract](SOCIAL-ADAPTERS.md#home-feed-diagnostic-increment), independently of source consent. Its event sequence bracket can reject intervening delivered scrolls and cross-window/epoch carryover; it cannot establish an atomic tree, complete event delivery, media-group identity or a qualified exposure. No Home detector/count is enabled by this diagnostic increment.
+The optional AS-041 developer Home check uses the [bounded geometry/event-association contract](SOCIAL-ADAPTERS.md#turning-a-report-into-a-fixture), independently of source consent. Its event sequence bracket can reject intervening delivered scrolls and cross-window/epoch carryover; it cannot establish an atomic tree, complete event delivery, media-group identity or a qualified exposure. No Home detector/count is enabled by this diagnostic increment.
 
 AS-048 source admission currently enumerates Instagram, Facebook, YouTube Shorts and TikTok independently. Catalog presence and affirmative source consent are separate from detector support. Unknown versions/routes remain unavailable; source additions preserve retained viewer-page semantics and cannot turn an encounter into playback/completion evidence.
 
