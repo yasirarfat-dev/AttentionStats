@@ -7,10 +7,10 @@
 
 ## Work on this foundation
 
-Open `C:\home\biobot\projects\AttentionStats` on this machine, or clone [the public repository](https://github.com/yasirarfat-dev/AttentionStats) elsewhere. Read [Index](INDEX.md), [State](STATE.md), [Tracker](FEATURE-TRACKER.md) and relevant specs. Required now: Git and Python 3.11 or newer. No Node package installation, Android SDK, private device data or credentials are required to edit/verify documentation.
+Open the repository root on this machine, or clone [the public repository](https://github.com/yasirarfat-dev/AttentionStats) elsewhere. Read [Index](INDEX.md), [State](STATE.md), [Tracker](FEATURE-TRACKER.md) and relevant specs. Required now: Git and Python 3.11 or newer. No Node package installation, Android SDK, private device data or credentials are required to edit/verify documentation.
 
 ```powershell
-Set-Location C:\home\biobot\projects\AttentionStats
+Set-Location <repository root>
 python tools/check_docs.py
 git diff --check
 git status --short

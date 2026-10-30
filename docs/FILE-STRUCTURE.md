@@ -7,7 +7,7 @@
 
 ## Current repository
 
-ADR-043 adds `policies/` for public user-facing notices and `release/PLAY-CONSOLE.md` as the reviewed source for the external release root's information file. Source and Gradle intermediates stay in this project. `C:\home\biobot\AppReleases\AttentionStats` holds store/policy copies, versioned immutable `releases/<version>+<code>/{android,metadata,notes}`, private testing material and a separate private/signing reservation. It is not a second editable application checkout. See [Release](RELEASE.md).
+ADR-043 adds `policies/` for public user-facing notices and `release/PLAY-CONSOLE.md` as the reviewed source for the external release root's information file. Source and Gradle intermediates stay in this project. the maintainer's private release folder (outside the repository) holds store/policy copies, versioned immutable `releases/<version>+<code>/{android,metadata,notes}`, private testing material and a separate private/signing reservation. It is not a second editable application checkout. See [Release](RELEASE.md).
 
 ADR-041 adds actual `android/app/src/main/java/com/attentionstats/detectors/` packages: `SurfaceDetector.kt`/`DetectorRegistry.kt`, `social/instagram/InstagramDetector.kt` and `accessibility/StructuralSnapshotReader.kt`. The former `reels/DetectorRegistry.kt` is removed. Other platform packages remain absent until substantive work begins. See [adapter guide](SOCIAL-ADAPTERS.md); the Reels enum/source catalog/bridge still enumerate two preview candidates.
 
@@ -57,7 +57,7 @@ AttentionStats/
   design/prototype/        synthetic browser study, tokens, tests, isolated manifest/lockfile
 ```
 
-The repository root is `C:\home\biobot\projects\AttentionStats`. Product display name is “Attention Stats”; public repository is `yasirarfat-dev/AttentionStats`. AS-033 adds a separate [design study](../design/prototype/README.md) with a development-only manifest and lockfile. Root `package.json`, two-document pnpm lockfile, Community CLI Android/iOS projects and `src/` now exist under AS-004. Do not mistake the browser study or unaccepted scaffold for runtime capability support.
+The repository root is the repository root. Product display name is “Attention Stats”; public repository is `yasirarfat-dev/AttentionStats`. AS-033 adds a separate [design study](../design/prototype/README.md) with a development-only manifest and lockfile. Root `package.json`, two-document pnpm lockfile, Community CLI Android/iOS projects and `src/` now exist under AS-004. Do not mistake the browser study or unaccepted scaffold for runtime capability support.
 
 ## Mobile structure and planned expansion
 

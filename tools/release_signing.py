@@ -15,7 +15,7 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DEST = Path("C:/home/biobot/AppReleases/AttentionStats/private/signing")
+DEFAULT_DEST = Path(os.environ.get("ATTENTION_RELEASE_ROOT", Path.home() / "AppReleases" / "AttentionStats")) / "private" / "signing"
 
 
 def outside_repository(path):

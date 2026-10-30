@@ -1,6 +1,6 @@
 # Attention Stats — Google Play Console information
 
-Everything to paste into Play Console for **attention.stats** 1.0.0 (versionCode 10). Updated 30 October 2026. A copy lives at `C:\home\biobot\AppReleases\AttentionStats\PLAY-CONSOLE.md` next to the signed bundle.
+Everything to paste into Play Console for **attention.stats** 1.0.0 (versionCode 10). Updated 30 October 2026. A copy lives at the maintainer's private release folder (outside the repository) next to the signed bundle.
 
 ## App details
 
@@ -74,7 +74,7 @@ Attention Stats uses Android's Accessibility service to recognise short-video sc
 Attention Stats is not a medical app and does not diagnose anything. It simply helps you see your habits and choose your own limits.
 ```
 
-**Graphics** (in `AppReleases\AttentionStats\store\en-US\graphics`): `icon-512.png`, `feature-graphic-1024x500.png`; phone screenshots in `store\en-US\screenshots`.
+**Graphics** (in `<release folder>/store\en-US\graphics`): `icon-512.png`, `feature-graphic-1024x500.png`; phone screenshots in `store\en-US\screenshots`.
 
 ## App content
 
@@ -115,8 +115,8 @@ Attention Stats is a digital wellbeing app. With the user's consent, its Accessi
 | Field | Value |
 |---|---|
 | Track | Closed testing (then production after the 14-day / 12-tester requirement for new personal accounts) |
-| App signing | Use Google Play App Signing (Google generates the app key); upload with the local upload key in `AppReleases\AttentionStats\private\signing` |
-| Bundle | `AppReleases\AttentionStats\releases\1.0.0+10\android\attention-stats-1.0.0-10.aab` |
+| App signing | Use Google Play App Signing (Google generates the app key); upload with the local upload key in `<release folder>/private\signing` |
+| Bundle | `<release folder>/releases\1.0.0+10\android\attention-stats-1.0.0-10.aab` |
 | Release name | 1.0.0 (10) |
 
 Release notes (≤ 500):

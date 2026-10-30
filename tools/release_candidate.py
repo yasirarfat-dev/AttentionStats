@@ -5,6 +5,7 @@ Never signs, installs, uploads, changes Console settings or starts a workflow.
 """
 
 import argparse
+import os
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -18,7 +19,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DEST = Path("C:/home/biobot/AppReleases/AttentionStats")
+DEFAULT_DEST = Path(os.environ.get("ATTENTION_RELEASE_ROOT", Path.home() / "AppReleases" / "AttentionStats"))
 BUNDLETOOL = ROOT / ".cache/release-tools/bundletool-all-1.18.3.jar"
 BUNDLETOOL_SHA = "a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29"
 ANDROID = "{http://schemas.android.com/apk/res/android}"

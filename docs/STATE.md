@@ -1,6 +1,6 @@
 # Current state
 
-**Status:** MVP 1.0.0 (versionCode 10) built with version-independent detection, interventions, redesigned UI and widget; verified live on the maintainer's Samsung SM-A075F (Android 16, API 36). Updated 2026-10-30.
+**Status:** MVP 1.0.0 (versionCode 10) built with version-independent detection, interventions, redesigned UI and widget; verified live on the maintainer's Samsung phone (Android 16). Updated 2026-10-30.
 **Responsibility:** Records what exists now, how it was verified, and what is next. Older detail lives in git history and the [implementation log](IMPLEMENTATION_LOG/README.md).
 **Related specifications:** [Index](INDEX.md), [Tracker](FEATURE-TRACKER.md), [Decisions](DECISIONS.md), [Adapters](SOCIAL-ADAPTERS.md), [Release](RELEASE.md).
 **Unresolved feasibility:** Fidelity on other phones, languages and future app versions is estimated, not proven; Snapchat has no fixtures yet; F-05 (automatic Google-account backup) remains blocked.
