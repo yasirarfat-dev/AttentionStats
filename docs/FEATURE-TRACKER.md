@@ -1,6 +1,6 @@
 # Feature tracker
 
-**Status:** MVP 1.0.0 implemented: short-video counting on five sources (ADR-066), app time, live counter, mindful breaks, blocks/daily limits, onboarding, Today/Insights/Protect/Settings and widget; export/restore, patterns beyond charts and iOS remain planned. Updated 2026-10-30.
+**Status:** MVP 1.0.0 implemented within its documented scope; maintainer reports closed beta. AS-052 establishes continuation on `develop`; export/restore, broader qualification and remaining full-product work are open. Updated 2026-11-03.
 **Responsibility:** Owns stable task IDs, priorities, dependencies, capability mapping and completion evidence.
 **Related specifications:** [Roadmap](ROADMAP.md), [State](STATE.md), [Capabilities](CAPABILITY-MATRIX.md), [Tests](TESTING.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-10 gate relevant tasks; dependencies below are required, not optional recommendations.
@@ -68,7 +68,7 @@ The next AS-041 increment adds an optional diagnostic event/geometry bracket: bo
 | AS-041 Per-platform activity and interaction qualification | P2 / expansion | experimental | C-33 | AS-005/AS-007/AS-010; ADR-038 now prioritizes independent mixed-Home-feed post/video/photo/ad qualification after AS-045; separate post/story/ad/context/action metric qualification with current version/locale evidence, T-17–T-19/T-21, no message/input capture; no inherited support from Reels detector |
 | AS-044 Optional completion-triggered Reels auto-scroll | P0 / user-prioritized counter MVP | experimental | Independent convenience; no statistics capability admission | ADR-051; separate session Allow, compact HUD toggle and explicit Start/always-visible Stop. Numeric playback-loop gate, version-pinned Instagram/Facebook/TikTok candidates and isolated upward-gesture dispatcher now exist; YouTube completion remains unavailable. Physical API36 passes 118 artificial decision/runtime checks and 146 own-window checks across 20 routes, including expanded-menu Start, collapsed Stop and toggle semantics. Live signal/action qualification and Play review remain open; [specification](AUTOSCROLL-SPEC.md). No timer fallback, silently enabled source or completion metric |
 | AS-045 Complete native main-navigation shell | P0 / user-prioritized integrated milestone | experimental | C-30 shell only; no full runtime admission | ADR-037; five persistent primary tabs and 20 native routes, feature-owned screens, actual saved Reels summaries, honest unavailable time/history/protection/backup/preferences, no grants or synthetic history. Latest existing navigation/SVG dependencies reused; type/lint/domain checks pass. Bundled build/lint and 121 own-window assertions across all five tabs/20 routes, detail/back/period selection and counter fixtures pass on physical API36. No full TalkBack/large-type/RTL/performance acceptance. AS-002/AS-004/full AS-018 accessibility/performance gates remain |
-| AS-046 Google Play closed-test release preparation | P0 / user-prioritized distribution milestone | experimental | Distribution only; no new capability admission | ADR-043; permanent `attention.stats` identity, same source workspace, versioned external artifact archive and root Play information, public policies/in-app link and release diagnostic gating. Exact release build/audit, signing/recovery, assets, owner contacts/account, source qualification and Console/accessibility review precede rollout. No live test period or production approval claimed |
+| AS-046 Google Play closed-test release preparation | P0 / user-prioritized distribution milestone | experimental | Distribution only; no new capability admission | ADR-043/ADR-064; maintainer reports closed-beta publication on 2026-11-03. Exact Console artifact/source mapping, test dates, declarations/review and remaining qualification are not independently verified by this continuation; no production approval claimed. See State and Release |
 
 | Task | Priority / stage | Status | Capability coverage | Prerequisites / concrete completion evidence |
 |---|---|---|---|---|
@@ -82,6 +82,10 @@ The next AS-041 increment adds an optional diagnostic event/geometry bracket: bo
 | Task | Priority / stage | Status | Capability coverage | Prerequisites / concrete completion evidence |
 |---|---|---|---|---|
 | AS-051 Unlock-session continuity, free Reels blocking and ad-count choice | P0 / user-prioritized MVP refinement | experimental | Narrow C-06/C-07/C-19/C-20/C-30/C-32 subsets | ADR-059/ADR-060; cross-app unlock counter, off-by-default per-source native viewer cover/immediate bypass and reversible recognized-ad inclusion with separate retained ad counts. Physical artifact/renderer/continuity evidence is separate; full source, safety, lifecycle and Play gates remain open. |
+
+| Task | Priority / stage | Status | Capability coverage | Prerequisites / concrete completion evidence |
+|---|---|---|---|---|
+| AS-052 Beta-preserving development branch and current handoff | P0 / user-prioritized continuation | implemented | Repository workflow only; no new runtime capability | ADR-067; clean fetched `main` baseline `1fc5382`, `develop` created, current entrypoint/release/roadmap handoff corrected; types, lint/boundaries, 66 Jest tests and docs check pass. [Dated evidence](IMPLEMENTATION_LOG/2026-11-03.md); no new binary or phone acceptance |
 
 ## Completion protocol
 

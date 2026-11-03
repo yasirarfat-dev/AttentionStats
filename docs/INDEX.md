@@ -1,6 +1,6 @@
 # Documentation index
 
-**Status:** Authoritative specifications, native calculations and an integrated Android preview exist; real Reels detectors and full runtime capabilities remain unqualified. Updated 2026-10-29.
+**Status:** Android MVP 1.0.0 exists; the maintainer reports closed-beta publication. Development continues on `develop`; broader qualification and full-product work remain open. Updated 2026-11-03.
 **Responsibility:** Maps every source-of-truth document, reading order and ownership boundary.
 **Related specifications:** [Current state](STATE.md), [Shared rules](AGENT-RULES.md), [Tracker](FEATURE-TRACKER.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-10 in [Decisions](DECISIONS.md); specifications do not constitute source, policy or application-build verification.
@@ -11,11 +11,11 @@ Attention Stats is a local-first, open-source personal digital wellbeing app: **
 
 **Mobile clients only.** The browser study is a completed, non-shipping design reference, not a website/web-app product. A possible Chrome extension is deferred until mobile work is complete and separately prioritized; there is no active extension implementation (ADR-024).
 
-**Experimental mobile scaffold started under AS-004.** A separate [interactive design study](../design/prototype/README.md) uses synthetic data and implements no tracking or native protection. End-to-end mobile runtime behavior remains a specification. No end-to-end application capability is implemented. Root `src/`, Android and iOS template source, a pnpm lockfile and a disabled-state bootstrap adapter now exist. AS-002/AS-004 native build and live-screen acceptance remain explicit gates; [installed package evidence](evidence/mobile-scaffold.json) is separate from the original probes. The design study has its own latest test tools and pnpm lockfile.
+**Current application:** [State](STATE.md) records the MVP's counting, app time, HUD, interventions, Today/Insights/Protect/Settings, onboarding and widgets, with scoped phone evidence and remaining gaps. ADR-066 supersedes the earlier version-pinned detector approach. The broader scaffold, lifecycle, accessibility, security and archive gates remain task-specific; a published beta does not close them automatically.
 
 AS-035 now supplies a separate [pure Kotlin analytics slice](../native/analytics-core/README.md), with domain packages and synthetic JVM/ART tests. It implements calculations only, not an installable app, collectors or mobile screens. The expanded [diary specification](ANALYTICS-SPEC.md) and [64-metric catalog](METRIC-CATALOG.md) make per-platform surface/detail analytics first-class. [Architecture](ARCHITECTURE.md#domain-oriented-modular-design) specifies feature-owned `src/` folders and live mobile verification for every implemented screen/behavior.
 
-AS-045 now adds an installed experimental native five-tab/20-route shell. AS-043 supplies actual saved category-count summaries and a compact draggable scrolling counter; unknown time/history/protection/customization features remain unavailable. Physical own-window traversal and scoped native fixtures pass; full collector/accessibility/accuracy/lifecycle admission is separate. [State](STATE.md) and [structured evidence](evidence/reels-preview.json) record the current artifacts and limits, including unavailable mixed-feed and distinct/repeat counts.
+The earlier [interactive design study](../design/prototype/README.md), scaffold probes and [preview evidence](evidence/reels-preview.json) remain historical artifacts with their original limits. They do not describe the full current MVP or replace current device evidence. ADR-067 defines the beta-preserving branch workflow and continuation order.
 
 | Reader/task | Reading order |
 |---|---|

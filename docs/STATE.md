@@ -1,6 +1,6 @@
 # Current state
 
-**Status:** MVP 1.0.0 (versionCode 10) built with version-independent detection, interventions, redesigned UI and widget; verified live on the maintainer's Samsung phone (Android 16). Updated 2026-10-30.
+**Status:** MVP 1.0.0 (versionCode 10) built and previously phone-verified; maintainer reports closed-beta publication. Further development uses `develop`. Updated 2026-11-03.
 **Responsibility:** Records what exists now, how it was verified, and what is next. Older detail lives in git history and the [implementation log](IMPLEMENTATION_LOG/README.md).
 **Related specifications:** [Index](INDEX.md), [Tracker](FEATURE-TRACKER.md), [Decisions](DECISIONS.md), [Adapters](SOCIAL-ADAPTERS.md), [Release](RELEASE.md).
 **Unresolved feasibility:** Fidelity on other phones, languages and future app versions is estimated, not proven; Snapchat has no fixtures yet; F-05 (automatic Google-account backup) remains blocked.
@@ -31,6 +31,11 @@
 
 ## Next
 
-1. Upload the signed AAB to the Play closed test; complete the Accessibility permission declaration with a short screen recording (see [Play Console notes](../release/PLAY-CONSOLE.md)).
-2. Gather tester reports (in-app "Report a problem") and turn each into a fixture.
-3. Capture Snapchat and non-English fixtures; then encrypted export/import (AS-014/AS-020).
+1. Preserve the beta baseline on `main`; continue on `develop` under ADR-067. The maintainer reports the closed beta is published; exact Console artifact/source mapping, tester dates and review status have not been independently inspected.
+2. Prioritize tester-reported correctness, privacy, crash and data-loss fixes. Turn sanitized detector reports into regression fixtures; qualify Snapchat, non-English layouts and the outstanding break reset on authorized phones.
+3. Deliver encrypted export/restore (AS-006/AS-009/AS-019 prerequisites, then AS-020), preserving existing history and testing cancellation, corruption and replacement failure.
+4. Complete the remaining history/coverage and accessibility work (AS-011/AS-014/AS-018/AS-037), then richer limits, focus/schedules and escape paths (AS-015–AS-017). Keep optional richer analytics and blocked Google backup separate.
+
+## Active continuation (2026-11-03)
+
+AS-052 establishes the development branch and current handoff. Clean `main` matched fetched `origin/main` at `1fc538221adfa3e66c1d94bdb9a0258509dc188c`; `develop` starts there. This is a source baseline, not a proven mapping to the Console binary. Fresh local `pnpm typecheck`, `pnpm lint`, `pnpm test` (66 tests) and `python tools/check_docs.py` pass before changes. No new Android build or phone trial was performed for this documentation-only continuation. See the [dated log](IMPLEMENTATION_LOG/2026-11-03.md).

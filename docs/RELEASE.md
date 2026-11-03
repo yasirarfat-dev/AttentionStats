@@ -1,11 +1,19 @@
 # Release and distribution
 
-**Status:** Closed-test preparation authorized; no Play rollout exists. Updated 2026-10-29.
+**Status:** Maintainer reports closed-beta publication of the MVP; Console details have not been independently inspected in this continuation. Updated 2026-11-03.
 **Responsibility:** Defines public repository publishing, Android distribution, signing and release gates.
 **Related specifications:** [Testing](TESTING.md), [Security](SECURITY.md), [Dependencies](DEPENDENCIES.md), [Contributing](CONTRIBUTING.md), [State](STATE.md).
-**Unresolved feasibility:** F-01–F-04 and F-08 in [Decisions](DECISIONS.md); `attention.stats` is selected, but signing, store enrollment/declarations and release qualification remain open.
+**Unresolved feasibility:** F-01–F-04 and F-08 in [Decisions](DECISIONS.md); exact Console artifact/source mapping, review status and broader qualification remain to be verified separately from the publication report.
 
-## Current closed-test preparation
+## Beta release and development branches
+
+The maintainer reports that closed beta is published (2026-11-03). Source currently declares versionName **1.0.0**, versionCode **10**, package **attention.stats**. Do not infer the uploaded artifact checksum, source commit, tester start dates, production eligibility or policy approval from that report. Earlier preparation details below are historical; consult actual Console records before selecting a new version code or changing store claims.
+
+Under ADR-067, `main` is the beta release line; `develop` starts at source commit `1fc538221adfa3e66c1d94bdb9a0258509dc188c`. Use small task branches from `develop` when useful and integrate reviewed, locally checked changes there. Merge to `main` through a reviewed PR after applicable phone, data-preservation and release checks. Branching does not configure GitHub protection rules or establish the source of the already uploaded binary. No new tag is assigned to that binary without artifact/source evidence.
+
+Urgent beta fixes may branch from `main`; propagate the reviewed fix into `develop` so it is retained. Preserve history, avoid force pushes, and use forward fixes where schema changes prevent safe binary rollback. All workflows remain manual only; merging/pushing does not authorize a workflow run, signing, upload or rollout.
+
+## Historical closed-test preparation
 
 ADR-043 sets the production package exactly **attention.stats**, versionName 0.1.0 / initial versionCode 1, subject to Console uniqueness. Keep the `com.attentionstats` source namespace and existing `com.attentionstats.debug` development identity/history; neither changes the Play package. Release snapshot contract 3 hides development-only structure controls and native code rejects those sessions.
 
@@ -15,7 +23,7 @@ ADR-064 reserves versionCode 2 for the resumed signed 0.1.0 candidate; code 1's 
 
 Code/builds remain in this repository. The separate local archive is the maintainer's private release folder (outside the repository), with `PLAY-CONSOLE.md` at its root and versioned `releases/<versionName>+<versionCode>/{android,metadata,notes}`, plus store, policies, testing and private/signing folders. Keep credentials and personal tester/feedback material outside Git. Never overwrite an archived release or represent an unsigned investigation bundle as uploadable.
 
-Closed testing can begin before the broad roadmap is complete only with a working, accurately described scoped candidate and applicable source/privacy/security/policy checks. Facebook/Home remain unavailable until independently qualified. Current [Google guidance](https://support.google.com/googleplay/android-developer/answer/14151465) requires applicable newer personal accounts to retain at least 12 continuously opted-in testers for 14 days before applying for production access. Documents, sideloads and internal tests do not start that period; real Console opt-ins and rollout establish eligibility. No production-approval date is promised.
+Closed testing can begin before the broad roadmap is complete only with a working, accurately described scoped candidate and applicable source/privacy/security/policy checks. ADR-066 and State supersede the earlier Facebook/Home availability restriction for the documented MVP subset. Recheck [Google's testing guidance](https://support.google.com/googleplay/android-developer/answer/14151465) and the actual account's Console requirements when assessing production eligibility; no current policy review was performed for this branch setup. Documents, sideloads and internal tests do not establish a Play test period. No production-approval date is promised.
 
 ## Documentation publication
 

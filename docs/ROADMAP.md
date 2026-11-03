@@ -1,9 +1,15 @@
 # Roadmap
 
-**Status:** Prioritized delivery plan; no application milestones complete. Updated 2026-10-29.
+**Status:** Scoped Android MVP 1.0.0 delivered; maintainer reports closed beta. Full-product completion and broader qualification remain open. Updated 2026-11-03.
 **Responsibility:** Defines stage boundaries, admission/exit gates and sequencing.
 **Related specifications:** [Tracker](FEATURE-TRACKER.md), [Capabilities](CAPABILITY-MATRIX.md), [Product](PRODUCT.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-09 may change supported delivery scope; no dates or parity promises are implied.
+
+## Current beta continuation
+
+ADR-067 preserves `main` as the beta release line and uses `develop` for integration. [State](STATE.md) and ADR-066 describe the current scoped MVP; the stages below retain the broader product requirements and historical sequencing, rather than instructions to recreate the scaffold.
+
+During testing, address reported correctness/privacy/data-loss failures first, qualify missing source/locale/lifecycle behavior, complete encrypted export/restore and its storage prerequisites, then finish history/accessibility and richer voluntary protection. Keep each change independently reviewable and verified. Testing duration is a planning window, not evidence that all product gates can be completed by its end. Remaining optional analytics and blocked Google backup retain their existing dependencies.
 
 ## Stage 0: documentation foundation
 
