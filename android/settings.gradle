@@ -11,4 +11,5 @@ include ':app'
 include ':analytics-core'
 include ':collection-prototype'
 include ':reels-core'
+include ':protection-core'
 includeBuild('../node_modules/@react-native/gradle-plugin')

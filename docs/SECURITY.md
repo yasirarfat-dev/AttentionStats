@@ -5,6 +5,11 @@
 **Related specifications:** [Privacy](PRIVACY.md), [Backup](BACKUP-RESTORE.md), [Crypto design](CRYPTO-ARCHIVE-DESIGN.md), [Models](DATA-MODELS.md), [Release](RELEASE.md), [Reporting entrypoint](../SECURITY.md).
 **Unresolved feasibility:** F-03 and F-04 in [Decisions](DECISIONS.md); reviewed prototype candidates/parameters still need build, interoperability, device-resource and encrypted Room qualification.
 
+## Current archive privacy boundary (ADR-073, 2026-11-04)
+
+By explicit maintainer decision, current exports use public-package profile 3 with SHA-256(`attention.stats`) as the input credential. This is an exception to the earlier secret portable-credential requirement below: it provides no confidentiality or authorship authentication against a file holder. It must never be presented as a secret key or end-to-end archive encryption. Local SQLCipher/Keystore protection remains unchanged. Android-managed cloud backup is separately opt-in and requires API 28+, device lock and transport client-side encryption; manual files rely on private destination/account access controls. No developer secret, escrow service or new remote recipient is introduced. The platform transport's documented encryption is distinct from the public archive wrapper.
+
+
 ## Threat model
 
 | Threat | Required control | Residual limit |

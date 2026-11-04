@@ -1,9 +1,9 @@
 # Adding and fixing social-app support
 
-**Status:** Version-independent adapters for Instagram, Facebook, YouTube, TikTok (incl. regional/lite) and Snapchat; 26 real-layout fixtures pass. Updated 2026-10-30.
+**Status:** Version-independent adapters for Instagram, Facebook, YouTube, TikTok (incl. regional/lite) and Snapchat; current candidate verification is in State. Updated 2026-11-05.
 **Responsibility:** How detection is organized, how to add an app, and how to turn a bug report into a regression test.
 **Related specifications:** [Architecture](ARCHITECTURE.md), [Social](SOCIAL-MEDIA-SPEC.md), [Decisions](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30), [Testing](TESTING.md), [Privacy](PRIVACY.md).
-**Unresolved feasibility:** Snapchat has no captured fixtures yet; non-English Facebook feed labels rely on the structural sound-toggle signal.
+**Unresolved feasibility:** Snapchat Spotlight has narrow captured/live evidence; Stories and broader source fidelity remain unqualified. Non-English video classification can rely on structural sound-toggle signals; photo support requires positive media evidence.
 
 ## Pipeline
 
@@ -20,6 +20,8 @@ Adapters are pure Kotlin with no Android imports (enforced by `tools/check_archi
 - `FeedLocator`: picks the focused media in a feed (crossing the list's middle, or the most visible fully shown item) and fingerprints it with its header row.
 - `Fingerprint`: normalizes labels (digits, punctuation, short toggle words removed) and hashes them with a device-local salt.
 - `Sponsored`: ad markers (view-id hints, exact "Sponsored"/"Ad" labels in several languages).
+
+The Facebook candidate prioritizes its known feed list over generic viewer geometry, groups supported album tiles into one media region, recognizes Photo-role button tiles and the explicit 360 photo TextureView role, and keeps positive photo bounds ahead of anonymous video wrappers. A video must cross the feed's middle or fit fully before fallback focus; a clipped bottom preview can change its header/player controls before reaching focus and must not count twice. Positive photos retain bounded partial-visibility fallback for shallow/clipped layouts. These source-specific choices need live qualification; fixtures and aggregate additions alone do not establish accuracy. Generic media/navigation labels do not identify posts. Same-host strongly matching metadata and its aliases preserve continuity/revisits, while a different post in a recycled slot must settle before counting.
 
 ## Adding an app
 

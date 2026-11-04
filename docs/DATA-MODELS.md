@@ -1,5 +1,7 @@
 # Data models
 
+> Development additions (2026-11-03, ADR-068/ADR-069): Room 6→7 adds `ProtectionConfiguration` (revision and bounded validated group/window document). Room 7→8 adds `Exposure.mediaKind` (`unknown` for historical rows), `playbackMs` (-1 for unknown), `qualifiedWatch` and `observedCompletion` (initially false), plus `DiaryConfiguration.measurePlayback` (off) and `countPhotos` (compatible on). Ad category and media kind are independent facets. Encounters, opted-in per-visit playback and completions are distinct. Imported current-device enablement stays disabled; old unknown playback is never backfilled from surface time. Schema snapshots and actual migration/device evidence govern acceptance.
+
 **Status:** Logical schema accepted; SQL/Room implementation and migrations pending. Updated 2026-10-29.
 **Responsibility:** Defines entities, invariants, time, provenance and schema evolution.
 **Related specifications:** [Storage](STORAGE-AND-RETENTION.md), [Contracts](NATIVE-CONTRACTS.md), [Tracking](TRACKING-SPEC.md), [Backup](BACKUP-RESTORE.md).
@@ -8,6 +10,11 @@
 The standalone [AS-006 fixture](../native/storage-qualification/README.md) has one artificial record table for encryption/build qualification only. It is excluded from the product build and is not an implementation or migration of these entities.
 
 The separate [archive-envelope fixture](../native/archive-qualification/README.md) has public artificial manifest/entity/end bytes for crypto readback only. Its fields are not this schema, and its independent reader implements no history/JSON admission, migration or restore. Product encodings and bounds remain AS-009/AS-020 work.
+
+## Schema 9 provenance continuation (ADR-074, 2026-11-04)
+
+Add `FactOrigin` with composite primary key (`tableName`, `recordId`) and a canonical random `originId` UUID. The additive 8→9 migration preserves existing rows. New/local facts fall back to the existing installation epoch; imported facts retain explicit source origins in the sidecar. Logical version 2/schema 9 serializes origins alongside facts, without exporting device key metadata. Replacement updates facts and sidecars in one transaction; erase removes both. This preserves future merge inputs but implements no synchronization, deletion tombstone or conflict resolution protocol.
+
 
 ## Entity catalog
 

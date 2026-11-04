@@ -1,6 +1,6 @@
 # Human factors and wellbeing design
 
-**Status:** Accepted experience direction; synthetic preview in AS-033; native experience unimplemented. Updated 2026-10-27.
+**Status:** Accepted experience direction applied to the scoped Android MVP and beta continuation; full human-factors/device qualification remains open. Updated 2026-11-04.
 **Responsibility:** Governs supportive engagement, psychological rationale, language, trust, interruptions and humane evaluation.
 **Related specifications:** [Vision](VISION.md), [Product](PRODUCT.md), [UX](UX-SPEC.md), [Design system](DESIGN-SYSTEM.md), [Protection](PROTECTION-SPEC.md), [Privacy](PRIVACY.md), [Preview](../design/prototype/README.md).
 **Unresolved feasibility:** F-01–F-04, F-08 and F-09 in [Decisions](DECISIONS.md); no psychological benefit, device smoothness or universal emotional response to this design has been demonstrated.

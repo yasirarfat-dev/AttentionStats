@@ -22,14 +22,15 @@ object FeedLocator {
         it.scrollable && it.bounds.height > it.bounds.width && it.bounds.width >= snapshot.screen.width * 0.9
     }.maxByOrNull { it.bounds.height }
 
-    fun focused(list: LayoutBounds, media: List<Media>): Media? {
+    fun focused(list: LayoutBounds, media: List<Media>, allowPartialVideos: Boolean = true): Media? {
         if (media.isEmpty()) return null
         val middle = (list.top + list.bottom) / 2
         media.firstOrNull { it.node.bounds.top <= middle && it.node.bounds.bottom >= middle }?.let { return it }
         // Bounds are clipped to the screen: an item not touching the list edges is fully visible.
         return media.filter { item ->
             val box = item.node.bounds
-            (box.top > list.top + 2 && box.bottom < list.bottom - 2) || box.visibleHeightWithin(list) >= list.height * 0.4
+            (box.top > list.top + 2 && box.bottom < list.bottom - 2) ||
+                ((!item.video || allowPartialVideos) && box.visibleHeightWithin(list) >= list.height * 0.25)
         }.minByOrNull { kotlin.math.abs(it.node.bounds.centerY - middle) }
     }
 
@@ -55,8 +56,9 @@ object FeedLocator {
         }
     }
 
-    fun frame(snapshot: ScreenSnapshot, list: ScreenNode, media: List<Media>, method: String, countPhotos: Boolean): AdapterFrame {
-        val item = focused(list.bounds, media) ?: return AdapterFrame(Surface.EXCLUDED, ReelRoute.HOME, method = method)
+    fun frame(snapshot: ScreenSnapshot, list: ScreenNode, media: List<Media>, method: String, countPhotos: Boolean,
+        allowPartialVideos: Boolean = true): AdapterFrame {
+        val item = focused(list.bounds, media, allowPartialVideos) ?: return AdapterFrame(Surface.EXCLUDED, ReelRoute.HOME, method = method)
         if (!item.video && !countPhotos) return AdapterFrame(Surface.EXCLUDED, ReelRoute.HOME, method = method)
         val labelled = item.header + snapshot.within(item.node.bounds).filter { it.label != null }
         val print = Fingerprint.of(labelled)
@@ -64,6 +66,6 @@ object FeedLocator {
         // Without any visible metadata, fall back to the hosting view; layout continuity keeps it stable.
         val identity = print?.identity ?: (item.node.key.toLong() * 7919 + snapshot.windowId)
         return AdapterFrame(Surface.REELS, ReelRoute.HOME, identity, print?.keys ?: emptySet(), category,
-            item.node.bounds, item.node.key, null, method)
+            item.node.bounds, item.node.key, null, method, mediaKind = if (item.video) "video" else "photo")
     }
 }

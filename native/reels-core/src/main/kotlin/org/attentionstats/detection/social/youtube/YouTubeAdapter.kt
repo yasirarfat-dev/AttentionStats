@@ -5,6 +5,7 @@ import org.attentionstats.detection.ScreenSnapshot
 import org.attentionstats.detection.ShortFormAdapter
 import org.attentionstats.detection.shared.ViewerLocator
 import org.attentionstats.reels.ReelApp
+import org.attentionstats.reels.Surface
 
 /** Shorts player from any entry (tab, Home shelf, search, channel, links). */
 object YouTubeAdapter : ShortFormAdapter {
@@ -12,6 +13,7 @@ object YouTubeAdapter : ShortFormAdapter {
     private val pagerIds = setOf("reel_recycler", "reel_watch_pager")
 
     override fun read(snapshot: ScreenSnapshot): AdapterFrame {
+        if (!snapshot.complete) return AdapterFrame(Surface.UNKNOWN)
         if (snapshot.typing) return AdapterFrame.TYPING
         val viewer = ViewerLocator.locate(snapshot, pagerIds) ?: return AdapterFrame.OUTSIDE
         return ViewerLocator.frame(snapshot, viewer, "youtube.shorts")

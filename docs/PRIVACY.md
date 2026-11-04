@@ -12,6 +12,13 @@ Current source increment (ADR-046): the selected Facebook viewer candidate now u
 
 The revised temporary development check additionally recognizes exact Like, Comment and Share controls and fixed Home/Reels/Video tab-position labels. It retains only their fixed tokens and up to three ancestor layouts, within the existing 16-match and 32-KiB limits (interface revision 2). These extra labels are diagnostic-only and never become observation signals without separate qualification. A fresh diagnostic notice describes the fields before each trial.
 
+## Current backup choice (ADR-073, 2026-11-04)
+
+The maintainer authorizes opt-in Android-managed backup, superseding blanket OS-backup exclusion only for one bounded logical snapshot. Live databases, keys/wrappers, grants, preferences and all other files remain excluded. Android chooses the configured provider/account and upload timing; the custom agent requires API 28+, secure screen lock and client-side-encrypted transport and rejects device transfer. A delivered archive stays in private no-backup quarantine until reviewed. No automatic upload is enabled merely by installing/upgrading or restoring this app.
+
+Exports use a public app-package credential, with no password for users to remember. Anyone with a file can decrypt or modify it; destination/account security is the privacy boundary. Do not advertise these files as secret encrypted archives. Direct Drive API/OAuth integration remains blocked; Android transport is separate. Local erase disables future system backups and removes pending restores but cannot erase external copies.
+
+
 ## Public promise
 
 Planned release message: **“No data sent to us. Your history stays on your device. Open source.”** Pair this with a nearby explanation: tracking stores the data you enable locally; optional exports or approved cloud backup move encrypted archives to a destination you choose. Do not advertise “collects no data,” “zero data collection,” or “never leaves your phone” without this distinction. Open source supports inspection; it is not proof that an untested binary has no network traffic.

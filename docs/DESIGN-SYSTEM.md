@@ -5,6 +5,10 @@
 **Related specifications:** [Human factors](HUMAN-FACTORS.md), [UX](UX-SPEC.md), [Navigation](NAVIGATION.md), [Settings](SETTINGS-SPEC.md), [Preview](../design/prototype/README.md), [Conventions](CONVENTIONS.md).
 **Unresolved feasibility:** F-03 in [Decisions](DECISIONS.md); Android font metrics, frame pacing and TalkBack require native verification. Browser checks do not certify native accessibility.
 
+## Current native appearance (ADR-071)
+
+The beta continuation replaces the forest-green palette with soft-white/cool-neutral light surfaces and deep navy dark surfaces, plus blue, teal or violet accents chosen by the person. Light, Dark and System selections and optional motion persist as device-local native preferences and apply to React Native navigation and native schedule/archive screens. Reduced motion takes priority; the rejected hand guide is removed under ADR-072. This is an aesthetic/readability choice, not proof of trust or relaxation. Native light-mode/accent and restart persistence have scoped phone evidence in the dated log; broad accessibility/performance qualification remains open. Older study palettes below are historical references.
+
 ## Character and hierarchy
 
 **Native preview update, ADR-033:** the user requests Google Digital Wellbeing-style clarity and usefulness. The React Native preview now opens to Today within five persistent tabs. Actual daily Instagram/Facebook viewer-page estimates link to observation/live-display controls and a clearly reported developer check. Unimplemented metrics use unavailable states. Shared native panels/destinations and original SVG tab symbols provide consistent routes without adding dependencies. Use system sans headings, a compact app bar, 28dp rounded filled containers, 48dp controls, tabular counts and calmer blue/lavender accents. The native light/dark palette lives in `src/ui/theme.ts`; the original browser palette below stays historical reference, not a constraint to retain the serif shell. No fake circular usage data or decorative progress score when counting is unavailable. [Google's wellbeing help](https://support.google.com/android/answer/9346420?hl=en) describes daily/app-level information; [Material color roles](https://m3.material.io/styles/color/the-color-system) and [typography](https://m3.material.io/styles/typography/applying-type) inform this original implementation. No Google assets/fonts are copied or fetched at runtime. Native device, contrast and accessibility qualification remain required.
@@ -90,3 +94,6 @@ An optional [live counter](LIVE-OVERLAY-SPEC.md) defaults to a **small top-cente
 AS-033 provides an [interactive reference](../design/prototype/README.md), tokens and browser tests. AS-018 must implement native semantics and source/configuration contracts; do not embed a WebView to bypass AS-002/AS-004.
 
 X-02 and X-04–X-07 in [Testing](TESTING.md) cover accessibility, truthful evidence and humane flow. Automated scans, contrast arithmetic, visual inspection, participant review and device accessibility are distinct evidence levels.
+
+
+2026-11-04 contrast review: light faint text was 4.37:1 on the alternate surface, below the normal-text target. Darkened that token to `#5C6C86`; other light/dark body/muted/faint pairs on canvas/surface/alternate/raised surfaces are calculated independently of screenshots. Full native dialog, accent/state, large-type and TalkBack acceptance remain separate.

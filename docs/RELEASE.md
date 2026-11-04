@@ -5,11 +5,13 @@
 **Related specifications:** [Testing](TESTING.md), [Security](SECURITY.md), [Dependencies](DEPENDENCIES.md), [Contributing](CONTRIBUTING.md), [State](STATE.md).
 **Unresolved feasibility:** F-01–F-04 and F-08 in [Decisions](DECISIONS.md); exact Console artifact/source mapping, review status and broader qualification remain to be verified separately from the publication report.
 
+Current develop backup exception (ADR-073/AS-058): `allowBackup=true` is paired with a custom opt-in protected-transport agent and a one-file include list; live databases/keys/preferences and device transfer remain excluded. Qualify the merged manifest/resources and actual recovery before release. The older 0.1.0 `tools/release_candidate.py` guards still intentionally describe that historical all-backup-disabled candidate; they are not acceptance tooling for this schema-9 development build. No release upload or main merge is authorized by the current checks.
+
 ## Beta release and development branches
 
 The maintainer reports that closed beta is published (2026-11-03). Source currently declares versionName **1.0.0**, versionCode **10**, package **attention.stats**. Do not infer the uploaded artifact checksum, source commit, tester start dates, production eligibility or policy approval from that report. Earlier preparation details below are historical; consult actual Console records before selecting a new version code or changing store claims.
 
-Under ADR-067, `main` is the beta release line; `develop` starts at source commit `1fc538221adfa3e66c1d94bdb9a0258509dc188c`. Use small task branches from `develop` when useful and integrate reviewed, locally checked changes there. Merge to `main` through a reviewed PR after applicable phone, data-preservation and release checks. Branching does not configure GitHub protection rules or establish the source of the already uploaded binary. No new tag is assigned to that binary without artifact/source evidence.
+Under ADR-067/ADR-068, `main` is the beta release line; `develop` starts at source commit `1fc538221adfa3e66c1d94bdb9a0258509dc188c`. Use small task branches from `develop` when useful and integrate reviewed, locally checked changes there. A merge to `main` requires both the maintainer's explicit agreement to the concrete candidate and the agent's readiness assessment after applicable phone, data-preservation and release checks. Passing tests or standing push authorization is insufficient. Branching does not configure GitHub protection rules or establish the source of the already uploaded binary. No new tag is assigned to that binary without artifact/source evidence.
 
 Urgent beta fixes may branch from `main`; propagate the reviewed fix into `develop` so it is retained. Preserve history, avoid force pushes, and use forward fixes where schema changes prevent safe binary rollback. All workflows remain manual only; merging/pushing does not authorize a workflow run, signing, upload or rollout.
 

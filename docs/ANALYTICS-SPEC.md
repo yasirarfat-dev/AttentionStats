@@ -1,5 +1,7 @@
 # Detailed personal activity diary
 
+> ADR-069 (2026-11-03) separates encounters, media type, advertising and optional playback evidence. Numeric player position/duration must advance for 3-second watches; stationary or missing signals add no playback. Surface occupancy is labelled on-screen time. A completion requires an observed continuous traversal from near the start to near the end; seeking/entry near the end is insufficient. Media and ad facets can overlap and must not be summed as mutually exclusive totals. Text-only posts and action outcomes remain independently qualified AS-041 work, with opt-ins and no input/comment-content retention.
+
 **Status:** Expanded specification; AS-035 calculations implemented and AS-050 timing/screens are experimental candidates. Updated 2026-10-29.
 **Responsibility:** Defines detailed app/activity analytics, evidence accounting, diary exploration, comparisons and summary semantics.
 **Related specifications:** [Metric catalog](METRIC-CATALOG.md), [Tracking](TRACKING-SPEC.md), [Social](SOCIAL-MEDIA-SPEC.md), [Models](DATA-MODELS.md), [Storage](STORAGE-AND-RETENTION.md), [UX](UX-SPEC.md), [Tests](TESTING.md).

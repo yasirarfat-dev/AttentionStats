@@ -20,6 +20,7 @@ def main() -> int:
         "testDebugUnitTest", ":analytics-core:verifyAnalytics", "generateCodegenArtifactsFromSchema",
         ":collection-prototype:verifyReconciliation",
         ":reels-core:verifyReels",
+        ":protection-core:verifyProtection",
         "help", "dependencies",
     ])
     local_sdk = ROOT / ".cache/as-004/sdk"

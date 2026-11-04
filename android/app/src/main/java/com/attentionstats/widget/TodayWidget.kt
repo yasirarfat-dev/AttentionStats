@@ -24,10 +24,10 @@ internal data class WidgetData(
 
 /** What a placed widget shows; chosen in [WidgetConfigureActivity] and changeable by long-press. */
 internal enum class WidgetStat(val key: String, val title: String, val description: String) {
-    OVERVIEW("overview", "Today at a glance", "Short videos, watching time, screen time and this session"),
+    OVERVIEW("overview", "Today at a glance", "Short videos, on-screen time, screen time and this session"),
     VIDEOS("videos", "Short videos today", "Today's count and which apps it came from"),
     SESSION("session", "This session", "Short videos since you unlocked your phone"),
-    WATCHING("watching", "Watching today", "Time spent in short videos today"),
+    WATCHING("watching", "On-screen time today", "Time spent in short videos today"),
     SCREEN("screen", "Screen time today", "Time in all apps today, with your top app"),
     BREAKS("breaks", "Breaks today", "Mindful breaks offered and taken today");
 
@@ -74,7 +74,7 @@ class TodayWidget : AppWidgetProvider() {
             val (value, unit, detail) = when (stat) {
                 WidgetStat.VIDEOS -> Triple(count(data.todayVideos), "short videos", apps.ifEmpty { "This session: ${count(data.sessionVideos)}" })
                 WidgetStat.SESSION -> Triple(count(data.sessionVideos), "since unlock", "Today: ${count(data.todayVideos)}")
-                WidgetStat.WATCHING -> Triple(duration(data.watchingMs), "watching short videos", "${count(data.todayVideos)} videos today")
+                WidgetStat.WATCHING -> Triple(duration(data.watchingMs), "short-video surface time", "${count(data.todayVideos)} videos today")
                 WidgetStat.SCREEN -> Triple(duration(data.screenMs), "on your phone",
                     data.topScreenApp?.let { "Most: ${it.first} · ${duration(it.second)}" } ?: "Turn on screen time in the app")
                 WidgetStat.BREAKS -> Triple(data.breaks.toString(), if (data.breaks == 1L) "mindful break" else "mindful breaks",

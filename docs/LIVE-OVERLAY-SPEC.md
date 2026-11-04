@@ -7,6 +7,8 @@
 **Related specifications:** [Social detection](SOCIAL-MEDIA-SPEC.md), [Tracking](TRACKING-SPEC.md), [Human factors](HUMAN-FACTORS.md), [Permissions](PERMISSIONS.md), [Contracts](NATIVE-CONTRACTS.md), [Models](DATA-MODELS.md), [Protection](PROTECTION-SPEC.md), [Settings](SETTINGS-SPEC.md), [Testing](TESTING.md).
 **Unresolved feasibility:** F-01, F-02, F-08 and F-09 in [Decisions](DECISIONS.md); target-version detection, native renderer choice, touch behavior, OEM lifecycle, policy review, battery cost and accessibility need evidence in AS-034.
 
+Current beta override (ADR-075/AS-059, 2026-11-04): retain the user's session On/Off choice through manual scrolling and unsupported/media transitions while suspending gestures and invalidating queued tokens. One control only: `Autoscroll` with a drawn play icon appears expanded while Off; the same button with a drawn pause icon appears just below counts while On, including minimized. Header taps/dragging never toggle it. Established Home/feed states retain committed-count display between posts; unknown/private/input/foreign/locked contexts remain excluded. First use still needs the separate convenience disclosure. Session termination clears ephemeral state. Direct fresh viewer/source/window/item/consent checks precede every gesture; On while waiting does not mean a gesture is authorized. Historical automatic-Stop and dual-control descriptions below are superseded for this candidate.
+
 ## Purpose and default
 
 Help someone notice continued scrolling while they are still in a supported feed. A glance should answer “how long has this visit lasted, how much have I already seen today, and do I want to continue?” It is an awareness tool, not a competition, diagnosis or mandatory barrier.

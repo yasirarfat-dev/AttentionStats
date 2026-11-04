@@ -4,6 +4,8 @@
 
     <queries>
       <intent><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent>
+      <intent><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.HOME" /></intent>
+      <intent><action android:name="android.intent.action.DIAL" /></intent>
       <package android:name="com.instagram.android" />
       <package android:name="com.facebook.katana" />
       <package android:name="com.google.android.youtube" />
@@ -18,7 +20,9 @@
       android:label="@string/app_name"
       android:icon="@mipmap/ic_launcher"
       android:roundIcon="@mipmap/ic_launcher_round"
-      android:allowBackup="false"
+      android:allowBackup="true"
+      android:backupAgent=".backup.SystemBackupAgent"
+      android:fullBackupOnly="true"
       android:fullBackupContent="@xml/backup_rules"
       android:dataExtractionRules="@xml/data_extraction_rules"
       android:theme="@style/AppTheme"
@@ -32,6 +36,16 @@
         <intent-filter><action android:name="android.accessibilityservice.AccessibilityService" /></intent-filter>
         <meta-data android:name="android.accessibilityservice" android:resource="@xml/reels_accessibility_service" />
       </service>
+      <activity
+        android:name=".protection.SchedulesActivity"
+        android:exported="false"
+        android:label="App schedules"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+      <activity
+        android:name=".backup.BackupActivity"
+        android:exported="false"
+        android:label="Encrypted backup"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar" />
       <activity
         android:name=".widget.WidgetConfigureActivity"
         android:exported="true"

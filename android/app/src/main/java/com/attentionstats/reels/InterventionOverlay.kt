@@ -157,7 +157,7 @@ internal class InterventionOverlay(
             interpolator = AccelerateDecelerateInterpolator()
             addUpdateListener { scale = it.animatedValue as Float; invalidate() }
         }
-        init { importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO; animator.start() }
+        init { importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO; if (com.attentionstats.appearance.AppearanceOwner.motion(context)) animator.start() }
         fun stop() = animator.cancel()
         override fun onDraw(canvas: Canvas) {
             val cx = width / 2f; val cy = height / 2f; val max = minOf(width, height) / 2f

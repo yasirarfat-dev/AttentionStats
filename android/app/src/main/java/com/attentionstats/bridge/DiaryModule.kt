@@ -11,6 +11,13 @@ import com.facebook.react.module.annotations.ReactModule
 @ReactModule(name = DiaryModule.NAME)
 class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpec(context) {
     override fun getName() = NAME
+    override fun getAppearance(promise: Promise) {
+        promise.resolve(com.attentionstats.appearance.AppearanceOwner.snapshot(context).toString())
+    }
+    override fun setAppearance(mode: String, accent: String, motion: Boolean, promise: Promise) {
+        try { promise.resolve(com.attentionstats.appearance.AppearanceOwner.save(context, mode, accent, motion)) }
+        catch (_: Exception) { promise.reject("APPEARANCE_UNSAVED", "Could not save appearance") }
+    }
     private val coordinator get() = ReelsCoordinator.get(context)
     private fun failure(promise: Promise, code: String) = promise.reject(code, "Diary operation unavailable; saved history preserved")
     override fun getSnapshot(days: Double, promise: Promise) {
@@ -19,7 +26,7 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
     }
     override fun configure(action: String, enabled: Boolean, count: Double, minutes: Double, expectedRevision: String, promise: Promise) {
         val revision = expectedRevision.toLongOrNull()
-        if (action !in (setOf("usage", "reminder", "onboarding", "ads", "break") + org.attentionstats.reels.ReelApp.entries.map { "block.${it.key}" }) || revision == null || revision < 0 ||
+        if (action !in (setOf("usage", "reminder", "onboarding", "ads", "break", "playback", "photos") + org.attentionstats.reels.ReelApp.entries.map { "block.${it.key}" }) || revision == null || revision < 0 ||
             !count.isFinite() || count % 1 != 0.0 || count !in 1.0..1000.0 ||
             !minutes.isFinite() || minutes % 1 != 0.0 || minutes !in 1.0..240.0) {
             failure(promise, "INVALID_ARGUMENT"); return
@@ -42,6 +49,20 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
         try {
             context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                 Uri.parse("package:${context.packageName}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            promise.resolve(true)
+        } catch (_: RuntimeException) { promise.resolve(false) }
+    }
+    override fun openAppSchedules(promise: Promise) {
+        try {
+            context.startActivity(Intent(context, com.attentionstats.protection.SchedulesActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            promise.resolve(true)
+        } catch (_: RuntimeException) { promise.resolve(false) }
+    }
+    override fun openBackup(promise: Promise) {
+        try {
+            context.startActivity(Intent(context, com.attentionstats.backup.BackupActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             promise.resolve(true)
         } catch (_: RuntimeException) { promise.resolve(false) }
     }
@@ -74,7 +95,8 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
     }
     override fun openBatterySettings(promise: Promise) {
         try {
-            context.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.parse("package:${context.packageName}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             promise.resolve(true)
         } catch (_: RuntimeException) { promise.resolve(false) }
     }

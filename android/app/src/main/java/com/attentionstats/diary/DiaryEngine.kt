@@ -40,11 +40,17 @@ internal class DiaryEngine(private val context: Context) {
         private set
     @Volatile var includeRecognizedAds = true
         private set
+    @Volatile var measurePlayback = false
+        private set
+    @Volatile var countPhotos = true
+        private set
     suspend fun loadChoices(history: HistoryStore) {
         blockLimits = history.database.data().blockers().filter { it.enabled }
             .mapNotNull { config -> ReelApp.byKey(config.appId)?.let { it to config.dailyLimit } }.toMap()
         val config = checkNotNull(history.database.data().diary())
         includeRecognizedAds = config.includeRecognizedAds
+        measurePlayback = config.measurePlayback
+        countPhotos = config.countPhotos
         breakSeconds = config.breakSeconds
     }
     val fence = AtomicLong()
@@ -93,6 +99,11 @@ internal class DiaryEngine(private val context: Context) {
                 "reminder" -> config.copy(reminderEnabled = enabled, reminderCount = count, reminderMinutes = minutes)
                 "onboarding" -> config.copy(onboardingSeen = true)
                 "ads" -> config.copy(includeRecognizedAds = enabled)
+                "playback", "photos" -> {
+                    dao.insertConsent(ConsentRecord(UUID.randomUUID().toString(), "metric.$action", 1,
+                        if (enabled) "allow" else "withdraw", now, Math.addExact(checkNotNull(dao.metadata()).configurationRevision, 1)))
+                    if (action == "playback") config.copy(measurePlayback = enabled) else config.copy(countPhotos = enabled)
+                }
                 "break" -> config.copy(breakSeconds = count.coerceIn(3, 60))
                 else -> {
                     require(action.startsWith("block."))
@@ -269,7 +280,10 @@ internal class DiaryEngine(private val context: Context) {
                     if (it.endMs <= it.startMs) 0L else (it.durationMs.toDouble() * overlap / (it.endMs - it.startMs)).toLong()
                 } } else emptyMap()
             val counts = dao.reelsCounts(from, until).associate { it.appId to it.count }
-            val photos = dao.categoryTotalsByApp(from, until, "photo").associate { it.appId to it.count }
+            val primaryPhotos = dao.categoryTotalsByApp(from, until, "photo").associate { it.appId to it.count }
+            val photos = dao.photoTotals(from, until).associate { it.appId to it.count }
+            val videos = dao.videoTotals(from, until).associate { it.appId to it.count }
+            val playback = dao.playbackTotals(from, until).associateBy { it.appId }
             val revisits = dao.revisitCounts(from, until).associate { it.appId to it.count }
             val packages = appTimes.keys + opens.keys + ReelApp.entries.map { it.packageName }
             val apps = JSONArray()
@@ -277,7 +291,8 @@ internal class DiaryEngine(private val context: Context) {
                 val social = ReelApp.byPackage(pkg)
                 val label = labels.getOrPut(pkg) { label(pkg) }
                 val ads = social?.let { dao.categoryCount(it.key, from, until, "ad") } ?: 0
-                val total = (counts[social?.key] ?: 0) - (photos[social?.key] ?: 0)
+                val total = (counts[social?.key] ?: 0) - (primaryPhotos[social?.key] ?: 0)
+                val evidence = playback[social?.key]
                 apps.put(JSONObject().put("packageName", pkg).put("name", label)
                     .put("social", social?.key ?: JSONObject.NULL)
                     .put("appMs", appTimes[pkg]?.toString() ?: JSONObject.NULL)
@@ -286,6 +301,11 @@ internal class DiaryEngine(private val context: Context) {
                     .put("reelsCount", (if (config.includeRecognizedAds) total else maxOf(0, total - ads)).toString())
                     .put("adCount", ads.toString())
                     .put("photoCount", (photos[social?.key] ?: 0).toString())
+                    .put("videoCount", (videos[social?.key] ?: 0).toString())
+                    .put("measuredVideoCount", evidence?.measured?.toString() ?: JSONObject.NULL)
+                    .put("playbackMs", evidence?.duration?.toString() ?: JSONObject.NULL)
+                    .put("watchCount", evidence?.qualified?.toString() ?: JSONObject.NULL)
+                    .put("completionCount", evidence?.completed?.toString() ?: JSONObject.NULL)
                     .put("revisitCount", (revisits[social?.key] ?: 0).toString()))
             }
             val hours = JSONArray(LongArray(24).also { buckets ->
@@ -299,7 +319,7 @@ internal class DiaryEngine(private val context: Context) {
             rows.put(JSONObject().put("day", day.toString()).put("apps", apps).put("hours", hours)
                 .put("interventions", interventions))
         }
-        return JSONObject().put("contractVersion", 2).put("revision", config.revision.toString())
+        return JSONObject().put("contractVersion", 3).put("revision", config.revision.toString())
             .put("usageEnabled", config.usageEnabled).put("usageGranted", usageGranted())
             .put("batteryOptimized", !context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName))
             .put("backgroundRestricted", if (Build.VERSION.SDK_INT >= 28) context.getSystemService(ActivityManager::class.java).isBackgroundRestricted else JSONObject.NULL)
@@ -309,6 +329,7 @@ internal class DiaryEngine(private val context: Context) {
             .put("reminderMinutes", config.reminderMinutes).put("onboardingSeen", config.onboardingSeen)
             .put("includeRecognizedAds", config.includeRecognizedAds)
             .put("breakSeconds", config.breakSeconds)
+            .put("measurePlayback", config.measurePlayback).put("countPhotos", config.countPhotos)
             .put("blockers", JSONArray(ReelApp.entries.map { app -> JSONObject().put("app", app.key)
                 .put("enabled", app in blockedApps).put("dailyLimit", blockLimits[app] ?: 0)
                 .put("available", blockingAvailable(app)) }))

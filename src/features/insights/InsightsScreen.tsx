@@ -15,7 +15,7 @@ import {
   Stat,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
-import { useAppIcons, useDiary } from '../diary';
+import { useAppIcons, useDiary, ViewingDetail } from '../diary';
 import { sourceDay } from '../today';
 
 /** Rough, friendly equivalents. Shown as "about" figures, never as precise claims. */
@@ -89,15 +89,15 @@ export function InsightsScreen() {
         onChange={setRange}
         options={[
           { value: '7', label: 'Last 7 days' },
-          { value: '31', label: 'Last 30 days' },
+          { value: '31', label: 'Last 31 days' },
         ]}
       />
 
       <Card>
         <View style={styles.stats}>
-          <Stat value={exactCount(String(total))} label="Short videos" />
+          <Stat value={exactCount(String(total))} label="Video encounters" />
           <Stat value={exactCount(String(average))} label="Daily average" />
-          <Stat value={duration(reelsMs)} label="Watching" />
+          <Stat value={duration(reelsMs)} label="On screen" />
         </View>
         <BarChart
           values={dailyVideos}
@@ -139,7 +139,8 @@ export function InsightsScreen() {
         </>
       )}
 
-      <SectionTitle>When you watch</SectionTitle>
+      <ViewingDetail days={days} />
+      <SectionTitle>When videos are on screen</SectionTitle>
       <Card>
         <BarChart
           values={hours}
@@ -169,7 +170,9 @@ export function InsightsScreen() {
                 />
               }
               title={reelsSources[item.key].name}
-              detail={item.ms > 0 ? `${duration(item.ms)} watching` : undefined}
+              detail={
+                item.ms > 0 ? `${duration(item.ms)} on screen` : undefined
+              }
               trailing={
                 <View style={styles.share}>
                   <Text style={styles.shareValue}>

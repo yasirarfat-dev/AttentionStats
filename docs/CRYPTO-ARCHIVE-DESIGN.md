@@ -5,6 +5,13 @@
 **Related specifications:** [Security](SECURITY.md), [Backup](BACKUP-RESTORE.md), [Models](DATA-MODELS.md), [Storage](STORAGE-AND-RETENTION.md), [Dependencies](DEPENDENCIES.md), [Decision ADR-031](DECISIONS.md).
 **Unresolved feasibility:** F-03/F-04 remain open. These are decisions for an isolated prototype, not a shipping format or encryption claim; AS-009/AS-020 acceptance remains separate.
 
+## Product profile 3 (ADR-073/ADR-074, 2026-11-04)
+
+The product no-key flow deliberately differs from the historical secret-key fixture below. Profile byte 3 uses SHA-256 of exact ASCII `attention.stats` as its 32-byte public credential before the existing salt/HKDF/wrapping pipeline. Envelope version/suite stay 1; all Argon fields remain zero. Accept the selected profile explicitly; changing a header profile cannot bypass AEAD binding. Anyone with a file can derive this credential, read it or forge a new valid envelope. There is no file-holder confidentiality or source authentication claim. Profile-1 fixtures continue testing the historical construction independently.
+
+Product logical format is now version 2/schema 9, including original per-fact origins; full replacement and re-export preserve IDs/origins. Older unpublished schema-8/profile-1 files are not supported in the new no-key UI. Runtime quotas remain 4 MiB plaintext / 100,000 logical records; origin sidecars are bounded by fact count. OS-managed backups require an independently protected Android transport; the public wrapper is not that protection.
+
+
 ## Scope and current evidence
 
 ADR-031 selects Room 3 with SQLCipher's SQLiteDriver integration for qualification, and a provider-independent logical archive using Tink Streaming AEAD. Neither Room nor crypto is installed in the application. Generated recovery credentials are the first archive path to prototype. A passphrase profile is specified for evaluation and stays unavailable until its separate gates pass. No Drive, scheduled transport, new source consent or device operation is authorized by this design.
@@ -124,7 +131,7 @@ Use checked arithmetic for byte/row multiplication and cumulative limits. Rechec
 
 ## Loss, rotation and crash recovery
 
-Keystore loss/invalidation, absent wrapper, failed tag and corrupt database are distinct native health conditions even when user-facing wording is cautious. Stop collection/mutation and preserve encrypted generations. Offer retry where meaningful, portable restore with user credentials, or separately confirmed full reset. No silent reinitialization, key guessing, default key or recovery upload. Without a usable local key or separately held archive credentials the developer cannot recover history.
+Keystore loss/invalidation, absent wrapper, failed tag and corrupt database are distinct native health conditions even when user-facing wording is cautious. Stop collection/mutation and preserve encrypted generations. Offer retry where meaningful, compatible portable restore, or separately confirmed full reset. Current profile-3 restoration requires no user-held secret; earlier profile-1 fixtures require their original credential. No silent reinitialization, guessed local database key or recovery upload. Without a usable local key or an available compatible archive, the developer cannot recover history. The public-package archive credential never substitutes for local Keystore protection.
 
 Wrapping-key rotation creates a new Keystore alias, wraps the existing DB key with a fresh nonce/AAD, flushes and verifies the new wrapper, then atomically activates its version. Keep the prior wrapper/alias until activation/reopen durability is confirmed. A crash must select a verified committed wrapper; it must not delete a still-needed alias. This changes local protection, not the database key or external archives.
 

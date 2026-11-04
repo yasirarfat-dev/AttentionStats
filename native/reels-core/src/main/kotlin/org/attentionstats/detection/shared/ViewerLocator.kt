@@ -117,7 +117,11 @@ object ViewerLocator {
         category: (List<ScreenNode>) -> PageCategory = ::defaultCategory): AdapterFrame {
         val page = viewer.page ?: return AdapterFrame(Surface.REELS, ReelRoute.VIEWER, method = method)
         val print = Fingerprint.of(metadata(snapshot, page.bounds))
+        val kind = category(snapshot.within(page.bounds))
+        val numericTime = snapshot.within(page.bounds).filter { it.bounds.top >= page.bounds.top + page.bounds.height * 0.6 }
+            .firstNotNullOfOrNull { PlaybackTimeParser.parse(it.label) }
         return AdapterFrame(Surface.REELS, ReelRoute.VIEWER, print?.identity, print?.keys ?: emptySet(),
-            category(snapshot.within(page.bounds)), page.bounds, null, progress(snapshot, page.bounds), method)
+            kind, page.bounds, null, progress(snapshot, page.bounds), method,
+            positionMs = numericTime?.first, durationMs = numericTime?.second)
     }
 }

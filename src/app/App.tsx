@@ -5,7 +5,7 @@ import {
   type LinkingOptions,
 } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StatusBar, useColorScheme, View } from 'react-native';
+import { AccessibilityInfo, StatusBar, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import {
   SafeAreaProvider,
@@ -19,7 +19,9 @@ import { ProtectScreen } from '../features/protection';
 import { SettingsScreen } from '../features/settings';
 import { WelcomeScreen } from '../features/onboarding';
 import { NavIcon, type NavSymbol } from '../ui/NavIcon';
-import { themes } from '../ui/theme';
+import { applyAppearance, useAppearance } from '../ui/theme';
+import { loadAppearance } from '../platform/appearance';
+import { useUnistyles } from 'react-native-unistyles';
 
 type Tabs = {
   Today: undefined;
@@ -48,13 +50,24 @@ const icons: Record<keyof Tabs, NavSymbol> = {
 
 function MainTabs({ onWelcome }: { onWelcome: () => void }) {
   const insets = useSafeAreaInsets();
-  const colors = useColorScheme() === 'dark' ? themes.dark : themes.light;
+  const { theme: colors } = useUnistyles();
+  const appearance = useAppearance();
+  const [reduceMotion, setReduceMotion] = useState(true);
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
+    const listener = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      setReduceMotion,
+    );
+    return () => listener.remove();
+  }, []);
   return (
     <Tab.Navigator
       initialRouteName="Today"
       backBehavior="history"
       screenOptions={({ route }) => ({
         headerShown: false,
+        animation: appearance.motion && !reduceMotion ? 'fade' : 'none',
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.muted,
         tabBarStyle: {
@@ -89,6 +102,21 @@ function MainTabs({ onWelcome }: { onWelcome: () => void }) {
 
 export default function App() {
   const [welcome, setWelcome] = useState<boolean | null>(null);
+  const [appearanceLoaded, setAppearanceLoaded] = useState(false);
+  useEffect(() => {
+    let active = true;
+    loadAppearance()
+      .then(value => {
+        if (active) applyAppearance(value);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (active) setAppearanceLoaded(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
   useEffect(() => {
     let active = true;
     if (!NativeDiary) {
@@ -105,8 +133,8 @@ export default function App() {
       active = false;
     };
   }, []);
-  const dark = useColorScheme() === 'dark';
-  const colors = dark ? themes.dark : themes.light;
+  const { theme: colors, rt } = useUnistyles();
+  const dark = rt.themeName === 'dark';
   const base = dark ? DarkTheme : DefaultTheme;
   return (
     <SafeAreaProvider>
@@ -125,7 +153,7 @@ export default function App() {
           },
         }}
       >
-        {welcome === null ? (
+        {welcome === null || !appearanceLoaded ? (
           <View style={{ flex: 1, backgroundColor: colors.canvas }} />
         ) : welcome ? (
           <WelcomeScreen onDone={() => setWelcome(false)} />

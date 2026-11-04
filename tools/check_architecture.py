@@ -159,6 +159,18 @@ def main() -> int:
                     errors.append(f"{label}: only the registry may reference another social adapter")
     if detector_count < 5:
         errors.append("Expected one isolated adapter per supported source")
+    protection_source = ROOT / "native/protection-core/src/main/kotlin"
+    protection_paths = sorted(protection_source.rglob("*.kt"))
+    if not protection_paths:
+        errors.append("No pure protection domain source found")
+    for path in protection_paths:
+        source_text = path.read_text(encoding="utf-8")
+        expected_package = ".".join(path.parent.relative_to(protection_source).parts)
+        if not re.search(rf"^package {re.escape(expected_package)}$", source_text, re.M):
+            errors.append(f"{path.relative_to(ROOT)}: protection package/path mismatch")
+        for imported in re.findall(r"^import ([\w.*]+)$", source_text, re.M):
+            if not imported.startswith(("kotlin.", "java.time.", "org.attentionstats.protection.")):
+                errors.append(f"{path.relative_to(ROOT)}: infrastructure import in protection domain")
     app_source = ROOT / "android/app/src/main/java/com/attentionstats"
     reader = app_source / "detection/SnapshotReader.kt"
     action_owners = {app_source / "reels/ReelsAccessibilityService.kt", app_source / "autoscroll/AutoScrollGestureDispatcher.kt"}
@@ -198,6 +210,7 @@ def main() -> int:
     print(f"PASS: {len(paths)} Kotlin source files; package paths and declared domain import boundaries")
     print(f"PASS: {len(prototype_paths)} collection prototype source files; pure boundary and no app dependency")
     print(f"PASS: {len(reels_paths)} pure Reels/detection files; {detector_count} isolated source adapters; label reading and actions confined")
+    print(f"PASS: {len(protection_paths)} pure protection files; package paths and infrastructure boundaries")
     print("PASS: standalone storage/archive qualification excluded from product settings/dependencies/source")
     print(f"PASS: {mobile_count} mobile TypeScript files; relative imports, feature public APIs and layer direction")
     print("Static checks do not establish native compilation, UI or runtime source support.")

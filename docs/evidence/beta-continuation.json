@@ -1,0 +1,191 @@
+{
+  "reviewedDate": "2026-11-05",
+  "branch": "develop",
+  "tasks": [
+    "AS-020",
+    "AS-054",
+    "AS-058",
+    "AS-059"
+  ],
+  "status": "experimental",
+  "detectorRevision": 14,
+  "phone": {
+    "api": 36,
+    "source": "Facebook",
+    "sourceVersion": "585.0.0.47.54"
+  },
+  "artifacts": {
+    "preview": {
+      "sha256": "eae39e5b18170b94b59d54d80be2fb26addfb4f7e2798084c92cf364c3a0fd86",
+      "size": 85832279
+    },
+    "instrumentation": {
+      "sha256": "8d6dae680af2b8bee68a81c1c5ff1acc7e1675f56e12dd750039bcaa48542bc6",
+      "size": 168942
+    }
+  },
+  "host": {
+    "encounterChecks": 56,
+    "fixtureChecks": 214,
+    "scheduleChecks": 27,
+    "jestChecks": 66,
+    "pythonChecks": 85,
+    "types": "passed",
+    "lintArchitectureBackupPolicy": "passed",
+    "format": "passed",
+    "androidPreviewAssemblyAndLint": "passed",
+    "androidLintIssueCounts": {
+      "Error": 0,
+      "Warning": 63
+    }
+  },
+  "backup": {
+    "archivePhoneAssertionsPriorIconBuild": 47,
+    "transport": "existing Google transport; app-scoped request accepted 2026-11-04",
+    "naturalPeriodicExecution": "not independently observed",
+    "freshInstallRestore": "not tested; live history preserved",
+    "directDriveApi": "blocked separately",
+    "mergeSync": "not implemented; stable fact IDs and origins preserved",
+    "archiveLimit": "4 MiB plaintext / 100000 rows; rejection without truncation"
+  },
+  "hud": {
+    "drawnPlayPauseIcons": true,
+    "phoneLiveInteractionsPriorFinalCollectorBuild": 9,
+    "phoneViewStateAssertionsPriorFinalCollectorBuild": 16,
+    "scope": "one explicit control; off expanded-only; on below minimized counts; unsupported contexts suspend gestures while retaining selected state",
+    "broaderAcceptance": "experimental"
+  },
+  "historicalTrials": [
+    {
+      "detectorRevision": 11,
+      "samples": 90,
+      "savedDeltas": {
+        "reel": 9,
+        "photo": 46,
+        "ad": 12,
+        "unclassified": 0,
+        "photoFacet": 51,
+        "videoFacet": 16
+      },
+      "idleDelta": 0,
+      "hudVisibleSamples": 90,
+      "liveHudChecks": 9,
+      "independentReview": "all samples reviewed; over 50 distinct media-containing posts; samples include partial/repeated posts",
+      "accuracyAccepted": false,
+      "findings": [
+        "same video counted twice across clipped-header/playback-control change; observed pair retained as regression fixtures"
+      ],
+      "artifactHash": "not retained; not attributed to final artifact"
+    },
+    {
+      "detectorRevision": 12,
+      "samples": 90,
+      "savedDeltas": {
+        "reel": 12,
+        "photo": 50,
+        "ad": 6,
+        "unclassified": 0,
+        "photoFacet": 55,
+        "videoFacet": 13
+      },
+      "idleDelta": 0,
+      "hudVisibleSamples": 90,
+      "liveHudChecks": 9,
+      "independentReview": "all samples reviewed; over 50 distinct media-containing posts; samples include partial/repeated posts",
+      "accuracyAccepted": false,
+      "artifacts": {
+        "preview": {
+          "sha256": "113f07ba2dcbf4b40ea7be820b4266227f0629d25c8b9e3220edde1d52c3457c",
+          "size": 85832279
+        },
+        "instrumentation": {
+          "sha256": "0e7695f5e2a32a505e288877b2364ab8ebeb25385eeca593ff725658cb2105e8",
+          "size": 167709
+        }
+      },
+      "findings": [
+        "360 photo TextureView missed; positive role added for revision13",
+        "some multi-photo cards unresolved",
+        "loading/player transitions can change classification; totals alone are not fidelity proof"
+      ]
+    },
+    {
+      "detectorRevision": 13,
+      "direction": "reverse",
+      "samples": 90,
+      "artifacts": {
+        "preview": {
+          "sha256": "eae39e5b18170b94b59d54d80be2fb26addfb4f7e2798084c92cf364c3a0fd86",
+          "size": 85832279
+        },
+        "instrumentation": {
+          "sha256": "8d6dae680af2b8bee68a81c1c5ff1acc7e1675f56e12dd750039bcaa48542bc6",
+          "size": 168942
+        }
+      },
+      "savedDeltas": {
+        "reel": 14,
+        "photo": 50,
+        "ad": 6,
+        "unclassified": 0,
+        "photoFacet": 55,
+        "videoFacet": 15
+      },
+      "idleDelta": 0,
+      "hudVisibleSamples": 90,
+      "liveHudChecks": 9,
+      "independentReview": "targeted panorama and photo-button album/ad observations; not every reverse sample independently catalogued",
+      "findings": [
+        "360-photo focus at sample88 adds one photo and one photo facet",
+        "positive Photo-role buttons on ordinary album and four-tile image ad; addressed by revision14"
+      ],
+      "accuracyAccepted": false
+    }
+  ],
+  "privacy": {
+    "sourceCaptures": "task-owned private screenshots/layouts and own-HUD crops removed after review; no source content published",
+    "publishedEvidence": "sanitized structural fixtures and aggregate results only",
+    "productionScreenCaptureAdded": false,
+    "emulatorUsed": false,
+    "globalBackupAccountOrTransportChanged": false,
+    "phoneOperatorFilesRemoved": true
+  },
+  "finalTrial": {
+    "direction": "forward",
+    "samples": 20,
+    "savedDeltas": {
+      "reel": 1,
+      "photo": 12,
+      "ad": 2,
+      "unclassified": 0,
+      "photoFacet": 14,
+      "videoFacet": 1
+    },
+    "idleDelta": 0,
+    "hudVisibleSamples": 20,
+    "liveHudChecks": 9,
+    "independentReview": "all 20 samples visually reviewed; 16 distinct focused media items including the already-counted baseline; 15 new primary encounters match these observations",
+    "repairsConfirmed": [
+      "360 photo retained through clipped header without duplicate",
+      "four-tile Photo-button advertisement counted once as image ad",
+      "single control uses native play/pause graphics; Off expanded-only and On below minimized counts"
+    ],
+    "scope": "narrow format/continuity and overlay pass on this device/source version; no universal source fidelity claim"
+  },
+  "finalPhone": {
+    "isolatedArchiveOriginAgentAssertions": 47,
+    "artificialHudChoiceViewStateAssertions": 16,
+    "actualSourceHudInteractionAssertions": 9,
+    "realHistoryReplaced": false,
+    "testPackageRemoved": true
+  },
+  "limitations": [
+    "no fresh-install/reinstall recovery tested",
+    "natural nightly execution and remote durability not independently observed",
+    "archive bound remains 4 MiB plaintext / 100000 rows",
+    "merge/sync and deletion conflict resolution not implemented",
+    "dynamic loading/music-backed/mixed-media layouts and broader devices/locales remain unqualified",
+    "Instagram centered-carousel coverage remains unqualified independently",
+    "no main merge, release bump or Play upload"
+  ]
+}

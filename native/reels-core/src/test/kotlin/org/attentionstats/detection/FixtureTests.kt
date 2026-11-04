@@ -15,12 +15,31 @@ import javax.xml.parsers.DocumentBuilderFactory
  */
 object FixtureTests {
     data class Expect(val surface: Surface, val route: ReelRoute? = null, val category: PageCategory? = null,
-        val identified: Boolean = surface == Surface.REELS)
+        val identified: Boolean = surface == Surface.REELS, val mediaKind: String? = null)
 
     private val expectations: Map<String, Expect> = mapOf(
+        "facebook/feed_photo_button_ad.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.AD, mediaKind = "photo"),
+        "facebook/feed_photo_button_album.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.PHOTO, mediaKind = "photo"),
+        "facebook/feed_panorama_photo.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.PHOTO, mediaKind = "photo"),
+        "facebook/feed_video_entering.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.PHOTO, mediaKind = "photo"),
+        "facebook/feed_video_focused.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.REEL, mediaKind = "video"),
+        "facebook/feed_image_ad.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.AD, mediaKind = "photo"),
+        "facebook/feed_clipped_photo.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.PHOTO, mediaKind = "photo"),
+        "facebook/feed_portrait_photo.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.PHOTO, mediaKind = "photo"),
+        "facebook/feed_music_photo.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.PHOTO, mediaKind = "photo"),
+        "facebook/feed_square_photo.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.PHOTO, mediaKind = "photo"),
+        "facebook/feed_reels_row_only.xml" to Expect(Surface.OUTSIDE, ReelRoute.HOME, identified = false),
+        "facebook/feed_tall_video_ad.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.AD, mediaKind = "video"),
+        "snapchat/stories.xml" to Expect(Surface.OUTSIDE),
+        "snapchat/story_viewer.xml" to Expect(Surface.OUTSIDE),
+        "snapchat/spotlight.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.REEL),
+        "snapchat/spotlight_next.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.REEL),
+        "instagram/home_photo.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.AD),
+        "instagram/home_photo_centered.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.AD),
         "instagram/reels_tab.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.REEL),
         "instagram/home_feed_ad_video.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.AD),
-        "facebook/home_no_video.xml" to Expect(Surface.OUTSIDE, identified = false),
+        // Historical "no video" negative contains a positively labelled image advertisement.
+        "facebook/home_no_video.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.AD, mediaKind = "photo"),
         "facebook/home_reels_row.xml" to Expect(Surface.OUTSIDE, identified = false),
         "facebook/home_feed_reel.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.REEL),
         "facebook/reel_opened_from_home_row.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.REEL),
@@ -32,8 +51,9 @@ object FixtureTests {
         "instagram/direct_inbox.xml" to Expect(Surface.OUTSIDE),
         "instagram/story.xml" to Expect(Surface.OUTSIDE),
         "instagram/home_suggestion_carousel.xml" to Expect(Surface.EXCLUDED, ReelRoute.HOME),
-        "facebook/home_feed_2.xml" to Expect(Surface.OUTSIDE),
-        "facebook/marketplace.xml" to Expect(Surface.OUTSIDE),
+        "facebook/home_feed_2.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.PHOTO),
+        // Historical fixture is a duplicate Home photo (Home tab selected), despite its filename.
+        "facebook/marketplace.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.PHOTO),
         "youtube/home_feed.xml" to Expect(Surface.OUTSIDE),
         "youtube/short_opened_from_home.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.REEL),
         "youtube/watch_page.xml" to Expect(Surface.OUTSIDE),
@@ -87,9 +107,49 @@ object FixtureTests {
             require(frame.surface == expect.surface, "surface ${expect.surface}")
             expect.route?.let { require(frame.route == it, "route $it") }
             expect.category?.let { require(frame.category == it, "category $it") }
+            expect.mediaKind?.let { require(frame.mediaKind == it, "media kind $it") }
             require((frame.identity != null) == expect.identified, "identified=${expect.identified}")
+            val full = parse(file)
+            val truncated = ScreenSnapshot(full.packageName, full.windowId, full.screen, full.nodes, complete = false, typing = false)
+            val unknown = AdapterRegistry.of(app).read(truncated)
+            require(unknown.surface == Surface.UNKNOWN && unknown.identity == null, "incomplete layout stays unknown")
         }
         check(failures.isEmpty()) { failures.joinToString("\n", "Fixture failures:\n") }
+        val snapchat = AdapterRegistry.of(ReelApp.SNAPCHAT)
+        val first = snapchat.read(parse(File(root, "snapchat/spotlight.xml")))
+        val next = snapchat.read(parse(File(root, "snapchat/spotlight_next.xml")))
+        check(first.identity != next.identity && org.attentionstats.reels.EncounterTracker.overlap(first.keys, next.keys) < 0.5) {
+            "Spotlight navigation must not suppress different items"
+        }
+        checks++
+        // Synthetic aspect-ratio/album variations of an observed photo; not live format qualification.
+        val facebook = AdapterRegistry.of(ReelApp.FACEBOOK)
+        val buttonAlbum = facebook.read(parse(File(root, "facebook/feed_photo_button_album.xml")))
+        check(buttonAlbum.page == LayoutBounds(0, 531, 720, 1251)) {
+            "observed photo-role buttons must group into one album, not focus an individual tile"
+        }
+        checks++
+        val photo = parse(File(root, "facebook/feed_portrait_photo.xml"))
+        val leaf = photo.nodes.first { it.cls.endsWith("ImageView") && it.label == "Photo" }
+        fun withBounds(node: ScreenNode, box: LayoutBounds, index: Int = node.index) = ScreenNode(index,
+            node.parent, node.depth, node.id, node.cls, node.label, box, node.scrollable, node.clickable,
+            node.selected, node.key + index - node.index, node.range)
+        for (box in listOf(LayoutBounds(0, 650, 720, 810), LayoutBounds(210, 350, 510, 1320))) {
+            val nodes = photo.nodes.map { if (it === leaf) withBounds(it, box) else it }
+            val frame = facebook.read(ScreenSnapshot(photo.packageName, photo.windowId, photo.screen, nodes, true, false))
+            check(frame.surface == Surface.REELS && frame.category == PageCategory.PHOTO && frame.mediaKind == "photo") {
+                "positive photo aspect ratio must not be rejected"
+            }
+            checks++
+        }
+        val tiles = photo.nodes.map { if (it === leaf) withBounds(it, LayoutBounds(0, 598, 230, 1048)) else it } +
+            listOf(withBounds(leaf, LayoutBounds(240, 598, 470, 1048), photo.nodes.size),
+                withBounds(leaf, LayoutBounds(480, 598, 720, 1048), photo.nodes.size + 1))
+        val album = facebook.read(ScreenSnapshot(photo.packageName, photo.windowId, photo.screen, tiles, true, false))
+        check(album.surface == Surface.REELS && album.mediaKind == "photo" && album.page?.width == 720) {
+            "one album must group narrow photo tiles into one media region"
+        }
+        checks++
         return checks
     }
 }

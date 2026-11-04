@@ -9,6 +9,7 @@ import org.attentionstats.detection.shared.Sponsored
 import org.attentionstats.detection.shared.ViewerLocator
 import org.attentionstats.reels.PageCategory
 import org.attentionstats.reels.ReelApp
+import org.attentionstats.reels.Surface
 
 /**
  * Reels viewer (tab, Home taps, Explore, profiles, shares) via its clips pager or geometry;
@@ -21,8 +22,10 @@ object InstagramAdapter : ShortFormAdapter {
         "row_feed_photo_imageview", "carousel_viewpager")
     private val videoIds = setOf("video_container", "video_states", "carousel_video_media_group", "clips_video_container")
     private val videoLabel = Regex("^(reel|video|clip) by ", RegexOption.IGNORE_CASE)
+    private val photoLabel = Regex("^(photo|image) by ", RegexOption.IGNORE_CASE)
 
     override fun read(snapshot: ScreenSnapshot): AdapterFrame {
+        if (!snapshot.complete) return AdapterFrame(Surface.UNKNOWN)
         if (snapshot.typing) return AdapterFrame.TYPING
         ViewerLocator.locate(snapshot, pagerIds)?.let { viewer ->
             return ViewerLocator.frame(snapshot, viewer, "instagram.viewer", ::viewerCategory)
@@ -37,10 +40,14 @@ object InstagramAdapter : ShortFormAdapter {
         val media = outermost.map { node ->
             val inside = listOf(node) + snapshot.descendants(node)
             val header = FeedLocator.headerBand(snapshot, list.bounds, node.bounds)
-            val ad = header.any(Sponsored::node) || snapshot.withId("cta_container").any {
+            val ad = (header + inside).any(Sponsored::node) || snapshot.withId("cta_container").any {
                 it.bounds.top in (node.bounds.bottom - 8)..(node.bounds.bottom + 60)
             }
-            val video = inside.any { it.id in videoIds || videoLabel.containsMatchIn(it.label ?: "") }
+            // Instagram also wraps music-backed photos in video_container. A wrapper alone
+            // cannot turn a positive photo/carousel into a video.
+            val photo = inside.any { it.id == "row_feed_photo_imageview" || photoLabel.containsMatchIn(it.label ?: "") }
+            val video = inside.any { it.id == "video_states" || it.id == "clips_video_container" ||
+                videoLabel.containsMatchIn(it.label ?: "") } || (!photo && inside.any { it.id in videoIds })
             FeedLocator.Media(node, video, ad, header)
         }
         return FeedLocator.frame(snapshot, list, media, "instagram.feed", countPhotos = true)
@@ -48,8 +55,9 @@ object InstagramAdapter : ShortFormAdapter {
 
     private fun viewerCategory(nodes: List<ScreenNode>): PageCategory = when {
         nodes.any(Sponsored::node) -> PageCategory.AD
-        nodes.none { it.id in videoIds || it.id == "clips_viewer_video_layout" } &&
-            nodes.any { it.id?.contains("carousel") == true || it.id?.contains("image") == true } -> PageCategory.PHOTO
+        nodes.any { photoLabel.containsMatchIn(it.label ?: "") } -> PageCategory.PHOTO
+        nodes.none { it.id == "video_states" || it.id == "clips_viewer_video_layout" } &&
+            nodes.any { it.id == "carousel_viewpager" || it.id == "row_feed_photo_imageview" } -> PageCategory.PHOTO
         else -> PageCategory.REEL
     }
 }

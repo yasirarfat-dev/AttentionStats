@@ -47,9 +47,14 @@ import java.util.concurrent.atomic.AtomicLong
  */
 internal class ReelsCoordinator private constructor(private val context: Context) {
     private val diary = com.attentionstats.diary.DiaryEngine(context)
+    internal val schedules = com.attentionstats.protection.ScheduleOwner(context)
+    private val archives = com.attentionstats.backup.ArchiveOwner(context)
     private val unlockSession = UnlockSessionCounter()
     val reminder get() = diary.reminder
     val breakSeconds get() = diary.breakSeconds
+    val countPhotos get() = diary.countPhotos
+    private val playback = mutableMapOf<ReelApp, org.attentionstats.reels.PlaybackEvidence>()
+    private val lastPlayback = mutableMapOf<String, org.attentionstats.reels.PlaybackEvidence.Result>()
     private class ObservationInvalidated : RuntimeException()
     private val jobs = Channel<suspend () -> Unit>(256)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -74,6 +79,9 @@ internal class ReelsCoordinator private constructor(private val context: Context
     @Volatile var serviceConnected = false
     @Volatile var health = "starting"
         private set
+    /** Content-free transient status for the explicitly invoked test APK; never persisted or bridged. */
+    @JvmField @Volatile var acquisitionStatus = "not_sampled"
+    @JvmField @Volatile var observationStatus = "not_observed"
     @Volatile var liveOverlay: OverlaySnapshot? = null
         private set
     /** Today's headline encounter count per app, refreshed after every write; feeds daily limits. */
@@ -160,6 +168,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
             if (health == "busy") { refreshConfiguration(current); health = "ready" }
             return current
         }
+        archives.cleanupAbandoned()
         return HistoryStore.open(context).also {
             store = it
             refreshConfiguration(it)
@@ -170,6 +179,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
     }
 
     private suspend fun refreshConfiguration(history: HistoryStore) {
+        schedules.load(history)
         diary.loadChoices(history)
         configuration = history.database.data().configurations().associateBy { it.sourceId }
         currentNotices = ReelApp.entries.filter {
@@ -191,6 +201,85 @@ internal class ReelsCoordinator private constructor(private val context: Context
         success(snapshotNow(opened()).toString())
     }
 
+    fun scheduleSnapshot(success: (String) -> Unit, failure: (String) -> Unit) = enqueue(failure) {
+        opened()
+        success(schedules.snapshot(grantEnabled() && serviceConnected))
+    }
+    fun exportArchive(cancelled: java.util.concurrent.atomic.AtomicBoolean,
+        success: (ByteArray) -> Unit, failure: (String) -> Unit) = enqueue(failure) {
+        try {
+            val plain = com.attentionstats.backup.LogicalArchive.export(opened()) { check(!cancelled.get()) }
+            val encrypted = try { com.attentionstats.backup.ArchiveEnvelope.write(plain,
+                com.attentionstats.backup.ArchiveEnvelope.packageCredential(), cancel = { check(!cancelled.get()) },
+                profile = com.attentionstats.backup.ArchiveEnvelope.PUBLIC_PACKAGE_PROFILE) }
+                finally { plain.fill(0) }
+            success(encrypted)
+        } catch (_: Exception) { failure(if (cancelled.get()) "CANCELLED" else "ARCHIVE_LIMIT_OR_EXPORT_FAILED") }
+    }
+    fun previewArchive(bytes: ByteArray, cancelled: java.util.concurrent.atomic.AtomicBoolean,
+        success: (String, Long) -> Unit, failure: (String) -> Unit) = enqueue(failure) {
+        try {
+            val staged = archives.preview(opened(), bytes, com.attentionstats.backup.ArchiveEnvelope.packageCredential(),
+                profile = com.attentionstats.backup.ArchiveEnvelope.PUBLIC_PACKAGE_PROFILE, cancel = { check(!cancelled.get()) })
+            success(staged.token, staged.summary.rows)
+        } catch (_: Exception) { failure(if (cancelled.get()) "CANCELLED" else "ARCHIVE_REJECTED") }
+        finally { bytes.fill(0) }
+    }
+    fun cancelArchive() = enqueue { archives.clear() }
+    fun restoreArchive(token: String, cancelled: java.util.concurrent.atomic.AtomicBoolean,
+        success: () -> Unit, failure: (String) -> Unit) {
+        invalidate()
+        enqueue(failure) {
+            val staged = archives.pending
+            if (staged == null || staged.token != token) { failure("STALE_PREVIEW"); return@enqueue }
+            var committed = false
+            try {
+                val history = opened()
+                val dao = history.database.data()
+                val metadata = checkNotNull(dao.metadata())
+                if (metadata.lastRevision != staged.historyRevision || metadata.configurationRevision != staged.configurationRevision) {
+                    failure("STALE_PREVIEW"); return@enqueue
+                }
+                val oldDiaryRevision = checkNotNull(dao.diary()).revision
+                history.database.withWriteTransaction {
+                    com.attentionstats.backup.LogicalArchive.replace(history, staged.history) { check(!cancelled.get()) }
+                    val imported = checkNotNull(dao.diary())
+                    dao.putDiary(imported.copy(usageEnabled = false, reminderEnabled = false,
+                        measurePlayback = false,
+                        usageEpoch = "", queryThroughMs = 0, effectiveAtMs = 0, grantLost = false, onboardingSeen = true,
+                        revision = Math.addExact(maxOf(oldDiaryRevision, imported.revision), 1)))
+                    dao.configurations().forEach { dao.configure(it.sourceId, false, it.consentRevision, System.currentTimeMillis()) }
+                    dao.disableBlockers(); dao.setOverlay(false)
+                    val protection = dao.protection()
+                    if (protection != null) {
+                        val plan = com.attentionstats.protection.ScheduleOwner.decode(protection.document)
+                        val disabled = plan.copy(windows = plan.windows.map { it.copy(enabled = false) })
+                        disabled.validate(schedules.excluded)
+                        dao.putProtection(protection.copy(revision = Math.addExact(protection.revision, 1),
+                            document = com.attentionstats.protection.ScheduleOwner.encode(disabled).toString()))
+                    }
+                    dao.advanceConfigurationRevision()
+                    check(!cancelled.get())
+                }
+                // Commit is durable here; cancellation after this point must not report a rollback.
+                committed = true
+                main.post { com.attentionstats.autoscroll.AutoScrollSession.clear() }
+                trackers.clear(); visits.clear(); routes.clear(); openExposures.clear(); unlockSession.clear(); allowances.clear()
+                diary.resetLive(); refreshConfiguration(history); refreshTodayCounts(history); publish()
+                archives.clear(); success()
+            } catch (_: Exception) { if (committed) { health = "storage_unavailable"; publish(); success() } else failure("RESTORE_FAILED") }
+            finally { archives.clear() }
+        }
+    }
+    fun saveSchedules(document: String, expected: Long, success: () -> Unit, failure: (String) -> Unit) = enqueue(failure) {
+        val history = opened()
+        val valid = try { com.attentionstats.protection.ScheduleOwner.decode(document).also { it.validate(schedules.excluded) }; true }
+            catch (_: Exception) { false }
+        if (!valid) { failure("INVALID_ARGUMENT"); return@enqueue }
+        if (!schedules.save(history, document, expected)) { failure("REVISION_CONFLICT"); return@enqueue }
+        publish(); success()
+    }
+
     fun diarySnapshot(days: Int, success: (String) -> Unit, failure: (String) -> Unit) {
         val capturedFence = diary.fence.get()
         enqueue(failure) { success(diary.snapshot(opened(), days, capturedFence, ::blockingAvailable)) }
@@ -204,6 +293,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
                 failure("REVISION_CONFLICT"); return@enqueue
             }
             if (action.startsWith("block.")) ReelApp.byKey(action.removePrefix("block."))?.let { allowances.remove(it) }
+            if (action == "playback") { playback.clear(); lastPlayback.clear() }
             publish()
             success(diary.snapshot(history, 1, blockingAvailable = ::blockingAvailable))
         }
@@ -305,7 +395,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
     @Suppress("DEPRECATION") // API 24-32 require the legacy PackageManager overload.
     fun installedVersion(app: ReelApp): String {
         for (name in app.packages) try {
-            return context.packageManager.getPackageInfo(name, 0).versionName?.take(100) ?: "installed"
+            return context.packageManager.getPackageInfo(name, 0).versionName?.take(100)?.takeIf { it.isNotBlank() } ?: "installed"
         } catch (_: android.content.pm.PackageManager.NameNotFoundException) { }
         return ""
     }
@@ -393,11 +483,19 @@ internal class ReelsCoordinator private constructor(private val context: Context
             dao.deleteUsage()
             dao.deleteTimers()
             dao.deleteInterventions()
+            dao.deleteProtection()
+            dao.deleteOrigins()
+            main.post { com.attentionstats.autoscroll.AutoScrollSession.clear() }
+            com.attentionstats.backup.SystemBackupState.configure(context, false)
+            com.attentionstats.backup.SystemBackupState.clearPending(context)
+            archives.clear()
+            schedules.reset()
             dao.disableBlockers()
             unlockSession.clear()
             todayCounts.clear()
             val preferences = checkNotNull(dao.diary())
             dao.putDiary(preferences.copy(usageEnabled = false, reminderEnabled = false,
+                measurePlayback = false,
                 usageEpoch = "", effectiveAtMs = 0, queryThroughMs = 0,
                 revision = preferences.revision + 1))
             diary.resetLive()
@@ -434,8 +532,9 @@ internal class ReelsCoordinator private constructor(private val context: Context
 
     /** Close the open episode and the focused item's dwell. */
     private suspend fun closeOpen(history: HistoryStore, app: ReelApp, at: Long = System.currentTimeMillis()) {
+        playback.remove(app)
         val dao = history.database.data()
-        openExposures.remove(app)?.let { dao.closeDwell(it.id, (at - it.atMs).coerceIn(0, MAX_DWELL_MS)) }
+        openExposures.remove(app)?.let { lastPlayback.remove(it.id); dao.closeDwell(it.id, (at - it.atMs).coerceIn(0, MAX_DWELL_MS)) }
         visits.remove(app)?.let { dao.closeEpisode(it, at) }
         routes.remove(app)
     }
@@ -444,20 +543,21 @@ internal class ReelsCoordinator private constructor(private val context: Context
 
     /** One adapter reading from the accessibility service. Serialized; returns immediately. */
     fun observe(app: ReelApp, frame: AdapterFrame, item: ItemFrame, windowId: Int, capturedEpoch: Long) = enqueue {
-        if (capturedEpoch != epoch.get() || !allowed(app) || !grantEnabled()) return@enqueue
+        if (capturedEpoch != epoch.get() || !allowed(app) || !grantEnabled()) { observationStatus = "fenced_or_not_granted"; return@enqueue }
         val history = opened()
         val dao = history.database.data()
         val wall = System.currentTimeMillis()
         if (item.surface == Surface.REELS) { lastRecognized[app] = item.atMs; lastRecognizedWall[app] = wall }
         val tracker = trackers.getOrPut(app) { EncounterTracker() }
         val encounter = tracker.observe(item)
+        observationStatus = if (encounter == null) "no_new_encounter:${item.surface}" else "encounter:${encounter.category}:revisit=${encounter.revisit}"
         if (item.surface == Surface.OUTSIDE || item.surface == Surface.UNKNOWN) {
             history.database.withWriteTransaction { closeOpen(history, app, wall); dao.advanceRevision() }
         }
         if (encounter != null) {
             history.database.withWriteTransaction {
                 if (capturedEpoch != epoch.get() || !allowed(app) || !grantEnabled()) throw ObservationInvalidated()
-                openExposures.remove(app)?.let { dao.closeDwell(it.id, (wall - it.atMs).coerceIn(0, MAX_DWELL_MS)) }
+                openExposures.remove(app)?.let { lastPlayback.remove(it.id); dao.closeDwell(it.id, (wall - it.atMs).coerceIn(0, MAX_DWELL_MS)) }
                 if (routes[app] != encounter.route) {
                     visits.remove(app)?.let { dao.closeEpisode(it, wall) }
                     routes[app] = encounter.route
@@ -478,19 +578,35 @@ internal class ReelsCoordinator private constructor(private val context: Context
                     surface = if (encounter.route == ReelRoute.HOME) "feed" else "viewer",
                     revisit = encounter.revisit, appVersion = installedVersion(app), method = frame.method,
                     itemKey = itemKey(encounter.identity), unlockSessionId = sessionId,
-                    sessionOrdinal = if (encounter.revisit) 0 else sessionOrdinal))
+                    sessionOrdinal = if (encounter.revisit) 0 else sessionOrdinal, mediaKind = frame.mediaKind))
                 dao.advanceRevision()
                 openExposures[app] = OpenExposure(exposureId, wall)
+                playback[app] = org.attentionstats.reels.PlaybackEvidence()
             }
             if (!encounter.revisit) unlockSession.record(app, encounter.category)
             refreshTodayCounts(history)
             if (SystemClock.elapsedRealtime() - widgetAt > 20_000) refreshWidget(force = false)
         }
         val counted = encounter != null && !encounter.revisit && encounter.category != PageCategory.PHOTO
+        val exposure = openExposures[app]
+        if (diary.measurePlayback && exposure != null && capturedEpoch == epoch.get()) {
+            val eligible = frame.surface == Surface.REELS && frame.mediaKind == "video" && tracker.focused == frame.identity
+            val evidence = playback[app]?.sample(item.atMs, if (eligible) frame.positionMs else null, if (eligible) frame.durationMs else null)
+            if (evidence != null && lastPlayback[exposure.id] != evidence) {
+                history.database.withWriteTransaction {
+                    if (capturedEpoch != epoch.get() || !diary.measurePlayback || !allowed(app)) throw ObservationInvalidated()
+                    dao.updatePlayback(exposure.id, evidence.confirmedMs, evidence.qualified, evidence.completed)
+                    dao.advanceRevision()
+                    if (capturedEpoch != epoch.get()) throw ObservationInvalidated()
+                }
+                lastPlayback[exposure.id] = evidence
+            }
+        }
         val signal = CounterSignal(item.atMs, item.surface, null, windowId, item.category, item.route)
         if (capturedEpoch == epoch.get() && allowed(app) && grantEnabled())
             diary.observe(history, app, signal, wall, counted) { capturedEpoch == epoch.get() && allowed(app) && grantEnabled() }
-        if (item.surface == Surface.REELS && capturedEpoch == epoch.get()) refreshOverlay(history, app, encounter?.revisit == true, capturedEpoch)
+        if ((item.surface == Surface.REELS || (item.route == ReelRoute.HOME && frame.method.endsWith(".feed"))) && capturedEpoch == epoch.get())
+            refreshOverlay(history, app, encounter?.revisit == true, capturedEpoch, item.route)
         else if (item.surface == Surface.OUTSIDE || item.surface == Surface.UNKNOWN) liveOverlay = null
         publish()
     }
@@ -554,7 +670,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
     }.values.sum()
 
     private suspend fun refreshOverlay(history: HistoryStore, app: ReelApp, scrollBack: Boolean = false,
-        capturedEpoch: Long = epoch.get()) {
+        capturedEpoch: Long = epoch.get(), route: ReelRoute? = null) {
         val dao = history.database.data()
         val zone = ZoneId.systemDefault()
         val day = Instant.now().atZone(zone).toLocalDate()
@@ -567,14 +683,14 @@ internal class ReelsCoordinator private constructor(private val context: Context
         liveOverlay = OverlaySnapshot(app, headline(visitCategories), headline(todayCategories), capturedEpoch,
             PageCategory.entries.filter { it != PageCategory.POST }.map {
                 OverlayCategory(it, visitCategories[it.key] ?: 0, todayCategories[it.key] ?: 0)
-            }, scrollBack, showCounterIcons, allAppsToday, routes[app] ?: ReelRoute.VIEWER, diary.includeRecognizedAds,
+            }, scrollBack, showCounterIcons, allAppsToday, route ?: routes[app] ?: ReelRoute.VIEWER, diary.includeRecognizedAds,
             reminder?.durationMs ?: 0, diary.breakProgress)
     }
 
     companion object {
         /** Notice 6: version-independent detection that reads on-screen labels in memory. */
         const val NOTICE_REVISION = 6
-        const val DETECTOR_REVISION = 10
+        const val DETECTOR_REVISION = 14
         private const val MAX_DWELL_MS = 30 * 60_000L
         @Volatile private var instance: ReelsCoordinator? = null
         fun get(context: Context): ReelsCoordinator = instance ?: synchronized(this) {

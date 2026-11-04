@@ -23,6 +23,8 @@ GitHub Actions CI/CD is **manual only** by explicit user instruction (2026-10-27
 
 Allowed feature states are planned, experimental, blocked and implemented. Runtime capability states are separate and defined in [Contracts](NATIVE-CONTRACTS.md). If a task is underway, keep its feature status accurate and record active work in State rather than claiming implementation early. IDs are stable: never renumber AS/C/scenario/ADR/F IDs to fill gaps. New ideas enter Queue and get promoted through a documented decision.
 
+**Merge agreement (2026-11-03):** Continue on `develop`. A merge into `main` requires both the maintainer's explicit agreement to the concrete candidate and the agent's readiness assessment after applicable verification. Standing commit/push authorization does not authorize merging. Never merge merely because checks pass.
+
 ## Package and machine rules
 
 Use pnpm. Every new direct runtime/development dependency resolves through `package@latest`, with exact date/version/license/compatibility evidence. Pin reviewed resolution in the lockfile; routine builds use frozen-lockfile. Do not silently downgrade, force peers or globally approve scripts. Native dependencies use latest stable releases with explicit pins and evidence.

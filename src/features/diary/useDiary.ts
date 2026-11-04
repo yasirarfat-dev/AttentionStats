@@ -75,6 +75,8 @@ export function useDiary(days: 1 | 7 | 31 = 1) {
       | 'onboarding'
       | 'ads'
       | 'break'
+      | 'playback'
+      | 'photos'
       | `block.${ReelsSourceKey}`,
     enabled: boolean,
     count = snapshot?.reminderCount ?? 15,

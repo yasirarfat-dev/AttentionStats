@@ -54,6 +54,7 @@ data class ItemFrame(
     val category: PageCategory,
     val scrollSequence: Long,
     val sameSlot: Boolean = false,
+    val slotKey: Int? = null,
 )
 
 data class Encounter(val identity: Long, val route: ReelRoute, val category: PageCategory,
@@ -79,6 +80,7 @@ class EncounterTracker(
     private var currentKeys: Set<Long> = emptySet()
     private var currentScroll = Long.MIN_VALUE
     private var currentRoute: ReelRoute? = null
+    private var currentSlot: Int? = null
     private var candidate: Long? = null
     private var candidateSince = 0L
     private var lastAt = Long.MIN_VALUE
@@ -90,7 +92,7 @@ class EncounterTracker(
     val focused: Long? get() = current
 
     /** Leaving the app or surface: the next item counts as a fresh entry. Seen items persist. */
-    fun leave() { current = null; currentKeys = emptySet(); candidate = null; currentRoute = null }
+    fun leave() { current = null; currentKeys = emptySet(); candidate = null; currentRoute = null; currentSlot = null }
 
     /** New unlock session: forget everything. */
     fun reset() { leave(); seen.clear(); ordinal = 0; lastAt = Long.MIN_VALUE }
@@ -105,9 +107,16 @@ class EncounterTracker(
         }
         val identity = frame.identity ?: run { candidate = null; return null }
         if (currentRoute != null && currentRoute != frame.route) leave()
-        if (identity == current) { candidate = null; currentKeys = frame.keys; return null }
-        if (frame.sameSlot && current != null) {
+        if (identity == current) { candidate = null; if (frame.keys.isNotEmpty()) currentKeys = frame.keys; return null }
+        if (current != null && frame.route == ReelRoute.HOME && frame.slotKey != null &&
+            frame.slotKey == currentSlot && (frame.keys.isEmpty() || overlap(currentKeys, frame.keys) >= 0.8)) {
+            // A scroll may clip the same post's header/caption. Keep strongly matching
+            // metadata in the same hosting view continuous, rather than counting it twice.
+            adopt(identity, frame, retainKeys = frame.keys.isEmpty()); return null
+        }
+        if (frame.sameSlot && current != null && candidate == null) {
             // The adapter proved this is the same on-screen item (continuous layout); adopt it.
+            // A recycled slot must not silently adopt a new post already awaiting its dwell.
             adopt(identity, frame); return null
         }
         if (candidate != identity) { candidate = identity; candidateSince = frame.atMs; return null }
@@ -123,10 +132,12 @@ class EncounterTracker(
         return Encounter(identity, frame.route, frame.category, revisit, frame.atMs, ordinal)
     }
 
-    private fun adopt(identity: Long, frame: ItemFrame) {
-        current = identity; currentKeys = frame.keys; currentScroll = frame.scrollSequence
+    private fun adopt(identity: Long, frame: ItemFrame, retainKeys: Boolean = false) {
+        current = identity; if (!retainKeys) currentKeys = frame.keys; currentScroll = frame.scrollSequence
         currentRoute = frame.route; candidate = null
-        if (seen.containsKey(identity)) seen[identity] = true
+        currentSlot = frame.slotKey
+        // Continuity aliases (for example a clipped header) must also remain revisits on return.
+        seen[identity] = true
     }
 
     companion object {

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
+import NativeDiary from '../../platform/specs/NativeDiary';
 import { StyleSheet } from 'react-native-unistyles';
 import {
   reelsSources,
@@ -12,6 +13,7 @@ import {
   Card,
   Divider,
   SectionTitle,
+  Row,
   Segmented,
   Stepper,
   ToggleRow,
@@ -78,6 +80,21 @@ export function ProtectScreen() {
 
   return (
     <Screen title="Protect" subtitle="Gentle tools you choose">
+      <SectionTitle>App schedules</SectionTitle>
+      <Card padded={false}>
+        <Row
+          icon="clock"
+          title="App groups & blocking periods"
+          detail="Choose apps or categories, then add multiple daily or overnight periods."
+          onPress={async () => {
+            if (!(await NativeDiary?.openAppSchedules()))
+              Alert.alert(
+                'Schedules unavailable',
+                'Could not open app schedules. Please try again.',
+              );
+          }}
+        />
+      </Card>
       <SectionTitle>Mindful breaks</SectionTitle>
       <Card>
         <ToggleRow

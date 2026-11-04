@@ -1,0 +1,20 @@
+<resources>
+    <style name="AttentionNativeLight" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:colorAccent">#285CD6</item>
+        <item name="android:windowBackground">#F5F7FC</item>
+        <item name="android:textColorPrimary">#18253D</item>
+        <item name="android:textColorSecondary">#53627B</item>
+        <item name="android:fontFamily">sans</item>
+    </style>
+    <style name="AttentionNativeDark" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:colorAccent">#ABC3FF</item>
+        <item name="android:windowBackground">#0D1421</item>
+        <item name="android:textColorPrimary">#ECF1FA</item>
+        <item name="android:textColorSecondary">#B0BFD6</item>
+        <item name="android:fontFamily">sans</item>
+    </style>
+    <style name="AttentionNativeLightTeal" parent="AttentionNativeLight"><item name="android:colorAccent">#096E6C</item></style>
+    <style name="AttentionNativeDarkTeal" parent="AttentionNativeDark"><item name="android:colorAccent">#8BDDD5</item></style>
+    <style name="AttentionNativeLightViolet" parent="AttentionNativeLight"><item name="android:colorAccent">#6746B5</item></style>
+    <style name="AttentionNativeDarkViolet" parent="AttentionNativeDark"><item name="android:colorAccent">#D0BCFF</item></style>
+</resources>

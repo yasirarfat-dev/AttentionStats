@@ -22,6 +22,9 @@ data class AdapterFrame(
     val slotKey: Int? = null,
     val progress: Double? = null,
     val method: String = "",
+    val mediaKind: String = if (category == PageCategory.PHOTO) "photo" else if (category == PageCategory.REEL) "video" else "unknown",
+    val positionMs: Long? = null,
+    val durationMs: Long? = null,
 ) {
     companion object {
         val OUTSIDE = AdapterFrame(Surface.OUTSIDE)

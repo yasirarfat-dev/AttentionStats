@@ -48,12 +48,18 @@ internal object AutoScrollSession {
         onChanged()
     }
     fun start(): Boolean {
-        val frame = latest ?: return false
-        val key = frame.key() ?: return false
-        if (!enabled || !usable(frame)) return false
-        gate.reset(); target = key; waitingUntil = 0; scrollSettlingUntil = 0; stillSince = 0; running = true; revision++
+        if (!enabled) return false
+        gate.reset(); target = null; waitingUntil = 0; scrollSettlingUntil = 0; stillSince = 0; running = true; revision++
         attempts = 0; confirmedTransitions = 0
-        reason = "waiting_for_cycle"; onChanged(); return true
+        latest?.takeIf(::usable)?.key()?.let { target = it }
+        reason = if (target == null) "waiting_for_playback" else "waiting_for_cycle"
+        onChanged(); return true
+    }
+    /** Suspend dispatch and invalidate queued gestures without changing the user's On choice. */
+    fun suspendActions(why: String) {
+        val changed = target != null || waitingUntil != 0L || reason != why
+        target = null; waitingUntil = 0; scrollSettlingUntil = 0; stillSince = 0; gate.reset()
+        if (changed) { revision++; reason = why; onChanged() }
     }
     fun stop(why: String = "stopped") {
         val changed = running || reason != why
@@ -61,9 +67,9 @@ internal object AutoScrollSession {
         if (changed) onChanged()
     }
     fun clear() { stop("off"); enabled = false; noticeAccepted = false; latest = null; onChanged() }
-    fun unavailable(reason: String) { latest = null; if (running) stop(reason) }
+    fun unavailable(reason: String) { latest = null; if (running) suspendActions(reason) }
     fun expire(token: Long, now: Long) {
-        if (current(token) && waitingUntil > 0 && now >= waitingUntil) stop("next_page_unconfirmed")
+        if (current(token) && waitingUntil > 0 && now >= waitingUntil) suspendActions("next_page_unconfirmed")
     }
     private fun fresh(frame: Frame): Boolean = SystemClock.elapsedRealtime() - frame.atMs in 0..750
     private fun usable(frame: Frame): Boolean = frame.eligible && frame.position?.let {
@@ -74,19 +80,25 @@ internal object AutoScrollSession {
         // Suppress only that bounded scroll tail. Clicks, context changes and Stop
         // remain immediate; an actual different page still fails the frame fence.
         if (running && (reason != "manual_scroll" ||
-            (waitingUntil == 0L && SystemClock.elapsedRealtime() >= scrollSettlingUntil))) stop(reason)
+            (waitingUntil == 0L && SystemClock.elapsedRealtime() >= scrollSettlingUntil))) suspendActions(reason)
     }
     fun frame(value: Frame, next: (Frame, Long) -> Unit) {
         latest = value
         if (!running) return
         val key = value.key()
         val previous = target
-        if (!enabled || !value.eligible || !fresh(value) || previous == null || value.app.key != previous.app ||
-            value.window != previous.window || value.epoch != previous.epoch) { stop("context_changed"); return }
+        if (previous == null) {
+            if (!enabled || key == null || !usable(value)) { suspendActions("waiting_for_playback"); return }
+            target = key; gate.reset(); reason = "waiting_for_cycle"; revision++; onChanged()
+            gate.sample(key, value.atMs, checkNotNull(value.position), true)
+            return
+        }
+        if (!enabled || !value.eligible || !fresh(value) || value.app.key != previous.app ||
+            value.window != previous.window || value.epoch != previous.epoch) { suspendActions("context_changed"); return }
         if (waitingUntil > 0) {
-            if (value.atMs >= waitingUntil) { stop("next_page_unconfirmed"); return }
+            if (value.atMs >= waitingUntil) { suspendActions("next_page_unconfirmed"); return }
             if (value.position != null && (!value.position.isFinite() || value.position !in 0.0..1.0)) {
-                stop("playback_unavailable"); return
+                suspendActions("playback_unavailable"); return
             }
             if (key != null && key != previous) {
                 confirmedTransitions++
@@ -99,7 +111,7 @@ internal object AutoScrollSession {
             }
             return
         }
-        if (key != null && key != previous) { stop("manual_page_change"); return }
+        if (key != null && key != previous) { suspendActions("manual_page_change"); return }
         if (key != null && value.position == null && stillSince > 0 && value.eligible && fresh(value)) {
             if (value.atMs - stillSince >= STILL_ITEM_MS) {
                 attempts++; stillSince = 0
@@ -108,14 +120,14 @@ internal object AutoScrollSession {
             }
             return
         }
-        if (key == null || value.position == null || !usable(value)) { stop("playback_unavailable"); return }
+        if (key == null || value.position == null || !usable(value)) { suspendActions("playback_unavailable"); return }
         if (gate.sample(key, value.atMs, value.position, true)) {
             attempts++
             waitingUntil = value.atMs + 2_500; reason = "advancing"; onChanged()
             next(value, revision)
         }
     }
-    fun current(token: Long): Boolean = enabled && running && revision == token
+    fun current(token: Long): Boolean = enabled && running && target != null && revision == token
     fun canStart(): Boolean = enabled && latest?.let {
         it.page != null && usable(it)
     } == true

@@ -94,6 +94,11 @@ data class Exposure(
     @ColumnInfo(defaultValue = "''") val unlockSessionId: String = "",
     /** 1-based position of this new encounter within its unlock session (0 for revisits). */
     @ColumnInfo(defaultValue = "0") val sessionOrdinal: Long = 0,
+    @ColumnInfo(defaultValue = "'unknown'") val mediaKind: String = "unknown",
+    /** -1 means no opted-in, qualified numeric playback observation. */
+    @ColumnInfo(defaultValue = "-1") val playbackMs: Long = -1,
+    @ColumnInfo(defaultValue = "0") val qualifiedWatch: Boolean = false,
+    @ColumnInfo(defaultValue = "0") val observedCompletion: Boolean = false,
 )
 
 @Entity(indices = [Index("sourceId", "startMs")])
@@ -123,6 +128,9 @@ data class DiaryConfiguration(
     val revision: Long = 0,
     /** Seconds a mindful-break screen waits before its choices unlock. */
     @ColumnInfo(defaultValue = "10") val breakSeconds: Int = 10,
+    @ColumnInfo(defaultValue = "0") val measurePlayback: Boolean = false,
+    /** Existing disclosed photo collection survives migration; fresh installs opt in separately. */
+    @ColumnInfo(defaultValue = "1") val countPhotos: Boolean = false,
 )
 
 /** Only package, timestamp and admitted event kind; no activity names or content. */
@@ -158,8 +166,30 @@ data class InterventionEvent(
     val decidedAtMs: Long = 0,
 )
 
+/** Bounded, versioned schedule document; parsed/validated by the protection owner. */
+@Entity
+data class ProtectionConfiguration(@PrimaryKey val id: Int = 1, val revision: Long = 0,
+    val document: String = "{\"groups\":[],\"windows\":[]}")
+
+/** Imported facts keep their original installation origin; new local facts use StoreMetadata. */
+@Entity(primaryKeys = ["tableName", "recordId"])
+data class FactOrigin(val tableName: String, val recordId: String, val originId: String)
+
 @Dao
 interface AttentionDao {
+    @Query("DELETE FROM FactOrigin") suspend fun deleteOrigins()
+    @Query("UPDATE Exposure SET playbackMs = :duration, qualifiedWatch = :qualified, observedCompletion = :completed WHERE id = :id")
+    suspend fun updatePlayback(id: String, duration: Long, qualified: Boolean, completed: Boolean)
+    @Query("SELECT appId, COUNT(*) AS count FROM Exposure WHERE occurredAtMs >= :start AND occurredAtMs < :end AND revisit = 0 AND (category = 'reel' OR mediaKind = 'video') GROUP BY appId")
+    suspend fun videoTotals(start: Long, end: Long): List<AppCount>
+    @Query("SELECT appId, COUNT(*) AS count FROM Exposure WHERE occurredAtMs >= :start AND occurredAtMs < :end AND revisit = 0 AND (category = 'photo' OR mediaKind = 'photo') GROUP BY appId")
+    suspend fun photoTotals(start: Long, end: Long): List<AppCount>
+    @Query("SELECT appId, COUNT(*) AS measured, SUM(playbackMs) AS duration, SUM(qualifiedWatch) AS qualified, SUM(observedCompletion) AS completed FROM Exposure WHERE occurredAtMs >= :start AND occurredAtMs < :end AND playbackMs >= 0 GROUP BY appId")
+    suspend fun playbackTotals(start: Long, end: Long): List<PlaybackTotal>
+    @Query("SELECT * FROM ProtectionConfiguration WHERE id = 1")
+    suspend fun protection(): ProtectionConfiguration?
+    @Upsert suspend fun putProtection(value: ProtectionConfiguration)
+    @Query("DELETE FROM ProtectionConfiguration") suspend fun deleteProtection()
     @Query("SELECT * FROM DiaryConfiguration WHERE id = 1")
     suspend fun diary(): DiaryConfiguration?
     @Upsert suspend fun putDiary(value: DiaryConfiguration)
@@ -246,15 +276,17 @@ interface AttentionDao {
 
 data class CategoryTotal(val category: String, val count: Long)
 data class AppCount(val appId: String, val count: Long)
+data class PlaybackTotal(val appId: String, val measured: Long, val duration: Long, val qualified: Long, val completed: Long)
 data class HourTotal(val category: Int, val count: Long)
 data class InterventionTotal(val kind: String, val choice: String, val count: Long)
 
 @Database(entities = [StoreMetadata::class, SourceConfiguration::class, LiveOverlayConfiguration::class,
     ConsentRecord::class, SurfaceEpisode::class, Exposure::class, CoverageInterval::class,
     DiaryConfiguration::class, AppUsageEvent::class, ReelsTimer::class, ReelsBlockConfiguration::class,
-    InterventionEvent::class],
-    version = 6, autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3),
-        AutoMigration(from = 3, to = 4), AutoMigration(from = 4, to = 5), AutoMigration(from = 5, to = 6)],
+    InterventionEvent::class, ProtectionConfiguration::class, FactOrigin::class],
+    version = 9, autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3),
+        AutoMigration(from = 3, to = 4), AutoMigration(from = 4, to = 5), AutoMigration(from = 5, to = 6),
+        AutoMigration(from = 6, to = 7), AutoMigration(from = 7, to = 8), AutoMigration(from = 8, to = 9)],
     exportSchema = true)
 abstract class AttentionDatabase : RoomDatabase() {
     abstract fun data(): AttentionDao

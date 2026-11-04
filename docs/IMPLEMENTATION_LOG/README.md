@@ -17,3 +17,5 @@ Entries:
 - [2026-10-29 — interrupted counter recovery and four-source admission](2026-10-29.md).
 - [2026-10-30 — resumed MVP verification and upload signing](2026-10-30.md).
 - [2026-11-03 — closed-beta continuation and development branch](2026-11-03.md).
+- [2026-11-04 — beta continuation and physical-device qualification](2026-11-04.md).
+- [2026-11-05 — Facebook continuity and final HUD icons](2026-11-05.md).

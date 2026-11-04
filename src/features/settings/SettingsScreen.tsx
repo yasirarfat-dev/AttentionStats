@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, Linking, Share, Text, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import {
@@ -19,15 +19,18 @@ import {
   Pill,
   Row,
   SectionTitle,
+  Segmented,
   ToggleRow,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
 import { useAppIcons, useDiary } from '../diary';
 import { useDeleteHistory } from './DeleteHistory';
 import { useReels } from '../sources';
+import { applyAppearance, useAppearance } from '../../ui/theme';
+import { saveAppearance } from '../../platform/appearance';
 
 const REPO = 'https://github.com/yasirarfat-dev/AttentionStats';
-const PRIVACY = `${REPO}/blob/main/policies/PRIVACY.md`;
+const PRIVACY = `${REPO}/blob/develop/policies/PRIVACY.md`;
 const EMAIL = 'consciousbiobot@gmail.com';
 const STORE = 'https://play.google.com/store/apps/details?id=attention.stats';
 
@@ -39,6 +42,22 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
     reelsSourceKeys.map(key => reelsSources[key].packageName),
   );
   const [autoScroll, setAutoScroll] = useState(false);
+  const appearance = useAppearance();
+  const appearancePending = useRef(false);
+  async function chooseAppearance(next: typeof appearance) {
+    if (appearancePending.current) return;
+    appearancePending.current = true;
+    try {
+      applyAppearance(await saveAppearance(next));
+    } catch {
+      Alert.alert(
+        'Could not save appearance',
+        'Your choice was not saved. Please try again.',
+      );
+    } finally {
+      appearancePending.current = false;
+    }
+  }
   useEffect(() => {
     NativeReels?.getAutoScrollSnapshot()
       .then(raw => setAutoScroll(parseAutoScrollStatus(raw).enabled))
@@ -174,7 +193,11 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <Row
           icon="eye"
           title="Accessibility"
-          detail="Needed to recognise short videos"
+          detail={
+            snapshot?.accessibilityEnabled && !snapshot?.serviceConnected
+              ? 'Disconnected. Turn this service off, then on in Android Settings.'
+              : 'Needed to recognise short videos'
+          }
           trailing={
             <Pill
               label={snapshot?.accessibilityEnabled ? 'On' : 'Off'}
@@ -225,6 +248,63 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         />
       </Card>
 
+      <SectionTitle>Appearance</SectionTitle>
+      <Card>
+        <Body>Make it comfortable for you</Body>
+        <Segmented
+          label="Theme"
+          value={appearance.mode}
+          options={[
+            { value: 'light', label: 'Light' },
+            { value: 'dark', label: 'Dark' },
+            { value: 'system', label: 'System' },
+          ]}
+          onChange={mode => void chooseAppearance({ ...appearance, mode })}
+        />
+        <Segmented
+          label="Accent color"
+          value={appearance.accent}
+          options={[
+            { value: 'blue', label: 'Blue' },
+            { value: 'teal', label: 'Teal' },
+            { value: 'violet', label: 'Violet' },
+          ]}
+          onChange={accent => void chooseAppearance({ ...appearance, accent })}
+        />
+        <ToggleRow
+          title="Gentle animations"
+          detail="Soft transitions between tabs. Your phone’s reduced-motion setting takes priority."
+          value={appearance.motion}
+          onChange={motion => void chooseAppearance({ ...appearance, motion })}
+        />
+        <Body muted>
+          System follows your phone’s light or dark setting. Your choices are
+          saved on this device.
+        </Body>
+      </Card>
+      <SectionTitle>What to measure</SectionTitle>
+      <Card padded={false}>
+        <ToggleRow
+          icon="layers"
+          title="Count photo encounters"
+          detail="Count recognized photos and carousels separately from videos in your enabled sources. One carousel post is one encounter."
+          value={diary.snapshot?.countPhotos ?? true}
+          disabled={!diary.snapshot}
+          onChange={value => diary.configure('photos', value)}
+        />
+        <ToggleRow
+          icon="play"
+          title="Measure confirmed playback (experimental)"
+          detail="Use exposed numeric player times for 3-second watches, playback time and observed completions. Pauses and missing signals add no time; availability varies by app and layout."
+          value={diary.snapshot?.measurePlayback ?? false}
+          disabled={!diary.snapshot}
+          onChange={value => diary.configure('playback', value)}
+        />
+      </Card>
+      <Body muted>
+        Text posts, likes, reactions and submitted comments are not measured in
+        this build. They need separate source qualification and opt-in controls.
+      </Body>
       <SectionTitle>Extras</SectionTitle>
       <Card padded={false}>
         <ToggleRow
@@ -294,8 +374,21 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
       <Card padded={false}>
         <Row
           icon="lock"
+          title="Backup & restore"
+          detail="No backup password to remember. Keep exported files in private storage."
+          onPress={async () => {
+            if (!(await NativeDiary?.openBackup()))
+              Alert.alert(
+                'Backup unavailable',
+                'Could not open backup. Please try again.',
+              );
+          }}
+        />
+        <Divider />
+        <Row
+          icon="lock"
           title="Privacy policy"
-          detail="Short and plain: nothing leaves your phone."
+          detail="Local history, your controls, and optional encrypted file transfers."
           onPress={() => Linking.openURL(PRIVACY)}
         />
         <Divider />
@@ -311,8 +404,8 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
       <Card padded={false}>
         <Row
           icon="info"
-          title="Stored only on this phone"
-          detail="Encrypted, never uploaded, not backed up anywhere. Pausing keeps it safe."
+          title="Encrypted local history"
+          detail="No data sent to us. Exports use a public app key and rely on your storage account for privacy. Erasing local history does not erase exported files."
         />
         <Divider />
         <Row
@@ -328,7 +421,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <Text style={styles.brand}>
           Attention Stats {snapshot?.device.appVersion ?? ''}
         </Text>
-        <Caption>No servers · No ads · No tracking · Open source</Caption>
+        <Caption>No developer telemetry · No ads · Open source</Caption>
         <Text style={styles.maker}>
           Made with care by{' '}
           <Text

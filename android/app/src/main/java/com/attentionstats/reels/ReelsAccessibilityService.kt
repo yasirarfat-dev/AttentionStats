@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicLong
 class ReelsAccessibilityService : AccessibilityService() {
     private val main = Handler(Looper.getMainLooper())
     private val coordinator by lazy { ReelsCoordinator.get(this) }
-    private val listener: () -> Unit = { main.post { renderOverlays() } }
+    private val listener: () -> Unit = { main.post { updateEventTargets(); schedule(0); renderOverlays() } }
     private val worker = Executors.newSingleThreadExecutor()
     @Volatile private var destroyed = false
     private var scheduled = false
@@ -54,7 +54,7 @@ class ReelsAccessibilityService : AccessibilityService() {
     @Volatile private var pausedApp: ReelApp? = null
     @Volatile private var displayEligible = false
     @Volatile private var lastFrame: AdapterFrame? = null
-    private data class Seen(val app: ReelApp, val window: Int, val atMs: Long, val frame: AdapterFrame)
+    private data class Seen(val app: ReelApp, val window: Int, val atMs: Long, val frame: AdapterFrame, val scroll: Long)
     @Volatile private var lastReels: Seen? = null
 
     private var hud: CounterHudView? = null
@@ -75,11 +75,14 @@ class ReelsAccessibilityService : AccessibilityService() {
     private var focusRequest: AudioFocusRequest? = null
     /** After "Keep watching", the dismissal is queued; do not re-show the break meanwhile. */
     private var breakQuietUntil = 0L
+    @Volatile private var scheduledPackage: String? = null
+    private var scheduleOverlay: InterventionOverlay? = null
+    private var scheduleOverlayPackage: String? = null
 
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                Intent.ACTION_SCREEN_OFF -> { coordinator.resetUnlockSession(); outside(true) }
+                Intent.ACTION_SCREEN_OFF -> { scheduledPackage = null; coordinator.resetUnlockSession(); outside(true) }
                 Intent.ACTION_USER_PRESENT -> schedule(0)
             }
         }
@@ -107,13 +110,15 @@ class ReelsAccessibilityService : AccessibilityService() {
         receiverRegistered = true
         // Events arrive only from the supported short-video apps; departure is noticed by polling
         // the foreground window's package while one of them is in front.
-        serviceInfo = serviceInfo?.apply { packageNames = ReelApp.allPackages.toTypedArray() }
+        updateEventTargets()
         coordinator.snapshot({ main.post { schedule(0) } }, { })
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null || destroyed) return
-        val app = ReelApp.byPackage(event.packageName?.toString() ?: "") ?: return
+        val foreground = event.packageName?.toString() ?: return
+        if (foreground in coordinator.schedules.plan.targets()) schedule(60)
+        val app = ReelApp.byPackage(foreground) ?: return
         if (!coordinator.allowed(app)) { if (coordinator.pausedSource(app)) schedule(300); return }
         when (event.eventType) {
             AccessibilityEvent.TYPE_VIEW_SCROLLED -> {
@@ -125,6 +130,17 @@ class ReelsAccessibilityService : AccessibilityService() {
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> schedule(60)
             else -> schedule(200)
         }
+    }
+
+    private fun updateEventTargets() {
+        val current = serviceInfo ?: return
+        val wanted = (ReelApp.allPackages + coordinator.schedules.plan.targets()).toSet()
+        val needed = android.accessibilityservice.AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
+            android.accessibilityservice.AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS
+        if (current.packageNames?.toSet() == wanted && current.flags and needed == needed) return
+        current.packageNames = wanted.toTypedArray()
+        current.flags = current.flags or needed
+        serviceInfo = current
     }
 
     private fun schedule(delay: Long) {
@@ -142,10 +158,19 @@ class ReelsAccessibilityService : AccessibilityService() {
         val now = SystemClock.elapsedRealtime()
         if (now - lastScan < 180) { schedule(180 - (now - lastScan)); return }
         lastScan = now
-        if (!interactive()) { outside(true); return }
-        val root = rootInActiveWindow ?: run { outside(false); return }
+        if (!interactive()) { coordinator.acquisitionStatus = "not_interactive"; scheduledPackage = null; outside(true); return }
+        val root = rootInActiveWindow ?: run { coordinator.acquisitionStatus = "no_active_root"; scheduledPackage = null; outside(false); return }
         try {
             val foreground = root.packageName?.toString()
+            coordinator.acquisitionStatus = "root_obtained"
+            // Whole-app schedules read package ownership only. No labels/nodes of arbitrary apps.
+            val targeted = foreground != null && foreground in coordinator.schedules.plan.targets()
+            scheduledPackage = foreground?.takeIf { coordinator.schedules.decision(it, now).isNotEmpty() }
+            if (scheduledPackage != null) {
+                outside(true)
+                main.post { AutoScrollSession.suspendActions("app_schedule"); renderOverlays() }
+                schedule(500); return
+            }
             visitHudVisibility.foreground(foreground)
             val app = ReelApp.byPackage(foreground ?: "")
             if (app != null && coordinator.pausedSource(app)) {
@@ -157,7 +182,9 @@ class ReelsAccessibilityService : AccessibilityService() {
             pausedApp = null
             if (app == null || !coordinator.allowed(app)) {
                 // System UI (notification shade, volume) is not a departure.
-                outside(foreground != "com.android.systemui" && foreground != packageName); return
+                outside(foreground != "com.android.systemui" && foreground != packageName)
+                if (targeted) schedule(1_000)
+                return
             }
             if (currentApp != null && currentApp != app) outside(true)
             if (currentApp != app) coordinator.pauseDiarySurface()
@@ -165,6 +192,8 @@ class ReelsAccessibilityService : AccessibilityService() {
             val capturedEpoch = coordinator.epoch()
             val snapshot = SnapshotReader.read(root, app.packages)
             var frame = AdapterRegistry.of(app).read(snapshot)
+            coordinator.acquisitionStatus = "${app.key}:${frame.surface}:${snapshot.nodes.size}:complete=${snapshot.complete}"
+            if (!coordinator.countPhotos && frame.mediaKind == "photo") frame = frame.copy(surface = Surface.EXCLUDED)
             val previous = lastReels
             // A pager mid-swipe briefly shows two half pages; keep the viewer alive through it.
             if (frame.surface == Surface.OUTSIDE && previous != null && previous.app == app &&
@@ -173,20 +202,21 @@ class ReelsAccessibilityService : AccessibilityService() {
             val previousPage = previous?.frame?.page
             val currentPage = frame.page
             val sameSlot = frame.route == ReelRoute.HOME && frame.slotKey != null && previous != null &&
+                previous.scroll == (scrollSequence[app]?.get() ?: 0L) &&
                 previous.app == app && previous.frame.slotKey == frame.slotKey && now - previous.atMs < 900 &&
                 previousPage != null && currentPage != null &&
                 kotlin.math.abs(previousPage.top - currentPage.top) < snapshot.screen.height / 2
-            if (frame.surface == Surface.REELS) lastReels = Seen(app, snapshot.windowId, now, frame)
+            if (frame.surface == Surface.REELS) lastReels = Seen(app, snapshot.windowId, now, frame, scrollSequence[app]?.get() ?: 0L)
             lastFrame = frame
 
             val decision = coordinator.blockDecision(app, frame)
             block = decision
             val counted = if (decision != null) frame.copy(surface = Surface.EXCLUDED) else frame
             val item = ItemFrame(now, counted.surface, counted.route, counted.identity, counted.keys, counted.category,
-                scrollSequence.getOrPut(app) { AtomicLong() }.get(), sameSlot)
+                scrollSequence.getOrPut(app) { AtomicLong() }.get(), sameSlot, counted.slotKey)
             coordinator.observe(app, counted, item, snapshot.windowId, capturedEpoch)
             displayEligible = decision == null && (frame.surface == Surface.REELS ||
-                (frame.route == ReelRoute.HOME && frame.method.endsWith(".feed") && frame.surface == Surface.EXCLUDED))
+                (frame.route == ReelRoute.HOME && frame.method.endsWith(".feed")))
             if (decision != null) main.post { enforceBlock(decision) }
             feedAutoScroll(app, frame, snapshot.windowId, capturedEpoch, now)
             main.post { renderOverlays() }
@@ -215,8 +245,40 @@ class ReelsAccessibilityService : AccessibilityService() {
 
     private fun renderOverlays() {
         if (destroyed) return
+        renderSchedule()
+        if (scheduleOverlay != null) { removeIntervention(); removeHud(); return }
         renderIntervention()
         renderHud()
+    }
+
+    private fun renderSchedule() {
+        val target = scheduledPackage?.takeIf { interactive() && coordinator.schedules.decision(it, SystemClock.elapsedRealtime()).isNotEmpty() }
+        if (target == scheduleOverlayPackage && scheduleOverlay != null) return
+        removeSchedule()
+        if (target == null) return
+        val view = InterventionOverlay(this, InterventionOverlay.Mode.BLOCK, "A little time away",
+            "This app is in a blocking period you chose. Change your schedule in Attention Stats or allow a short visit.",
+            0, "Open Attention Stats", "Allow 5 minutes",
+            { scheduledPackage = null; removeSchedule(); open("attentionstats://protect") },
+            { coordinator.schedules.allow(target, SystemClock.elapsedRealtime()); scheduledPackage = null; removeSchedule(); schedule(0) })
+        val params = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
+        if (Build.VERSION.SDK_INT >= 30) {
+            params.height = getSystemService(WindowManager::class.java).currentWindowMetrics.bounds.height() - navigationBarHeight()
+            params.gravity = Gravity.TOP
+        }
+        try {
+            getSystemService(WindowManager::class.java).addView(view, params)
+            scheduleOverlay = view; scheduleOverlayPackage = target
+            pausePlayback(true)
+        } catch (_: RuntimeException) { view.finish(); scheduleOverlay = null; scheduleOverlayPackage = null }
+    }
+    private fun removeSchedule() {
+        val view = scheduleOverlay ?: return
+        view.finish()
+        try { getSystemService(WindowManager::class.java).removeView(view) } catch (_: RuntimeException) { }
+        scheduleOverlay = null; scheduleOverlayPackage = null
+        pausePlayback(false)
     }
 
     private fun renderIntervention() {
@@ -235,7 +297,7 @@ class ReelsAccessibilityService : AccessibilityService() {
         if (intervention != null && interventionKind == wanted && interventionApp == app) return
         removeIntervention()
         val current = checkNotNull(app)
-        AutoScrollSession.stop("intervention")
+        AutoScrollSession.suspendActions("intervention")
         val session = coordinator.liveOverlay?.visit ?: reminder?.count?.toLong() ?: 0
         val minutes = ((reminder?.durationMs ?: 0) / 60_000).toInt()
         val view = when (wanted) {
@@ -338,26 +400,25 @@ class ReelsAccessibilityService : AccessibilityService() {
         if (!displayEligible || intervention != null || !coordinator.overlayEnabled || state == null || active != state.app ||
             visitHudVisibility.hiddenFor(state.app) || state.epoch != coordinator.epoch() || !coordinator.allowed(state.app) ||
             !interactive()) {
-            if (AutoScrollSession.running && intervention == null) AutoScrollSession.stop("viewer_unavailable")
+            if (AutoScrollSession.running && intervention == null) AutoScrollSession.suspendActions("viewer_unavailable")
             removeHud(); return
         }
         ensureHud()
         hud?.setPausedState(false)
         hud?.update(state)
-        val viewer = state.route == ReelRoute.VIEWER
-        hud?.setAutoScrollControl(viewer && AutoScrollSession.enabled, AutoScrollSession.running, AutoScrollSession.canStart())
-        hud?.setAutoScrollOption(viewer, AutoScrollSession.enabled)
+        hud?.setAutoScrollControl(true, AutoScrollSession.running, AutoScrollSession.canStart())
     }
 
     private fun ensureHud() {
         if (hud == null) {
             val density = resources.displayMetrics.density
             val view = CounterHudView(this, ::openDashboard, ::pauseObservation, ::hideCounterThisVisit, {
-                if (AutoScrollSession.running) AutoScrollSession.stop() else AutoScrollSession.start()
-            }, {
-                if (AutoScrollSession.enabled) AutoScrollSession.configure(false, 1)
-                else if (AutoScrollSession.noticeAccepted) AutoScrollSession.configure(true, 1)
-                else openConvenience()
+                when {
+                    AutoScrollSession.running -> AutoScrollSession.stop()
+                    AutoScrollSession.enabled -> AutoScrollSession.start()
+                    AutoScrollSession.noticeAccepted -> { AutoScrollSession.configure(true, 1); AutoScrollSession.start() }
+                    else -> openConvenience()
+                }
             })
             val params = WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
@@ -396,21 +457,34 @@ class ReelsAccessibilityService : AccessibilityService() {
 
     private fun feedAutoScroll(app: ReelApp, frame: AdapterFrame, window: Int, epoch: Long, now: Long) {
         if (!AutoScrollSession.enabled || frame.route != ReelRoute.VIEWER || frame.surface != Surface.REELS) {
-            if (AutoScrollSession.running) main.post { AutoScrollSession.stop("playback_unavailable") }
+            if (AutoScrollSession.running) main.post { AutoScrollSession.suspendActions("playback_unavailable") }
             return
         }
         val value = AutoScrollSession.Frame(app, window, frame.identity, epoch, now, frame.progress,
             coordinator.overlayEnabled && !visitHudVisibility.hiddenFor(app))
-        main.post { AutoScrollSession.frame(value) { _, token -> advance(token, frame.page) } }
+        main.post { AutoScrollSession.frame(value) { expected, token -> advance(token, expected) } }
     }
 
-    private fun advance(token: Long, page: LayoutBounds?) {
+    private fun advance(token: Long, expected: AutoScrollSession.Frame) {
         if (!AutoScrollSession.current(token)) return
         main.postDelayed({ AutoScrollSession.expire(token, SystemClock.elapsedRealtime()) }, 2_500)
-        val bounds = page ?: return AutoScrollSession.stop("context_changed")
-        if (intervention != null || hud?.isShown != true || !interactive()) { AutoScrollSession.stop("context_changed"); return }
+        if (intervention != null || hud?.isShown != true || !interactive() || expected.epoch != coordinator.epoch() ||
+            !coordinator.allowed(expected.app) || !coordinator.grantEnabled() ||
+            SystemClock.elapsedRealtime() - expected.atMs !in 0..750) {
+            AutoScrollSession.suspendActions("context_changed"); return
+        }
+        val root = rootInActiveWindow ?: return AutoScrollSession.suspendActions("context_changed")
+        val bounds = try {
+            if (!expected.app.owns(root.packageName?.toString()) || root.windowId != expected.window)
+                return AutoScrollSession.suspendActions("context_changed")
+            val snapshot = SnapshotReader.read(root, expected.app.packages)
+            val current = AdapterRegistry.of(expected.app).read(snapshot)
+            if (!snapshot.complete || snapshot.typing || current.surface != Surface.REELS || current.route != ReelRoute.VIEWER ||
+                current.identity != expected.page) return AutoScrollSession.suspendActions("context_changed")
+            current.page ?: return AutoScrollSession.suspendActions("context_changed")
+        } finally { SnapshotReader.recycle(root) }
         try { com.attentionstats.autoscroll.AutoScrollGestureDispatcher.dispatch(this, bounds, token, main) }
-        catch (_: RuntimeException) { AutoScrollSession.stop("gesture_unavailable") }
+        catch (_: RuntimeException) { AutoScrollSession.suspendActions("gesture_unavailable") }
     }
 
     // ---- HUD helpers -----------------------------------------------------------------------
@@ -445,7 +519,7 @@ class ReelsAccessibilityService : AccessibilityService() {
     }
 
     private fun openDashboard() { open("attentionstats://today") }
-    private fun openConvenience() { AutoScrollSession.stop("permission_review"); open("attentionstats://convenience") }
+    private fun openConvenience() { AutoScrollSession.suspendActions("permission_review"); open("attentionstats://convenience") }
     private fun open(uri: String) {
         startActivity(Intent(this, MainActivity::class.java).setAction(Intent.ACTION_VIEW).setData(android.net.Uri.parse(uri))
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP))
@@ -454,7 +528,7 @@ class ReelsAccessibilityService : AccessibilityService() {
 
     private fun hideCounterThisVisit() {
         currentApp?.let { visitHudVisibility.hide(it) }
-        AutoScrollSession.stop("counter_hidden")
+        AutoScrollSession.suspendActions("counter_hidden")
         removeHud()
     }
 
@@ -475,6 +549,7 @@ class ReelsAccessibilityService : AccessibilityService() {
     override fun onInterrupt() { }
 
     override fun onDestroy() {
+        removeSchedule()
         destroyed = true
         removeIntervention()
         removeHud()

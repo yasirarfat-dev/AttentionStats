@@ -15,13 +15,15 @@ const SOURCE_URL = 'https://github.com/yasirarfat-dev/AttentionStats';
 const promises: { icon: IconName; title: string; detail: string }[] = [
   {
     icon: 'phone',
-    title: 'Everything stays on your phone',
-    detail: 'No servers, no account. Your history is encrypted on this device.',
+    title: 'Local and encrypted by default',
+    detail:
+      'No developer server or account. Optional backup files go where you choose; keep them private.',
   },
   {
     icon: 'noads',
-    title: 'No ads. No tracking. Ever.',
-    detail: 'No analytics, no data sales, nothing to pay for.',
+    title: 'No ads or developer telemetry',
+    detail:
+      'Your activity diary stays local unless you export it. No data sales, nothing to pay for.',
   },
   {
     icon: 'code',
@@ -38,9 +40,9 @@ const promises: { icon: IconName; title: string; detail: string }[] = [
 const features: { icon: IconName; title: string; detail: string }[] = [
   {
     icon: 'play',
-    title: 'Counts every short video',
+    title: 'Counts recognized short videos',
     detail:
-      'Reels, Shorts, TikToks and Spotlight, from any screen: tabs, feeds, profiles, links.',
+      'Reels, Shorts, TikToks and Spotlight. Detection is an estimate and varies with app layouts.',
   },
   {
     icon: 'clock',
@@ -72,7 +74,9 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
   const allowed = !!reels.snapshot?.sources.some(
     source => source.enabled && source.consentCurrent,
   );
-  const accessibility = !!reels.snapshot?.accessibilityEnabled;
+  const accessibility =
+    !!reels.snapshot?.accessibilityEnabled &&
+    !!reels.snapshot?.serviceConnected;
   const usage =
     !!diary.snapshot?.usageEnabled && !!diary.snapshot?.usageGranted;
 
@@ -108,7 +112,7 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
               accessibilityLabel="Attention Stats"
             />
             <Text accessibilityRole="header" style={styles.headline}>
-              Your attention,{'\n'}counted. Never collected.
+              Your attention,{'\n'}in your hands.
             </Text>
             <Body muted center>
               A private, open-source companion that helps you see and shape how

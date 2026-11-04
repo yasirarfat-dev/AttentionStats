@@ -20,8 +20,8 @@ The Android binding includes Apache-2.0 Android Open Source Project code;
 SQLite core is in the public domain. SQLCipher is a main-preview dependency;
 the isolated qualification application remains excluded from the product.
 
-The isolated, development-only archive qualification APK uses Tink Android 1.24.0
+The Android application's encrypted archive and the isolated qualification APK use Tink Android 1.24.0
 (Google LLC), Apache-2.0; see licenses/tink.txt.
 Its shaded Protocol Buffers runtime uses the BSD-3-Clause license;
 see licenses/protobuf.txt. Upstream Tink v1.24.0 pins protobuf 33.6.
-These libraries are not product dependencies.
+The standalone qualification application remains excluded from the product.

@@ -5,6 +5,11 @@
 **Related specifications:** [Models](DATA-MODELS.md), [Privacy](PRIVACY.md), [Backup](BACKUP-RESTORE.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-02 and F-04 in [Decisions](DECISIONS.md); encrypted storage performance and filesystem behavior require tests.
 
+## Provenance before backup (ADR-074, 2026-11-04)
+
+Schema 9/logical archive version 2 now preserve per-fact random installation origins alongside original IDs through replacement and re-export. New destination facts keep their new installation origin. This is the first implemented prerequisite for the future multi-origin design below; it is not a merge/sync implementation. Origin sidecars must be removed with their facts; current full erase and replacement do so transactionally. Future selective retention/deletion must extend that invariant and add tombstone/fence reconciliation before admitting synchronization.
+
+
 ## Authority and durability
 
 The AS-043 developer preview now composes the main-app native Room/SQLCipher store in `HistoryStore`; `ReelsCoordinator` serializes its writes. It is distinct from the excluded AS-006 fixture. The database, WAL and installation-local key wrapper live in credential-encrypted no-backup storage. Configuration acknowledgements follow committed transactions; exposure proposals are acknowledged only after their transaction commits, and displayed totals query committed rows. The preview keeps all observations until explicit deletion. Delete disables all sources/HUD and removes episodes/exposures, consent records, coverage and temporary diagnostics; no portable export or per-app retention controls are implemented yet. Storage/key failure preserves files and suppresses observation/display, with a later explicit status refresh attempting a non-destructive reopen. Full migration, crash/resource and independent security gates remain open.

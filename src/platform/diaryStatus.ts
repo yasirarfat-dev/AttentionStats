@@ -22,10 +22,15 @@ const app = z.strictObject({
   adCount: count,
   photoCount: count,
   revisitCount: count,
+  videoCount: count.nullable().default(null),
+  measuredVideoCount: count.nullable().default(null),
+  playbackMs: count.nullable().default(null),
+  watchCount: count.nullable().default(null),
+  completionCount: count.nullable().default(null),
 });
 const schema = z
   .strictObject({
-    contractVersion: z.literal(2),
+    contractVersion: z.union([z.literal(2), z.literal(3)]),
     revision: count,
     usageEnabled: z.boolean(),
     usageGranted: z.boolean(),
@@ -47,6 +52,8 @@ const schema = z
     onboardingSeen: z.boolean(),
     includeRecognizedAds: z.boolean(),
     breakSeconds: z.number().int().min(1).max(120),
+    measurePlayback: z.boolean().default(false),
+    countPhotos: z.boolean().default(true),
     blockers: z
       .array(
         z.strictObject({

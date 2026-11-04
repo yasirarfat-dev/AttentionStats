@@ -1,9 +1,16 @@
 # Native contracts
 
+> Development continuation (2026-11-03): `NativeDiary.openAppSchedules()` and `openBackup()` launch native editors and return launch success only. Schedule edits and archive jobs share the serialized native history owner, validate bounded input and revision-check mutations. No JavaScript-supplied SQL or local paths. Diary detail adds media/optional playback values and explicit collection choices under ADR-069; null means unavailable. Record the exact serialized version and migration evidence in State; old preview descriptions below are historical, not permission to silently expand a strict decoder.
+
 **Status:** Normative domain interface draft; read-only scaffold bootstrap spec/adapter exists, full domain transport pending. Updated 2026-10-29.
 **Responsibility:** Defines typed operations, status, revisioning, events, errors and platform behavior.
 **Related specifications:** [Architecture](ARCHITECTURE.md), [Models](DATA-MODELS.md), [Tracking](TRACKING-SPEC.md), [Backup](BACKUP-RESTORE.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-02–F-04 and F-07 in [Decisions](DECISIONS.md); logical unions must be lowered into supported Codegen primitives without changing meaning.
+
+## Backup continuation (ADR-073/ADR-074, 2026-11-04)
+
+Native backup UI requires no recovery-key input. Internal archive commands export/preview public-package envelope profile 3 and logical version 2/schema 9, preserving immutable fact IDs/origins. Native-only Android backup consent/status is device-local; requested or handed-to-Android states never mean confirmed cloud completion. The agent accepts one bounded file into no-backup quarantine; review uses the same token/revision-bound transactional replacement. No source grants or enabled protection are imported. No JS credential, Google token, backup account identifier or provider filename is bridged.
+
 
 ## Experimental scaffold handshake
 
@@ -159,3 +166,9 @@ ADR-058 adds batteryOptimized (boolean) and backgroundRestricted (boolean or nul
 ADR-059/ADR-060 extend the experimental Diary contract with includeRecognizedAds and four unique blocker rows (app, enabled, available). configure additionally accepts ads and block.<known-source>, with independent explicit block consent, optimistic revision and native validation. available requires consented supported observation plus connected Android accessibility, independently of HUD display. NativeReels raw category facts remain conserved; its visit field now represents that source’s contribution to the current observed unlock session. HUD session totals aggregate all source contributions and apply the ad policy; UI labels make raw detail totals distinct. Unknown/missing ad classification is never removed speculatively.
 
 ADR-062 advances NativeDiary to contractVersion 2, requiring nullable decimal-string appOpens on each daily app row. It is the observed foreground-entry estimate defined in Tracking, not cold launches. A package with observed opens but no positive paired interval can have appMs null; it still appears in the whole-app list. Daily/range projection preserves unknown versus recorded zero and exact counts. No Room migration is needed. Period changes clear the prior-period presentation; an in-flight old-period response cannot replace a newer selection, and a skipped refresh is retried when the serialized request completes.
+
+## Beta diary contract 3 and appearance preferences
+
+ADR-069 advances NativeDiary to contractVersion 3 with `measurePlayback` and `countPhotos`, and daily app-row decimal values `videoCount`, nullable `measuredVideoCount`, `playbackMs`, `watchCount` and `completionCount`. Photo totals are an independent media facet and can overlap advertising; sums across facets are not conserved exclusive categories. Playback values are null when no qualified numeric observations exist. Watches are per-visit 3-second qualifications, not unique videos or platform watch counts. Historical contract-2 payloads remain readable with unknown playback defaults. Configure additionally accepts playback/photos with revision checks and consent records; restore leaves playback off.
+
+`getAppearance()` / `setAppearance(mode, accent, motion)` use bounded enumerations (`system|light|dark`, `blue|teal|violet`) and a Boolean motion preference. They persist non-sensitive visual choices independently of history/observation. A save resolves only after native persistence; failed saves do not claim success. Native activities apply the same saved light/dark/accent choice. No permission grant or source activation follows an appearance change.

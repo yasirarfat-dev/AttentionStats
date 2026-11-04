@@ -19,9 +19,14 @@ object Fingerprint {
     private val spaces = Regex("\\s+")
     private val toggles = listOf("follow", "subscribe", "like", "mute", "sound", "play", "pause", "save",
         "share", "comment", "repost", "remix", "more", "translation", "join", "add friend", "tap to")
+    /** Fixed navigation is not item metadata (notably Spotlight's full-screen container). */
+    private val navigation = setOf("home", "camera", "map", "chat", "stories", "spotlight", "reels", "shorts",
+        "friends", "profile", "notifications", "inbox", "following", "for you", "explore", "search", "original audio",
+        "photo", "photos", "image", "video", "videos", "reel", "ad", "ads", "sponsored")
 
     fun normalize(label: String): String? {
         val value = label.lowercase().replace(digits, " ").replace(punctuation, " ").replace(spaces, " ").trim()
+        if (value in navigation || Regex("^(home|reels|friends|marketplace|notifications|profile) tab of(?: new)?$").matches(value)) return null
         if (value.length < 3) return null
         if (value.length <= 24 && toggles.any { value.contains(it) }) return null
         return value

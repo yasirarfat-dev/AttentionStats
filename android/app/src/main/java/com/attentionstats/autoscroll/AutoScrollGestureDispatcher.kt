@@ -18,9 +18,9 @@ internal object AutoScrollGestureDispatcher {
         val gesture = GestureDescription.Builder().addStroke(GestureDescription.StrokeDescription(path, 0, 300)).build()
         val accepted = service.dispatchGesture(gesture, object : AccessibilityService.GestureResultCallback() {
             override fun onCancelled(gestureDescription: GestureDescription?) {
-                if (AutoScrollSession.current(token)) AutoScrollSession.stop("gesture_cancelled")
+                if (AutoScrollSession.current(token)) AutoScrollSession.suspendActions("gesture_cancelled")
             }
         }, handler)
-        if (!accepted) AutoScrollSession.stop("gesture_unavailable")
+        if (!accepted) AutoScrollSession.suspendActions("gesture_unavailable")
     }
 }

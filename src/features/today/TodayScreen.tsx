@@ -21,7 +21,7 @@ import {
   Stat,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
-import { useAppIcons, useDiary } from '../diary';
+import { useAppIcons, useDiary, ViewingDetail } from '../diary';
 import { countingReady, useReels } from '../sources';
 
 export type SourceDay = {
@@ -41,7 +41,7 @@ export function sourceDay(
     const app = day?.apps.find(item => item.social === key);
     return {
       key,
-      videos: Number(app?.reelsCount ?? 0),
+      videos: Number(app?.videoCount ?? app?.reelsCount ?? 0),
       reelsMs: Number(app?.reelsMs ?? 0),
       appMs: Number(app?.appMs ?? 0),
       ads: Number(app?.adCount ?? 0),
@@ -108,10 +108,10 @@ export function TodayScreen({
       )}
 
       <Card tone="hero">
-        <Text style={styles.heroLabel}>Short videos today</Text>
+        <Text style={styles.heroLabel}>Video encounters today</Text>
         <Text
           style={styles.heroValue}
-          accessibilityLabel={`${videos} short videos today`}
+          accessibilityLabel={`${videos} video encounters today`}
         >
           {exactCount(String(videos))}
         </Text>
@@ -128,7 +128,7 @@ export function TodayScreen({
             value={exactCount(String(session))}
             label="This session"
           />
-          <Stat inverse value={duration(reelsMs)} label="Watching" />
+          <Stat inverse value={duration(reelsMs)} label="On screen" />
           <Stat
             inverse
             value={String(breaks)}
@@ -137,6 +137,7 @@ export function TodayScreen({
         </View>
       </Card>
 
+      <ViewingDetail days={diary.snapshot?.days ?? []} />
       <SectionTitle>By app</SectionTitle>
       <Card padded={false}>
         {sources

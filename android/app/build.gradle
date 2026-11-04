@@ -166,6 +166,8 @@ dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation project(':analytics-core')
     implementation project(':reels-core')
+    implementation project(':protection-core')
+    implementation libs.tink
     implementation(libs.room.runtime)
     implementation(libs.sqlite)
     implementation(libs.sqlcipher)

@@ -32,6 +32,10 @@ Promotion requires a decision, domain-spec/matrix update and AS task/dependencie
 
 ## Unscheduled evaluation questions
 
+Q-021 / 2026-11-03: Multiple editable time periods per app or user-defined app category/group, including evening and overnight blocks. Promoted by explicit maintainer instruction: ADR-068, AS-053 and existing AS-012/AS-015–AS-017. No hardcoded membership or schedule; activation requires a preview.
+
+Q-022 / 2026-11-03: Separate video/photo encounters, confirmed playback, 3-second watches and completions; later text-post/social-action detail by opt-in. Promoted: ADR-069/AS-055 and AS-041 qualification. Never equate paused player visibility with watching, or a click with a submitted comment.
+
 | ID / received | Idea | Disposition |
 |---|---|---|
 | Q-018 / 2026-10-28 | A complete ad-free personal wellbeing system with rich design, counting, understanding and voluntary protection; cover viewers entered from Home videos | Accepted ADR-047; [Feature vision](FEATURE-VISION.md), AS-047 planning artifact, existing AS-013/AS-041 route qualification and AS-011/AS-014/AS-018 implementation owners; no universal watch-count promise |
