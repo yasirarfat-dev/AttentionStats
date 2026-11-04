@@ -64,3 +64,5 @@ Latest priority: Facebook photo qualification across varied shapes/formats, with
 See the [November 5 log](IMPLEMENTATION_LOG/2026-11-05.md) and [aggregate candidate evidence](evidence/beta-continuation.json) for historical failed trials, exact artifact hashes and final scope. Recorded photo/video additions are not accepted precision/recall. Instagram centered-carousel coverage remains unqualified independently of Facebook.
 
 Final installed detector-14 artifacts pass 47 isolated archive and 16 HUD state assertions; 56 encounter/214 fixture host checks pass. The four-tile image ad and explicit 360-photo continuity are confirmed in the final scoped run. Private source captures are removed after review. Main/release remain unchanged; automatic backup is enabled only for the authorized debug app and fresh-device recovery remains a gate.
+
+Reviewed implementation `ac426c9` is committed and pushed to origin/develop with remote hash verified. Main stays at `1fc5382`; no merge, release bump, Play upload or remote workflow run occurred. Source/artifact evidence is in the linked beta continuation record.
