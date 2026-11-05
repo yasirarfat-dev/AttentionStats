@@ -54,6 +54,13 @@ object SnapshotReader {
         return (if (at >= 0) value.substring(at + 4) else value).takeIf { it.isNotEmpty() && it.length <= 80 }
     }
 
+    /** Fixed player-control semantics only; live labels stay inside this acquisition boundary. */
+    fun hasFixedControlLabel(node: AccessibilityNodeInfo, expected: String): Boolean {
+        require(expected == "Play" || expected == "Pause")
+        return !node.isPassword && !node.isEditable && (node.text?.toString()?.takeIf { it.isNotBlank() }
+            ?: node.contentDescription?.toString()) == expected
+    }
+
     @Suppress("DEPRECATION") // recycle is required on API 24-32 and a no-op afterwards.
     fun recycle(node: AccessibilityNodeInfo?) { if (Build.VERSION.SDK_INT < 33) node?.recycle() }
 }

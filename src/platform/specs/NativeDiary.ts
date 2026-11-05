@@ -16,6 +16,10 @@ export interface Spec extends TurboModule {
   openBatterySettings(): Promise<boolean>;
   pinWidget(): Promise<boolean>;
   openAppSchedules(): Promise<boolean>;
+  openAppSchedule(packageName: string): Promise<boolean>;
+  getAppSchedules(): Promise<string>;
+  saveAppSchedules(document: string, expectedRevision: string): Promise<string>;
+  getProtectableApps(): Promise<string>;
   openBackup(): Promise<boolean>;
   getAppearance(): Promise<string>;
   setAppearance(mode: string, accent: string, motion: boolean): Promise<string>;

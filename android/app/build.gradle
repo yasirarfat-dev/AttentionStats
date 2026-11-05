@@ -3,6 +3,12 @@ apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 apply plugin: "com.google.devtools.ksp"
 
+def verifyPaletteTokens = tasks.register("verifyPaletteTokens", Exec) {
+    workingDir(rootProject.projectDir.parentFile)
+    commandLine("python", "tools/generate_palette.py", "--check")
+}
+tasks.named("preBuild").configure { dependsOn(verifyPaletteTokens) }
+
 kotlin {
     compilerOptions { allWarningsAsErrors.set(true) }
 }

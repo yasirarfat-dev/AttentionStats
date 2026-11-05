@@ -36,12 +36,7 @@
         <intent-filter><action android:name="android.accessibilityservice.AccessibilityService" /></intent-filter>
         <meta-data android:name="android.accessibilityservice" android:resource="@xml/reels_accessibility_service" />
       </service>
-      <activity
-        android:name=".protection.SchedulesActivity"
-        android:exported="false"
-        android:label="App schedules"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar" />
-      <activity
+        <activity
         android:name=".backup.BackupActivity"
         android:exported="false"
         android:label="Encrypted backup"

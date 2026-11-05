@@ -1,0 +1,140 @@
+package com.attentionstats.qualification
+
+import android.app.Instrumentation
+import android.app.UiAutomation
+import android.os.SystemClock
+import android.view.MotionEvent
+import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityWindowInfo
+import com.attentionstats.detection.SnapshotReader
+import com.attentionstats.reels.ReelsCoordinator
+import org.attentionstats.detection.AdapterRegistry
+import org.attentionstats.reels.ReelApp
+import org.attentionstats.reels.ReelRoute
+import org.attentionstats.reels.Surface
+import org.json.JSONObject
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+
+/** Explicit operator trial: bounded viewer gestures, own break controls, restored reminder choices. */
+internal object LiveBreakVerification {
+    fun run(instrumentation: Instrumentation): String {
+        val context = instrumentation.targetContext
+        val owner = ReelsCoordinator.get(context)
+        val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
+        automation.serviceInfo = automation.serviceInfo.apply {
+            flags = flags or android.accessibilityservice.AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
+        }
+        fun await(call: ((String) -> Unit, (String) -> Unit) -> Unit): JSONObject {
+            val done = CountDownLatch(1); var raw: String? = null
+            call({ raw = it; done.countDown() }, { done.countDown() })
+            check(done.await(15, TimeUnit.SECONDS)) { "native operation timeout" }
+            return JSONObject(checkNotNull(raw) { "native operation unavailable" })
+        }
+        fun snapshot() = await { success, failure -> owner.diarySnapshot(1, success, failure) }
+        val original = snapshot()
+        fun configure(action: String, enabled: Boolean, count: Int, minutes: Int) {
+            val revision = snapshot().getString("revision").toLong()
+            await { success, failure -> owner.configureDiary(action, enabled, count, minutes, revision, success, failure) }
+        }
+        fun ownButton(label: String, click: Boolean = false): Boolean {
+            for (window in automation.windows) {
+                if (window.type != AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY) continue
+                val root = window.root ?: continue
+                try {
+                    if (root.packageName?.toString() != context.packageName) continue
+                    val queue = ArrayDeque<AccessibilityNodeInfo>(); queue.add(root)
+                    try {
+                        var visited = 0
+                        while (queue.isNotEmpty() && visited++ < 120) {
+                            val node = queue.removeFirst()
+                            try {
+                                if (node.isVisibleToUser && node.text?.toString() == label) {
+                                    if (click) check(node.performAction(AccessibilityNodeInfo.ACTION_CLICK))
+                                    return true
+                                }
+                                for (index in 0 until node.childCount) node.getChild(index)?.let { queue.add(it) }
+                            } finally { if (node !== root) SnapshotReader.recycle(node) }
+                        }
+                    } finally { queue.forEach { if (it !== root) SnapshotReader.recycle(it) } }
+                } finally { SnapshotReader.recycle(root) }
+            }
+            return false
+        }
+        // Caller first opens an admitted dedicated viewer; never guess where a swipe would land.
+        var initialApp: ReelApp? = null
+        val initialDeadline = SystemClock.elapsedRealtime() + 10_000
+        while (initialApp == null && SystemClock.elapsedRealtime() < initialDeadline) {
+            val root = automation.rootInActiveWindow
+            if (root != null) try { initialApp = ReelApp.byPackage(root.packageName?.toString() ?: "") }
+                finally { SnapshotReader.recycle(root) }
+            if (initialApp == null) for (window in automation.windows) {
+                if (window.type != AccessibilityWindowInfo.TYPE_APPLICATION || !window.isFocused) continue
+                val candidate = window.root ?: continue
+                try { initialApp = ReelApp.byPackage(candidate.packageName?.toString() ?: "") }
+                finally { SnapshotReader.recycle(candidate) }
+            }
+            if (initialApp == null) SystemClock.sleep(200)
+        }
+        val app = checkNotNull(initialApp) { "supported viewer not foreground" }
+        check(owner.serviceConnected && owner.allowed(app)) { "source/service unavailable" }
+        fun nextItem(): Boolean {
+            var owned: AccessibilityNodeInfo? = null
+            for (window in automation.windows) {
+                if (window.type != AccessibilityWindowInfo.TYPE_APPLICATION || !window.isFocused) continue
+                val candidate = window.root ?: continue
+                if (app.owns(candidate.packageName?.toString())) { owned = candidate; break }
+                SnapshotReader.recycle(candidate)
+            }
+            val active = owned ?: return false
+            val captured = try {
+                if (active.packageName?.toString() == context.packageName) return false // A break can attach between polling and this read.
+                check(app.owns(active.packageName?.toString())) { "viewer ownership changed" }
+                SnapshotReader.read(active, app.packages)
+            } finally { SnapshotReader.recycle(active) }
+            val frame = AdapterRegistry.of(app).read(captured)
+            check(frame.surface == Surface.REELS && frame.route == ReelRoute.VIEWER) { "qualified viewer required" }
+            val box = checkNotNull(frame.page)
+            val downAt = SystemClock.uptimeMillis()
+            for (step in 0..12) {
+                val action = when (step) { 0 -> MotionEvent.ACTION_DOWN; 12 -> MotionEvent.ACTION_UP; else -> MotionEvent.ACTION_MOVE }
+                val event = MotionEvent.obtain(downAt, SystemClock.uptimeMillis(), action,
+                    box.left + box.width * .4f, box.top + box.height * (.78f - .53f * step / 12), 0)
+                try { check(automation.injectInputEvent(event, true)) } finally { event.recycle() }
+                SystemClock.sleep(25)
+            }
+            SystemClock.sleep(1_600)
+            return true
+        }
+        var cycles = 0
+        try {
+            configure("reminder", true, 5, 240)
+            configure("break", true, 3, 15)
+            repeat(3) { cycle ->
+                val before = await { success, failure -> owner.snapshot(success, failure) }
+                    .getJSONObject("session").getString("count").toLong()
+                var attempts = 0
+                while (!ownButton("I'm done for now") && attempts++ < 16) {
+                    if (!nextItem()) SystemClock.sleep(500)
+                }
+                check(ownButton("I'm done for now")) {
+                    val after = await { success, failure -> owner.snapshot(success, failure) }
+                        .getJSONObject("session").getString("count").toLong()
+                    "break did not appear; cycle=${cycle + 1}; countDelta=${after - before}; connected=${owner.serviceConnected}; scan=${owner.acquisitionStatus}"
+                }
+                if (cycle < 2) {
+                    SystemClock.sleep(15_000) // Reproduce interaction well after the countdown completes.
+                    check(ownButton("Keep watching", true)) { "delayed Continue unavailable" }
+                } else check(ownButton("I'm done for now", true))
+                SystemClock.sleep(4_000)
+                check(!ownButton("I'm done for now")) { "dismissed cover remained or reappeared" }
+                cycles++
+                instrumentation.sendStatus(1, android.os.Bundle().apply { putString("stream", "Live break cycle $cycles passed") })
+            }
+            return "PASS: $cycles live break cycles; two delayed Keep watching choices and I'm done remove the cover without reappearing; reminder preferences restored"
+        } finally {
+            configure("break", true, original.getInt("breakSeconds"), original.getInt("reminderMinutes"))
+            configure("reminder", original.getBoolean("reminderEnabled"), original.getInt("reminderCount"), original.getInt("reminderMinutes"))
+        }
+    }
+}

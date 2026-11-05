@@ -11,10 +11,10 @@ internal object AppearanceOwner {
     fun snapshot(context: Context): JSONObject {
         val prefs = context.getSharedPreferences("appearance", Context.MODE_PRIVATE)
         return JSONObject().put("mode", prefs.getString("mode", "system"))
-            .put("accent", prefs.getString("accent", "blue")).put("motion", prefs.getBoolean("motion", true))
+            .put("accent", prefs.getString("accent", "graphite")).put("motion", prefs.getBoolean("motion", true))
     }
     fun save(context: Context, mode: String, accent: String, motion: Boolean): String {
-        require(mode in setOf("system", "light", "dark") && accent in setOf("blue", "teal", "violet"))
+        require(mode in setOf("system", "light", "dark") && accent in setOf("graphite", "blue", "teal", "violet"))
         check(context.getSharedPreferences("appearance", Context.MODE_PRIVATE).edit()
             .putString("mode", mode).putString("accent", accent).putBoolean("motion", motion).commit())
         return snapshot(context).toString()
@@ -23,9 +23,11 @@ internal object AppearanceOwner {
         "dark" -> true; "light" -> false
         else -> context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
+    fun palette(context: Context): NativePalette = PaletteTokens.resolve(dark(context), snapshot(context).getString("accent"))
     fun prepare(activity: Activity) {
         val dark = dark(activity)
         val style = when (snapshot(activity).getString("accent")) {
+            "graphite" -> if (dark) R.style.AttentionNativeDarkGraphite else R.style.AttentionNativeLightGraphite
             "teal" -> if (dark) R.style.AttentionNativeDarkTeal else R.style.AttentionNativeLightTeal
             "violet" -> if (dark) R.style.AttentionNativeDarkViolet else R.style.AttentionNativeLightViolet
             else -> if (dark) R.style.AttentionNativeDark else R.style.AttentionNativeLight

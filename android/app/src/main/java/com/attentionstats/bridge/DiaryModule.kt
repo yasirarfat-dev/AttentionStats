@@ -53,11 +53,46 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
         } catch (_: RuntimeException) { promise.resolve(false) }
     }
     override fun openAppSchedules(promise: Promise) {
+        openSchedules(null, promise)
+    }
+    override fun openAppSchedule(packageName: String, promise: Promise) {
+        if (packageName !in org.attentionstats.reels.ReelApp.allPackages) { promise.resolve(false); return }
+        openSchedules(packageName, promise)
+    }
+    private fun openSchedules(packageName: String?, promise: Promise) {
         try {
-            context.startActivity(Intent(context, com.attentionstats.protection.SchedulesActivity::class.java)
+            val uri = Uri.parse("attentionstats://protect/schedules").buildUpon().apply {
+                if (packageName != null) appendQueryParameter("packageName", packageName)
+            }.build()
+            context.startActivity(Intent(context, com.attentionstats.MainActivity::class.java).setAction(Intent.ACTION_VIEW).setData(uri)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             promise.resolve(true)
         } catch (_: RuntimeException) { promise.resolve(false) }
+    }
+    override fun getAppSchedules(promise: Promise) {
+        coordinator.scheduleSnapshot({ promise.resolve(it) }, { failure(promise, it) })
+    }
+    override fun saveAppSchedules(document: String, expectedRevision: String, promise: Promise) {
+        val revision = expectedRevision.toLongOrNull()
+        if (revision == null || revision < 0) { failure(promise, "INVALID_ARGUMENT"); return }
+        coordinator.saveSchedules(document, revision,
+            { coordinator.scheduleSnapshot({ promise.resolve(it) }, { failure(promise, it) }) }, { failure(promise, it) })
+    }
+    override fun getProtectableApps(promise: Promise) {
+        Thread {
+            try {
+                val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+                val choices = context.packageManager.queryIntentActivities(intent, 0)
+                    .filter { it.activityInfo.packageName !in coordinator.schedules.excluded }
+                    .distinctBy { it.activityInfo.packageName }
+                    .map { it.activityInfo.packageName to it.loadLabel(context.packageManager).toString().take(100) }
+                    .sortedBy { it.second.lowercase() }.take(500)
+                promise.resolve(org.json.JSONArray().apply { choices.forEach { (pkg, name) ->
+                    put(org.json.JSONObject().put("packageName", pkg).put("name", name)
+                        .put("shortVideos", pkg in org.attentionstats.reels.ReelApp.allPackages))
+                } }.toString())
+            } catch (_: Exception) { failure(promise, "APPS_UNAVAILABLE") }
+        }.start()
     }
     override fun openBackup(promise: Promise) {
         try {

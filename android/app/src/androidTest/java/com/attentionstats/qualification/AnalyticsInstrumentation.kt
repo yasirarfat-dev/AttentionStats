@@ -18,10 +18,18 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var feedReverse = false
     private var feedSamples = 90
     private var hudLive = false
+    private var protection = false
+    private var breakLive = false
+    private var scheduleLive = false
+    private var scheduleUi = false
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
         beta = arguments?.getString("beta") == "true"
         hudLive = arguments?.getString("hudLive") == "true"
+        protection = arguments?.getString("protection") == "true"
+        breakLive = arguments?.getString("breakLive") == "true"
+        scheduleLive = arguments?.getString("scheduleLive") == "true"
+        scheduleUi = arguments?.getString("scheduleUi") == "true"
         feedTrial = arguments?.getString("feedTrial")?.takeIf { it in setOf("instagram", "facebook") }
         feedReverse = arguments?.getString("feedReverse") == "true"
         feedSamples = arguments?.getString("feedSamples")?.toIntOrNull()?.takeIf { it in 10..90 } ?: 90
@@ -33,6 +41,22 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            if (scheduleUi) {
+                result.putString("stream", ScheduleUiVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (scheduleLive) {
+                result.putString("stream", LiveScheduleVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (breakLive) {
+                result.putString("stream", LiveBreakVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (protection) {
+                result.putString("stream", "PASS: ${ProtectionVerification.run(this)} synthetic protection codec/attached-view checks")
+                finish(Activity.RESULT_OK, result); return
+            }
             if (hudLive) {
                 val automation = getUiAutomation(android.app.UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
                 automation.serviceInfo = automation.serviceInfo.apply {

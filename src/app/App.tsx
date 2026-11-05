@@ -3,6 +3,7 @@ import {
   DefaultTheme,
   NavigationContainer,
   type LinkingOptions,
+  type NavigatorScreenParams,
 } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AccessibilityInfo, StatusBar, View } from 'react-native';
@@ -15,7 +16,10 @@ import NativeDiary from '../platform/specs/NativeDiary';
 import { parseDiarySnapshot } from '../platform/diaryStatus';
 import { TodayScreen } from '../features/today';
 import { InsightsScreen } from '../features/insights';
-import { ProtectScreen } from '../features/protection';
+import {
+  ProtectionNavigator,
+  type ProtectionRoutes,
+} from '../features/protection';
 import { SettingsScreen } from '../features/settings';
 import { WelcomeScreen } from '../features/onboarding';
 import { NavIcon, type NavSymbol } from '../ui/NavIcon';
@@ -26,7 +30,7 @@ import { useUnistyles } from 'react-native-unistyles';
 type Tabs = {
   Today: undefined;
   Insights: undefined;
-  Protect: undefined;
+  Protect: NavigatorScreenParams<ProtectionRoutes> | undefined;
   Settings: undefined;
 };
 const Tab = createBottomTabNavigator<Tabs>();
@@ -36,7 +40,10 @@ const linking: LinkingOptions<Tabs> = {
     screens: {
       Today: 'today',
       Insights: 'insights',
-      Protect: 'protect',
+      Protect: {
+        path: 'protect',
+        screens: { Overview: '', Schedules: 'schedules' },
+      },
       Settings: { path: 'settings', alias: ['convenience', 'reels'] },
     },
   },
@@ -92,7 +99,7 @@ function MainTabs({ onWelcome }: { onWelcome: () => void }) {
         )}
       </Tab.Screen>
       <Tab.Screen name="Insights" component={InsightsScreen} />
-      <Tab.Screen name="Protect" component={ProtectScreen} />
+      <Tab.Screen name="Protect" component={ProtectionNavigator} />
       <Tab.Screen name="Settings">
         {() => <SettingsScreen onWelcome={onWelcome} />}
       </Tab.Screen>

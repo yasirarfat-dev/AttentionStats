@@ -25,6 +25,8 @@ export function Screen({
       ]}
     >
       <ScrollView
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         contentContainerStyle={[
           styles.content,
           { paddingTop: header ? 8 : insets.top + 16, paddingBottom: 32 },

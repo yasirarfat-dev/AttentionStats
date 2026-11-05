@@ -43,5 +43,34 @@ class DetectorBoundaries(unittest.TestCase):
                 self.assertTrue(self.check_source(reference))
 
 
+class NativeActionBoundaries(unittest.TestCase):
+    def check_source(self, name, text):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text, encoding="utf-8")
+            errors = []
+            checker.check_native_actions(root, errors)
+            return errors
+
+    def test_foreign_label_reads_rejected_and_acquisition_owner_allowed(self):
+        for value in ["val title = node.text", "val label = root.contentDescription", "val label = event.getText()"]:
+            with self.subTest(value=value):
+                self.assertTrue(self.check_source("another/Reader.kt", value))
+                self.assertFalse(self.check_source("detection/SnapshotReader.kt", value))
+
+    def test_actions_cannot_escape_declared_owners(self):
+        for value in ["node.performAction(AccessibilityNodeInfo.ACTION_CLICK)", "performGlobalAction(1)", "dispatchGesture(gesture)"]:
+            with self.subTest(value=value):
+                self.assertTrue(self.check_source("another/Dispatcher.kt", value))
+        self.assertFalse(self.check_source("protection/PlaybackPauseDispatcher.kt", "node.performAction(AccessibilityNodeInfo.ACTION_CLICK)"))
+
+    def test_pause_owner_cannot_change_volume_broadcast_keys_or_navigate(self):
+        for value in ["performGlobalAction(1)", "dispatchGesture(gesture)", "dispatchMediaKeyEvent(event)", "setStreamVolume(1)", "adjustStreamVolume(1)"]:
+            with self.subTest(value=value):
+                self.assertTrue(self.check_source("protection/PlaybackPauseDispatcher.kt", value))
+
+
 if __name__ == "__main__":
     unittest.main()

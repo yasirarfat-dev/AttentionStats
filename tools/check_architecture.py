@@ -67,7 +67,7 @@ def check_mobile_source(source: Path, errors: list[str]) -> int:
                 errors.append(f"{label}: source import leaves src: {imported}")
                 continue
             target = next((candidate for candidate in [
-                base if base.suffix in {".png", ".jpg", ".webp"} else base.with_suffix(".ts"), base.with_suffix(".tsx"),
+                base if base.suffix in {".png", ".jpg", ".webp", ".json"} else base.with_suffix(".ts"), base.with_suffix(".tsx"),
                 base / "index.ts", base / "index.tsx",
             ] if candidate.is_file()), None)
             if target is None:
@@ -85,6 +85,22 @@ def check_mobile_source(source: Path, errors: list[str]) -> int:
             if owner[0] == "features" and parts[0] == "app":
                 errors.append(f"{label}: feature cannot depend on app composition")
     return len(paths)
+
+
+def check_native_actions(app_source: Path, errors: list[str]) -> None:
+    reader = app_source / "detection/SnapshotReader.kt"
+    action_owners = {app_source / "reels/ReelsAccessibilityService.kt", app_source / "autoscroll/AutoScrollGestureDispatcher.kt",
+                     app_source / "protection/PlaybackPauseDispatcher.kt"}
+    for path in app_source.rglob("*.kt"):
+        source_text = path.read_text(encoding="utf-8")
+        # Only the snapshot reader touches live node text; it copies labels into memory-only values.
+        if path != reader and re.search(r"\b(?:node|root|source|event)\s*\??\.\s*(?:text|contentDescription|getText|getContentDescription)\b", source_text):
+            errors.append(f"{path.relative_to(app_source)}: only SnapshotReader may read on-screen labels")
+        if path not in action_owners and re.search(r"\b(?:performGlobalAction|performAction|dispatchGesture)\s*\(", source_text):
+            errors.append(f"{path.relative_to(app_source)}: platform actions belong only to user-chosen blocks/breaks and auto-scroll")
+        if path == app_source / "protection/PlaybackPauseDispatcher.kt" and any(token in source_text for token in
+                ("performGlobalAction(", "dispatchGesture(", "dispatchMediaKeyEvent(", "adjustStreamVolume(", "setStreamVolume(")):
+            errors.append(f"{path.relative_to(app_source)}: pause dispatcher may only activate a revalidated explicit player Pause control")
 
 
 def main() -> int:
@@ -148,13 +164,13 @@ def main() -> int:
             if not imported.startswith(("kotlin.", "org.attentionstats.reels.", "org.attentionstats.detection.", "java.security.")):
                 errors.append(f"{label}: infrastructure import in pure domain")
         code = re.sub(r'"[A-Za-z0-9_.]+"', '""', source_text)
-        if re.search(r"(?:android\.|androidx\.|java\.(?:io|net|sql)\.|com\.facebook\.react\.|kotlinx\.|javax\.)", code):
+        if re.search(r"\b(?:android\.|androidx\.|java\.(?:io|net|sql)\.|com\.facebook\.react\.|kotlinx\.|javax\.)", code):
             errors.append(f"{label}: side effect dependency in pure domain")
         parts = path.relative_to(reels).parts
         if "social" in parts:
             detector_count += 1
             platform = parts[parts.index("social") + 1]
-            for target in re.findall(r"org\.attentionstats\.detection\.social\.(\w+)", source_text):
+            for target in re.findall(r"\borg\.attentionstats\.detection\.social\.(\w+)", source_text):
                 if target != platform:
                     errors.append(f"{label}: only the registry may reference another social adapter")
     if detector_count < 5:
@@ -172,15 +188,7 @@ def main() -> int:
             if not imported.startswith(("kotlin.", "java.time.", "org.attentionstats.protection.")):
                 errors.append(f"{path.relative_to(ROOT)}: infrastructure import in protection domain")
     app_source = ROOT / "android/app/src/main/java/com/attentionstats"
-    reader = app_source / "detection/SnapshotReader.kt"
-    action_owners = {app_source / "reels/ReelsAccessibilityService.kt", app_source / "autoscroll/AutoScrollGestureDispatcher.kt"}
-    for path in app_source.rglob("*.kt"):
-        source_text = path.read_text(encoding="utf-8")
-        # Only the snapshot reader touches live node text; it copies labels into memory-only values.
-        if path != reader and re.search(r"(?:node|root|source|event)\s*\??\.\s*(?:text|contentDescription|getText|getContentDescription)", source_text):
-            errors.append(f"{path.relative_to(ROOT)}: only SnapshotReader may read on-screen labels")
-        if path not in action_owners and re.search(r"(?:performGlobalAction|performAction|dispatchGesture)\s*\(", source_text):
-            errors.append(f"{path.relative_to(ROOT)}: platform actions belong only to user-chosen blocks/breaks and auto-scroll")
+    check_native_actions(app_source, errors)
     auto_source = ROOT / "android/app/src/main/java/com/attentionstats/autoscroll"
     for path in auto_source.rglob("*.kt"):
         text = path.read_text(encoding="utf-8")

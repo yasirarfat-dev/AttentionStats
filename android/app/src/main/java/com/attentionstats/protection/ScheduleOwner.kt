@@ -8,6 +8,7 @@ import com.attentionstats.storage.ProtectionConfiguration
 import androidx.room3.withWriteTransaction
 import org.attentionstats.protection.AppGroup
 import org.attentionstats.protection.BlockWindow
+import org.attentionstats.protection.BlockScope
 import org.attentionstats.protection.SchedulePlan
 import org.json.JSONArray
 import org.json.JSONObject
@@ -57,9 +58,9 @@ internal class ScheduleOwner(private val context: Context) {
         return true
     }
 
-    fun decision(packageName: String, elapsed: Long): List<BlockWindow> {
+    fun decision(packageName: String, elapsed: Long, scope: BlockScope = BlockScope.APP): List<BlockWindow> {
         if ((allowances[packageName] ?: 0) > elapsed) return emptyList()
-        return plan.matching(packageName, ZonedDateTime.now(), excluded)
+        return plan.matching(packageName, ZonedDateTime.now(), excluded, scope)
     }
     fun allow(packageName: String, elapsed: Long) { allowances[packageName] = elapsed + 5 * 60_000 }
     fun reset() { plan = SchedulePlan(); revision = 0; allowances.clear() }
@@ -90,17 +91,27 @@ internal class ScheduleOwner(private val context: Context) {
                 AppGroup(row.getString("id"), row.getString("name"), members.toSet())
             }, (0 until windows.length()).map { i ->
                 val row = windows.getJSONObject(i)
-                require(row.keys().asSequence().toSet() == setOf("id", "groupId", "days", "startMinute", "endMinute", "enabled"))
+                val keys = row.keys().asSequence().toSet()
+                val legacy = setOf("id", "groupId", "days", "startMinute", "endMinute", "enabled")
+                require(keys == legacy || keys == legacy + setOf("scope", "allDay"))
                 require(row.get("enabled") is Boolean)
+                val scope = if ("scope" in keys) BlockScope.entries.first { it.key == row.getString("scope") } else BlockScope.APP
+                val allDay = if ("allDay" in keys) { require(row.get("allDay") is Boolean); row.getBoolean("allDay") } else false
+                if (scope == BlockScope.SHORT_VIDEOS) {
+                    val group = (0 until groups.length()).map { groups.getJSONObject(it) }.first { it.getString("id") == row.getString("groupId") }
+                    val members = group.getJSONArray("packages")
+                    require((0 until members.length()).all { members.getString(it) in org.attentionstats.reels.ReelApp.allPackages })
+                }
                 BlockWindow(row.getString("id"), row.getString("groupId"), integer(row, "days"),
-                    integer(row, "startMinute"), integer(row, "endMinute"), row.getBoolean("enabled"))
+                    integer(row, "startMinute"), integer(row, "endMinute"), row.getBoolean("enabled"), scope, allDay)
             })
         }
         fun encode(plan: SchedulePlan): JSONObject = JSONObject().put("groups", JSONArray().apply {
             plan.groups.forEach { put(JSONObject().put("id", it.id).put("name", it.name).put("packages", JSONArray(it.packages.sorted()))) }
         }).put("windows", JSONArray().apply {
             plan.windows.forEach { put(JSONObject().put("id", it.id).put("groupId", it.groupId).put("days", it.days)
-                .put("startMinute", it.startMinute).put("endMinute", it.endMinute).put("enabled", it.enabled)) }
+                .put("startMinute", it.startMinute).put("endMinute", it.endMinute).put("enabled", it.enabled)
+                .put("scope", it.scope.key).put("allDay", it.allDay)) }
         })
     }
 }

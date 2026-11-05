@@ -66,15 +66,20 @@ class ReelsAccessibilityService : AccessibilityService() {
     private val visitHudVisibility = VisitHudVisibility()
 
     private var intervention: InterventionOverlay? = null
-    private var interventionKind: String? = null
+    @Volatile private var interventionKind: String? = null
+    @Volatile private var breakCoversPlayer = false
+    @Volatile private var foregroundPackage: String? = null
     private var interventionApp: ReelApp? = null
-    private var interventionId: String? = null
+    private var interventionReceipt: org.attentionstats.protection.InterventionOutcome? = null
     @Volatile private var block: ReelsCoordinator.BlockDecision? = null
     private var blockActedAt = 0L
     private var blockRetried = false
     private var focusRequest: AudioFocusRequest? = null
-    /** After "Keep watching", the dismissal is queued; do not re-show the break meanwhile. */
-    private var breakQuietUntil = 0L
+    /** Suppress stale published reminders until the serialized dismissal acknowledges completion. */
+    private var breakDismissPending = false
+    @Volatile private var breakPreparationToken = 0L
+    private var preparingBreak = false
+    private var breakPauseConfirmed: Boolean? = null
     @Volatile private var scheduledPackage: String? = null
     private var scheduleOverlay: InterventionOverlay? = null
     private var scheduleOverlayPackage: String? = null
@@ -95,7 +100,7 @@ class ReelsAccessibilityService : AccessibilityService() {
         scanning = true
         worker.execute {
             try { if (!destroyed) sample() }
-            catch (_: RuntimeException) { outside(false) }
+            catch (_: RuntimeException) { foregroundPackage = null; outside(false) }
             finally { scanning = false }
         }
     }
@@ -136,7 +141,8 @@ class ReelsAccessibilityService : AccessibilityService() {
         val current = serviceInfo ?: return
         val wanted = (ReelApp.allPackages + coordinator.schedules.plan.targets()).toSet()
         val needed = android.accessibilityservice.AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
-            android.accessibilityservice.AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS
+            android.accessibilityservice.AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS or
+            android.accessibilityservice.AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
         if (current.packageNames?.toSet() == wanted && current.flags and needed == needed) return
         current.packageNames = wanted.toTypedArray()
         current.flags = current.flags or needed
@@ -153,15 +159,26 @@ class ReelsAccessibilityService : AccessibilityService() {
     private fun interactive(): Boolean = getSystemService(PowerManager::class.java).isInteractive &&
         !getSystemService(KeyguardManager::class.java).isKeyguardLocked
 
+    /** A touched nonfocusable overlay can be "active" while the actual app still owns input focus. */
+    private fun providerRoot(): android.view.accessibility.AccessibilityNodeInfo? {
+        val active = rootInActiveWindow ?: return null
+        if (active.packageName?.toString() != packageName) return active
+        val focused = windows.firstOrNull { it.isFocused && it.type != android.view.accessibility.AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY }?.root
+        if (focused == null) return active
+        SnapshotReader.recycle(active)
+        return focused
+    }
+
     /** Worker thread. */
     private fun sample() {
         val now = SystemClock.elapsedRealtime()
         if (now - lastScan < 180) { schedule(180 - (now - lastScan)); return }
         lastScan = now
-        if (!interactive()) { coordinator.acquisitionStatus = "not_interactive"; scheduledPackage = null; outside(true); return }
-        val root = rootInActiveWindow ?: run { coordinator.acquisitionStatus = "no_active_root"; scheduledPackage = null; outside(false); return }
+        if (!interactive()) { coordinator.acquisitionStatus = "not_interactive"; foregroundPackage = null; scheduledPackage = null; outside(true); return }
+        val root = providerRoot() ?: run { coordinator.acquisitionStatus = "no_active_root"; foregroundPackage = null; scheduledPackage = null; outside(false); return }
         try {
             val foreground = root.packageName?.toString()
+            foregroundPackage = foreground
             coordinator.acquisitionStatus = "root_obtained"
             // Whole-app schedules read package ownership only. No labels/nodes of arbitrary apps.
             val targeted = foreground != null && foreground in coordinator.schedules.plan.targets()
@@ -182,7 +199,7 @@ class ReelsAccessibilityService : AccessibilityService() {
             pausedApp = null
             if (app == null || !coordinator.allowed(app)) {
                 // System UI (notification shade, volume) is not a departure.
-                outside(foreground != "com.android.systemui" && foreground != packageName)
+                outside(foreground != "com.android.systemui")
                 if (targeted) schedule(1_000)
                 return
             }
@@ -209,9 +226,9 @@ class ReelsAccessibilityService : AccessibilityService() {
             if (frame.surface == Surface.REELS) lastReels = Seen(app, snapshot.windowId, now, frame, scrollSequence[app]?.get() ?: 0L)
             lastFrame = frame
 
-            val decision = coordinator.blockDecision(app, frame)
+            val decision = coordinator.blockDecision(app, frame, foreground.orEmpty())
             block = decision
-            val counted = if (decision != null) frame.copy(surface = Surface.EXCLUDED) else frame
+            val counted = if (decision != null || breakCoversPlayer) frame.copy(surface = Surface.EXCLUDED) else frame
             val item = ItemFrame(now, counted.surface, counted.route, counted.identity, counted.keys, counted.category,
                 scrollSequence.getOrPut(app) { AtomicLong() }.get(), sameSlot, counted.slotKey)
             coordinator.observe(app, counted, item, snapshot.windowId, capturedEpoch)
@@ -286,15 +303,20 @@ class ReelsAccessibilityService : AccessibilityService() {
         val decision = block
         val reminder = coordinator.reminder
         val wanted: String? = when {
-            app == null || !interactive() -> null
+            app == null || !app.owns(foregroundPackage) || !interactive() -> null
             decision != null && decision.app == app -> decision.kind
-            interventionKind != null && interventionKind != "break" && interventionApp == app -> interventionKind // Stay until chosen.
-            reminder != null && reminder.app == app && displayEligible && SystemClock.elapsedRealtime() > breakQuietUntil -> "break"
-            interventionKind == "break" && interventionApp == app -> "break"
+            interventionKind != null && interventionKind !in setOf("break", "schedule") && interventionApp == app -> interventionKind // Stay until chosen.
+            !breakDismissPending && reminder != null && reminder.app == app && displayEligible -> "break"
+            !breakDismissPending && reminder != null && lastFrame == null && interventionKind == "break" && interventionApp == app -> "break"
             else -> null
         }
         if (wanted == null) { removeIntervention(); return }
         if (intervention != null && interventionKind == wanted && interventionApp == app) return
+        if (wanted == "break" && breakPauseConfirmed == null) {
+            if (!preparingBreak) prepareBreak(checkNotNull(app))
+            return
+        }
+        val compactBreak = wanted == "break" && breakPauseConfirmed != true
         removeIntervention()
         val current = checkNotNull(app)
         AutoScrollSession.suspendActions("intervention")
@@ -306,13 +328,14 @@ class ReelsAccessibilityService : AccessibilityService() {
                     append("$session short videos")
                     if (minutes > 0) append(" · $minutes min")
                     append(" since you unlocked your phone.")
+                    if (compactBreak) append("\nPause the video when you're ready for a quiet moment.")
                 }, coordinator.breakSeconds, "I'm done for now", "Keep watching",
-                { decide("left"); breakQuietUntil = SystemClock.elapsedRealtime() + 5_000; coordinator.dismissReminder()
-                    performGlobalAction(GLOBAL_ACTION_HOME) },
-                { decide("continued"); breakQuietUntil = SystemClock.elapsedRealtime() + 5_000; coordinator.dismissReminder() })
+                { dismissBreak("left"); performGlobalAction(GLOBAL_ACTION_HOME) },
+                { dismissBreak("continued") }, compact = compactBreak)
             else -> InterventionOverlay(this, InterventionOverlay.Mode.BLOCK,
-                if (wanted == "limit") "Daily limit reached" else "${current.observationLabel} are off",
-                if (wanted == "limit") "You chose ${decision?.limit} short videos a day on ${current.displayName}.\n" +
+                if (wanted == "limit") "Daily limit reached" else if (wanted == "schedule") "Short videos are on a pause" else "${current.observationLabel} are off",
+                if (wanted == "schedule") "A time slot you chose is active. Everything else in ${current.displayName} still works."
+                else if (wanted == "limit") "You chose ${decision?.limit} short videos a day on ${current.displayName}.\n" +
                     "Everything else in the app still works." else
                     "You chose to turn them off.\nEverything else in ${current.displayName} still works.",
                 coordinator.breakSeconds, "Okay", "Allow 5 minutes",
@@ -325,7 +348,12 @@ class ReelsAccessibilityService : AccessibilityService() {
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
         // Stop above the navigation bar so its buttons/gesture area stay visible and usable.
         val navigation = navigationBarHeight()
-        if (navigation > 0) {
+        if (compactBreak) {
+            params.height = WindowManager.LayoutParams.WRAP_CONTENT
+            params.gravity = Gravity.BOTTOM
+            params.y = navigation
+            params.flags = params.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+        } else if (navigation > 0) {
             params.height = resources.displayMetrics.heightPixels.let { visible ->
                 if (Build.VERSION.SDK_INT >= 30) getSystemService(WindowManager::class.java).currentWindowMetrics.bounds.height() - navigation
                 else visible
@@ -334,11 +362,53 @@ class ReelsAccessibilityService : AccessibilityService() {
         }
         try {
             getSystemService(WindowManager::class.java).addView(view, params)
-            intervention = view; interventionKind = wanted; interventionApp = current; interventionId = null
+            intervention = view; interventionKind = wanted; interventionApp = current
+            breakCoversPlayer = wanted == "break" && !compactBreak
+            val receipt = org.attentionstats.protection.InterventionOutcome { id, choice -> coordinator.decideIntervention(id, choice) }
+            interventionReceipt = receipt
             view.alpha = 0f; view.animate().alpha(1f).setDuration(220).start()
-            pausePlayback(true)
-            coordinator.recordIntervention(current, wanted) { id -> if (intervention === view) interventionId = id }
-        } catch (_: RuntimeException) { intervention = null; interventionKind = null }
+            if (wanted != "break") pausePlayback(true)
+            coordinator.recordIntervention(current, wanted) { id ->
+                receipt.recorded(id)
+            }
+        } catch (_: RuntimeException) { view.finish(); removeIntervention() }
+    }
+
+    /** Pause before covering the player. Unconfirmed playback gets a nonmodal reminder instead. */
+    private fun prepareBreak(app: ReelApp) {
+        preparingBreak = true
+        val token = ++breakPreparationToken
+        val epoch = coordinator.epoch()
+        val reminder = coordinator.reminder
+        AutoScrollSession.suspendActions("prepare_break")
+        worker.execute {
+            var confirmed = false
+            var valid = false
+            try {
+                val root = providerRoot()
+                if (root != null) try {
+                    val window = root.windowId
+                    fun current(): Boolean {
+                        if (destroyed || token != breakPreparationToken || coordinator.epoch() != epoch ||
+                            coordinator.reminder != reminder || currentApp != app || !coordinator.allowed(app) || !interactive()) return false
+                        val active = providerRoot() ?: return false
+                        return try { active.windowId == window && app.owns(active.packageName?.toString()) }
+                            finally { SnapshotReader.recycle(active) }
+                    }
+                    valid = current()
+                    if (valid) confirmed = com.attentionstats.protection.PlaybackPauseDispatcher.prepare(app, root, ::current)
+                    valid = current()
+                } finally { SnapshotReader.recycle(root) }
+            } catch (_: Exception) { valid = false }
+            main.post {
+                if (destroyed || token != breakPreparationToken) return@post
+                preparingBreak = false
+                if (valid && currentApp == app && coordinator.reminder == reminder) {
+                    breakPauseConfirmed = confirmed
+                    renderOverlays()
+                } else schedule(0)
+            }
+        }
     }
 
     /** Service contexts often report empty window insets, so fall back to the system dimension. */
@@ -351,7 +421,20 @@ class ReelsAccessibilityService : AccessibilityService() {
         return if (id > 0) resources.getDimensionPixelSize(id) else 0
     }
 
-    private fun decide(choice: String) { coordinator.decideIntervention(interventionId, choice) }
+    private fun decide(choice: String) {
+        interventionReceipt?.choose(choice)
+    }
+
+    private fun dismissBreak(choice: String) {
+        breakDismissPending = true
+        decide(choice)
+        removeIntervention()
+        coordinator.dismissReminder {
+            breakDismissPending = false
+            renderOverlays()
+            schedule(0)
+        }
+    }
 
     /**
      * Leave the short-video player with Back: once immediately, and once more if the player is
@@ -369,12 +452,16 @@ class ReelsAccessibilityService : AccessibilityService() {
     }
 
     private fun removeIntervention() {
+        breakCoversPlayer = false
+        breakPreparationToken++
+        preparingBreak = false
+        breakPauseConfirmed = null
         intervention?.let { view ->
             view.finish()
             try { getSystemService(WindowManager::class.java).removeView(view) } catch (_: RuntimeException) { }
         }
         if (intervention != null) pausePlayback(false)
-        intervention = null; interventionKind = null; interventionApp = null; interventionId = null
+        intervention = null; interventionKind = null; interventionApp = null; interventionReceipt = null
     }
 
     /** Holding transient audio focus makes video players pause while a break or block is shown. */
@@ -468,7 +555,7 @@ class ReelsAccessibilityService : AccessibilityService() {
     private fun advance(token: Long, expected: AutoScrollSession.Frame) {
         if (!AutoScrollSession.current(token)) return
         main.postDelayed({ AutoScrollSession.expire(token, SystemClock.elapsedRealtime()) }, 2_500)
-        if (intervention != null || hud?.isShown != true || !interactive() || expected.epoch != coordinator.epoch() ||
+        if (preparingBreak || intervention != null || hud?.isShown != true || !interactive() || expected.epoch != coordinator.epoch() ||
             !coordinator.allowed(expected.app) || !coordinator.grantEnabled() ||
             SystemClock.elapsedRealtime() - expected.atMs !in 0..750) {
             AutoScrollSession.suspendActions("context_changed"); return

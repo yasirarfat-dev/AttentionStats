@@ -49,3 +49,6 @@ Q-022 / 2026-11-03: Separate video/photo encounters, confirmed playback, 3-secon
 | Q-008 / 2026-10-27 | Possible Chrome extension after mobile delivery | Deferred by ADR-024 until mobile work is complete and the user separately prioritizes it. No extension task, manifest, implementation or website/web-app product is authorized now |
 
 These are design questions, not requests waiting on the current user. Proceed with the accepted foundation and tracker. Record new user corrections directly in decisions/state rather than leaving them as unresolved queue entries.
+
+
+Q-023 / 2026-11-05: Per-app multi-slot blocking with whole-app/short-video scope, distracting-app groups, blackish dark theme and stuck mindful-break actions. Promoted by explicit maintainer request through ADR-076, AS-053/AS-057 and AS-060. Keep whole-app daily duration budgets distinct from the existing daily video-count limit; no universal selective blocker is implied.

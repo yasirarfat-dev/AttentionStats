@@ -47,7 +47,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start --host 127.0.0.1",
-    "lint": "oxlint src index.js && python tools/check_architecture.py && python tools/check_backup_policy.py",
+    "lint": "oxlint src index.js && python tools/check_architecture.py && python tools/check_backup_policy.py && python tools/generate_palette.py --check",
     "format:check": "prettier --check src index.js babel.config.js metro.config.js jest.config.js",
     "format": "prettier --write src index.js babel.config.js metro.config.js jest.config.js",
     "typecheck": "tsc --noEmit",

@@ -12,6 +12,9 @@ import java.security.MessageDigest
 internal object OperatorInspection {
     fun run(instrumentation: Instrumentation, target: String): String {
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
+        automation.serviceInfo = automation.serviceInfo.apply {
+            flags = flags or android.accessibilityservice.AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
+        }
         var pendingRoot = automation.rootInActiveWindow
         val until = android.os.SystemClock.elapsedRealtime() + 3_000
         while (pendingRoot == null && android.os.SystemClock.elapsedRealtime() < until) {

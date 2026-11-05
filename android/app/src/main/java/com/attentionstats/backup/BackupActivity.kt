@@ -5,9 +5,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Switch
 import android.provider.Settings
@@ -19,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class BackupActivity : Activity() {
     private val coordinator get() = ReelsCoordinator.get(this)
     private val cancelled = AtomicBoolean(false)
-    private lateinit var column: LinearLayout
+    private lateinit var page: com.attentionstats.appearance.NativePage
     private lateinit var status: TextView
     private var encrypted: ByteArray? = null
     private var operation = false
@@ -27,8 +24,7 @@ class BackupActivity : Activity() {
         com.attentionstats.appearance.AppearanceOwner.prepare(this)
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-        column = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(32, 32, 32, 48) }
-        setContentView(ScrollView(this).apply { addView(column) })
+        page = com.attentionstats.appearance.NativePage(this)
         text("Backup & restore", 24f)
         text("Keep a portable copy of your history and choices without remembering a backup key. Choose a private destination using Android's file picker; a cloud provider you choose may upload the file.")
         text("Backups use this app's public package name as their key. Anyone who obtains a file can read or modify it using that public key. Keep files in private storage and protect your cloud account. No secret backup password is required.")
@@ -53,7 +49,7 @@ class BackupActivity : Activity() {
                 finally { changingAutomatic = false }
             }
         }
-        column.addView(automatic)
+        page.toggle(automatic)
         button("Request Android backup") {
             try { SystemBackupState.request(this); status.text = SystemBackupState.status(this) }
             catch (_: Exception) { message("Enable automatic backup and set a screen lock first.") }
@@ -80,12 +76,9 @@ class BackupActivity : Activity() {
         text("Android manages automatic cloud backup using your device backup settings. This app does not connect to the Drive API or choose an account for you. Manual exports rely on the privacy of the destination you choose.")
         button("Done") { finish() }
     }
-    private fun text(value: String, size: Float = 16f): TextView = TextView(this).apply {
-        text = value; textSize = size; setPadding(0, 12, 0, 12); column.addView(this)
-    }
-    private fun button(value: String, action: () -> Unit) { column.addView(Button(this).apply {
-        text = value; setOnClickListener { if (!operation) action() }
-    }) }
+    override fun onResume() { super.onResume(); if (::page.isInitialized) page.refresh() }
+    private fun text(value: String, size: Float = 15f): TextView = page.text(value, size)
+    private fun button(value: String, action: () -> Unit) = page.button(value, filled = value == "Create backup") { if (!operation) action() }
     private fun createBackup() {
         AlertDialog.Builder(this).setTitle("Keep this backup private")
             .setMessage("No password to remember. The app package name is the public backup key, so anyone with the file can open it. Your selected storage provider controls access. Continue only with a destination you trust.")

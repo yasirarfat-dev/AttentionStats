@@ -3,7 +3,6 @@ package com.attentionstats.reels
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.RadialGradient
@@ -12,6 +11,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.view.Gravity
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -38,16 +38,21 @@ internal class InterventionOverlay(
     private val secondaryLabel: String,
     private val onPrimary: () -> Unit,
     private val onSecondary: () -> Unit,
+    private val elapsedRealtime: () -> Long = SystemClock::elapsedRealtime,
+    private val compact: Boolean = false,
 ) : FrameLayout(context) {
     enum class Mode { BREAK, BLOCK }
 
+    private val palette = com.attentionstats.appearance.AppearanceOwner.palette(context)
     private val density = resources.displayMetrics.density
     private fun dp(value: Int) = (value * density).toInt()
     private val handler = Handler(Looper.getMainLooper())
     private val orb = BreathingOrb(context)
     private val secondary: TextView
     private val prompt: TextView
-    private var remaining = waitSeconds
+    private val session = org.attentionstats.protection.InterventionSession(if (compact) 0 else waitSeconds * 1000L)
+    private var finished = false
+    private var lastPromptAtMs = 0L
     private var promptIndex = 0
 
     private val prompts = listOf(
@@ -64,26 +69,39 @@ internal class InterventionOverlay(
         isClickable = true // Touches stop here; they never reach the paused app.
         isFocusable = true
         background = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-            if (mode == Mode.BREAK) intArrayOf(Color.rgb(16, 42, 38), Color.rgb(12, 24, 32))
-            else intArrayOf(Color.rgb(28, 22, 48), Color.rgb(12, 18, 30)))
-        addView(orb, LayoutParams(dp(260), dp(260), Gravity.CENTER_HORIZONTAL or Gravity.TOP).apply { topMargin = dp(96) })
+            if (mode == Mode.BREAK) intArrayOf(palette.surface, palette.canvas)
+            else intArrayOf(palette.surfaceAlt, palette.canvas))
+        if (!compact) addView(orb, LayoutParams(dp(260), dp(260), Gravity.CENTER_HORIZONTAL or Gravity.TOP).apply { topMargin = dp(96) })
+        else orb.stop()
 
         val column = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
-            setPadding(dp(28), 0, dp(28), dp(40))
+            setPadding(dp(28), if (compact) dp(20) else 0, dp(28), dp(if (compact) 20 else 40))
         }
-        column.addView(text("ATTENTION STATS", 12f, Color.argb(150, 210, 230, 220), bold = true, spacing = 0.18f))
-        column.addView(text(headline, 30f, Color.WHITE, bold = true).apply {
+        if (!compact) column.addView(text("ATTENTION STATS", 12f, palette.muted, bold = true, spacing = 0.18f))
+        column.addView(text(headline, if (compact) 23f else 30f, palette.text, bold = true).apply {
             accessibilityLiveRegion = ACCESSIBILITY_LIVE_REGION_POLITE
         }, wrap(top = 14))
-        column.addView(text(detail, 17f, Color.argb(220, 225, 236, 230)), wrap(top = 10))
-        prompt = text(prompts.first(), 15f, Color.argb(190, 196, 222, 210)).apply { alpha = 0.9f }
-        column.addView(prompt, wrap(top = 22))
-        column.addView(button(primaryLabel, primary = true) { finish(); onPrimary() }, wrap(top = 32))
-        secondary = button(secondaryLabel, primary = false) { if (remaining <= 0) { finish(); onSecondary() } }
-        column.addView(secondary, wrap(top = 12))
-        addView(column, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM))
+        column.addView(text(detail, 17f, palette.muted), wrap(top = 10))
+        prompt = text(prompts.first(), 15f, palette.muted).apply { alpha = 0.9f }
+        if (!compact) column.addView(prompt, wrap(top = 22))
+        val primary = button(primaryLabel, primary = true) {
+            if (session.choose(elapsedRealtime(), waitRequired = false)) { finish(); onPrimary() }
+        }
+        secondary = button(secondaryLabel, primary = false) {
+            if (session.choose(elapsedRealtime(), waitRequired = true)) { finish(); onSecondary() }
+        }
+        if (compact) {
+            val actions = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
+            actions.addView(primary, LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = dp(8) })
+            actions.addView(secondary, LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f))
+            column.addView(actions, wrap(top = 16))
+        } else {
+            column.addView(primary, wrap(top = 32))
+            column.addView(secondary, wrap(top = 12))
+        }
+        addView(column, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, if (compact) Gravity.TOP else Gravity.BOTTOM))
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
         contentDescription = "$headline. $detail"
     }
@@ -91,6 +109,8 @@ internal class InterventionOverlay(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         handler.removeCallbacksAndMessages(null)
+        session.start(elapsedRealtime())
+        lastPromptAtMs = elapsedRealtime()
         tick()
     }
 
@@ -108,10 +128,10 @@ internal class InterventionOverlay(
         text = label; textSize = 16f; gravity = Gravity.CENTER
         minHeight = dp(54)
         typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
-        setTextColor(if (primary) Color.rgb(10, 32, 26) else Color.WHITE)
+        setTextColor(if (primary) palette.onAccent else palette.text)
         background = GradientDrawable().apply {
             cornerRadius = dp(27).toFloat()
-            if (primary) setColor(Color.rgb(170, 232, 200)) else { setColor(Color.argb(28, 255, 255, 255)); setStroke(dp(1), Color.argb(90, 255, 255, 255)) }
+            if (primary) setColor(palette.accentFill) else { setColor(palette.surfaceAlt); setStroke(dp(1), palette.border) }
         }
         isClickable = true; isFocusable = true
         setOnClickListener { action() }
@@ -123,6 +143,9 @@ internal class InterventionOverlay(
     }
 
     private fun tick() {
+        if (finished) return
+        val now = elapsedRealtime()
+        val remaining = session.remainingSeconds(now)
         if (remaining > 0) {
             secondary.text = "$secondaryLabel · $remaining"
             secondary.alpha = 0.45f
@@ -132,25 +155,31 @@ internal class InterventionOverlay(
             secondary.alpha = 1f
             secondary.isEnabled = true
         }
-        if (remaining % 5 == 0 && remaining != waitSeconds) {
+        if (!compact && now - lastPromptAtMs >= 5_000 && com.attentionstats.appearance.AppearanceOwner.motion(context)) {
+            lastPromptAtMs = now
             promptIndex = (promptIndex + 1) % prompts.size
             prompt.animate().alpha(0f).setDuration(250).withEndAction {
                 prompt.text = prompts[promptIndex]; prompt.animate().alpha(0.9f).setDuration(400).start()
             }.start()
         }
-        remaining--
-        handler.postDelayed({ tick() }, 1_000)
+        handler.postDelayed({ tick() }, 250)
     }
 
-    fun finish() { handler.removeCallbacksAndMessages(null); orb.stop() }
+    fun finish() {
+        finished = true; session.finish()
+        handler.removeCallbacksAndMessages(null)
+        prompt.animate().cancel(); animate().cancel(); orb.stop()
+    }
 
     override fun onDetachedFromWindow() { finish(); super.onDetachedFromWindow() }
 
     /** A soft glowing circle that grows over 5 s (breathe in) and shrinks over 5 s (breathe out). */
     private class BreathingOrb(context: Context) : View(context) {
+        private val palette = com.attentionstats.appearance.AppearanceOwner.palette(context)
+        private fun alpha(color: Int, value: Int) = (color and 0x00FFFFFF) or (value shl 24)
         private val glow = Paint(Paint.ANTI_ALIAS_FLAG)
         private val core = Paint(Paint.ANTI_ALIAS_FLAG)
-        private val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; color = Color.argb(70, 200, 255, 230) }
+        private val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; color = alpha(palette.accent, 70) }
         private var scale = 0.7f
         private val animator = ValueAnimator.ofFloat(0.62f, 1f).apply {
             duration = 5_000; repeatMode = ValueAnimator.REVERSE; repeatCount = ValueAnimator.INFINITE
@@ -162,11 +191,11 @@ internal class InterventionOverlay(
         override fun onDraw(canvas: Canvas) {
             val cx = width / 2f; val cy = height / 2f; val max = minOf(width, height) / 2f
             val radius = max * scale
-            glow.shader = RadialGradient(cx, cy, radius, intArrayOf(Color.argb(120, 120, 230, 190), Color.argb(0, 60, 140, 160)),
+            glow.shader = RadialGradient(cx, cy, radius, intArrayOf(alpha(palette.accent, 90), alpha(palette.accent, 0)),
                 null, Shader.TileMode.CLAMP)
             canvas.drawCircle(cx, cy, radius, glow)
             core.shader = LinearGradient(cx - radius, cy - radius, cx + radius, cy + radius,
-                Color.argb(230, 150, 236, 200), Color.argb(230, 120, 160, 240), Shader.TileMode.CLAMP)
+                alpha(palette.accent, 180), alpha(palette.accentFill, 230), Shader.TileMode.CLAMP)
             canvas.drawCircle(cx, cy, radius * 0.48f, core)
             ring.strokeWidth = max * 0.01f + 1
             canvas.drawCircle(cx, cy, radius * 0.72f, ring)

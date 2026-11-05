@@ -1,6 +1,7 @@
 package com.attentionstats
 
 import android.os.Bundle
+import android.content.Intent
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
@@ -12,6 +13,12 @@ class MainActivity : ReactActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     supportFragmentManager.fragmentFactory = RNScreensFragmentFactory()
     super.onCreate(savedInstanceState)
+  }
+
+  override fun onNewIntent(intent: Intent) {
+    // Retain links received while React is starting, before its URL listener is attached.
+    setIntent(intent)
+    super.onNewIntent(intent)
   }
 
   /**

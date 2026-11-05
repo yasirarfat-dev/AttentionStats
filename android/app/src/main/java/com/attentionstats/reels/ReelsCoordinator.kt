@@ -302,11 +302,14 @@ internal class ReelsCoordinator private constructor(private val context: Context
     // ---- Interventions -------------------------------------------------------------------
 
     /** Synchronous, cache-only decision so the service can react within one frame. */
-    fun blockDecision(app: ReelApp, frame: AdapterFrame): BlockDecision? {
-        if (frame.surface != Surface.REELS || frame.route != ReelRoute.VIEWER || !allowed(app)) return null
-        val limit = diary.blockLimits[app] ?: return null
+    fun blockDecision(app: ReelApp, frame: AdapterFrame, foregroundPackage: String): BlockDecision? {
+        if (!app.owns(foregroundPackage) || frame.surface != Surface.REELS || frame.route != ReelRoute.VIEWER || !allowed(app)) return null
         if ((allowances[app] ?: 0L) > SystemClock.elapsedRealtime()) return null
         val today = todayCounts[app] ?: 0L
+        if (schedules.decision(foregroundPackage, SystemClock.elapsedRealtime(),
+                org.attentionstats.protection.BlockScope.SHORT_VIDEOS).isNotEmpty())
+            return BlockDecision(app, "schedule", today, 0)
+        val limit = diary.blockLimits[app] ?: return null
         return when {
             limit <= 0 -> BlockDecision(app, "block", today, 0)
             today >= limit -> BlockDecision(app, "limit", today, limit)
@@ -333,7 +336,9 @@ internal class ReelsCoordinator private constructor(private val context: Context
         history.database.data().decideIntervention(id, choice, System.currentTimeMillis())
         history.database.data().advanceRevision()
     }
-    fun dismissReminder() = enqueue { diary.dismiss(); publish() }
+    fun dismissReminder(onDismissed: () -> Unit = {}) = enqueue {
+        diary.dismiss(); publish(); main.post { onDismissed() }
+    }
     fun stopDiaryLive() = enqueue { diary.resetLive(); publish() }
     fun pauseDiarySurface() = enqueue { diary.pauseSurface() }
 

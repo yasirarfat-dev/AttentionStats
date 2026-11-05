@@ -97,3 +97,9 @@ X-02 and X-04–X-07 in [Testing](TESTING.md) cover accessibility, truthful evid
 
 
 2026-11-04 contrast review: light faint text was 4.37:1 on the alternate surface, below the normal-text target. Darkened that token to `#5C6C86`; other light/dark body/muted/faint pairs on canvas/surface/alternate/raised surfaces are calculated independently of screenshots. Full native dialog, accent/state, large-type and TalkBack acceptance remain separate.
+
+
+ADR-076 supersedes the native dark navy backgrounds with near-black neutral roles: canvas #08090B, surface #141518, alternate #1C1D21, raised #25262B, text #F1F2F4, muted #B9BCC5 and border/track #3B3D45. Blue/teal/violet remain explicit accents; dark hero backgrounds use restrained charcoal tints. Native editor/dialog backgrounds and intervention covers use the same blackish direction. Light appearance stays supported. Contrast calculations and physical-phone appearance review are recorded separately; a palette change alone does not accept broad accessibility.
+
+
+ADR-078 makes [paletteTokens.json](../src/ui/paletteTokens.json) the current shared semantic source. [generate_palette.py](../tools/generate_palette.py) generates Kotlin NativePalette roles and native style resources; `--check` in lint rejects drift. Graphite adds readable neutral accent text (#D5D7DD dark / #30333B light), distinct charcoal action fill (#3A3D45 dark / #30333B light) and neutral selected surfaces. The shared React Native Kit uses accentFill for filled controls; accent remains readable for text/icons. New installs default to Graphite, and existing explicit choices remain. Native backup/widget setup and break overlays use these generated roles. The former stock schedule Activity is removed; schedule selection, time fields, groups and reviews reuse Screen/Kit. Android Settings/document pickers remain OS surfaces.

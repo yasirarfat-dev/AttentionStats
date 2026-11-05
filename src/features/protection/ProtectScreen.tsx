@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Text, View } from 'react-native';
-import NativeDiary from '../../platform/specs/NativeDiary';
+import { Text, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import {
   reelsSources,
@@ -26,7 +25,11 @@ type BlockMode = 'off' | 'limit' | 'always';
 /** Native contract: count 1000 means "always block"; 1..999 is a daily limit. */
 const ALWAYS = 1000;
 
-export function ProtectScreen() {
+export function ProtectScreen({
+  onSchedules,
+}: {
+  onSchedules: (packageName?: string) => void;
+}) {
   const diary = useDiary(1);
   const reels = useReels();
   const snapshot = diary.snapshot;
@@ -47,6 +50,12 @@ export function ProtectScreen() {
   }, [snapshot?.revision]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
   /** Steppers save once the person stops tapping, not on every tap. */
   const later = (save: () => unknown) => {
     if (timer.current) clearTimeout(timer.current);
@@ -84,15 +93,9 @@ export function ProtectScreen() {
       <Card padded={false}>
         <Row
           icon="clock"
-          title="App groups & blocking periods"
-          detail="Choose apps or categories, then add multiple daily or overnight periods."
-          onPress={async () => {
-            if (!(await NativeDiary?.openAppSchedules()))
-              Alert.alert(
-                'Schedules unavailable',
-                'Could not open app schedules. Please try again.',
-              );
-          }}
+          title="Distracting apps & productive time"
+          detail="Group any apps, then block them together during custom time slots or all day."
+          onPress={() => onSchedules()}
         />
       </Card>
       <SectionTitle>Mindful breaks</SectionTitle>
@@ -100,9 +103,12 @@ export function ProtectScreen() {
         <ToggleRow
           icon="heart"
           title="Offer a break"
-          detail="A calm full-screen pause after a run of short videos. You can always keep watching."
+          detail="A gentle pause after a run of short videos. You can always keep watching."
           value={!!snapshot?.reminderEnabled}
-          onChange={value => saveReminder(value)}
+          onChange={value => {
+            if (timer.current) clearTimeout(timer.current);
+            void saveReminder(value);
+          }}
           disabled={!snapshot}
         />
         {snapshot?.reminderEnabled && (
@@ -150,7 +156,9 @@ export function ProtectScreen() {
             />
             <Body muted>
               A run starts over when you lock your phone or spend 5 minutes away
-              from short videos. After a break, the next run begins.
+              from short videos. After a break, the next run begins. If the
+              player cannot be safely paused, a compact reminder leaves its
+              controls available and skips the wait.
             </Body>
           </View>
         )}
@@ -162,6 +170,11 @@ export function ProtectScreen() {
           Choose per app. A block leaves the short-video player and shows a
           pause screen. Everything else in the app keeps working, and you can
           allow 5 minutes when you really need it.
+        </Body>
+        <Body muted>
+          Daily limits count videos. Time slots can block the whole app or short
+          videos during periods such as 5–11 AM and 6–11 PM. Saved slots apply
+          separately, even when the control below is Off.
         </Body>
         {reelsSourceKeys
           .filter(key => installed.has(key) || modeOf(key) !== 'off')
@@ -190,6 +203,12 @@ export function ProtectScreen() {
                     { value: 'limit', label: 'Daily limit' },
                     { value: 'always', label: 'Always' },
                   ]}
+                />
+                <Row
+                  icon="clock"
+                  title="+ Time slots"
+                  detail="Multiple periods · whole app or short videos"
+                  onPress={() => onSchedules(reelsSources[key].packageName)}
                 />
                 {mode === 'limit' && (
                   <Stepper

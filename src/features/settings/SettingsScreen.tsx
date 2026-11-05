@@ -265,6 +265,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
           label="Accent color"
           value={appearance.accent}
           options={[
+            { value: 'graphite', label: 'Graphite' },
             { value: 'blue', label: 'Blue' },
             { value: 'teal', label: 'Teal' },
             { value: 'violet', label: 'Violet' },

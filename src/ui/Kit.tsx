@@ -182,7 +182,7 @@ export function ToggleRow({
           value={value}
           disabled={disabled}
           onValueChange={onChange}
-          trackColor={{ true: theme.accent, false: theme.track }}
+          trackColor={{ true: theme.accentFill, false: theme.track }}
           thumbColor={value ? theme.onAccent : theme.surface}
         />
       }
@@ -362,11 +362,13 @@ export function Segmented<T extends string>({
   value,
   onChange,
   label,
+  disabled = false,
 }: {
   options: { value: T; label: string }[];
   value: T;
   onChange: (next: T) => void;
   label: string;
+  disabled?: boolean;
 }) {
   return (
     <View
@@ -380,7 +382,8 @@ export function Segmented<T extends string>({
           <Pressable
             key={option.value}
             accessibilityRole="radio"
-            accessibilityState={{ selected }}
+            accessibilityState={{ selected, disabled }}
+            disabled={disabled}
             onPress={() => onChange(option.value)}
             style={[styles.segment, selected && styles.segmentOn]}
           >
@@ -499,7 +502,7 @@ const styles = StyleSheet.create(theme => ({
     minHeight: 52,
     borderRadius: 26,
     paddingHorizontal: 22,
-    backgroundColor: theme.accent,
+    backgroundColor: theme.accentFill,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -548,8 +551,10 @@ const styles = StyleSheet.create(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 6,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
-  segmentOn: { backgroundColor: theme.surface },
+  segmentOn: { backgroundColor: theme.accentSoft, borderColor: theme.accent },
   segmentText: { color: theme.muted, fontSize: 14, fontWeight: '600' },
   segmentTextOn: { color: theme.text },
   meterTrack: {

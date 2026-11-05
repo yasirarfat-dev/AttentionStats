@@ -1,0 +1,80 @@
+{
+  "recordedOn": "2026-11-05",
+  "status": "experimental",
+  "tasks": [
+    "AS-053",
+    "AS-057",
+    "AS-060",
+    "AS-061"
+  ],
+  "decisions": [
+    "ADR-076",
+    "ADR-077",
+    "ADR-078"
+  ],
+  "branch": "develop",
+  "artifactsSha256": {
+    "preview": "7d359d47557bb3dc713d4fefed1b51bf0c70f1f6d87d1e64e198703c91b126fb",
+    "diagnosticTest": "63735edd6ba3c30c9175a005d00b29283ccf10e3f0e90258a6e235c8c6b1fc58"
+  },
+  "initialVerificationTestApkSha256": "68311c2f8741d2d816dffb08682f3bb18a94e1291fac46f42ed61450d464e026",
+  "testArtifactNote": "The diagnostic test APK adds bounded count-delta/service-state details on break failure. The preview APK is unchanged; other device checks used the initial verification test APK.",
+  "host": {
+    "typecheck": "pass",
+    "lintArchitectureBackupPalette": "pass",
+    "format": "pass",
+    "jestTests": 91,
+    "pythonTests": 88,
+    "protectionChecks": 57,
+    "encounterChecks": 56,
+    "detectorFixtureChecks": 214,
+    "docsPublicArtifacts": "pass"
+  },
+  "android": {
+    "previewAssembly": "pass",
+    "testAssembly": "pass",
+    "previewLintErrors": 0,
+    "previewLintWarnings": 63
+  },
+  "physicalPhone": {
+    "api": 36,
+    "protectionCodecAttachedViewChecks": 14,
+    "realScheduleUiPersistenceChecks": 7,
+    "wholeAppRule": "pass: task-owned all-day calculator rule covers app; immediate five-minute allowance removes cover and preserves app access; rule removed",
+    "isolatedArchiveChecks": 47,
+    "hudChoiceViewStateChecks": 16,
+    "finalLiveBreakTrial": {
+      "passedCycles": 3,
+      "delayedKeepWatchingChoices": 2,
+      "leaveChoices": 1,
+      "dismissalObservationSeconds": 4,
+      "preferencesRestored": true
+    },
+    "earlierTrials": [
+      "Initial candidate passed three live break cycles before the queued-auto-scroll preparation guard.",
+      "Setup attempts stopped on Home-feed or service readiness preconditions; Android no-restart instrumentation startup also failed after target process exit.",
+      "One final-preview retest did not produce a reminder within 16 bounded viewer gestures. Its cause was not established; it remains a trigger-qualification gap. A subsequent diagnostic-test retry passed three cycles without changing the preview APK."
+    ],
+    "appearance": "Graphite selected through Settings and persisted; own dark overview/group/scoped editor/per-app/backup images visually reviewed; no launcher widget available",
+    "preserved": [
+      "Existing app history and rules",
+      "Original reminder preferences after live trials",
+      "Other selected accessibility services",
+      "Existing backup account and transport settings"
+    ]
+  },
+  "limitations": [
+    "No universal automatic playback-pause qualification; unknown controls use the immediate compact nonmodal fallback.",
+    "Live selective-only schedule enforcement, rule-conflict lifecycle, broader devices/locales, TalkBack/large-type/RTL and light-mode phone review remain open.",
+    "Widget configuration visuals remain unqualified on this phone.",
+    "No fresh-install backup recovery, scalability, main merge, release increment, Play upload or remote workflow execution."
+  ],
+  "cleanup": {
+    "taskOwnedRulesRemoved": true,
+    "testPackageRemoved": true,
+    "taskOwnedPrivateCapturesRemoved": true,
+    "mainDebugAppReopened": true,
+    "selectedAccessibilityServicesPreserved": true,
+    "boundedOwnFatalCrashBuffer": "none observed"
+  }
+}
