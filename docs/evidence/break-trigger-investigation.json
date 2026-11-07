@@ -47,9 +47,45 @@
     "diffWhitespace": "pass",
     "compatibilityWarnings": "Existing Gradle/AGP/Kotlin/CMake deprecations and native object-path warning; no dependency changes"
   },
+  "resumedQualification": {
+    "recordedOn": "2026-11-07",
+    "baselineSourceCommit": "cf6d58d4c1247381161135f1ae0741c1094e943c",
+    "productOrTestCodeChanged": false,
+    "installedPreviewSha256Verified": true,
+    "api": 36,
+    "source": "instagram",
+    "sourceVersion": "454.0.0.54.77",
+    "initialTrial": "stopped: dedicated viewer required; complete REELS/HOME snapshot after the Reels deep link. No positive trigger acceptance from this stage.",
+    "navigation": "Fresh bounded sanitized inspection identified the clickable clips_tab control; one fixed-control navigation tap entered the dedicated viewer. No target content or account identifiers retained.",
+    "finalTrial": {
+      "result": "pass",
+      "instrumentationCode": -1,
+      "cycles": [
+        { "cycle": 1, "gestures": 12, "encounterDelta": 5, "nativeReason": "count", "nativeCountAtLeast": 5, "action": "Keep watching", "actionDelaySeconds": 15 },
+        { "cycle": 2, "gestures": 10, "encounterDelta": 5, "nativeReason": "count", "nativeCountAtLeast": 5, "action": "Keep watching", "actionDelaySeconds": 15 },
+        { "cycle": 3, "gestures": 9, "encounterDelta": 5, "nativeReason": "count", "nativeCountAtLeast": 5, "action": "I'm done for now" }
+      ],
+      "eachCycle": "Native pending reminder matches Instagram and the configured five-count threshold; progress is 1.0; chosen action removes the reminder with no reappearance over four seconds.",
+      "gestureInterpretation": "Dispatched gestures are distinct from settled committed encounters; these values do not establish detector precision/recall or prove that every gesture advanced the feed."
+    },
+    "cleanup": {
+      "reminderPreferencesRestoredByFinally": true,
+      "accessibilitySelectionsUnchanged": true,
+      "taskOwnedTestRemoved": true,
+      "taskOwnedSanitizedPhoneLayoutRemoved": true,
+      "debugAppReopened": true,
+      "ownFatalExceptionInBoundedCrashBuffer": false
+    },
+    "verification": ["documentation/public-artifact checker passes", "architecture boundaries pass", "diff whitespace check passes"],
+    "remainingGates": [
+      "Historical sixteen-gesture missing-reminder trial remains unexplained.",
+      "This narrow count-trigger/dismissal result does not qualify source-wide automatic pause, selective schedules, time-trigger/reset, lifecycle or accessibility.",
+      "No new build, main merge, release increment, Play upload or remote workflow run."
+    ]
+  },
   "limitations": [
     "The historical sixteen-gesture no-reminder trial remains unexplained; this OUTSIDE result is a separate trial.",
-    "No three-cycle positive trigger acceptance with the final strengthened test; native count-trigger assertion still needs an admitted live viewer.",
+    "The original stopped trial has no positive trigger acceptance; the later resumedQualification separately records three passing cycles with the same strengthened test.",
     "No source-wide pause, selective schedule, accessibility or lifecycle acceptance.",
     "No product APK change, main merge, release increment, Play upload or remote workflow run."
   ]
