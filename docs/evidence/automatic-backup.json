@@ -1,0 +1,75 @@
+{
+  "recordedOn": "2026-11-07",
+  "task": "AS-058",
+  "decision": "ADR-079",
+  "status": "experimental",
+  "branch": "develop",
+  "baselineSourceCommit": "eec6345",
+  "scope": "Automatic foreground initialization, preserved opt-outs, pending-recovery fence and bounded product archive capacity",
+  "artifactsSha256": {
+    "finalPreview": "6a7e2a0c7d329071447d707d9dd23f840c74697175a161d07d8e2c8892cc4d15",
+    "finalTest": "852e8ea27525dd1ea69c9ebd62239c081ebdbc60a1e3ec36e54199aa7b8f2c56"
+  },
+  "checks": {
+    "typecheck": "pass",
+    "lintArchitectureBackupPolicyPalette": "pass",
+    "format": "pass",
+    "jest": 91,
+    "python": 88,
+    "previewAndTestAssembly": "pass",
+    "previewLint": {
+      "errors": 0,
+      "warnings": 64
+    },
+    "physicalPhone": {
+      "api": 36,
+      "abi": "arm64-v8a",
+      "instrumentationCode": -1,
+      "isolatedArchiveAndBackupChecks": 64,
+      "hudChecks": 16,
+      "attachedBackupPageChecks": 5,
+      "maximumEnvelopePlaintextMiB": 20,
+      "maximumEnvelopeRoundTrip": "pass",
+      "aboveMaximumRejected": true,
+      "previousFourMiBPlaintextCeilingRejectsLargerPayload": true,
+      "defaultAndSavedOptOut": "pass",
+      "pendingRestoreBlocksRequest": "pass",
+      "dailyRetryAndClockRollback": "pass",
+      "missingLockServiceWaitAndOptOut": "pass"
+    }
+  },
+  "transportTrials": [
+    {
+      "stage": "original four-MiB candidate",
+      "result": "Incremental and backgrounded non-incremental requests report transport error. No partial snapshot or history deletion."
+    },
+    {
+      "stage": "typed export-limit diagnostic candidate",
+      "result": "Non-incremental request reports transport error; app status confirms archive size/record limit rejection. Intermediate APK hash not retained."
+    },
+    {
+      "stage": "final twenty-MiB candidate",
+      "command": "adb shell bmgr backupnow --non-incremental com.attentionstats.debug",
+      "result": "Package Success; Backup finished Success",
+      "appStatus": "Snapshot handed to Android. Cloud upload completion is not confirmed.",
+      "scope": "Only this debug app, through the phone's existing transport; no account or global backup-setting changes"
+    }
+  ],
+  "cleanup": {
+    "testPackageRemoved": true,
+    "syntheticStoresKeysAndPreferencesRemoved": true,
+    "accessibilitySelectionsUnchanged": true,
+    "debugAppReopened": true,
+    "automaticBackupRemainsEnabled": true,
+    "ownFatalExceptionInBoundedCrashBuffer": false,
+    "privateAccessibilityBaselineRemoved": true
+  },
+  "limitations": [
+    "No fresh-install or second-device recovery, live-history replacement or synchronization trial",
+    "No guaranteed nightly execution or independent provider-durability verification",
+    "Twenty-MiB envelope readback does not establish maximum logical-history restore, minimum-API memory, crash or process-death qualification",
+    "Product limits remain twenty MiB plaintext, one hundred thousand logical records and 256 KiB per record; no truncation or pruning",
+    "Direct Drive API remains blocked under F-05; multi-origin merge, conflicts and tombstones remain planned",
+    "No main merge, release bump, Play upload or remote workflow run"
+  ]
+}

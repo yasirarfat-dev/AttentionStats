@@ -12,16 +12,16 @@ Current source increment (ADR-046): the selected Facebook viewer candidate now u
 
 The revised temporary development check additionally recognizes exact Like, Comment and Share controls and fixed Home/Reels/Video tab-position labels. It retains only their fixed tokens and up to three ancestor layouts, within the existing 16-match and 32-KiB limits (interface revision 2). These extra labels are diagnostic-only and never become observation signals without separate qualification. A fresh diagnostic notice describes the fields before each trial.
 
-## Current backup choice (ADR-073, 2026-11-04)
+## Current backup choice (ADR-073/ADR-079, 2026-11-07)
 
-The maintainer authorizes opt-in Android-managed backup, superseding blanket OS-backup exclusion only for one bounded logical snapshot. Live databases, keys/wrappers, grants, preferences and all other files remain excluded. Android chooses the configured provider/account and upload timing; the custom agent requires API 28+, secure screen lock and client-side-encrypted transport and rejects device transfer. A delivered archive stays in private no-backup quarantine until reviewed. No automatic upload is enabled merely by installing/upgrading or restoring this app.
+The maintainer authorizes automatic-by-default Android-managed backup on first foreground entry, preserving saved opt-outs, superseding blanket OS-backup exclusion only for one bounded logical snapshot. Live databases, keys/wrappers, grants, preferences and all other files remain excluded. Android chooses the configured provider/account and upload timing; the custom agent requires API 28+, secure screen lock and client-side-encrypted transport and rejects device transfer. A delivered archive stays in private no-backup quarantine until reviewed. Foreground entry initializes an unset backup choice to on and requests Android scheduling when prerequisites are met. Installation and pre-launch restore alone do not initialize it. The switch remains available; local erase persists off. Pending recovery blocks new snapshots until review/discard.
 
 Exports use a public app-package credential, with no password for users to remember. Anyone with a file can decrypt or modify it; destination/account security is the privacy boundary. Do not advertise these files as secret encrypted archives. Direct Drive API/OAuth integration remains blocked; Android transport is separate. Local erase disables future system backups and removes pending restores but cannot erase external copies.
 
 
 ## Public promise
 
-Planned release message: **“No data sent to us. Your history stays on your device. Open source.”** Pair this with a nearby explanation: tracking stores the data you enable locally; optional exports or approved cloud backup move encrypted archives to a destination you choose. Do not advertise “collects no data,” “zero data collection,” or “never leaves your phone” without this distinction. Open source supports inspection; it is not proof that an untested binary has no network traffic.
+Planned release message: **“No data sent to us. Your history stays on your device. Open source.”** Pair this with a nearby explanation: tracking stores the data you enable locally; manual exports or Android-managed backup can move history to the selected file destination or the account configured in Android Settings. Do not advertise “collects no data,” “zero data collection,” or “never leaves your phone” without this distinction. Open source supports inspection; it is not proof that an untested binary has no network traffic.
 
 The experimental installed counter and its scoped encryption/phone evidence are recorded in State; the full product and independent security/accuracy review remain incomplete. The [user privacy policy](../policies/PRIVACY.md) describes the current candidate separately from this future catalog. ADR-043 prepares a closed test, not a live rollout. Store declarations describe the exact release artifact, including third-party code, independently of how a store defines off-device collection. Do not claim full product encryption, tracking accuracy or verified egress from design intent.
 
@@ -52,7 +52,7 @@ AS-043's historical notice-2 preview inventory was narrower than the planned cat
 | Rules, schedules, overrides and focus sessions | Chosen protection | Local DB; reason text optional, no remote accountability recipient | Per rule behavior, pause, emergency bypass, delete/reset |
 | UI preferences | Theme, motion, layout | MMKV; non-sensitive only | Settings/reset; exclude from undocumented OS transfers |
 | Keys and optional provider tokens | Encryption / approved backup only | Native secure storage; never exported as plaintext | Key reset, provider disconnect and recovery guidance |
-| Archives and provider metadata | User-selected portability/backup, off | Ciphertext at chosen destination; provider sees account, size, name/time, transfer/IP metadata as applicable | Scope, destination, cancellation and external deletion guidance |
+| Archives and provider metadata | Manual portability or default-on Android-managed recovery, with opt-out | Ciphertext at chosen destination; provider sees account, size, name/time, transfer/IP metadata as applicable | Scope, destination, cancellation and external deletion guidance |
 | Health and diagnostics | Local troubleshooting | Bounded local reason codes and timings; no raw node text/history/identifiers | Inspect and clear; synthetic reports only in public repository |
 
 ## Consent lifecycle and exclusions
@@ -67,9 +67,9 @@ The permission dashboard shows enabled sources, fields, applications, detail lev
 
 ## Transfers and OS behavior
 
-Portable encrypted exports are independent of cloud backup. A system picker may hand a file to a provider that uploads it; tell the person which destination was chosen and that the provider can see metadata. Encryption does not hide file size, account, time or network origin. The app cannot revoke copies after export. Backups can contain sensitive history even if encrypted; require scope preview and user-held recovery credentials.
+Portable encrypted exports are independent of cloud backup. A system picker may hand a file to a provider that uploads it; tell the person which destination was chosen and that the provider can see metadata. Encryption does not hide file size, account, time or network origin. The app cannot revoke copies after export. Backups can contain sensitive history even if encrypted; use scope preview and disclose the current public-package credential, which provides no secrecy against a file holder.
 
-Automatic personal Google-account backup is desired, but direct Drive integration is **unverified and blocked pending policy clarification**. It must not be described as working or implemented through a silently substituted transport. No product sign-in is required for local use. Android automatic backup/device transfer of sensitive data is disabled and explicitly excluded as specified in [Backup](BACKUP-RESTORE.md); OEM behavior must be tested.
+Automatic personal Google-account backup is desired, but direct Drive integration is **unverified and blocked pending policy clarification**. It must not be described as working or implemented through a silently substituted transport. No product sign-in is required for local use. Android-managed backup is enabled by default on foreground entry under ADR-079, with saved opt-outs preserved; all other OS backup and device transfer are explicitly excluded as specified in [Backup](BACKUP-RESTORE.md); OEM behavior must be tested.
 
 ## Privacy acceptance
 

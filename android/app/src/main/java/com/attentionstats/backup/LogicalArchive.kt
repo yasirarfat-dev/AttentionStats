@@ -16,6 +16,7 @@ import java.io.StringReader
 
 /** Explicit schema-9 snapshot; stable fact IDs/origins survive replacement and re-export. */
 internal object LogicalArchive {
+    class LimitExceeded : IllegalArgumentException()
     val tables = listOf("SourceConfiguration", "LiveOverlayConfiguration", "ConsentRecord", "SurfaceEpisode",
         "Exposure", "CoverageInterval", "DiaryConfiguration", "AppUsageEvent", "ReelsTimer",
         "ReelsBlockConfiguration", "InterventionEvent", "ProtectionConfiguration")
@@ -41,14 +42,14 @@ internal object LogicalArchive {
         fun record(kind: Int, value: JSONObject) {
             cancel()
             val bytes = value.toString().toByteArray(Charsets.UTF_8)
-            require(bytes.size <= MAX_RECORD && output.size().toLong() + bytes.size + 5 <= ArchiveEnvelope.MAX_PLAIN)
+            if (bytes.size > MAX_RECORD || output.size().toLong() + bytes.size + 5 > ArchiveEnvelope.MAX_PLAIN) throw LimitExceeded()
             stream.writeByte(kind); stream.writeInt(bytes.size); stream.write(bytes)
         }
         val counts = JSONObject()
         var total = 0L
         for (table in tables) usePrepared("SELECT COUNT(*) FROM `$table`") { statement ->
             check(statement.step()); val count = statement.getLong(0)
-            total = Math.addExact(total, count); require(total <= MAX_ROWS)
+            total = Math.addExact(total, count); if (total > MAX_ROWS) throw LimitExceeded()
             counts.put(table, count.toString())
         }
         val localOrigin = checkNotNull(history.database.data().metadata()).installationEpoch

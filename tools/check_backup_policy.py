@@ -37,4 +37,4 @@ if __name__ == "__main__":
           (base / "res/xml/backup_rules.xml").read_text(),
           (base / "res/xml/data_extraction_rules.xml").read_text())
     print("PASS: one logical archive only; protected cloud transport; device transfer excluded")
-    print("Static policy checks do not establish opt-in behavior, a Google upload or fresh-device recovery.")
+    print("Static policy checks do not establish initialization/opt-out behavior, a Google upload or fresh-device recovery.")

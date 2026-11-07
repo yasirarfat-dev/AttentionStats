@@ -52,3 +52,5 @@ These are design questions, not requests waiting on the current user. Proceed wi
 
 
 Q-023 / 2026-11-05: Per-app multi-slot blocking with whole-app/short-video scope, distracting-app groups, blackish dark theme and stuck mindful-break actions. Promoted by explicit maintainer request through ADR-076, AS-053/AS-057 and AS-060. Keep whole-app daily duration budgets distinct from the existing daily video-count limit; no universal selective blocker is implied.
+
+Q-024 / 2026-11-07: Backup should initialize automatically so people do not forget setup; eventual synchronization should be similarly convenient. Promoted through ADR-079 and AS-058 for default-on Android-managed recovery with saved opt-outs. Real cross-device synchronization retains AS-038/ADR-050/ADR-074's approved-transport, merge/conflict and deletion prerequisites; automatic initialization must follow qualified sync availability rather than relabeling recovery as sync.

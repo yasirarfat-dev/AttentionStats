@@ -376,7 +376,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <Row
           icon="lock"
           title="Backup & restore"
-          detail="No backup password to remember. Keep exported files in private storage."
+          detail="Automatic Android backup starts enabled. Manage backup, recovery and manual files."
           onPress={async () => {
             if (!(await NativeDiary?.openBackup()))
               Alert.alert(
@@ -389,7 +389,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <Row
           icon="lock"
           title="Privacy policy"
-          detail="Local history, your controls, and optional encrypted file transfers."
+          detail="Local history, automatic Android backup and your controls."
           onPress={() => Linking.openURL(PRIVACY)}
         />
         <Divider />
@@ -406,7 +406,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <Row
           icon="info"
           title="Encrypted local history"
-          detail="No data sent to us. Exports use a public app key and rely on your storage account for privacy. Erasing local history does not erase exported files."
+          detail="No data sent to us. Android can back up history to your device backup account. Manual files use a public app key. Local erase turns backup off; external copies may remain."
         />
         <Divider />
         <Row

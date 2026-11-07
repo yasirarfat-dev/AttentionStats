@@ -86,7 +86,8 @@ class AnalyticsInstrumentation : Instrumentation() {
             verifyReels()
             val count = if (beta) BetaVerification.run(this) else 0
             val hudChecks = if (beta) HudBehaviorVerification.run(this) else 0
-            result.putString("stream", "PASS: analytics and encounter checks; $count isolated beta archive checks; $hudChecks HUD choice/view-state checks")
+            val backupUi = if (beta) BackupUiVerification.run(this) else 0
+            result.putString("stream", "PASS: analytics and encounter checks; $count isolated beta archive checks; $hudChecks HUD choice/view-state checks; $backupUi attached backup UI checks")
             finish(Activity.RESULT_OK, result)
         } catch (failure: Throwable) {
             result.putString("stream", "FAIL: ${failure.javaClass.simpleName}: ${failure.message?.take(160)}")

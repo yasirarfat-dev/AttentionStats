@@ -7,7 +7,7 @@
 
 ## Current archive privacy boundary (ADR-073, 2026-11-04)
 
-By explicit maintainer decision, current exports use public-package profile 3 with SHA-256(`attention.stats`) as the input credential. This is an exception to the earlier secret portable-credential requirement below: it provides no confidentiality or authorship authentication against a file holder. It must never be presented as a secret key or end-to-end archive encryption. Local SQLCipher/Keystore protection remains unchanged. Android-managed cloud backup is separately opt-in and requires API 28+, device lock and transport client-side encryption; manual files rely on private destination/account access controls. No developer secret, escrow service or new remote recipient is introduced. The platform transport's documented encryption is distinct from the public archive wrapper.
+By explicit maintainer decision, current exports use public-package profile 3 with SHA-256(`attention.stats`) as the input credential. This is an exception to the earlier secret portable-credential requirement below: it provides no confidentiality or authorship authentication against a file holder. It must never be presented as a secret key or end-to-end archive encryption. Local SQLCipher/Keystore protection remains unchanged. Android-managed cloud backup initializes on unless a saved choice exists (ADR-079) and requires API 28+, device lock and transport client-side encryption; manual files rely on private destination/account access controls. No developer secret, escrow service or new remote recipient is introduced. The platform transport's documented encryption is distinct from the public archive wrapper.
 
 
 ## Threat model
@@ -19,7 +19,7 @@ By explicit maintainer decision, current exports use public-package profile 3 wi
 | Broad accessibility capture | Narrow package/field allowlists, source consent and sensitive-context exclusion | Target UI can change; unsupported contexts must fail closed |
 | Malicious/corrupt import | Authenticate before parsing trusted content, resource bounds, staged validation and atomic replacement | Resource exhaustion requires explicit quotas and tested limits |
 | Dependency or build compromise | Latest metadata/license review, lockfile, approved build scripts, provenance and binary egress checks | Open source and latest releases do not guarantee safety |
-| Leaking logs/backups/issue reports | Redaction, no automatic uploads, OS transfer exclusion, synthetic public fixtures | User-controlled external copies cannot be recalled |
+| Leaking logs/backups/issue reports | Redaction, no automatic diagnostic uploads, one-file protected OS backup only, transfer exclusion, synthetic public fixtures | User-controlled external copies cannot be recalled |
 | Intervention trapping the user | Permanent emergency routes, renderer escape tests, static rules only | OS/OEM failure can prevent enforcement, never justify anti-uninstall behavior |
 
 Protected assets include usage and optional content history, rule configuration, keys, recovery credentials, provider tokens and signing material. The developer's repository and distribution credentials are separate from runtime device keys. No shared master decryption key or developer recovery service is allowed.

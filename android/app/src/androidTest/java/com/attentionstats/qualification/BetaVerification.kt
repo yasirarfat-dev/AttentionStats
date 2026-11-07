@@ -1,6 +1,7 @@
 package com.attentionstats.qualification
 
 import android.app.Instrumentation
+import android.content.Context
 import android.content.ContextWrapper
 import androidx.room3.withWriteTransaction
 import androidx.room3.withReadTransaction
@@ -161,6 +162,11 @@ internal object BetaVerification {
             val pending = com.attentionstats.backup.SystemBackupState.pending(agent)
             expect(pending.readBytes().contentEquals(publicArchive))
             expect(!com.attentionstats.backup.SystemBackupState.enabled(agent))
+            // Foreground initialization must not overwrite a delivered recovery archive.
+            com.attentionstats.backup.SystemBackupState.initialize(agent)
+            expect(com.attentionstats.backup.SystemBackupState.enabled(agent))
+            expect(runCatching { com.attentionstats.backup.SystemBackupState.request(agent) }.isFailure)
+            expect(pending.readBytes().contentEquals(publicArchive))
             expect(runCatching { deliver(File(agentFiles, "unexpected")) }.isFailure)
             expect(runCatching { deliver(size = ArchiveEnvelope.MAX_CIPHER + 1L) }.isFailure)
             input.writeBytes(publicArchive.copyOf(publicArchive.size - 1))
@@ -171,6 +177,59 @@ internal object BetaVerification {
             expect(pending.readBytes().contentEquals(publicArchive))
             com.attentionstats.backup.SystemBackupState.clearPending(agent)
             expect(!pending.exists())
+            com.attentionstats.backup.SystemBackupState.configure(agent, false)
+            com.attentionstats.backup.SystemBackupState.initialize(agent)
+            expect(!com.attentionstats.backup.SystemBackupState.enabled(agent))
+            // Simulate the old persisted opt-out across another foreground entry.
+            com.attentionstats.backup.SystemBackupState.initialize(agent)
+            expect(!com.attentionstats.backup.SystemBackupState.enabled(agent))
+            check(agent.getSharedPreferences("system-backup", Context.MODE_PRIVATE).edit().clear().commit())
+            com.attentionstats.backup.SystemBackupState.initialize(agent)
+            expect(com.attentionstats.backup.SystemBackupState.enabled(agent))
+            val backupPrefs = agent.getSharedPreferences("system-backup", Context.MODE_PRIVATE)
+            val requestedAt = backupPrefs.getLong("requestedAt", 0L)
+            expect(!com.attentionstats.backup.SystemBackupState.supported(agent) || requestedAt > 0L)
+            com.attentionstats.backup.SystemBackupState.initialize(agent)
+            expect(backupPrefs.getLong("requestedAt", 0L) == requestedAt)
+            if (com.attentionstats.backup.SystemBackupState.supported(agent)) {
+                val future = System.currentTimeMillis() + 86_400_000L
+                check(backupPrefs.edit().putLong("requestedAt", future).commit())
+                com.attentionstats.backup.SystemBackupState.initialize(agent)
+                expect(backupPrefs.getLong("requestedAt", 0L) < future)
+                check(backupPrefs.edit().putLong("requestedAt", 1L).commit())
+                com.attentionstats.backup.SystemBackupState.initialize(agent)
+                expect(backupPrefs.getLong("requestedAt", 0L) > 1L)
+            }
+            check(backupPrefs.edit().clear().commit())
+            val lockedOut = object : ContextWrapper(agentContext) {
+                override fun getSystemService(name: String): Any? =
+                    if (name == Context.KEYGUARD_SERVICE) null else super.getSystemService(name)
+            }
+            com.attentionstats.backup.SystemBackupState.initialize(lockedOut)
+            expect(com.attentionstats.backup.SystemBackupState.enabled(lockedOut))
+            expect(backupPrefs.getLong("requestedAt", 0L) == 0L)
+            com.attentionstats.backup.SystemBackupState.configure(lockedOut, false)
+            com.attentionstats.backup.SystemBackupState.initialize(lockedOut)
+            expect(!com.attentionstats.backup.SystemBackupState.enabled(lockedOut))
+            // Full product envelope ceiling, including >4 MiB compatibility with the previous reader.
+            val largePlain = ByteArray(ArchiveEnvelope.MAX_PLAIN) { (it % 251).toByte() }
+            try {
+                val largeArchive = ArchiveEnvelope.write(largePlain, publicCredential,
+                    profile = ArchiveEnvelope.PUBLIC_PACKAGE_PROFILE)
+                try {
+                    expect(largeArchive.size <= ArchiveEnvelope.MAX_CIPHER)
+                    val readback = ArchiveEnvelope.read(largeArchive, publicCredential,
+                        expectedProfile = ArchiveEnvelope.PUBLIC_PACKAGE_PROFILE)
+                    try { expect(readback.contentEquals(largePlain)) } finally { readback.fill(0) }
+                    expect(runCatching { ArchiveEnvelope.read(largeArchive, publicCredential,
+                        plaintextLimit = 4 * ArchiveEnvelope.SEGMENT,
+                        expectedProfile = ArchiveEnvelope.PUBLIC_PACKAGE_PROFILE) }.isFailure)
+                } finally { largeArchive.fill(0) }
+            } finally { largePlain.fill(0) }
+            val tooLarge = ByteArray(ArchiveEnvelope.MAX_PLAIN + 1)
+            try { expect(runCatching { ArchiveEnvelope.write(tooLarge, publicCredential,
+                profile = ArchiveEnvelope.PUBLIC_PACKAGE_PROFILE) }.isFailure) }
+            finally { tooLarge.fill(0) }
             plain.fill(0); archive.fill(0); corrupt.fill(0); publicArchive.fill(0)
             checks
         } finally {

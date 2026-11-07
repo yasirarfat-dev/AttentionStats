@@ -21,6 +21,10 @@ open class SystemBackupAgent : BackupAgent() {
     override fun onRestore(data: BackupDataInput, appVersionCode: Int, newState: ParcelFileDescriptor) = Unit
 
     override fun onFullBackup(data: FullBackupDataOutput) {
+        if (SystemBackupState.pending(this).exists()) {
+            SystemBackupState.record(this, "Review or discard the delivered restore before backing up new history.")
+            throw IOException("Pending restore requires review")
+        }
         if (!SystemBackupState.enabled(this)) return
         if (android.os.Build.VERSION.SDK_INT < 28 || !SystemBackupState.supported(this) || data.transportFlags and FLAG_CLIENT_SIDE_ENCRYPTION_ENABLED == 0 ||
             data.transportFlags and FLAG_DEVICE_TO_DEVICE_TRANSFER != 0) {
@@ -29,6 +33,7 @@ open class SystemBackupAgent : BackupAgent() {
         }
         val cancelled = AtomicBoolean(false)
         val result = AtomicReference<ByteArray?>()
+        val exportFailure = AtomicReference<String?>()
         val done = CountDownLatch(1)
         val file = File(filesDir, SystemBackupState.RELATIVE_FILE)
         try {
@@ -37,7 +42,7 @@ open class SystemBackupAgent : BackupAgent() {
                     if (cancelled.get()) bytes.fill(0) else result.set(bytes)
                 }
                 done.countDown()
-            }, { done.countDown() })
+            }, { code -> exportFailure.set(code); done.countDown() })
             if (!done.await(25, TimeUnit.SECONDS)) throw IOException("Snapshot timed out")
             val bytes = result.get() ?: throw IOException("Snapshot unavailable or too large")
             if (data.quota > 0 && bytes.size.toLong() + 2048 > data.quota) throw IOException("Backup quota exceeded")
@@ -47,7 +52,9 @@ open class SystemBackupAgent : BackupAgent() {
             fullBackupFile(file, data)
             SystemBackupState.record(this, "Snapshot handed to Android. Cloud upload completion is not confirmed.")
         } catch (_: Exception) {
-            SystemBackupState.record(this, "Backup did not finish. History is unchanged; Android may retry.")
+            SystemBackupState.record(this, if (exportFailure.get() == "ARCHIVE_TOO_LARGE")
+                "History exceeds the current backup size or record limit. No backup was offered and no history was removed."
+                else "Backup did not finish. History is unchanged; Android may retry.")
             throw IOException("Backup snapshot unavailable")
         } finally {
             synchronized(result) { cancelled.set(true); result.getAndSet(null)?.fill(0) }

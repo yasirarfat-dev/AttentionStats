@@ -9,7 +9,7 @@
 
 ## Backup continuation (ADR-073/ADR-074, 2026-11-04)
 
-Native backup UI requires no recovery-key input. Internal archive commands export/preview public-package envelope profile 3 and logical version 2/schema 9, preserving immutable fact IDs/origins. Native-only Android backup consent/status is device-local; requested or handed-to-Android states never mean confirmed cloud completion. The agent accepts one bounded file into no-backup quarantine; review uses the same token/revision-bound transactional replacement. No source grants or enabled protection are imported. No JS credential, Google token, backup account identifier or provider filename is bridged.
+Native backup UI requires no recovery-key input. Internal archive commands export/preview public-package envelope profile 3 and logical version 2/schema 9, preserving immutable fact IDs/origins. Native-only Android backup choice/status is device-local; ADR-079 initializes only an unset choice on foreground entry, preserving explicit off, and blocks new snapshots while a restore awaits review; requested or handed-to-Android states never mean confirmed cloud completion. The agent accepts one bounded file into no-backup quarantine; review uses the same token/revision-bound transactional replacement. No source grants or enabled protection are imported. Product bounds are 20 MiB plaintext, 100,000 records and 256 KiB per record; oversized exports return native ARCHIVE_TOO_LARGE without partial output or history removal. No JS credential, Google token, backup account identifier or provider filename is bridged.
 
 
 ## Experimental scaffold handshake

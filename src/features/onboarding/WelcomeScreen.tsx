@@ -17,13 +17,13 @@ const promises: { icon: IconName; title: string; detail: string }[] = [
     icon: 'phone',
     title: 'Local and encrypted by default',
     detail:
-      'No developer server or account. Optional backup files go where you choose; keep them private.',
+      'No developer server or app account. Automatic backup uses your Android backup settings; turn it off in Settings → Backup & restore.',
   },
   {
     icon: 'noads',
     title: 'No ads or developer telemetry',
     detail:
-      'Your activity diary stays local unless you export it. No data sales, nothing to pay for.',
+      'No data sent to us. Android may back up your history to your device backup account. No data sales, nothing to pay for.',
   },
   {
     icon: 'code',
@@ -198,8 +198,9 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
             </Body>
             <Body muted>
               It never records, saves or sends what you watch, type or message.
-              Counts stay encrypted on this phone. It only presses Back or
-              swipes for you when you turn on blocking or auto-scroll.
+              Counts are stored encrypted on this phone and are eligible for
+              Android backup. It only presses Back or swipes for you when you
+              turn on blocking or auto-scroll.
             </Body>
           </Card>
 

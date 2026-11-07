@@ -9,7 +9,7 @@
 
 The product no-key flow deliberately differs from the historical secret-key fixture below. Profile byte 3 uses SHA-256 of exact ASCII `attention.stats` as its 32-byte public credential before the existing salt/HKDF/wrapping pipeline. Envelope version/suite stay 1; all Argon fields remain zero. Accept the selected profile explicitly; changing a header profile cannot bypass AEAD binding. Anyone with a file can derive this credential, read it or forge a new valid envelope. There is no file-holder confidentiality or source authentication claim. Profile-1 fixtures continue testing the historical construction independently.
 
-Product logical format is now version 2/schema 9, including original per-fact origins; full replacement and re-export preserve IDs/origins. Older unpublished schema-8/profile-1 files are not supported in the new no-key UI. Runtime quotas remain 4 MiB plaintext / 100,000 logical records; origin sidecars are bounded by fact count. OS-managed backups require an independently protected Android transport; the public wrapper is not that protection.
+Product logical format is now version 2/schema 9, including original per-fact origins; full replacement and re-export preserve IDs/origins. Older unpublished schema-8/profile-1 files are not supported in the new no-key UI. Under ADR-079, product runtime quotas are 20 MiB plaintext / 100,000 logical records; origin sidecars are bounded by fact count. OS-managed backups require an independently protected Android transport; the public wrapper is not that protection.
 
 
 ## Scope and current evidence

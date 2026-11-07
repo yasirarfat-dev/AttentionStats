@@ -1,13 +1,13 @@
 # Attention Stats privacy policy
 
-Last updated: 4 November 2026 · App: **Attention Stats** (`attention.stats`), version 1.0.0 and development continuation · Contact: **consciousbiobot@gmail.com**
+Last updated: 7 November 2026 · App: **Attention Stats** (`attention.stats`), version 1.0.0 and development continuation · Contact: **consciousbiobot@gmail.com**
 
 Attention Stats is a free, open-source digital wellbeing app created by Yasir Arfat ([yasirarfat.com](https://yasirarfat.com)) and published on Google Play by Convenience Labs. Its [source code](https://github.com/yasirarfat-dev/AttentionStats) is public, so anyone can verify everything below.
 
 ## The short version
 
-- **Local by default.** No developer account, server, telemetry, advertising or automatic crash reporting. The app has no Internet permission. When available and explicitly chosen, manual export writes a file to your selected destination; that provider may upload it under its own policy. You can also opt into Android-managed automatic backup.
-- **We never receive your history automatically.** Local history is encrypted. You control optional external archives and support messages.
+- **Private local storage, Android-managed backup.** No developer account, server, telemetry, advertising or automatic crash reporting. The app has no Internet permission. When available and explicitly chosen, manual export writes a file to your selected destination; that provider may upload it under its own policy. Automatic Android backup starts enabled when you open this development version unless you already saved a choice. Turn it off in Settings → Backup & restore. Android backup must also be enabled on your phone.
+- **We never receive your history automatically.** Local history is encrypted. You can disable Android backup and control manual external archives and support messages.
 - **You are in control.** Every feature is optional, and you can pause counting or delete everything at any time.
 
 ## What the app uses, and why
@@ -36,27 +36,28 @@ If you allow Usage Access, the app reads Android's app-usage events (app package
 - Break and block events, and what you chose (for example "took a break").
 - Your settings, consent choices and selected app-group/schedule configuration. Appearance and motion are device-local visual preferences.
 
-This data is kept in an encrypted database in the app's private storage, protected by a key in the Android Keystore. The live database, device keys and preferences are excluded from Android backup and device transfer. If you explicitly enable Android-managed backup, only a bounded logical copy of your history and supported choices is offered to Android. Local history stays until you delete it.
+This data is kept in an encrypted database in the app's private storage, protected by a key in the Android Keystore. The live database, device keys and preferences are excluded from Android backup and device transfer. Unless you turn off Android-managed backup, only a bounded logical copy of your history and supported choices is offered to Android. Local history stays until you delete it.
 
-## Optional backups
+## Automatic backup and manual files
 
 Backup files require no password to remember. They use the app's public package name as their key; anyone who obtains a file can read or modify it. Keep manual exports in private storage and protect your cloud account. The public app key is not secret encryption protection.
 
-If you opt into automatic Android backup, Android uses the backup account/provider configured on your device. Android controls timing, typically roughly nightly when eligible, and may delay or skip runs. Our agent requires Android 9 or newer, a secure screen lock and a transport reporting client-side encryption; device-to-device transfer remains excluded. Android's transport protection is separate from the public archive key. The app does not read your backup-account email or authorize the Drive API. No data is sent to the developer.
+Automatic Android backup initializes without an app account, password or destination setup. Previously saved off choices remain off, including after local deletion. When enabled, Android uses the backup account/provider configured on your device. Android controls timing, typically roughly nightly when eligible, and may delay or skip runs. Our agent requires Android 9 or newer, a secure screen lock and a transport reporting client-side encryption; device-to-device transfer remains excluded. Android's transport protection is separate from the public archive key. The app does not read your backup-account email or authorize the Drive API. No data is sent to the developer.
 
 Restored files are kept in private staging for review before replacement; tracking and protection remain off until you choose to enable them. Disabling backup stops future app participation. Deleting local history disables future system backup and removes pending restores but cannot erase files or older copies already held by your provider. Manual exports are chosen through Android's file picker. In-app daily/weekly scheduling and continuous cross-device synchronization are not implemented.
 
 ## Sharing
 
-We do not automatically receive, sell or share your activity history. Enabled activity is recorded locally; optional backup transfers go to your chosen storage or Android backup provider. No advertising or developer analytics SDK receives it. If you tap a link (for example to this policy, GitHub or Google Play), your browser or that service handles it under its own policy.
+We do not automatically receive, sell or share your activity history. Enabled activity is recorded locally; manual exports go to your chosen storage and automatic backups go to your Android backup provider. No advertising or developer analytics SDK receives it. If you tap a link (for example to this policy, GitHub or Google Play), your browser or that service handles it under its own policy.
 
 If you contact us or open a GitHub issue, we receive only what you choose to send. The in-app "Report a problem" form pre-fills your phone model, Android version and app versions so we can fix detection; it never includes your history. You can edit it before sending.
 
 ## Your choices and deletion
 
+- Turn automatic backup off or on in Settings → Backup & restore. Existing provider copies may remain.
 - Turn counting on or off per app, pause everything, or hide the counter at any time.
 - Turn off the accessibility service or usage access in Android settings at any time.
-- **Settings → Delete all history** permanently removes every count, timer, event and setting. Uninstalling the app or clearing its storage also removes all data.
+- **Settings → Delete all history** removes local counts, timers, events and settings and disables future automatic backups. Uninstalling or clearing storage also removes local data; external backup copies may remain.
 
 ## Children
 

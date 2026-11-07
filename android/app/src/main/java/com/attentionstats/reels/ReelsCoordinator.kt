@@ -214,7 +214,11 @@ internal class ReelsCoordinator private constructor(private val context: Context
                 profile = com.attentionstats.backup.ArchiveEnvelope.PUBLIC_PACKAGE_PROFILE) }
                 finally { plain.fill(0) }
             success(encrypted)
-        } catch (_: Exception) { failure(if (cancelled.get()) "CANCELLED" else "ARCHIVE_LIMIT_OR_EXPORT_FAILED") }
+        } catch (problem: Exception) { failure(when {
+            cancelled.get() -> "CANCELLED"
+            problem is com.attentionstats.backup.LogicalArchive.LimitExceeded -> "ARCHIVE_TOO_LARGE"
+            else -> "ARCHIVE_EXPORT_FAILED"
+        }) }
     }
     fun previewArchive(bytes: ByteArray, cancelled: java.util.concurrent.atomic.AtomicBoolean,
         success: (String, Long) -> Unit, failure: (String) -> Unit) = enqueue(failure) {

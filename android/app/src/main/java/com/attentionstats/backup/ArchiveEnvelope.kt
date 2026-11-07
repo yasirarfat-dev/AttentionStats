@@ -37,7 +37,8 @@ internal object ArchiveEnvelope {
     fun packageCredential(): String = encodeCredential(MessageDigest.getInstance("SHA-256")
         .digest(PORTABLE_PACKAGE.toByteArray(Charsets.US_ASCII)))
     const val SEGMENT = 1_048_576
-    const val MAX_PLAIN = 4 * SEGMENT
+    // Leave transport overhead below Android's 25 MB per-app cloud quota.
+    const val MAX_PLAIN = 20 * SEGMENT
     const val MAX_CIPHER = MAX_PLAIN + 16_384
     private val magic = byteArrayOf(0x41, 0x54, 0x54, 0x4e, 0x41, 0x52, 0x43, 0)
     private val keysetDomain = "AttentionStats/archive/v1/keyset\u0000".toByteArray(Charsets.US_ASCII)

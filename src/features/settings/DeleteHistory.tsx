@@ -40,7 +40,7 @@ export function useDeleteHistory({
   function start() {
     Alert.alert(
       'This is your private record',
-      `It is the story of where your attention went, and only you have it. It lives on this phone alone: no account, no server, no backup. Nobody, not even us, can see it or bring it back.
+      `Your history is stored privately on this phone. Android backups or files you exported may also exist. Deleting here turns off future automatic backups and removes pending restores; it cannot delete copies held by your backup provider or elsewhere. No data is sent to us.
 
 It takes just ${size(storageBytes)}. Many people return months later to see how far they have come.
 
@@ -56,7 +56,7 @@ Need a break from tracking? Pausing keeps everything safe.`,
   function second() {
     Alert.alert(
       'Erase it forever?',
-      'Every short video, every minute of app time, your breaks and your blocks, all gone for good. There is no undo and no copy anywhere.\n\nFuture you may want to look back at this. Are you completely sure?',
+      'This removes your history and choices from this phone. There is no local undo. Automatic backup will be turned off, but external backup copies may remain.\n\nContinue with deletion?',
       [
         { text: 'Keep my history', style: 'cancel' },
         {

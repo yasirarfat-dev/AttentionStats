@@ -5,7 +5,7 @@
 **Related specifications:** [UX](UX-SPEC.md), [Privacy](PRIVACY.md), [Protection](PROTECTION-SPEC.md), [Backup](BACKUP-RESTORE.md), [Models](DATA-MODELS.md).
 **Unresolved feasibility:** F-01–F-08 in [Decisions](DECISIONS.md); unavailable settings must state the gate rather than appear functional.
 
-Current backup control (ADR-073/AS-058): native Backup & restore offers off-by-default Android-managed backup, device-backup settings, a timing request with unconfirmed-upload status, pending-system-restore review/discard and manual no-key export/import. The public package credential requires no user memorization and does not protect a file from its holder. Device-local consent/preferences never travel in a backup.
+Current backup control (ADR-073/AS-058): native Backup & restore offers automatic-by-default Android-managed backup (ADR-079), preserving saved opt-outs and local-erase off choices, device-backup settings, a timing request with unconfirmed-upload status, pending-system-restore review/discard and manual no-key export/import. The public package credential requires no user memorization and does not protect a file from its holder. Device-local consent/preferences never travel in a backup.
 
 ## Persistence and change rules
 

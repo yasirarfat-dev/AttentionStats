@@ -23,21 +23,21 @@ class BackupActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         com.attentionstats.appearance.AppearanceOwner.prepare(this)
         super.onCreate(savedInstanceState)
+        try { SystemBackupState.initialize(this) } catch (_: RuntimeException) { }
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         page = com.attentionstats.appearance.NativePage(this)
         text("Backup & restore", 24f)
         text("Keep a portable copy of your history and choices without remembering a backup key. Choose a private destination using Android's file picker; a cloud provider you choose may upload the file.")
         text("Backups use this app's public package name as their key. Anyone who obtains a file can read or modify it using that public key. Keep files in private storage and protect your cloud account. No secret backup password is required.")
-        text("Snapshots currently support up to 4 MiB / 100,000 records. Restore checks the file and previews replacement of current history. Tracking, reminders, blocks and schedules stay off afterward until you choose to enable them. System permissions are never imported.")
+        text("Snapshots currently support up to 20 MiB / 100,000 records. Restore checks the file and previews replacement of current history. Tracking, reminders, blocks and schedules stay off afterward until you choose to enable them. System permissions are never imported.")
         status = text(SystemBackupState.status(this))
         text("Automatic Android backup", 21f)
-        text("Android backs up to the backup account configured on this phone, usually roughly nightly after at least 24 hours, while idle with a suitable network. Timing is not guaranteed. No backup password to remember. Android 9 or newer and a screen lock are required. The backup transport must provide client-side encryption.")
+        text("Automatic backup starts enabled unless you previously turned it off. Android uses the backup account already configured on this phone, usually roughly nightly after at least 24 hours, while idle with a suitable network. Timing is not guaranteed. Android backup must be enabled in device settings. No password to remember. Android 9 or newer, a screen lock and an encrypted backup transport are required. This protects recovery; it does not sync live history between devices.")
         @Suppress("DEPRECATION")
         var changingAutomatic = false
         val automatic = Switch(this).apply {
             text = "Allow automatic Android backup"
             isChecked = SystemBackupState.enabled(this@BackupActivity)
-            isEnabled = SystemBackupState.supported(this@BackupActivity)
             setPadding(0, 16, 0, 16)
             setOnCheckedChangeListener { _, enabled ->
                 if (changingAutomatic) return@setOnCheckedChangeListener
@@ -52,7 +52,7 @@ class BackupActivity : Activity() {
         page.toggle(automatic)
         button("Request Android backup") {
             try { SystemBackupState.request(this); status.text = SystemBackupState.status(this) }
-            catch (_: Exception) { message("Enable automatic backup and set a screen lock first.") }
+            catch (_: Exception) { message("Enable automatic backup, set a screen lock and review or discard any pending restore first.") }
         }
         button("Android backup settings") {
             val actions = listOf("android.settings.BACKUP_SETTINGS", Settings.ACTION_PRIVACY_SETTINGS, Settings.ACTION_SETTINGS)
@@ -76,7 +76,19 @@ class BackupActivity : Activity() {
         text("Android manages automatic cloud backup using your device backup settings. This app does not connect to the Drive API or choose an account for you. Manual exports rely on the privacy of the destination you choose.")
         button("Done") { finish() }
     }
-    override fun onResume() { super.onResume(); if (::page.isInitialized) page.refresh() }
+    override fun onResume() {
+        super.onResume()
+        if (::page.isInitialized) {
+            page.refresh()
+            // Returning from Android settings may have satisfied the screen-lock prerequisite.
+            if (!operation) {
+                val previous = SystemBackupState.status(this)
+                try { SystemBackupState.initialize(this) } catch (_: RuntimeException) { }
+                val current = SystemBackupState.status(this)
+                if (current != previous) status.text = current
+            }
+        }
+    }
     private fun text(value: String, size: Float = 15f): TextView = page.text(value, size)
     private fun button(value: String, action: () -> Unit) = page.button(value, filled = value == "Create backup") { if (!operation) action() }
     private fun createBackup() {
@@ -92,7 +104,9 @@ class BackupActivity : Activity() {
                         startActivityForResult(Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE)
                             .setType("application/octet-stream").putExtra(Intent.EXTRA_TITLE, "attention-stats.attentionbackup"), EXPORT)
                     } catch (_: RuntimeException) { clearBytes(); operation = false; status.text = "No document provider available." }
-                } }, { runOnUiThread { operation = false; status.text = "Could not export. History is unchanged; the snapshot may exceed the supported limit." } })
+                } }, { code -> runOnUiThread { operation = false; status.text = if (code == "ARCHIVE_TOO_LARGE")
+                    "History exceeds the current backup size or record limit. No partial backup was created and no history was removed."
+                    else "Could not export. History is unchanged; try again later." } })
             }.show()
     }
     private fun restore() {

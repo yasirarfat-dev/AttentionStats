@@ -1,6 +1,6 @@
 # Delete Attention Stats data
 
-Attention Stats (`attention.stats`) has no developer account or history server. Local history stays on your phone unless you choose manual export or enable Android-managed backup.
+Attention Stats (`attention.stats`) has no developer account or history server. History is stored locally; automatic Android backup starts enabled unless you have a saved choice. You can turn it off in Settings → Backup & restore. Manual exports are also available.
 
 1. **In the app:** open **Settings → Delete all history** and confirm. This permanently removes every short-video count, timer, app-usage event, break/block event and consent record, turns counting off, disables future automatic app backups, removes pending restores and hides the counter.
 2. **Everything else:** open **Android Settings → Apps → Attention Stats → Storage → Clear storage**, or uninstall the app. Wording varies by phone.
