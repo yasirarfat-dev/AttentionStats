@@ -5,6 +5,7 @@
   "branch": "develop",
   "scope": "Test-only readiness, trigger validation and failure diagnostics; no product behavior change",
   "baselineSourceCommit": "89d0139",
+  "testImplementationCommit": "8d8841cf541073a15164e6b3bda3598031c2b04e",
   "artifactsSha256": {
     "unchangedPreview": "7d359d47557bb3dc713d4fefed1b51bf0c70f1f6d87d1e64e198703c91b126fb",
     "finalTest": "7464251cdf8d9713dee85c85758065b1ebeac3d232e4995658f1c225560d2807"
