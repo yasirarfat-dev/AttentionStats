@@ -145,3 +145,6 @@ Checkpoint cleanup is complete: the final installed preview hash matches the loc
 
 
 The warning increase from 64 to 67 is accounted for: the new waiting label adds one Android-resource/localization warning and its visibility expression adds two KTX style suggestions. These are recorded polish debt, not zero-warning acceptance. The user-requested checkpoint leaves them for the resumed session rather than restarting runtime work.
+
+
+Reviewed auto-scroll implementation/checkpoint `6daf05460041fd53b3b9a56757b176fa147cf05d` is committed and pushed normally to origin/develop, with the remote hash independently verified. Author/committer use the intended no-reply identity and authenticated GitHub login matches. Main remains `1fc538221adfa3e66c1d94bdb9a0258509dc188c`. This publication records code and bounded qualification summaries; private phone captures/history and detailed diagnostic files are not uploaded. Work is stopped at the maintainer's request for a new session; no full-QA, all-source auto-scroll or main-merge acceptance is claimed.
