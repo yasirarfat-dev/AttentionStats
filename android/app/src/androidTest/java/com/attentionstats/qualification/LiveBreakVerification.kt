@@ -77,7 +77,18 @@ internal object LiveBreakVerification {
             if (initialApp == null) SystemClock.sleep(200)
         }
         val app = checkNotNull(initialApp) { "supported viewer not foreground" }
+        // Instrumentation can restart the target before Android rebinds its selected service.
+        // Wait for that existing grant; never enable a source or change a service selection here.
+        val serviceDeadline = SystemClock.elapsedRealtime() + 10_000
+        while (!owner.serviceConnected && SystemClock.elapsedRealtime() < serviceDeadline) SystemClock.sleep(100)
         check(owner.serviceConnected && owner.allowed(app)) { "source/service unavailable" }
+        check(app !in owner.blockChoices()) { "existing viewer block preserved; disable it before this trial" }
+        val schedules = await { success, failure -> owner.scheduleSnapshot(success, failure) }
+        val plan = com.attentionstats.protection.ScheduleOwner.decode(JSONObject()
+            .put("groups", schedules.getJSONArray("groups")).put("windows", schedules.getJSONArray("windows")).toString())
+        check(plan.windows.none { window ->
+            window.enabled && plan.groups.any { it.id == window.groupId && it.packages.any(app::owns) }
+        }) { "existing source schedules preserved; choose a source without enabled slots" }
         fun nextItem(): Boolean {
             var owned: AccessibilityNodeInfo? = null
             for (window in automation.windows) {
@@ -93,7 +104,9 @@ internal object LiveBreakVerification {
                 SnapshotReader.read(active, app.packages)
             } finally { SnapshotReader.recycle(active) }
             val frame = AdapterRegistry.of(app).read(captured)
-            check(frame.surface == Surface.REELS && frame.route == ReelRoute.VIEWER) { "qualified viewer required" }
+            check(frame.surface == Surface.REELS && frame.route == ReelRoute.VIEWER) {
+                "qualified viewer required; ${frame.surface}/${frame.route}; scan=${owner.acquisitionStatus}"
+            }
             val box = checkNotNull(frame.page)
             val downAt = SystemClock.uptimeMillis()
             for (step in 0..12) {
@@ -114,14 +127,25 @@ internal object LiveBreakVerification {
                 val before = await { success, failure -> owner.snapshot(success, failure) }
                     .getJSONObject("session").getString("count").toLong()
                 var attempts = 0
-                while (!ownButton("I'm done for now") && attempts++ < 16) {
-                    if (!nextItem()) SystemClock.sleep(500)
+                var gestures = 0
+                while (!ownButton("I'm done for now") && attempts < 16) {
+                    attempts++
+                    if (nextItem()) gestures++ else SystemClock.sleep(500)
                 }
+                val after = await { success, failure -> owner.snapshot(success, failure) }
+                    .getJSONObject("session").getString("count").toLong()
+                val pending = owner.reminder
+                // Report only trial deltas and bounded state, never personal totals or source labels.
+                val diagnostic = "cycle=${cycle + 1}; gestures=$gestures; delta=${after - before}; " +
+                    "pending=${pending != null}; progress=${owner.liveOverlay?.breakProgress}; " +
+                    "connected=${owner.serviceConnected}; scan=${owner.acquisitionStatus}"
                 check(ownButton("I'm done for now")) {
-                    val after = await { success, failure -> owner.snapshot(success, failure) }
-                        .getJSONObject("session").getString("count").toLong()
-                    "break did not appear; cycle=${cycle + 1}; countDelta=${after - before}; connected=${owner.serviceConnected}; scan=${owner.acquisitionStatus}"
+                    "break missing; $diagnostic"
                 }
+                check(pending != null && pending.app == app && pending.reason == "count" && pending.count >= 5) {
+                    "displayed break lacks the configured count trigger; $diagnostic"
+                }
+                instrumentation.sendStatus(1, android.os.Bundle().apply { putString("stream", "Live break trigger: $diagnostic") })
                 if (cycle < 2) {
                     SystemClock.sleep(15_000) // Reproduce interaction well after the countdown completes.
                     check(ownButton("Keep watching", true)) { "delayed Continue unavailable" }
