@@ -22,6 +22,14 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var breakLive = false
     private var scheduleLive = false
     private var scheduleSelective = false
+    private var autoScrollSafety = false
+    private var playbackProbe: String? = null
+    private var disableBackup = false
+    private var autoScrollLive = false
+    private var autoScrollApp = "facebook"
+    private var hiddenPlaybackProbe: String? = null
+    private var autoScrollUseCurrent = false
+    private var autoScrollControls = false
     private var scheduleUi = false
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
@@ -31,6 +39,14 @@ class AnalyticsInstrumentation : Instrumentation() {
         breakLive = arguments?.getString("breakLive") == "true"
         scheduleLive = arguments?.getString("scheduleLive") == "true"
         scheduleSelective = arguments?.getString("scheduleSelective") == "true"
+        autoScrollSafety = arguments?.getString("autoScrollSafety") == "true"
+        playbackProbe = arguments?.getString("playbackProbe")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
+        disableBackup = arguments?.getString("disableBackup") == "true"
+        autoScrollLive = arguments?.getString("autoScrollLive") == "true"
+        autoScrollApp = arguments?.getString("autoScrollApp")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null } ?: "facebook"
+        hiddenPlaybackProbe = arguments?.getString("hiddenPlaybackProbe")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
+        autoScrollUseCurrent = arguments?.getString("autoScrollUseCurrent") == "true"
+        autoScrollControls = arguments?.getString("autoScrollControls") == "true"
         scheduleUi = arguments?.getString("scheduleUi") == "true"
         feedTrial = arguments?.getString("feedTrial")?.takeIf { it in setOf("instagram", "facebook") }
         feedReverse = arguments?.getString("feedReverse") == "true"
@@ -43,6 +59,34 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            if (disableBackup) {
+                com.attentionstats.backup.SystemBackupState.configure(targetContext, false)
+                check(!com.attentionstats.backup.SystemBackupState.enabled(targetContext))
+                result.putString("stream", "PASS: operator-requested automatic backup off; no transfer requested")
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (autoScrollLive) {
+                result.putString("stream", LiveAutoScrollVerification.run(this, autoScrollApp, autoScrollUseCurrent))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (autoScrollControls) {
+                result.putString("stream", "PASS: ${LiveAutoScrollControlsVerification.run(this)} actual HUD start/stop/waiting checks; no source gestures")
+                finish(Activity.RESULT_OK, result); return
+            }
+            val hiddenProbe = hiddenPlaybackProbe
+            if (hiddenProbe != null) {
+                result.putString("stream", HiddenPlaybackProbe.run(this, hiddenProbe))
+                finish(Activity.RESULT_OK, result); return
+            }
+            val probe = playbackProbe
+            if (probe != null) {
+                result.putString("stream", PlaybackProbeVerification.run(this, probe))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (autoScrollSafety) {
+                result.putString("stream", "PASS: ${AutoScrollSafetyVerification.run(this)} synthetic auto-scroll safety checks; no real gestures")
+                finish(Activity.RESULT_OK, result); return
+            }
             if (scheduleSelective) {
                 result.putString("stream", SelectiveScheduleVerification.run(this))
                 finish(Activity.RESULT_OK, result); return

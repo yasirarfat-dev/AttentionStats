@@ -15,7 +15,7 @@ import org.attentionstats.reels.ReelRoute
 
 /** Operator-only actions are confined to fixed controls in this app's own overlay. */
 internal object LiveHudVerification {
-    data class State(val header: Rect?, val controls: List<Pair<String, Rect>>) {
+    data class State(val header: Rect?, val controls: List<Pair<String, Rect>>, val waiting: Boolean = false) {
         fun json() = JSONObject().put("visible", header != null).put("autoControls", controls.size)
     }
     private const val HEADER = "header"
@@ -23,6 +23,7 @@ internal object LiveHudVerification {
         var header: Rect? = null
         val controls = mutableListOf<Pair<String, Rect>>()
         var clicked = false
+        var waiting = false
         for (window in automation.windows) {
             if (window.type != AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY) continue
             val root = window.root ?: continue
@@ -39,6 +40,7 @@ internal object LiveHudVerification {
                             val text = node.text?.toString() ?: ""
                             val isHeader = description.startsWith("Estimated viewer pages.") || description.startsWith("Counting paused.")
                             val isControl = text == "Autoscroll"
+                            if (text == "Waiting for playback progress") waiting = true
                             val controlState = if (description.startsWith("Auto-scroll on")) "on" else "off"
                             val box = Rect().also { node.getBoundsInScreen(it) }
                             if (isHeader) header = box
@@ -53,9 +55,10 @@ internal object LiveHudVerification {
             } finally { SnapshotReader.recycle(root) }
         }
         if (click != null) check(clicked) { "Owned HUD control unavailable" }
-        return State(header, controls)
+        return State(header, controls, waiting)
     }
     fun state(instrumentation: Instrumentation, automation: UiAutomation) = scan(instrumentation, automation)
+    fun choose(instrumentation: Instrumentation, automation: UiAutomation, control: String) = scan(instrumentation, automation, control)
 
     fun run(instrumentation: Instrumentation, automation: UiAutomation): Int {
         val foreground = checkNotNull(automation.rootInActiveWindow)

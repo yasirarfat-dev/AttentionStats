@@ -37,6 +37,11 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
             }
         }
     }
+    private val autoStatus = TextView(context).apply {
+        text = "Waiting for playback progress"
+        textSize = 11f; setTextColor(Color.WHITE); gravity = Gravity.CENTER
+        setPadding(dp(10), 0, dp(10), dp(8)); visibility = GONE
+    }
     private val visit = number()
     private val today = number()
     private val sessionIcon = icon("session")
@@ -62,6 +67,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
         private set
     private var autoControlAvailable = false
     private var autoControlRunning = false
+    private var autoControlReady = false
     var moveCounter: (Float, Float) -> Unit = { _, _ -> }
     var resetPosition: () -> Unit = {}
 
@@ -180,6 +186,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
         }
         details.addView(actions)
         addView(autoScroll, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply { gravity = Gravity.CENTER_HORIZONTAL })
+        addView(autoStatus, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply { gravity = Gravity.CENTER_HORIZONTAL })
         addView(details, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
     }
 
@@ -188,6 +195,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     fun setAutoScrollControl(visible: Boolean, running: Boolean, ready: Boolean) {
         autoControlAvailable = visible
         autoControlRunning = running
+        autoControlReady = ready
         updateAutoVisibility()
         val icon = context.getDrawable(if (running) R.drawable.ic_autoscroll_pause else R.drawable.ic_autoscroll_play)
         icon?.setBounds(0, 0, dp(20), dp(20))
@@ -201,6 +209,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
 
     private fun updateAutoVisibility() {
         autoScroll.visibility = if (autoControlAvailable && (expanded || autoControlRunning)) VISIBLE else GONE
+        autoStatus.visibility = if (autoScroll.visibility == VISIBLE && autoControlRunning && !autoControlReady) VISIBLE else GONE
     }
 
     private fun icon(symbol: String) = SymbolView(context, symbol, iconColor).apply {

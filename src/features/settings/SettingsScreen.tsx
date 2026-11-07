@@ -311,7 +311,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <ToggleRow
           icon="play"
           title="Auto-scroll (experimental)"
-          detail="Adds a button to the floating counter that moves to the next video when one ends, where the app shows playback progress."
+          detail="Adds a button to the floating counter that moves to the next video when one ends, where the player exposes progress. If it cannot read progress, the counter shows that it is waiting."
           value={autoScroll}
           onChange={async value => {
             try {

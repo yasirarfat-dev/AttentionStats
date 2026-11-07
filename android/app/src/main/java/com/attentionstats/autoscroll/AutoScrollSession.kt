@@ -9,7 +9,7 @@ import org.json.JSONObject
 /** Ephemeral convenience session. Never changes observation consent, counts or history. Main thread only. */
 internal object AutoScrollSession {
     data class Frame(val app: ReelApp, val window: Int, val page: Long?, val epoch: Long,
-        val atMs: Long, val position: Double?, val eligible: Boolean) {
+        val atMs: Long, val position: Double?, val eligible: Boolean, val mediaKind: String = "unknown") {
         fun key() = page?.let { CompletionGate.Context(app.key, window, it, epoch) }
     }
     private val gate = CompletionGate()
@@ -27,7 +27,7 @@ internal object AutoScrollSession {
     private var target: CompletionGate.Context? = null
     private var waitingUntil = 0L
     private var scrollSettlingUntil = 0L
-    /** When the current item has no playback progress (photo, image ad): when it arrived. */
+    /** Arrival of an explicitly classified photo without playback progress. Never a video timer. */
     private var stillSince = 0L
     private const val STILL_ITEM_MS = 5_000L
     @Volatile var attempts = 0
@@ -36,7 +36,7 @@ internal object AutoScrollSession {
         private set
     var onChanged: () -> Unit = {}
 
-    /** Any source qualifies; a session only starts when the player exposes numeric progress. */
+    /** Source support is evidence-dependent; numeric playback or an explicit photo is required. */
     @Suppress("UNUSED_PARAMETER")
     fun candidate(app: ReelApp, version: String): Boolean = true
     fun configure(value: Boolean, notice: Int) {
@@ -51,8 +51,11 @@ internal object AutoScrollSession {
         if (!enabled) return false
         gate.reset(); target = null; waitingUntil = 0; scrollSettlingUntil = 0; stillSince = 0; running = true; revision++
         attempts = 0; confirmedTransitions = 0
-        latest?.takeIf(::usable)?.key()?.let { target = it }
-        reason = if (target == null) "waiting_for_playback" else "waiting_for_cycle"
+        latest?.takeIf(::ready)?.let {
+            target = it.key()
+            if (still(it)) stillSince = it.atMs
+        }
+        reason = if (target == null) "waiting_for_playback" else if (stillSince > 0) "still_item" else "waiting_for_cycle"
         onChanged(); return true
     }
     /** Suspend dispatch and invalidate queued gestures without changing the user's On choice. */
@@ -63,7 +66,7 @@ internal object AutoScrollSession {
     }
     fun stop(why: String = "stopped") {
         val changed = running || reason != why
-        running = false; target = null; waitingUntil = 0; scrollSettlingUntil = 0; gate.reset(); revision++; reason = why
+        running = false; target = null; waitingUntil = 0; scrollSettlingUntil = 0; stillSince = 0; gate.reset(); revision++; reason = why
         if (changed) onChanged()
     }
     fun clear() { stop("off"); enabled = false; noticeAccepted = false; latest = null; onChanged() }
@@ -75,6 +78,8 @@ internal object AutoScrollSession {
     private fun usable(frame: Frame): Boolean = frame.eligible && frame.position?.let {
         it.isFinite() && it in 0.0..1.0
     } == true && fresh(frame)
+    private fun still(frame: Frame): Boolean = frame.mediaKind == "photo" && frame.position == null
+    private fun ready(frame: Frame): Boolean = usable(frame) || (frame.eligible && still(frame) && fresh(frame))
     fun manualInteraction(reason: String) {
         // Our swipe can deliver pager callbacks after the new page is first visible.
         // Suppress only that bounded scroll tail. Clicks, context changes and Stop
@@ -88,9 +93,10 @@ internal object AutoScrollSession {
         val key = value.key()
         val previous = target
         if (previous == null) {
-            if (!enabled || key == null || !usable(value)) { suspendActions("waiting_for_playback"); return }
-            target = key; gate.reset(); reason = "waiting_for_cycle"; revision++; onChanged()
-            gate.sample(key, value.atMs, checkNotNull(value.position), true)
+            if (!enabled || key == null || !ready(value)) { suspendActions("waiting_for_playback"); return }
+            target = key; gate.reset(); stillSince = if (still(value)) value.atMs else 0
+            reason = if (still(value)) "still_item" else "waiting_for_cycle"; revision++; onChanged()
+            value.position?.let { gate.sample(key, value.atMs, it, true) }
             return
         }
         if (!enabled || !value.eligible || !fresh(value) || value.app.key != previous.app ||
@@ -102,17 +108,19 @@ internal object AutoScrollSession {
             }
             if (key != null && key != previous) {
                 confirmedTransitions++
+                if (!ready(value)) { suspendActions("playback_unavailable"); return }
                 target = key; waitingUntil = 0; scrollSettlingUntil = value.atMs + 750
                 // The page transition and readiness to scroll again are separate facts.
                 // A photo or image ad has no progress: show it briefly, then move on.
                 gate.reset()
-                if (value.position == null) { stillSince = value.atMs; reason = "still_item" } else { stillSince = 0; reason = "waiting_for_cycle" }
+                if (still(value)) { stillSince = value.atMs; reason = "still_item" } else { stillSince = 0; reason = "waiting_for_cycle" }
                 onChanged()
             }
             return
         }
         if (key != null && key != previous) { suspendActions("manual_page_change"); return }
-        if (key != null && value.position == null && stillSince > 0 && value.eligible && fresh(value)) {
+        if (key != null && still(value)) {
+            if (stillSince == 0L) stillSince = value.atMs
             if (value.atMs - stillSince >= STILL_ITEM_MS) {
                 attempts++; stillSince = 0
                 waitingUntil = value.atMs + 2_500; reason = "advancing"; onChanged()
@@ -120,6 +128,7 @@ internal object AutoScrollSession {
             }
             return
         }
+        stillSince = 0
         if (key == null || value.position == null || !usable(value)) { suspendActions("playback_unavailable"); return }
         if (gate.sample(key, value.atMs, value.position, true)) {
             attempts++
@@ -129,7 +138,7 @@ internal object AutoScrollSession {
     }
     fun current(token: Long): Boolean = enabled && running && target != null && revision == token
     fun canStart(): Boolean = enabled && latest?.let {
-        it.page != null && usable(it)
+        it.page != null && ready(it)
     } == true
     fun snapshot(versions: (ReelApp) -> String): String = JSONObject().put("contract", 1)
         .put("enabled", enabled).put("running", running).put("reason", reason)

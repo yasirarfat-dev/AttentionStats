@@ -488,7 +488,11 @@ class ReelsAccessibilityService : AccessibilityService() {
         val active = currentApp
         val pausedHere = pausedApp != null && pausedApp == active && coordinator.overlayEnabled && intervention == null &&
             !visitHudVisibility.hiddenFor(checkNotNull(active)) && interactive()
-        if (pausedHere) { ensureHud(); hud?.setPausedState(true); return }
+        if (pausedHere) {
+            ensureHud(); hud?.setPausedState(true)
+            hud?.setAutoScrollControl(true, AutoScrollSession.running, false)
+            return
+        }
         if (!displayEligible || intervention != null || !coordinator.overlayEnabled || state == null || active != state.app ||
             visitHudVisibility.hiddenFor(state.app) || state.epoch != coordinator.epoch() || !coordinator.allowed(state.app) ||
             !interactive()) {
@@ -553,7 +557,7 @@ class ReelsAccessibilityService : AccessibilityService() {
             return
         }
         val value = AutoScrollSession.Frame(app, window, frame.identity, epoch, now, frame.progress,
-            coordinator.overlayEnabled && !visitHudVisibility.hiddenFor(app))
+            coordinator.overlayEnabled && !visitHudVisibility.hiddenFor(app), frame.mediaKind)
         main.post { AutoScrollSession.frame(value) { expected, token -> advance(token, expected) } }
     }
 
@@ -573,6 +577,12 @@ class ReelsAccessibilityService : AccessibilityService() {
             val current = AdapterRegistry.of(expected.app).read(snapshot)
             if (!snapshot.complete || snapshot.typing || current.surface != Surface.REELS || current.route != ReelRoute.VIEWER ||
                 current.identity != expected.page) return AutoScrollSession.suspendActions("context_changed")
+            if (expected.position == null) {
+                if (expected.mediaKind != "photo" || current.mediaKind != "photo" || current.progress != null)
+                    return AutoScrollSession.suspendActions("playback_unavailable")
+            } else if (current.progress?.let { it.isFinite() && it in 0.0..1.0 } != true) {
+                return AutoScrollSession.suspendActions("playback_unavailable")
+            }
             current.page ?: return AutoScrollSession.suspendActions("context_changed")
         } finally { SnapshotReader.recycle(root) }
         try { com.attentionstats.autoscroll.AutoScrollGestureDispatcher.dispatch(this, bounds, token, main) }

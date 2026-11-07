@@ -75,7 +75,15 @@ internal object OperatorInspection {
                 }
                 write(-1); xml.endTag(null, "hierarchy"); xml.endDocument()
             }
-            return "CAPTURE ${app.key}: ${snapshot.nodes.size} sanitized nodes; ${frame.surface}/${frame.route}/${frame.category}; numericPlayback=${frame.positionMs != null}"
+            val navigation = snapshot.nodes.filter { node ->
+                node.clickable && node.bounds.height < snapshot.screen.height / 6 &&
+                    (node.bounds.top < snapshot.screen.top + snapshot.screen.height / 5 ||
+                        node.bounds.bottom > snapshot.screen.bottom - snapshot.screen.height / 6) &&
+                    node.label?.matches(Regex("Reels(?:[, ]+(?:tab|selected|not selected|[0-9]+|of|new|button))*", RegexOption.IGNORE_CASE)) == true
+            }.take(2).joinToString(";") { node ->
+                "${node.bounds.left},${node.bounds.top},${node.bounds.right},${node.bounds.bottom}"
+            }
+            return "CAPTURE ${app.key}: ${snapshot.nodes.size} sanitized nodes; ${frame.surface}/${frame.route}/${frame.category}; numericPlayback=${frame.positionMs != null}; progress=${frame.progress}; page=${frame.page}; fixedReelsNavigation=$navigation"
         } finally { SnapshotReader.recycle(root) }
     }
     private fun sanitize(value: String): String {
