@@ -1,0 +1,86 @@
+{
+  "recordedOn": "2026-11-07",
+  "task": "AS-053",
+  "status": "experimental",
+  "branch": "develop",
+  "baselineSourceCommit": "5220ae68fe9428ca19ef9a644e358a4dc5e35725",
+  "scope": "Selective time-slot cover, user-chosen exit and temporary allowance; release-readiness assessment",
+  "artifactsSha256": {
+    "preview": "9d2c75c2f553685c5744407a34306c2c3ff4f39fdcae83ad9f97e603f00b0229",
+    "test": "94611003b45a2753822c61f8dec41eaa2c43acf7a4b75be5f8898da7a90569b8"
+  },
+  "device": {
+    "api": 36,
+    "abi": "arm64-v8a",
+    "source": "Instagram",
+    "sourceVersion": "454.0.0.54.77"
+  },
+  "trials": [
+    {
+      "stage": "baseline first test",
+      "result": "Stopped before rule creation: source/service unavailable; initial test did not separate service and consent states.",
+      "instrumentationCode": 0
+    },
+    {
+      "stage": "baseline diagnostic test",
+      "result": "Stopped before rule creation: connected=false, allowed=true, grant=false; selected service preserved.",
+      "instrumentationCode": 0
+    },
+    {
+      "stage": "baseline after app-only service rebind",
+      "result": "Stopped before rule creation: admitted viewer unavailable.",
+      "instrumentationCode": 0
+    },
+    {
+      "stage": "baseline admitted viewer",
+      "result": "Failed selective-cover assertion after task-owned rule creation; finally removes rule. Code inspection identifies automatic Back also dispatched for schedule decisions.",
+      "instrumentationCode": 0
+    },
+    {
+      "stage": "first product candidate",
+      "result": "Pass: selective cover, same-source Android Back release, fixed-tab reentry, immediate allowance and rule cleanup. Superseded by final explicit-Okay candidate.",
+      "instrumentationCode": -1,
+      "previewSha256": "bc043aecb8c8bfafb4628a24f0b05c3b55cdd5241f6a9574ae391937b83f435d",
+      "testSha256": "3b61ad90ce926089037572bd0054e2251efc7d48788b93c9ed6c55c290672688"
+    },
+    {
+      "stage": "final reviewed candidate",
+      "result": "PASS: selective viewer cover; Okay and Back release within same source; fixed-tab reentries block; five-minute allowance preserves viewer for four seconds; task-owned rules and allowance removed",
+      "instrumentationCode": -1
+    }
+  ],
+  "checks": {
+    "previewAndTestAssembly": "pass",
+    "previewLint": {
+      "errors": 0,
+      "warnings": 64
+    },
+    "typecheck": "pass",
+    "lintArchitectureBackupPolicyPalette": "pass",
+    "format": "pass",
+    "jest": 91,
+    "python": 88
+  },
+  "cleanup": {
+    "installedPreviewHashVerified": true,
+    "taskOwnedRulesAndAllowanceRemoved": true,
+    "testPackageRemoved": true,
+    "sanitizedSourceLayoutRemoved": true,
+    "accessibilitySelectionsUnchanged": true,
+    "originalAccessibilityMasterFlagRestored": true,
+    "appOnlyServiceRebindPerformed": true,
+    "otherSelectedServicesPreserved": true,
+    "debugAppReopened": true,
+    "existingHistoryPreserved": true,
+    "ownFatalInBoundedCrashBuffer": false
+  },
+  "limitations": [
+    "Only the physical API-36 phone and installed Instagram version; not source-wide or minimum-API acceptance",
+    "Four-second post-allowance observation is not five-minute expiry qualification",
+    "No unknown-layout/source-revocation, clock/overnight, overlapping-rule, process-death or broad accessibility acceptance",
+    "Original accessibility master flag was off despite a saved app selection; runtime instrumentation temporarily enables accessibility, and cleanup restores the original off flag. No ongoing collection/service-readiness claim follows from the final app launch.",
+    "No new backup/fresh-install recovery or historical reminder-gap qualification",
+    "No main merge, release version change, signing, binary publication, Play inspection or remote workflow run",
+    "Readiness effort allowance is low confidence, based on outstanding gates rather than measured delivery velocity"
+  ]
+}

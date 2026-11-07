@@ -234,7 +234,9 @@ class ReelsAccessibilityService : AccessibilityService() {
             coordinator.observe(app, counted, item, snapshot.windowId, capturedEpoch)
             displayEligible = decision == null && (frame.surface == Surface.REELS ||
                 (frame.route == ReelRoute.HOME && frame.method.endsWith(".feed")))
-            if (decision != null) main.post { enforceBlock(decision) }
+            // Time slots retain their cover and immediate allowance inside the chosen viewer.
+            // Navigating Back here races the renderer and removes the schedule explanation.
+            if (decision != null && decision.kind != "schedule") main.post { enforceBlock(decision) }
             feedAutoScroll(app, frame, snapshot.windowId, capturedEpoch, now)
             main.post { renderOverlays() }
             when {
@@ -339,7 +341,10 @@ class ReelsAccessibilityService : AccessibilityService() {
                     "Everything else in the app still works." else
                     "You chose to turn them off.\nEverything else in ${current.displayName} still works.",
                 coordinator.breakSeconds, "Okay", "Allow 5 minutes",
-                { decide("left"); blockActedAt = 0; removeIntervention() },
+                {
+                    decide("left"); blockActedAt = 0; removeIntervention()
+                    if (wanted == "schedule") performGlobalAction(GLOBAL_ACTION_BACK)
+                },
                 { decide("allowed"); coordinator.allowFor(current, 5); removeIntervention(); schedule(0) })
         }
         // Not focusable: system Back/Home/Recents always reach Android, so the screen never traps anyone.

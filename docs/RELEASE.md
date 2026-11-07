@@ -1,11 +1,35 @@
 # Release and distribution
 
-**Status:** Maintainer reports closed-beta publication of the MVP; Console details have not been independently inspected in this continuation. Updated 2026-11-03.
+**Status:** Maintainer reports closed-beta publication of the MVP; Console details have not been independently inspected in this continuation. Updated 2026-11-07.
 **Responsibility:** Defines public repository publishing, Android distribution, signing and release gates.
 **Related specifications:** [Testing](TESTING.md), [Security](SECURITY.md), [Dependencies](DEPENDENCIES.md), [Contributing](CONTRIBUTING.md), [State](STATE.md).
 **Unresolved feasibility:** F-01–F-04 and F-08 in [Decisions](DECISIONS.md); exact Console artifact/source mapping, review status and broader qualification remain to be verified separately from the publication report.
 
-Current develop backup exception (ADR-073/AS-058): `allowBackup=true` is paired with a custom opt-in protected-transport agent and a one-file include list; live databases/keys/preferences and device transfer remain excluded. Qualify the merged manifest/resources and actual recovery before release. The older 0.1.0 `tools/release_candidate.py` guards still intentionally describe that historical all-backup-disabled candidate; they are not acceptance tooling for this schema-9 development build. No release upload or main merge is authorized by the current checks.
+Current develop backup exception (ADR-073/ADR-079/AS-058): `allowBackup=true` is paired with an automatic-by-default protected-transport agent that preserves saved opt-outs, and a one-file include list; live databases/keys/preferences and device transfer remain excluded. Qualify the merged manifest/resources and actual recovery before release. The older 0.1.0 `tools/release_candidate.py` guards still intentionally describe that historical all-backup-disabled candidate; they are not acceptance tooling for this schema-9 development build. No release upload or main merge is authorized by the current checks.
+
+## Readiness assessment (2026-11-07)
+
+The current Android beta is functional within its recorded scope; it is **not cleared for a fully qualified production release**. Readiness requires a declared supported scope, passing applicable scenarios on the concrete candidate, and maintainer acceptance. No amount of unit-test passing establishes universal device/source reliability or guarantees defect-free software. This assessment uses repository evidence, not a new Play-policy or Console inspection.
+
+The tracker contains 61 tasks: six implemented, 43 experimental, eleven planned and one blocked. These are task states, **not a completion percentage**: old scaffold rows retain broad qualification gates while later milestones implement useful overlapping subsets. Conversely, a published beta does not close those gates. Do not estimate remaining effort by subtracting six from 61.
+
+| Remaining release gate | Owners | Required closing evidence |
+|---|---|---|
+| Detector/counting fidelity | AS-013/AS-048/AS-054/AS-055 | Declared app/version/locale/route matrix; independently observed settled items versus saved counts, ads/photos/revisits/negative contexts, explicit unsupported playback metrics. |
+| Protection and safe escape | AS-015–AS-017/AS-053/AS-060/AS-061 | Live selective and whole-app rules, overlaps/allowances, time-trigger/reset, delayed/repeated actions, safe navigation and pause/fallback behavior. Historical unexplained reminder failure remains separately tracked. |
+| Data preservation and recovery | AS-006/AS-009/AS-019/AS-020/AS-058 | Upgrade/migration, interruption/low-space/key-loss preservation, actual fresh-install recovery on an isolated installation, corrupt/cancelled replacement and maximum logical-history restore. Envelope readback and transport handoff alone are insufficient. |
+| Lifecycle and time correctness | AS-003/AS-010/AS-011/AS-014 | Applicable L-01–L-07 on declared supported devices: process death, restart, lock, revoked permission, offline use, clock/zone/day boundaries and honest gaps. |
+| History, coverage and bounded resources | AS-011/AS-014/AS-037/AS-038 | Correct totals/unknown coverage, bounded queries and declared long-history dataset; measured cold/warm latency, memory/storage and seven-day battery/CPU baseline comparison (L-08). |
+| Accessibility and visual polish | AS-018/AS-045/AS-056/AS-057/AS-059 | Core journeys with TalkBack, large type, light/dark themes, reduced motion, RTL, keyboard/insets and relevant loading/empty/error/partial states on a real phone; widget configuration included. |
+| Privacy and security | AS-006/AS-007/AS-021 | Applicable S-01–S-06: merged component/permission/backup audit, release egress/log inspection, deletion/no-resurrection, malicious input/resource bounds, dependency/license/vulnerability review. Public-package files must not be described as secret encrypted archives. |
+| Device compatibility and build maintenance | AS-002/AS-004/AS-018/AS-022 | Minimum supported API plus declared OEM/API/locale matrix and release-binary execution; disposition of existing AGP/Kotlin/CMake warnings. The current API-36 phone cannot qualify older APIs. |
+| Release provenance and distribution | AS-022/AS-046 | Exact source/artifact/signature mapping, current signed candidate and declarations, verified Console testing/review state, current official policy review and recovery/release notes; explicit maintainer agreement before main merge. |
+
+Recommended sequence: close selective protection and reminder timing first; prove isolated recovery/data-preservation next; complete the declared source/device matrix and accessibility/lifecycle checks; then review the exact signed release candidate. Fixes may reopen affected checks. No remote workflow, merge, signing or publication follows automatically from this plan.
+
+For planning only, reserve roughly **4–8 focused engineering weeks** for the current Android beta's remaining qualification, fixes and polish, assuming the required devices and Console evidence are available and no major detector/storage redesign emerges. This is a low-confidence effort allowance, not measured velocity or a delivery promise; elapsed tester/review/soak time can extend it. Re-estimate after the protection and recovery gates expose actual defects. A single chat session cannot clear the multi-device, seven-day resource and distribution gates.
+
+The broader product vision adds unfinished diary/budget/focus behavior and optional notifications, richer interactions/network analytics, retention/import, predictions, actual synchronization and later iOS. Those are additional development milestones with independent feasibility gates, not final QA of today's beta. Direct Drive API remains blocked under F-05. No credible full-vision completion date is established yet; scope and feasibility must be resolved before scheduling it.
 
 ## Beta release and development branches
 

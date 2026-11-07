@@ -21,6 +21,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var protection = false
     private var breakLive = false
     private var scheduleLive = false
+    private var scheduleSelective = false
     private var scheduleUi = false
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
@@ -29,6 +30,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         protection = arguments?.getString("protection") == "true"
         breakLive = arguments?.getString("breakLive") == "true"
         scheduleLive = arguments?.getString("scheduleLive") == "true"
+        scheduleSelective = arguments?.getString("scheduleSelective") == "true"
         scheduleUi = arguments?.getString("scheduleUi") == "true"
         feedTrial = arguments?.getString("feedTrial")?.takeIf { it in setOf("instagram", "facebook") }
         feedReverse = arguments?.getString("feedReverse") == "true"
@@ -41,6 +43,10 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            if (scheduleSelective) {
+                result.putString("stream", SelectiveScheduleVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
             if (scheduleUi) {
                 result.putString("stream", ScheduleUiVerification.run(this))
                 finish(Activity.RESULT_OK, result); return

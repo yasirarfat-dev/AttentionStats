@@ -70,6 +70,8 @@ Host and shared-source Gradle suites run the same source; current results are in
 
 ## Protection scenarios
 
+AS-053 selective-slot runtime qualification has an explicit test-only `scheduleSelective=true` instrumentation mode. The operator first opens an already-consented, admitted Instagram dedicated viewer. The test waits for the existing service, refuses existing enabled source slots/blocks, and adds only a task-owned all-day `short_videos` rule. It requires the actual selective cover, both Okay and Android Back into a non-viewer within the same source with no cover, fixed Reels-tab reentries with renewed cover, and immediate five-minute allowance preserving the viewer without cover for four seconds. It removes its group/slot in `finally` using the current revision, expires its own granted allowance, and verifies rule removal on success. No source grant, reminder choice or pre-existing rule is changed. Missing service/viewer/control or incomplete/editable context is a failed/stopped trial, not acceptance. This narrow pass would not qualify the five-minute expiry, unknown layouts, all sources, rule conflicts, process death or full P-01–P-08.
+
 | ID | Given / action | Required result |
 |---|---|---|
 | P-01 | App and category budgets overlap with focus rule and per-rule exception | Count usage once; deterministic precedence/reasons; one exception doesn't waive unrelated rules |
