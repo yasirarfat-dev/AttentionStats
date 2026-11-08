@@ -1,6 +1,6 @@
 # Current state
 
-**Status:** MVP 1.0.0 (versionCode 10) built and previously phone-verified; maintainer reports closed-beta publication. Further development uses `develop`. Updated 2026-11-07.
+**Status:** MVP 1.0.0 (versionCode 10) built and previously phone-verified; maintainer reports closed-beta publication. Further development uses `develop`. Updated 2026-11-08.
 **Responsibility:** Records what exists now, how it was verified, and what is next. Older detail lives in git history and the [implementation log](IMPLEMENTATION_LOG/README.md).
 **Related specifications:** [Index](INDEX.md), [Tracker](FEATURE-TRACKER.md), [Decisions](DECISIONS.md), [Adapters](SOCIAL-ADAPTERS.md), [Release](RELEASE.md).
 **Unresolved feasibility:** Broader device/language fidelity and live playback/social-action qualification remain open. Snapchat fixtures now exist on `develop`, with runtime acceptance recorded separately below. F-05 (direct Drive API integration) remains blocked; separately authorized Android-managed backup is under AS-058.
@@ -148,3 +148,13 @@ The warning increase from 64 to 67 is accounted for: the new waiting label adds 
 
 
 Reviewed auto-scroll implementation/checkpoint `6daf05460041fd53b3b9a56757b176fa147cf05d` is committed and pushed normally to origin/develop, with the remote hash independently verified. Author/committer use the intended no-reply identity and authenticated GitHub login matches. Main remains `1fc538221adfa3e66c1d94bdb9a0258509dc188c`. This publication records code and bounded qualification summaries; private phone captures/history and detailed diagnostic files are not uploaded. Work is stopped at the maintainer's request for a new session; no full-QA, all-source auto-scroll or main-merge acceptance is claimed.
+
+## Resumed auto-scroll qualification (2026-11-08)
+
+Resumed from clean `develop` at `e67ef7e`. The installed preview matches the final November 7 artifact; automatic backup remains off. The live test now clicks the actual HUD Start/Stop controls, restores a test-expanded panel where possible, and reports service/source/HUD readiness separately. Only test code changes; no product APK, dependency, schema or release-version change.
+
+The unchanged preview passes 26 synthetic ART checks and one scoped Instagram/TikTok numeric-end/confirmed-next-item trial with the original test. The strengthened test additionally passes **TikTok 47.7.3 actual HUD Start → numeric end → one automatic attempt → confirmed distinct next item → HUD Stop**, with numeric playback available on arrival. A separate long-video trial reaches its 150-second limit before numeric end with zero attempts and supplies no end acceptance. Instagram's original-test result is on 454.0.0.54.77; its later HUD trials stop on foreground/HUD loss and are not accepted. The phone switches to a calling screen during this stage; further source navigation waits for phone availability.
+
+Fresh installed versions differ from the checkpoint for Facebook (586.0.0.52.53), TikTok (47.7.3) and Snapchat (14.31.0.56); YouTube remains 21.40.165. No new Facebook/YouTube/Snapchat end support is inferred. Next: finish actual-HUD Instagram and the current-version Facebook/YouTube/Snapchat waiting/end matrix when the phone is free, then negative/lifecycle checks and the remaining recovery/accessibility/release gates. Source detail/results stay local. See the [dated log](IMPLEMENTATION_LOG/2026-11-08.md). AS-044/AS-059 remain experimental; main is unchanged.
+
+Background cleanup restores this session's original accessibility settings (master on), removes the task-owned test and sanitized layouts, and verifies backup remains off. No history reset/replacement or foreground app launch occurs during cleanup. Future tests must inspect actual health rather than reuse either session's baseline.

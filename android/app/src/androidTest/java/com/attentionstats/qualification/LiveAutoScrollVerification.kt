@@ -16,7 +16,7 @@ import org.json.JSONObject
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-/** Operator-authorized source trial: one bounded setup swipe, then at most one auto transition. */
+/** Operator-authorized source trial: bounded setup, real HUD controls, at most one auto transition. */
 internal object LiveAutoScrollVerification {
     fun run(instrumentation: Instrumentation, key: String, useCurrent: Boolean = false): String {
         val context = instrumentation.targetContext
@@ -58,7 +58,9 @@ internal object LiveAutoScrollVerification {
         }
         val serviceUntil = SystemClock.elapsedRealtime() + 10_000
         while (!owner.serviceConnected && SystemClock.elapsedRealtime() < serviceUntil) SystemClock.sleep(100)
-        check(owner.serviceConnected && owner.allowed(app) && owner.overlayEnabled) { "source/service/HUD unavailable" }
+        check(owner.serviceConnected) { "accessibility service not connected" }
+        check(owner.allowed(app)) { "source consent unavailable" }
+        check(owner.overlayEnabled) { "HUD disabled" }
         check(app !in owner.blockChoices()) { "existing source block preserved" }
         val schedules = await { success, failure -> owner.scheduleSnapshot(success, failure) }
         val plan = com.attentionstats.protection.ScheduleOwner.decode(JSONObject().put("groups", schedules.getJSONArray("groups"))
@@ -80,6 +82,7 @@ internal object LiveAutoScrollVerification {
         var minimum: Double? = null
         var maximum: Double? = null
         var setupSwipes = 0
+        var restoreCollapsed = false
         try {
             reminder(false)
             main { AutoScrollSession.configure(true, 1) }
@@ -106,7 +109,16 @@ internal object LiveAutoScrollVerification {
             check(started.surface == Surface.REELS && started.route == ReelRoute.VIEWER && started.progress?.let { it < .9 } == true) {
                 "setup did not reach an advancing candidate; swipes=$setupSwipes; progress=${started.progress}; route=${started.route}"
             }
-            main { check(AutoScrollSession.start()) }
+            val hudUntil = SystemClock.elapsedRealtime() + 5_000
+            var hud = LiveHudVerification.state(instrumentation, automation)
+            while (hud.header == null && SystemClock.elapsedRealtime() < hudUntil) {
+                SystemClock.sleep(100); hud = LiveHudVerification.state(instrumentation, automation)
+            }
+            check(hud.header != null) { "visible HUD required before Start" }
+            restoreCollapsed = hud.controls.isEmpty()
+            if (restoreCollapsed) LiveHudVerification.choose(instrumentation, automation, "header")
+            LiveHudVerification.choose(instrumentation, automation, "off")
+            check(AutoScrollSession.running) { "HUD Start did not enable run" }
             val began = SystemClock.elapsedRealtime()
             var nextStatus = began + 5_000
             var missingProgressSince = 0L
@@ -117,7 +129,11 @@ internal object LiveAutoScrollVerification {
                 reasons[reason] = (reasons[reason] ?: 0) + 1
                 observedAttempts = AutoScrollSession.attempts
                 observedTransitions = AutoScrollSession.confirmedTransitions
-                if (observedTransitions >= 1) { main { AutoScrollSession.stop() }; break }
+                if (observedTransitions >= 1) {
+                    LiveHudVerification.choose(instrumentation, automation, "on")
+                    check(!AutoScrollSession.running) { "HUD Stop did not disable run" }
+                    break
+                }
                 check(AutoScrollSession.running) { "operator stopped the run" }
                 check(observedAttempts <= 1) { "more than one automatic attempt" }
                 if (reason in setOf("gesture_cancelled", "gesture_unavailable", "next_page_unconfirmed"))
@@ -150,16 +166,25 @@ internal object LiveAutoScrollVerification {
             check(settled()) {
                 "next item not settled: ${next.surface}/${next.route}/${next.mediaKind}; progress=${next.progress}; sameIdentity=${next.identity == started.identity}; overlap=${overlap()}; attempts=$observedAttempts; confirmed=$observedTransitions"
             }
-            return "PASS: $key numeric video end produces one automatic attempt and one confirmed distinct next item; Stop prevents further attempts; setupSwipes=$setupSwipes; nextPlaybackAvailable=${next.progress != null}; progress=$minimum..$maximum; reasons=$reasons"
+            return "PASS: $key HUD Start, numeric video end, one automatic attempt and one confirmed distinct next item; HUD Stop prevents further attempts; setupSwipes=$setupSwipes; nextPlaybackAvailable=${next.progress != null}; progress=$minimum..$maximum; reasons=$reasons"
         } finally {
-            main {
-                AutoScrollSession.clear()
-                if (hadNotice || wasEnabled) {
-                    AutoScrollSession.configure(true, 1)
-                    if (!wasEnabled) AutoScrollSession.configure(false, 1)
+            try {
+                main { AutoScrollSession.stop() }
+                if (restoreCollapsed) {
+                    val hud = LiveHudVerification.state(instrumentation, automation)
+                    if (hud.header != null && hud.controls.singleOrNull()?.first == "off")
+                        LiveHudVerification.choose(instrumentation, automation, "header")
                 }
+            } finally {
+                main {
+                    AutoScrollSession.clear()
+                    if (hadNotice || wasEnabled) {
+                        AutoScrollSession.configure(true, 1)
+                        if (!wasEnabled) AutoScrollSession.configure(false, 1)
+                    }
+                }
+                reminder(original.getBoolean("reminderEnabled"))
             }
-            reminder(original.getBoolean("reminderEnabled"))
         }
     }
 }
