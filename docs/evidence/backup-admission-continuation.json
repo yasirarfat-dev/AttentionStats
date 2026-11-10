@@ -134,5 +134,12 @@
     "installedPreviewHashVerified": true,
     "debugAppReopened": true,
     "taskInstrumentationIdle": true
+  },
+  "implementationCommit": "a6dcb6d8934fac2609748173021d1da1205b8764",
+  "publication": {
+    "branch": "origin/develop",
+    "remoteHashVerified": true,
+    "mainUnchanged": "1fc538221adfa3e66c1d94bdb9a0258509dc188c",
+    "remoteWorkflowsRun": false
   }
 }
