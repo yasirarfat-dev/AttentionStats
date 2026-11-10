@@ -46,6 +46,13 @@
     "Initial new test compilation failed -Werror on redundant Unit expression; corrected before final assembly.",
     "Initial read-only preflight treated absent-package pm path exit 1 as failure; package-list preflight passed before any install."
   ],
+  "implementationCommit": "0f556e9877cc7d5d6c542b9df95b7ea5e07d2763",
+  "publication": {
+    "branch": "develop",
+    "remoteHashVerified": true,
+    "mainUnchanged": "1fc538221adfa3e66c1d94bdb9a0258509dc188c",
+    "githubWorkflowDispatched": false
+  },
   "limitations": [
     "Queue-pressure tests use the actual production helper with an isolated coroutine channel, not a real source-triggered service trial.",
     "The historical missing-reminder cause, time-trigger/reset, full lifecycle and accessibility remain open.",
