@@ -44,8 +44,6 @@ class ReelsAccessibilityService : AccessibilityService() {
     private val listener: () -> Unit = { main.post { updateEventTargets(); schedule(0); renderOverlays() } }
     private val worker = Executors.newSingleThreadExecutor()
     @Volatile private var destroyed = false
-    private var scheduled = false
-    @Volatile private var scanning = false
     private var lastScan = 0L
 
     private val scrollSequence = ConcurrentHashMap<ReelApp, AtomicLong>()
@@ -94,15 +92,12 @@ class ReelsAccessibilityService : AccessibilityService() {
     }
     private var receiverRegistered = false
 
-    private val tick = Runnable {
-        scheduled = false
-        if (scanning) { schedule(200); return@Runnable }
-        scanning = true
-        worker.execute {
-            try { if (!destroyed) sample() }
-            catch (_: RuntimeException) { foregroundPackage = null; outside(false) }
-            finally { scanning = false }
-        }
+    private val sampling = SurfaceSamplingLoop(worker, ::sample) {
+        coordinator.acquisitionStatus = "read_failed"
+        foregroundPackage = null
+        scheduledPackage = null
+        outside(false)
+        1_000L
     }
 
     override fun onServiceConnected() {
@@ -150,10 +145,7 @@ class ReelsAccessibilityService : AccessibilityService() {
     }
 
     private fun schedule(delay: Long) {
-        if (Looper.myLooper() != Looper.getMainLooper()) { main.post { schedule(delay) }; return }
-        if (destroyed || scheduled) return
-        scheduled = true
-        main.postDelayed(tick, delay)
+        if (!destroyed) sampling.request(delay)
     }
 
     private fun interactive(): Boolean = getSystemService(PowerManager::class.java).isInteractive &&
@@ -170,12 +162,12 @@ class ReelsAccessibilityService : AccessibilityService() {
     }
 
     /** Worker thread. */
-    private fun sample() {
+    private fun sample(): Long? {
         val now = SystemClock.elapsedRealtime()
-        if (now - lastScan < 180) { schedule(180 - (now - lastScan)); return }
+        if (now - lastScan < 180) return 180 - (now - lastScan)
         lastScan = now
-        if (!interactive()) { coordinator.acquisitionStatus = "not_interactive"; foregroundPackage = null; scheduledPackage = null; outside(true); return }
-        val root = providerRoot() ?: run { coordinator.acquisitionStatus = "no_active_root"; foregroundPackage = null; scheduledPackage = null; outside(false); return }
+        if (!interactive()) { coordinator.acquisitionStatus = "not_interactive"; foregroundPackage = null; scheduledPackage = null; outside(true); return null }
+        val root = providerRoot() ?: run { coordinator.acquisitionStatus = "no_active_root"; foregroundPackage = null; scheduledPackage = null; outside(false); return 1_000L }
         try {
             val foreground = root.packageName?.toString()
             foregroundPackage = foreground
@@ -186,7 +178,7 @@ class ReelsAccessibilityService : AccessibilityService() {
             if (scheduledPackage != null) {
                 outside(true)
                 main.post { AutoScrollSession.suspendActions("app_schedule"); renderOverlays() }
-                schedule(500); return
+                return 500L
             }
             visitHudVisibility.foreground(foreground)
             val app = ReelApp.byPackage(foreground ?: "")
@@ -194,14 +186,13 @@ class ReelsAccessibilityService : AccessibilityService() {
                 if (currentApp != app) outside(true)
                 currentApp = app; pausedApp = app; displayEligible = false
                 main.post { renderOverlays() }
-                schedule(1_500); return
+                return 1_500L
             }
             pausedApp = null
             if (app == null || !coordinator.allowed(app)) {
                 // System UI (notification shade, volume) is not a departure.
                 outside(foreground != "com.android.systemui")
-                if (targeted) schedule(1_000)
-                return
+                return if (targeted || foreground == "com.android.systemui") 1_000L else null
             }
             if (currentApp != null && currentApp != app) outside(true)
             if (currentApp != app) coordinator.pauseDiarySurface()
@@ -239,10 +230,10 @@ class ReelsAccessibilityService : AccessibilityService() {
             if (decision != null && decision.kind != "schedule") main.post { enforceBlock(decision) }
             feedAutoScroll(app, frame, snapshot.windowId, capturedEpoch, now)
             main.post { renderOverlays() }
-            when {
-                frame.surface == Surface.REELS -> schedule(400)
-                displayEligible || decision != null -> schedule(700)
-                else -> schedule(1_500) // Cheap ownership check until departure.
+            return when {
+                frame.surface == Surface.REELS -> 400L
+                displayEligible || decision != null -> 700L
+                else -> 1_500L // Cheap ownership check until departure.
             }
         } finally { SnapshotReader.recycle(root) }
     }
@@ -571,7 +562,7 @@ class ReelsAccessibilityService : AccessibilityService() {
             SystemClock.elapsedRealtime() - expected.atMs !in 0..750) {
             AutoScrollSession.suspendActions("context_changed"); return
         }
-        val root = rootInActiveWindow ?: return AutoScrollSession.suspendActions("context_changed")
+        val root = providerRoot() ?: return AutoScrollSession.suspendActions("context_changed")
         val bounds = try {
             if (!expected.app.owns(root.packageName?.toString()) || root.windowId != expected.window)
                 return AutoScrollSession.suspendActions("context_changed")
@@ -662,7 +653,7 @@ class ReelsAccessibilityService : AccessibilityService() {
         if (receiverRegistered) { unregisterReceiver(screenReceiver); receiverRegistered = false }
         AutoScrollSession.onChanged = {}
         AutoScrollSession.clear()
-        worker.shutdownNow()
+        sampling.close()
         main.removeCallbacksAndMessages(null)
         coordinator.serviceConnected = false
         coordinator.removeListener(listener)

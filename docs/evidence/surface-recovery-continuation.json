@@ -1,0 +1,133 @@
+{
+  "recordedDate": "2026-11-11",
+  "branch": "develop",
+  "sourceBase": "eea867388b3b56335606c0cab4128e776aa804ce",
+  "tasks": [
+    "AS-044",
+    "AS-059"
+  ],
+  "status": "experimental",
+  "environment": {
+    "api": 36,
+    "manufacturer": "samsung",
+    "locale": "en-US",
+    "sources": {
+      "instagram": "454.0.0.54.77",
+      "facebook": "586.0.0.52.53",
+      "youtube": "21.40.165",
+      "tiktok": "47.7.3"
+    }
+  },
+  "firstArtifactsSha256": {
+    "preview": "ec2b0058089f6bf77758b0d5f5c0ef140c0e6984326bb804b67239aac2d464ae",
+    "test": "7b738f1d2686eaf6dafd0d5682f14bc41b906a26c22d04d2fcd577ff30ce86f4"
+  },
+  "finalArtifactsSha256": {
+    "preview": "8bb2043b2c0a02cfbc8ee450a9a868d78055c8985c6600acc89ffb9631fe0256",
+    "test": "7b738f1d2686eaf6dafd0d5682f14bc41b906a26c22d04d2fcd577ff30ce86f4"
+  },
+  "host": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "jest": 99,
+    "pythonUnit": 88,
+    "completionGate": 31,
+    "encounterChecks": 56,
+    "fixtureChecks": 214,
+    "scheduleChecks": 57
+  },
+  "android": {
+    "previewAssembly": "pass",
+    "testAssembly": "pass",
+    "previewLint": {
+      "errors": 0,
+      "warnings": 67
+    },
+    "physicalSynthetic": {
+      "surfaceSampling": 13,
+      "autoScrollSafety": 26,
+      "hudBehavior": 24,
+      "instrumentationCode": -1
+    }
+  },
+  "finalLiveHudReturn": {
+    "instagram": {
+      "checks": 15,
+      "shadeReturnCycles": 3,
+      "sourceGestures": 0,
+      "instrumentationCode": -1
+    },
+    "facebook": {
+      "checks": 15,
+      "shadeReturnCycles": 3,
+      "sourceGestures": 0,
+      "instrumentationCode": -1
+    },
+    "youtube": {
+      "checks": 15,
+      "shadeReturnCycles": 3,
+      "sourceGestures": 0,
+      "instrumentationCode": -1
+    },
+    "tiktok": {
+      "checks": 15,
+      "shadeReturnCycles": 3,
+      "sourceGestures": 0,
+      "instrumentationCode": -1
+    }
+  },
+  "firstCandidateEndTrial": {
+    "source": "tiktok",
+    "result": "failed",
+    "limitSeconds": 150,
+    "proposals": 1,
+    "confirmedTransitions": 0,
+    "transientReason": "context_changed",
+    "instrumentationCode": 0,
+    "endAccepted": false
+  },
+  "finalLongItemTrial": {
+    "source": "tiktok",
+    "result": "bounded no-end trial",
+    "limitSeconds": 150,
+    "proposals": 0,
+    "confirmedTransitions": 0,
+    "instrumentationCode": 0,
+    "endAccepted": false
+  },
+  "limits": [
+    "Historical missing-HUD causes are not established.",
+    "Synthetic retry results do not reproduce Android process death or OEM restrictions.",
+    "Live shade-return does not qualify every source route, playback completion, negative interruption or accessibility case.",
+    "Focused-source final validation retains all existing package/window/item/consent/freshness fences.",
+    "No new Facebook, YouTube or Snapchat end support is accepted.",
+    "Source details remain local; no notification or source content captures are published.",
+    "The shorter final TikTok trial still fails to confirm the next item; the exact final-dispatch/confirmation failure remains unresolved."
+  ],
+  "finalShorterItemTrial": {
+    "source": "tiktok",
+    "result": "failed: completion proposal without confirmed next item",
+    "limitSeconds": 150,
+    "proposals": 1,
+    "confirmedTransitions": 0,
+    "instrumentationCode": 0,
+    "endAccepted": false
+  },
+  "finalActualHudControls": {
+    "source": "tiktok",
+    "checks": 6,
+    "instrumentationCode": -1,
+    "sourceGestures": 0,
+    "scope": "Start/Stop and collapse behavior; usable progress meant waiting assertion was skipped"
+  },
+  "cleanup": {
+    "ownedTestRemoved": true,
+    "originalAccessibilityUnchanged": true,
+    "privateBaselineRemoved": true,
+    "backupOff": true,
+    "historyClearedOrReplaced": false,
+    "installedPreviewHashVerified": true,
+    "debugAppReopened": true
+  }
+}

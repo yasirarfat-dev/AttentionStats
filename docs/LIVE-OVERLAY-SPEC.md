@@ -107,3 +107,10 @@ ADR-059 supersedes route/app-visit resets for the headline counter: This unlock 
 
 
 ADR-077/AS-061 distinguishes pause-confirmed full-screen breathers from unconfirmed-playback reminders. The latter use a wrap-content nonmodal bottom window above navigation, immediate actions, no breathing orb/countdown and an explicit suggestion to pause manually. Provider controls outside the card remain touchable. Native preparation precedes the full cover and is fenced by source/window/consent/epoch and current reminder. Queued auto-scroll dispatch is rejected while pause preparation is pending. Source control labels stay memory-only in SnapshotReader; no global media/volume changes or resume action are introduced.
+
+
+## Transient acquisition recovery
+
+AS-059 uses a serial native sampling loop, shared with pause preparation. A missing active root, a transient read exception or temporary System UI ownership removes current display/action eligibility and retries ownership after one second while interactive. A confirmed unrelated, untargeted app sleeps until a selected-source event; a locked/noninteractive device waits for the normal unlock event. Only a fresh qualified source scan and committed matching snapshot can restore the HUD. A retry never authorizes content traversal in unrelated apps or an automatic gesture.
+
+Pending source callbacks coalesce, an earlier event can expedite an idle poll, and reads never overlap. Teardown cancels scheduled work and fences late worker completion. The existing 180 ms acquisition floor remains. Physical synthetic scheduler checks and actual notification-shade return trials are separate evidence; neither proves process-death, OEM battery, all-source playback or full accessibility acceptance. See the [November 11 continuation](IMPLEMENTATION_LOG/2026-11-11.md#continuation--surface-sampling-and-hud-recovery).

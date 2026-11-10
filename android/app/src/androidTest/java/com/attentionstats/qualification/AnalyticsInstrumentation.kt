@@ -36,9 +36,13 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var hudBehavior = false
     private var scheduleUi = false
     private var backupAdmission = false
+    private var surfaceLifecycle = false
+    private var surfaceSampling = false
     private var scheduleDraft = false
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
+        surfaceLifecycle = arguments?.getString("surfaceLifecycle") == "true"
+        surfaceSampling = arguments?.getString("surfaceSampling") == "true"
         beta = arguments?.getString("beta") == "true"
         hudLive = arguments?.getString("hudLive") == "true"
         protection = arguments?.getString("protection") == "true"
@@ -71,6 +75,14 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            if (surfaceLifecycle) {
+                result.putString("stream", "PASS: ${LiveSurfaceLifecycleVerification.run(this)} actual source/HUD shade-return checks; no source gestures")
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (surfaceSampling) {
+                result.putString("stream", "PASS: ${SurfaceSamplingVerification.run(this)} isolated surface scheduling checks; no source or history changes")
+                finish(Activity.RESULT_OK, result); return
+            }
             if (scheduleDraft) {
                 result.putString("stream", ScheduleDraftVerification.run(this))
                 finish(Activity.RESULT_OK, result); return
