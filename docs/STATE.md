@@ -179,3 +179,5 @@ Reviewed implementation `0c5a1b9b6dd782f2e1ac6b635c1b78dd207dc4b4` is committed 
 Next-session safe trial order and prerequisites are recorded in the [November 10 handoff](IMPLEMENTATION_LOG/2026-11-10.md#next-session-handoff), including Facebook hidden-control qualification, an unsaved scope draft and synthetic key-loss recovery. Preview/debug share an application ID; neither may be cleared or uninstalled for fresh-install testing against the real history.
 
 Final read-only review leaves an unverified AS-058 admission-versus-concurrent-delivery race candidate for controlled latch testing; no framework overlap was reproduced. Pending-file serialization does not establish atomic transport handoff. Details are retained in the dated log; this remains an experimental gate.
+
+AS-060 closing review also identifies an untested coordinator queue-rejection path that can omit the dismissal acknowledgement and retain `breakDismissPending`; prioritize a saturation/failure regression next session. It is not established as the historical missing-reminder cause; no final-audit production edits were made.
