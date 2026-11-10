@@ -30,6 +30,8 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var hiddenPlaybackProbe: String? = null
     private var autoScrollUseCurrent = false
     private var autoScrollControls = false
+    private var pendingRestore = false
+    private var hudBehavior = false
     private var scheduleUi = false
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
@@ -47,6 +49,8 @@ class AnalyticsInstrumentation : Instrumentation() {
         hiddenPlaybackProbe = arguments?.getString("hiddenPlaybackProbe")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollUseCurrent = arguments?.getString("autoScrollUseCurrent") == "true"
         autoScrollControls = arguments?.getString("autoScrollControls") == "true"
+        pendingRestore = arguments?.getString("pendingRestore") == "true"
+        hudBehavior = arguments?.getString("hudBehavior") == "true"
         scheduleUi = arguments?.getString("scheduleUi") == "true"
         feedTrial = arguments?.getString("feedTrial")?.takeIf { it in setOf("instagram", "facebook") }
         feedReverse = arguments?.getString("feedReverse") == "true"
@@ -71,6 +75,14 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             if (autoScrollControls) {
                 result.putString("stream", "PASS: ${LiveAutoScrollControlsVerification.run(this)} actual HUD start/stop/waiting checks; no source gestures")
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (pendingRestore) {
+                result.putString("stream", "PASS: ${PendingRestoreVerification.run(this)} isolated pending-restore AtomicFile checks; no transport")
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (hudBehavior) {
+                result.putString("stream", "PASS: ${HudBehaviorVerification.run(this)} synthetic HUD behavior/accessibility checks")
                 finish(Activity.RESULT_OK, result); return
             }
             val hiddenProbe = hiddenPlaybackProbe

@@ -1,6 +1,6 @@
 # Current state
 
-**Status:** MVP 1.0.0 (versionCode 10) built and previously phone-verified; maintainer reports closed-beta publication. Further development uses `develop`. Updated 2026-11-08.
+**Status:** MVP 1.0.0 (versionCode 10) built and previously phone-verified; maintainer reports closed-beta publication. Further development uses `develop`. Updated 2026-11-10.
 **Responsibility:** Records what exists now, how it was verified, and what is next. Older detail lives in git history and the [implementation log](IMPLEMENTATION_LOG/README.md).
 **Related specifications:** [Index](INDEX.md), [Tracker](FEATURE-TRACKER.md), [Decisions](DECISIONS.md), [Adapters](SOCIAL-ADAPTERS.md), [Release](RELEASE.md).
 **Unresolved feasibility:** Broader device/language fidelity and live playback/social-action qualification remain open. Snapchat fixtures now exist on `develop`, with runtime acceptance recorded separately below. F-05 (direct Drive API integration) remains blocked; separately authorized Android-managed backup is under AS-058.
@@ -160,3 +160,15 @@ Fresh installed versions differ from the checkpoint for Facebook (586.0.0.52.53)
 Background cleanup restores this session's original accessibility settings (master on), removes the task-owned test and sanitized layouts, and verifies backup remains off. No history reset/replacement or foreground app launch occurs during cleanup. Future tests must inspect actual health rather than reuse either session's baseline.
 
 Reviewed test/evidence change `b100ac158d174f19a6985a426f4a5c91c86b1ac1` is committed and pushed normally to origin/develop; the remote hash is independently verified. Author/committer and authenticated GitHub login match the intended contributor. Main remains `1fc538221adfa3e66c1d94bdb9a0258509dc188c`; no merge or workflow run occurs.
+
+
+## Timeboxed parallel reliability continuation (2026-11-10)
+
+Continued on `develop` from `e2ae3c4` with three worker agents and root integration. The four existing HUD/instrumentation/resource changes were preserved, reviewed and completed. AS-053 now retains an explicitly selected short-video draft across installed-app catalog loss and group changes; unsupported new selective drafts cannot silently save as whole-app rules. Eight editor regressions cover scope changes, cancellation, all-day/overnight boundaries and the per-app shortcut. AS-058 recognizes committed, recovery and staging pending-restore files, uses AtomicFile recovery with a shared process lock, and reports incomplete discard without claiming success. AS-059 fixes paused spoken-state refresh/resume, spoken category totals and the paused Today icon. No dependency, schema or release-version changes.
+
+The actual completion gate passes 31 new host checks; pending-restore filesystem helpers pass 12 host checks. Full mobile types/lint/format and 99 Jest tests pass; baseline 88 Python tests and documentation/public-artifact checks pass. These remain experimental tasks. A first Android lint analysis encountered an internal CanvasSize/Kotlin symbol exception while sources were still changing; stable-source retry and final phone evidence are recorded in the [dated log](IMPLEMENTATION_LOG/2026-11-10.md). The initial installed-package HUD baseline did not finish and was stopped; it supplies no acceptance evidence and the resulting force-stop response is not a reproduced product crash.
+
+Backup is retained off under the no-upload instruction. No source grant, history replacement/deletion, main merge, release/signing, Play upload or remote workflow run is part of this continuation. Next qualification continues actual-HUD source end/waiting and negative/lifecycle cases, schedule accessibility and isolated fresh-install recovery. Host or synthetic ART checks do not accept real source fidelity, full TalkBack behavior or framework recovery after reinstall.
+
+
+Final stable-source preview/test assembly, preview lint (zero errors, 66 warnings), 56 encounter/214 fixture checks and 57 protection checks pass. Physical-phone synthetic runs pass 18 isolated AtomicFile, 24 detached HUD behavior/accessibility and 26 auto-scroll safety assertions, each with instrumentation code -1. The new helper's intermediate nullability compile error is corrected and recorded. Task-owned instrumentation is removed; accessibility selections/master state are unchanged, backup is verified off, history is preserved, and the final preview remains installed. These are scoped safety checks, not fresh-install recovery, live source end support, rendered schedule acceptance or full accessibility approval. Final artifact hashes and limits are in [reliability evidence](evidence/reliability-continuation.json).

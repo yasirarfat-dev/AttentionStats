@@ -176,3 +176,10 @@ Start with native capability status and last-success time, compare consent/confi
 Reproduce clock/DST/reboot/revocation failures using injected clocks and dedicated emulators/test devices. Do not change the shared machine timezone, kill shared Node/Java processes, reset shared adb state or alter other repositories. If an emulator/device is in use by another agent, select an isolated target and explicit serial. Keep diagnostics, profiles, traces and real-device captures outside Git. Privacy and data-loss verification takes precedence over making a demo look complete.
 
 For AS-048, do not clear the development app when updating from the two-source preview: schema 3 and the existing package identity are retained. The four-source catalog seeds only missing disabled rows. Bundled preview and test APKs must be rebuilt from a stable source tree before phone qualification; tests from an earlier artifact do not qualify a changed binary.
+
+
+## Focused host safety checks
+
+`python tools/test_autoscroll.py` runs 31 synthetic completion-gate checks with the cached reviewed Kotlin compiler. `python tools/test_backup_files.py --offline` runs 12 synthetic pending-restore filesystem checks. These compile actual product helpers and need no phone, account, transport or history. Bootstrap the reviewed compiler through the analytics workflow above if its cache is absent. They do not qualify Android AtomicFile recovery, source playback, live UI or fresh-install recovery.
+
+For isolated Android pending-file lifecycle or detached HUD checks, build/install the current preview and task-owned test APK, then run the custom instrumentation with `-e pendingRestore true` or `-e hudBehavior true`. Require the explicit PASS stream and instrumentation code -1, preserve backup opt-out and original accessibility settings, and remove only the test package owned by the trial. These modes use synthetic data and never invoke a backup transport or source gesture. The pending-file test uses a unique cache directory; it does not test the production history archive or reinstall recovery.

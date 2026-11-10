@@ -8,6 +8,7 @@ import java.io.File
 /** Device-local backup choice/status. These preferences and pending restores are never backed up. */
 internal object SystemBackupState {
     const val RELATIVE_FILE = "system-backup/history.attentionbackup"
+    private val pendingLock = Any()
     private fun preferences(context: Context) = context.getSharedPreferences("system-backup", Context.MODE_PRIVATE)
     fun enabled(context: Context) = preferences(context).getBoolean("enabled", false)
     fun supported(context: Context) = android.os.Build.VERSION.SDK_INT >= 28 &&
@@ -18,7 +19,7 @@ internal object SystemBackupState {
         val prefs = preferences(context)
         if (!prefs.contains("enabled")) check(prefs.edit().putBoolean("enabled", true).commit())
         if (!enabled(context)) return
-        if (pending(context).exists()) {
+        if (hasPending(context)) {
             record(context, "Review or discard the delivered restore before backing up new history.")
             return
         }
@@ -40,7 +41,7 @@ internal object SystemBackupState {
     }
     fun request(context: Context) {
         check(enabled(context) && supported(context))
-        check(!pending(context).exists()) { "Review or discard the pending restore first" }
+        check(!hasPending(context)) { "Review or discard the pending restore first" }
         BackupManager(context).dataChanged()
         check(preferences(context).edit().putLong("requestedAt", System.currentTimeMillis()).commit())
         record(context, "Requested. Android controls timing; an upload is not confirmed.")
@@ -50,5 +51,15 @@ internal object SystemBackupState {
     }
     fun status(context: Context): String = preferences(context).getString("status", "No backup attempt recorded.")!!
     fun pending(context: Context) = File(context.noBackupFilesDir, "system-restore.attentionbackup")
-    fun clearPending(context: Context) { pending(context).delete() }
+    fun hasPending(context: Context) = synchronized(pendingLock) { PendingRestoreFiles.exists(pending(context)) }
+    fun <T> readPending(context: Context, read: (java.io.InputStream) -> T): T = synchronized(pendingLock) {
+        android.util.AtomicFile(pending(context)).openRead().use(read)
+    }
+    fun writePending(context: Context, bytes: ByteArray) = synchronized(pendingLock) {
+        val owned = android.util.AtomicFile(pending(context))
+        val output = owned.startWrite()
+        try { output.write(bytes); owned.finishWrite(output) }
+        catch (failure: Exception) { owned.failWrite(output); throw failure }
+    }
+    fun clearPending(context: Context) = synchronized(pendingLock) { PendingRestoreFiles.discard(pending(context)) }
 }

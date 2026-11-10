@@ -58,17 +58,24 @@ class BackupActivity : Activity() {
             val actions = listOf("android.settings.BACKUP_SETTINGS", Settings.ACTION_PRIVACY_SETTINGS, Settings.ACTION_SETTINGS)
             for (action in actions) try { startActivity(Intent(action)); break } catch (_: RuntimeException) { }
         }
-        if (SystemBackupState.pending(this).isFile) {
+        if (SystemBackupState.hasPending(this)) {
             text("Android delivered a backup. Review it before replacing current history.")
             button("Review Android restore") {
                 operation = true
                 Thread {
-                    val bytes = try { SystemBackupState.pending(this).inputStream().use(::readArchive) }
+                    val bytes = try { SystemBackupState.readPending(this, ::readArchive) }
                         catch (_: Exception) { runOnUiThread { operation = false; message("Could not read the restored backup. Current history is unchanged.") }; return@Thread }
                     runOnUiThread { preview(bytes, true) }
                 }.start()
             }
-            button("Discard Android restore") { SystemBackupState.clearPending(this); status.text = "Pending restore discarded. Current history is unchanged." }
+            button("Discard Android restore") {
+                try {
+                    SystemBackupState.clearPending(this)
+                    status.text = "Pending restore discarded. Current history is unchanged."
+                } catch (_: Exception) {
+                    status.text = "Could not discard the delivered restore. Automatic backup remains blocked; try again. Current history is unchanged."
+                }
+            }
         }
         text("Manual files", 21f)
         button("Create backup") { createBackup() }
@@ -176,7 +183,12 @@ class BackupActivity : Activity() {
                 .setNeutralButton("Back up current data first") { _, _ -> coordinator.cancelArchive(); createBackup() }
                 .setPositiveButton("Replace history") { _, _ ->
                     operation = true
-                    coordinator.restoreArchive(token, cancelled, { runOnUiThread { if (systemRestore) SystemBackupState.clearPending(this); operation = false; status.text = "History restored. Tracking and protection are off; review your choices before re-enabling them." } },
+                    coordinator.restoreArchive(token, cancelled, { runOnUiThread {
+                        val discarded = !systemRestore || runCatching { SystemBackupState.clearPending(this) }.isSuccess
+                        operation = false
+                        status.text = "History restored. Tracking and protection are off; review your choices before re-enabling them." +
+                            if (discarded) "" else " The delivered backup could not be discarded. Automatic backup remains blocked; discard it before requesting a new backup."
+                    } },
                         { code -> runOnUiThread { operation = false; status.text = if (code == "STALE_PREVIEW") "History changed since preview. Select the archive again to review a fresh replacement." else "Restore did not complete. Existing history is preserved." } })
                 }.setOnCancelListener { coordinator.cancelArchive() }.show()
         } }, { runOnUiThread { operation = false; status.text = "Backup rejected: damaged file, unsupported format or limit. Older recovery-key archives are not supported by this flow. Existing history is unchanged." } })

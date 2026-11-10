@@ -124,6 +124,7 @@ export function TimeSlotEditor({
     to = allDay ? 0 : toMinute(end);
   const valid =
     !!selected &&
+    (scope === 'app' || canSelectShortVideos) &&
     days > 0 &&
     from !== null &&
     to !== null &&
@@ -131,7 +132,7 @@ export function TimeSlotEditor({
   const slot: TimeSlot = {
     id: initial?.id ?? newProtectionId(),
     groupId,
-    scope: canSelectShortVideos ? scope : 'app',
+    scope,
     allDay,
     days,
     startMinute: from ?? 0,
@@ -157,15 +158,7 @@ export function TimeSlotEditor({
             accessibilityRole="radio"
             accessibilityState={{ selected: groupId === group.id }}
             disabled={busy}
-            onPress={() => {
-              setGroupId(group.id);
-              if (
-                !group.packages.every(pkg =>
-                  apps.some(app => app.packageName === pkg && app.shortVideos),
-                )
-              )
-                setScope('app');
-            }}
+            onPress={() => setGroupId(group.id)}
           >
             <View style={[styles.row, { padding: 16 }]}>
               <View style={styles.grow}>
@@ -187,7 +180,7 @@ export function TimeSlotEditor({
           disabled={busy}
           value={slot.scope}
           options={
-            canSelectShortVideos
+            canSelectShortVideos || scope === 'short_videos'
               ? [
                   { value: 'app', label: 'Whole app' },
                   { value: 'short_videos', label: 'Short videos' },
@@ -201,6 +194,12 @@ export function TimeSlotEditor({
             ? 'Every screen in the selected apps. Their content is never read for this rule.'
             : 'Only recognized short-video viewers. Messages and other screens stay available. Source tracking must be enabled.'}
         </Body>
+        {scope === 'short_videos' && !canSelectShortVideos && (
+          <Body muted>
+            Short-video blocking is unavailable for this group. Choose a
+            supported group or explicitly select Whole app before saving.
+          </Body>
+        )}
       </Card>
       <SectionTitle>When</SectionTitle>
       <Card>

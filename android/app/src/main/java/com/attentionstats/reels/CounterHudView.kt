@@ -13,6 +13,7 @@ import android.view.ViewConfiguration
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.isVisible
 import org.attentionstats.reels.PageCategory
 import com.attentionstats.R
 
@@ -38,7 +39,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
         }
     }
     private val autoStatus = TextView(context).apply {
-        text = "Waiting for playback progress"
+        setText(R.string.autoscroll_waiting)
         textSize = 11f; setTextColor(Color.WHITE); gravity = Gravity.CENTER
         setPadding(dp(10), 0, dp(10), dp(8)); visibility = GONE
     }
@@ -68,6 +69,8 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     private var autoControlAvailable = false
     private var autoControlRunning = false
     private var autoControlReady = false
+    private var countingDescription: CharSequence = ""
+    private var showIcons = true
     var moveCounter: (Float, Float) -> Unit = { _, _ -> }
     var resetPosition: () -> Unit = {}
 
@@ -208,8 +211,8 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     }
 
     private fun updateAutoVisibility() {
-        autoScroll.visibility = if (autoControlAvailable && (expanded || autoControlRunning)) VISIBLE else GONE
-        autoStatus.visibility = if (autoScroll.visibility == VISIBLE && autoControlRunning && !autoControlReady) VISIBLE else GONE
+        autoScroll.isVisible = autoControlAvailable && (expanded || autoControlRunning)
+        autoStatus.isVisible = autoScroll.isVisible && autoControlRunning && !autoControlReady
     }
 
     private fun icon(symbol: String) = SymbolView(context, symbol, iconColor).apply {
@@ -221,11 +224,16 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
         if (paused == value) return
         paused = value
         if (value && expanded) setExpanded(false)
-        for (child in listOf(visit, today, todayIcon)) child.visibility = if (value) GONE else VISIBLE
+        for (child in listOf(visit, today)) child.visibility = if (value) GONE else VISIBLE
+        todayIcon.isVisible = !value && showIcons
         (header.getChildAt(2))?.visibility = if (value) GONE else VISIBLE // divider
         pausedLabel.visibility = if (value) VISIBLE else GONE
         alpha = if (value) 0.85f else 1f
-        header.contentDescription = if (value) "Counting paused. Double tap to resume." else header.contentDescription
+        updateHeaderDescription()
+    }
+
+    private fun updateHeaderDescription() {
+        header.contentDescription = if (paused) "Counting paused. Double tap to resume." else countingDescription
     }
 
     fun setExpanded(value: Boolean) {
@@ -241,9 +249,10 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     }
 
     fun update(state: ReelsCoordinator.OverlaySnapshot) {
+        showIcons = state.showIcons
         sessionIcon.progress = state.breakProgress
         sessionIcon.visibility = if (state.showIcons || state.breakProgress >= 0) VISIBLE else GONE
-        todayIcon.visibility = if (state.showIcons) VISIBLE else GONE
+        todayIcon.isVisible = !paused && showIcons
         for (number in listOf(visit, today)) {
             val params = number.layoutParams as LayoutParams
             val gap = if (state.showIcons) dp(6) else 0
@@ -255,7 +264,8 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
         visit.update(state.visit, state.scrollBack)
         today.update(state.today, state.scrollBack)
         val adScope = if (state.includeRecognizedAds) "Recognized ads included." else "Recognized ads counted separately."
-        header.contentDescription = "Estimated viewer pages. $adScope This unlock session across all observed apps ${state.visit}. $scopeLabel ${state.today}. Tap to expand or collapse statistics."
+        countingDescription = "Estimated viewer pages. $adScope This unlock session across all observed apps ${state.visit}. $scopeLabel ${state.today}. Tap to expand or collapse statistics."
+        updateHeaderDescription()
         val unclassified = state.categories.firstOrNull { it.category == PageCategory.UNCLASSIFIED }
         for (item in state.categories) categoryRows[item.category]?.let { (row, sessionValue, dayValue) ->
             // "Videos" includes items whose kind the adapter could not tell apart.
@@ -268,7 +278,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
                 PageCategory.AD -> "Recognized image ads"
                 else -> "Unclassified pages"
             }
-            row.contentDescription = "$label. This unlock session across all observed apps ${item.visit}. $scopeLabel ${item.today}. Partial estimates."
+            row.contentDescription = "$label. This unlock session across all observed apps ${item.visit + extraVisit}. $scopeLabel ${item.today + extraToday}. Partial estimates."
         }
     }
 

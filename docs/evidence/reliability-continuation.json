@@ -1,0 +1,62 @@
+{
+  "recordedDate": "2026-11-10",
+  "branch": "develop",
+  "sourceBase": "e2ae3c4c2d5a3a4864dd77e3ca1de2649b48b9f8",
+  "tasks": [
+    "AS-044",
+    "AS-053",
+    "AS-058",
+    "AS-059",
+    "AS-018"
+  ],
+  "status": "experimental",
+  "artifactsSha256": {
+    "preview": "93a34b4477d073d9b7bd3bf3178cbc6f0a4532d9fd4948bdc23ee170c8e1015c",
+    "test": "820df82a63760eee31d0e79b97addbff8b6f6d99bd736b8faedf2bab367aaeb6"
+  },
+  "host": {
+    "jest": 99,
+    "pythonUnit": 88,
+    "completionGate": 31,
+    "pendingRestoreFiles": 12,
+    "reelsEncounters": 56,
+    "reelsFixtures": 214,
+    "protection": 57,
+    "typecheck": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "docs": "pass"
+  },
+  "android": {
+    "previewAssembly": "pass",
+    "testAssembly": "pass",
+    "previewLint": {
+      "errors": 0,
+      "warnings": 66
+    },
+    "physicalPhoneSynthetic": {
+      "pendingRestoreAtomicFile": 18,
+      "hudBehaviorAndDescriptions": 24,
+      "autoScrollSessionSafety": 26,
+      "instrumentationCode": -1
+    }
+  },
+  "cleanup": {
+    "taskTestRemoved": true,
+    "accessibilitySettingsUnchanged": true,
+    "automaticBackupOff": true,
+    "historyClearedOrReplaced": false
+  },
+  "failedChecksRetained": [
+    "Initial installed HUD baseline did not finish; task target force-stopped. No acceptance result.",
+    "Initial lint crashed internally in CanvasSize/Kotlin analysis during concurrent edits; stable-source retry passed without suppression.",
+    "New isolated Android test initially failed Kotlin nullability compilation; corrected before final assembly."
+  ],
+  "limitations": [
+    "No real source end/gesture/lifecycle acceptance added.",
+    "HUD suite uses detached Android views; full TalkBack/live overlay acceptance remains open.",
+    "Schedule draft interaction tests are host only; new warning/rendered flow remains unqualified.",
+    "Isolated AtomicFile tests are not framework transport, process-kill or reinstall recovery.",
+    "No merge to main, release, Play upload, dependency change or remote workflow run."
+  ]
+}

@@ -5,7 +5,6 @@ import android.app.backup.BackupDataInput
 import android.app.backup.BackupDataOutput
 import android.app.backup.FullBackupDataOutput
 import android.os.ParcelFileDescriptor
-import android.util.AtomicFile
 import com.attentionstats.reels.ReelsCoordinator
 import java.io.File
 import java.io.FileInputStream
@@ -21,7 +20,7 @@ open class SystemBackupAgent : BackupAgent() {
     override fun onRestore(data: BackupDataInput, appVersionCode: Int, newState: ParcelFileDescriptor) = Unit
 
     override fun onFullBackup(data: FullBackupDataOutput) {
-        if (SystemBackupState.pending(this).exists()) {
+        if (SystemBackupState.hasPending(this)) {
             SystemBackupState.record(this, "Review or discard the delivered restore before backing up new history.")
             throw IOException("Pending restore requires review")
         }
@@ -78,10 +77,7 @@ open class SystemBackupAgent : BackupAgent() {
             }
             ArchiveEnvelope.read(bytes, ArchiveEnvelope.packageCredential(),
                 expectedProfile = ArchiveEnvelope.PUBLIC_PACKAGE_PROFILE).fill(0)
-            val owned = AtomicFile(SystemBackupState.pending(this))
-            val output = owned.startWrite()
-            try { output.write(bytes); owned.finishWrite(output) }
-            catch (failure: Exception) { owned.failWrite(output); throw failure }
+            SystemBackupState.writePending(this, bytes)
             SystemBackupState.record(this, "Android delivered a backup. Open Backup & restore to review it.")
         } finally { bytes.fill(0) }
     }
