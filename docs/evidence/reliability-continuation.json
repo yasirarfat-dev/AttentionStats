@@ -58,5 +58,13 @@
     "Schedule draft interaction tests are host only; new warning/rendered flow remains unqualified.",
     "Isolated AtomicFile tests are not framework transport, process-kill or reinstall recovery.",
     "No merge to main, release, Play upload, dependency change or remote workflow run."
-  ]
+  ],
+  "implementationCommit": "0c5a1b9b6dd782f2e1ac6b635c1b78dd207dc4b4",
+  "publication": {
+    "remote": "https://github.com/yasirarfat-dev/AttentionStats.git",
+    "branch": "develop",
+    "remoteHashVerified": true,
+    "mainUnchanged": "1fc538221adfa3e66c1d94bdb9a0258509dc188c",
+    "githubWorkflowDispatched": false
+  }
 }
