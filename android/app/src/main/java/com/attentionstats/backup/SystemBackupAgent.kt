@@ -45,11 +45,13 @@ open class SystemBackupAgent : BackupAgent() {
             if (!done.await(25, TimeUnit.SECONDS)) throw IOException("Snapshot timed out")
             val bytes = result.get() ?: throw IOException("Snapshot unavailable or too large")
             if (data.quota > 0 && bytes.size.toLong() + 2048 > data.quota) throw IOException("Backup quota exceeded")
-            check(SystemBackupState.enabled(this))
-            check(file.parentFile!!.mkdirs() || file.parentFile!!.isDirectory)
-            file.outputStream().use { it.write(bytes) }
-            fullBackupFile(file, data)
-            SystemBackupState.record(this, "Snapshot handed to Android. Cloud upload completion is not confirmed.")
+            SystemBackupState.withBackupAdmission(this) {
+                check(SystemBackupState.enabled(this))
+                check(file.parentFile!!.mkdirs() || file.parentFile!!.isDirectory)
+                file.outputStream().use { it.write(bytes) }
+                fullBackupFile(file, data)
+                SystemBackupState.record(this, "Snapshot handed to Android. Cloud upload completion is not confirmed.")
+            }
         } catch (_: Exception) {
             SystemBackupState.record(this, if (exportFailure.get() == "ARCHIVE_TOO_LARGE")
                 "History exceeds the current backup size or record limit. No backup was offered and no history was removed."

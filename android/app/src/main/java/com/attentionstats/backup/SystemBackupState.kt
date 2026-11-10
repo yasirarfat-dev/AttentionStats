@@ -40,11 +40,12 @@ internal object SystemBackupState {
         else record(context, "Automatic backup is off. Existing provider copies may remain.")
     }
     fun request(context: Context) {
-        check(enabled(context) && supported(context))
-        check(!hasPending(context)) { "Review or discard the pending restore first" }
-        BackupManager(context).dataChanged()
-        check(preferences(context).edit().putLong("requestedAt", System.currentTimeMillis()).commit())
-        record(context, "Requested. Android controls timing; an upload is not confirmed.")
+        withBackupAdmission(context) {
+            check(enabled(context) && supported(context))
+            BackupManager(context).dataChanged()
+            check(preferences(context).edit().putLong("requestedAt", System.currentTimeMillis()).commit())
+            record(context, "Requested. Android controls timing; an upload is not confirmed.")
+        }
     }
     fun record(context: Context, status: String) {
         check(preferences(context).edit().putString("status", status).commit())
@@ -52,6 +53,11 @@ internal object SystemBackupState {
     fun status(context: Context): String = preferences(context).getString("status", "No backup attempt recorded.")!!
     fun pending(context: Context) = File(context.noBackupFilesDir, "system-restore.attentionbackup")
     fun hasPending(context: Context) = synchronized(pendingLock) { PendingRestoreFiles.exists(pending(context)) }
+    /** Never await coordinator export here: restore delivery must remain free during snapshot work. */
+    fun <T> withBackupAdmission(context: Context, action: () -> T): T = synchronized(pendingLock) {
+        check(!PendingRestoreFiles.exists(pending(context))) { "Review or discard the pending restore first" }
+        action()
+    }
     fun <T> readPending(context: Context, read: (java.io.InputStream) -> T): T = synchronized(pendingLock) {
         android.util.AtomicFile(pending(context)).openRead().use(read)
     }

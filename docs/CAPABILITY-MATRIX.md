@@ -95,3 +95,5 @@ Control codes specify minimum controls, not optional refinements: T = off by def
 ## Admission procedure
 
 Add new rows before implementation, including an acceptance ID in [Testing](TESTING.md) and a task mapping in [Feature tracker](FEATURE-TRACKER.md). A supported detector record must include application version range, Android build/API, locale, surface, evidence fields, fixtures, precision/recall procedure, known exclusions, and date. Do not publish real account traces. Changed versions invalidate untested claims; unsupported versions return unknown rather than using a generic scroll counter.
+
+The later November 11 continuation adds 19 isolated admission/delivery overlap checks under C-25/C-28 and a process-local final-handoff guard. Scoped source/HUD outcomes and the deferred unsaved schedule draft are separate from framework recovery, full source fidelity and accessibility acceptance. All affected capabilities remain experimental; see the [continuation log](IMPLEMENTATION_LOG/2026-11-11.md#continuation--live-source-checks-and-backup-admission).

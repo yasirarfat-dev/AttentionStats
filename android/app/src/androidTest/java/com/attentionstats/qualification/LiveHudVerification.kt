@@ -15,7 +15,8 @@ import org.attentionstats.reels.ReelRoute
 
 /** Operator-only actions are confined to fixed controls in this app's own overlay. */
 internal object LiveHudVerification {
-    data class State(val header: Rect?, val controls: List<Pair<String, Rect>>, val waiting: Boolean = false) {
+    data class State(val header: Rect?, val controls: List<Pair<String, Rect>>, val waiting: Boolean = false,
+        val expanded: Boolean = false, val paused: Boolean = false) {
         fun json() = JSONObject().put("visible", header != null).put("autoControls", controls.size)
     }
     private const val HEADER = "header"
@@ -24,6 +25,8 @@ internal object LiveHudVerification {
         val controls = mutableListOf<Pair<String, Rect>>()
         var clicked = false
         var waiting = false
+        var expanded = false
+        var paused = false
         for (window in automation.windows) {
             if (window.type != AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY) continue
             val root = window.root ?: continue
@@ -43,7 +46,10 @@ internal object LiveHudVerification {
                             if (text == "Waiting for playback progress") waiting = true
                             val controlState = if (description.startsWith("Auto-scroll on")) "on" else "off"
                             val box = Rect().also { node.getBoundsInScreen(it) }
-                            if (isHeader) header = box
+                            if (isHeader) {
+                                header = box; expanded = node.isSelected
+                                paused = description.startsWith("Counting paused.")
+                            }
                             if (isControl) controls.add(controlState to box)
                             if (!clicked && click != null && ((click == HEADER && isHeader) || (isControl && click == controlState))) {
                                 check(node.performAction(AccessibilityNodeInfo.ACTION_CLICK)); clicked = true
@@ -55,7 +61,7 @@ internal object LiveHudVerification {
             } finally { SnapshotReader.recycle(root) }
         }
         if (click != null) check(clicked) { "Owned HUD control unavailable" }
-        return State(header, controls, waiting)
+        return State(header, controls, waiting, expanded, paused)
     }
     fun state(instrumentation: Instrumentation, automation: UiAutomation) = scan(instrumentation, automation)
     fun choose(instrumentation: Instrumentation, automation: UiAutomation, control: String) = scan(instrumentation, automation, control)

@@ -1,0 +1,138 @@
+{
+  "recordedDate": "2026-11-11",
+  "branch": "develop",
+  "sourceBase": "ac47d6ff6cbadcb94a6cfc8f664a1af6bd9f1993",
+  "tasks": [
+    "AS-044",
+    "AS-053",
+    "AS-058",
+    "AS-059"
+  ],
+  "status": "experimental",
+  "environment": {
+    "api": "36",
+    "manufacturer": "samsung",
+    "locale": "en-US",
+    "sources": {
+      "facebook": "586.0.0.52.53",
+      "instagram": "454.0.0.54.77",
+      "youtube": "21.40.165",
+      "tiktok": "47.7.3",
+      "snapchat": "14.31.0.56"
+    }
+  },
+  "baselineArtifactsSha256": {
+    "preview": "ea77c7664f4657446a72f348c701e7b24451178afd7f9212afe93798a5861b01",
+    "test": "e17a27e6ec769db0ca66a266102f28dd06dbec77955d0e76dd7dc20b51aafa43"
+  },
+  "finalArtifactsSha256": {
+    "preview": "30a0777ef40108a7b94a9cbdcb1d35c38b1c7e0ab3754194322289dc54487c5f",
+    "test": "8b0bbfa4f79fc5b8152c01ed735b6041b9e93ae012e2c6aad3a28d2c14a1dff9"
+  },
+  "host": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "jest": 99,
+    "pythonUnit": 88,
+    "completionGate": 31,
+    "pendingRestoreFiles": 12
+  },
+  "android": {
+    "previewAssembly": "pass",
+    "testAssembly": "pass",
+    "previewLint": {
+      "errors": 0,
+      "warnings": 67
+    },
+    "physicalSynthetic": {
+      "backupAdmission": 19,
+      "pendingRestoreAtomicFile": 18,
+      "autoScrollSafety": 26,
+      "instrumentationCode": -1
+    }
+  },
+  "baselineSourceTrials": {
+    "instagram": {
+      "result": "pass",
+      "actualHudStartEndDistinctNextStop": true,
+      "setupSwipes": 1,
+      "automaticAttempts": 1,
+      "confirmedTransitions": 1
+    },
+    "facebook": {
+      "viewerSamples": 300,
+      "usableProgressSamples": 0,
+      "gestures": 0,
+      "actualHudChecks": 7,
+      "endSupportAccepted": false
+    },
+    "youtube": {
+      "viewerSamples": 300,
+      "usableProgressSamples": 0,
+      "gestures": 0,
+      "endSupportAccepted": false
+    },
+    "snapchat": {
+      "stoppedAfterSamples": 50,
+      "eligibleViewerSamples": 0,
+      "gestures": 0,
+      "acceptance": false
+    }
+  },
+  "finalSourceTrials": {
+    "youtube": {
+      "actualHudChecks": 7,
+      "endSupportAccepted": false,
+      "laterRetry": "stopped before Start on absent HUD; earlier seven-check pass remains scoped"
+    },
+    "instagram": {
+      "result": "stopped",
+      "reason": "after service rebound, three setup swipes did not acquire numeric progress",
+      "acceptance": false
+    },
+    "tiktok": {
+      "result": "stopped",
+      "reason": "visible HUD unavailable before Start",
+      "acceptance": false
+    }
+  },
+  "scheduleDraft": {
+    "result": "deferred",
+    "reason": "required existing supported and unsupported uniquely named groups unavailable",
+    "configurationChanged": false,
+    "uiBodyAccepted": false
+  },
+  "failedOrStoppedChecks": [
+    "Initial YouTube HUD check inferred expansion from absent optional control; corrected to header selection; seven-check retry passes.",
+    "Schedule draft preflight used a debug-mangled internal property absent in preview; test-only access removed; retry defers without changing rules.",
+    "Snapchat no-action probe stopped by operator after zero eligible viewer samples; force-stop instrumentation reports process crashed, not a reproduced product crash.",
+    "An overlapping local instrumentation client left a task-owned record; guard now refuses unfinished instrumentation and ignores finished framework records. Only verified task clients/target were stopped.",
+    "After task stops, Android removes the app accessibility selection or leaves it disconnected. Only the app selection is restored/rebound, preserving others. Intermediate final-source trials stop on missing service/HUD.",
+    "Final Instagram setup has no numeric candidate after three swipes; baseline pass is not relabeled as final-artifact acceptance.",
+    "Final TikTok trial stops before Start because the HUD is unavailable; no end acceptance.",
+    "Later Instagram/YouTube HUD checks stop on missing HUD; source/service lifecycle remains unqualified.",
+    "The YouTube launcher required shell quoting for its activity alias; corrected before navigation.",
+    "A service-rebind command rejected an empty settings argument before mutation; corrected quoting allowed a bounded app-only rebind."
+  ],
+  "limitations": [
+    "No actual framework transport callback overlap or reinstall recovery",
+    "No maximum-history, interruption or cross-process acceptance",
+    "Facebook/YouTube end scrolling remains unavailable on sampled layouts",
+    "Snapchat viewer and broader source/lifecycle/negative/accessibility matrix unqualified",
+    "Schedule UI body remains unrun without required groups"
+  ],
+  "cleanup": {
+    "taskTestRemoved": true,
+    "syntheticDirectoriesRemoved": true,
+    "sanitizedLayoutsRemoved": true,
+    "originalAccessibilityRestored": true,
+    "otherServiceSelectionsPreserved": true,
+    "automaticBackupOff": true,
+    "realHistoryClearedOrReplaced": false,
+    "privateSettingsBaselineRemoved": true,
+    "installedPreviewHashVerified": true,
+    "debugAppReopened": true,
+    "taskInstrumentationIdle": true
+  }
+}

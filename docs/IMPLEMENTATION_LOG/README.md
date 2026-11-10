@@ -23,4 +23,4 @@ Entries:
 - [2026-11-08 — auto-scroll continuation and actual HUD control qualification](2026-11-08.md).
 
 - [2026-11-10 — parallel reliability repairs and isolated safety checks](2026-11-10.md).
-- [2026-11-11 — reminder backpressure and isolated key-loss recovery](2026-11-11.md).
+- [2026-11-11 — reminder backpressure, key-loss recovery and backup admission](2026-11-11.md).

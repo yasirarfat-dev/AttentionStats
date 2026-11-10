@@ -35,6 +35,8 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var keyLossRecovery = false
     private var hudBehavior = false
     private var scheduleUi = false
+    private var backupAdmission = false
+    private var scheduleDraft = false
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
         beta = arguments?.getString("beta") == "true"
@@ -56,6 +58,8 @@ class AnalyticsInstrumentation : Instrumentation() {
         keyLossRecovery = arguments?.getString("keyLossRecovery") == "true"
         hudBehavior = arguments?.getString("hudBehavior") == "true"
         scheduleUi = arguments?.getString("scheduleUi") == "true"
+        backupAdmission = arguments?.getString("backupAdmission") == "true"
+        scheduleDraft = arguments?.getString("scheduleDraft") == "true"
         feedTrial = arguments?.getString("feedTrial")?.takeIf { it in setOf("instagram", "facebook") }
         feedReverse = arguments?.getString("feedReverse") == "true"
         feedSamples = arguments?.getString("feedSamples")?.toIntOrNull()?.takeIf { it in 10..90 } ?: 90
@@ -67,6 +71,14 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            if (scheduleDraft) {
+                result.putString("stream", ScheduleDraftVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (backupAdmission) {
+                result.putString("stream", "PASS: ${BackupAdmissionVerification.run(this)} isolated backup admission/delivery checks; no transport or real history changes")
+                finish(Activity.RESULT_OK, result); return
+            }
             if (disableBackup) {
                 com.attentionstats.backup.SystemBackupState.configure(targetContext, false)
                 check(!com.attentionstats.backup.SystemBackupState.enabled(targetContext))
