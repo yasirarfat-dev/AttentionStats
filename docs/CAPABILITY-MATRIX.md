@@ -9,6 +9,8 @@ ADR-073/ADR-074 add the experimental AS-058 Android-managed backup route, automa
 
 ADR-076 extends experimental C-16/C-17/C-19/C-20/C-30 subsets through AS-053/AS-057/AS-060: per-app/group slots with explicit whole-app or qualified short-video scope, all-day timing, charcoal dark surfaces and reliable prompt dismissal. Arbitrary-app schedules use package ownership only; selective scope still requires source consent and qualified viewers. No full capability row is admitted by these changes.
 
+November 11 adds scoped C-20 queue-pressure dismissal evidence and C-25/C-28 isolated key-loss recovery evidence under AS-060/AS-058; [dated results](IMPLEMENTATION_LOG/2026-11-11.md) do not accept real source/lifecycle behavior, framework reinstall recovery or concurrent backup delivery. Capability states remain experimental.
+
 ADR-077/AS-061 adds an experimental safety gate: full-screen breathers require confirmed pause; unknown players receive a compact nonmodal reminder with immediate actions. No universal playback-control capability is admitted, no additional grant is requested and no Play/resume action is introduced.
 
 ## Interpretation

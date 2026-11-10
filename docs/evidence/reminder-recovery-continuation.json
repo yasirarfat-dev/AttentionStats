@@ -1,0 +1,56 @@
+{
+  "recordedDate": "2026-11-11",
+  "branch": "develop",
+  "sourceBase": "217ddfeac74f8222a0faf4816f7e9d694c1a7089",
+  "tasks": [
+    "AS-060",
+    "AS-058"
+  ],
+  "status": "experimental",
+  "artifactsSha256": {
+    "preview": "ea77c7664f4657446a72f348c701e7b24451178afd7f9212afe93798a5861b01",
+    "test": "e17a27e6ec769db0ca66a266102f28dd06dbec77955d0e76dd7dc20b51aafa43"
+  },
+  "host": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "jest": 99,
+    "pythonUnit": 88,
+    "completionGate": 31,
+    "pendingRestoreFiles": 12
+  },
+  "android": {
+    "previewAssembly": "pass",
+    "testAssembly": "pass",
+    "previewLint": {
+      "errors": 0,
+      "warnings": 67
+    },
+    "physicalPhoneSynthetic": {
+      "saturatedReminderQueue": 9,
+      "sourceKeyLossRecovery": 17,
+      "protectionCodecAttachedViews": 14,
+      "instrumentationCode": -1
+    }
+  },
+  "cleanup": {
+    "taskTestRemoved": true,
+    "syntheticStoresAndAliasesRemoved": true,
+    "accessibilitySettingsUnchanged": true,
+    "automaticBackupOff": true,
+    "realHistoryClearedOrReplaced": false,
+    "privateSettingsBaselineRemoved": true
+  },
+  "failedChecksRetained": [
+    "Initial new test compilation failed -Werror on redundant Unit expression; corrected before final assembly.",
+    "Initial read-only preflight treated absent-package pm path exit 1 as failure; package-list preflight passed before any install."
+  ],
+  "limitations": [
+    "Queue-pressure tests use the actual production helper with an isolated coroutine channel, not a real source-triggered service trial.",
+    "The historical missing-reminder cause, time-trigger/reset, full lifecycle and accessibility remain open.",
+    "Key-loss recovery uses only synthetic local stores and task-owned aliases; no framework transport or reinstall recovery.",
+    "Concurrent backup admission versus restore delivery, maximum logical recovery and long-history scalability remain unqualified.",
+    "No dependency/schema/version change, main merge, binary publication, Play upload or remote workflow run."
+  ]
+}

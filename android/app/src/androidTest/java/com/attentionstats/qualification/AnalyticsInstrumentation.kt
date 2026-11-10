@@ -31,6 +31,8 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var autoScrollUseCurrent = false
     private var autoScrollControls = false
     private var pendingRestore = false
+    private var reminderDismissal = false
+    private var keyLossRecovery = false
     private var hudBehavior = false
     private var scheduleUi = false
     override fun onCreate(arguments: Bundle?) {
@@ -50,6 +52,8 @@ class AnalyticsInstrumentation : Instrumentation() {
         autoScrollUseCurrent = arguments?.getString("autoScrollUseCurrent") == "true"
         autoScrollControls = arguments?.getString("autoScrollControls") == "true"
         pendingRestore = arguments?.getString("pendingRestore") == "true"
+        reminderDismissal = arguments?.getString("reminderDismissal") == "true"
+        keyLossRecovery = arguments?.getString("keyLossRecovery") == "true"
         hudBehavior = arguments?.getString("hudBehavior") == "true"
         scheduleUi = arguments?.getString("scheduleUi") == "true"
         feedTrial = arguments?.getString("feedTrial")?.takeIf { it in setOf("instagram", "facebook") }
@@ -79,6 +83,14 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             if (pendingRestore) {
                 result.putString("stream", "PASS: ${PendingRestoreVerification.run(this)} isolated pending-restore AtomicFile checks; no transport")
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (reminderDismissal) {
+                result.putString("stream", "PASS: ${ReminderDismissalVerification.run(this)} isolated reminder queue checks; no history or settings changes")
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (keyLossRecovery) {
+                result.putString("stream", "PASS: ${KeyLossRecoveryVerification.run(this)} isolated key-loss recovery checks; no transport or real history changes")
                 finish(Activity.RESULT_OK, result); return
             }
             if (hudBehavior) {

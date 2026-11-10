@@ -340,8 +340,10 @@ internal class ReelsCoordinator private constructor(private val context: Context
         history.database.data().decideIntervention(id, choice, System.currentTimeMillis())
         history.database.data().advanceRevision()
     }
-    fun dismissReminder(onDismissed: () -> Unit = {}) = enqueue {
-        diary.dismiss(); publish(); main.post { onDismissed() }
+    fun dismissReminder(onDismissed: () -> Unit = {}) {
+        ReminderDismissal.enqueue(scope, jobs, diary::dismiss) {
+            publish(); main.post { onDismissed() }
+        }
     }
     fun stopDiaryLive() = enqueue { diary.resetLive(); publish() }
     fun pauseDiarySurface() = enqueue { diary.pauseSurface() }

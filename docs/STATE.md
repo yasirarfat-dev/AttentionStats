@@ -1,6 +1,6 @@
 # Current state
 
-**Status:** MVP 1.0.0 (versionCode 10) built and previously phone-verified; maintainer reports closed-beta publication. Further development uses `develop`. Updated 2026-11-10.
+**Status:** MVP 1.0.0 (versionCode 10) built and previously phone-verified; maintainer reports closed-beta publication. Further development uses `develop`. Updated 2026-11-11.
 **Responsibility:** Records what exists now, how it was verified, and what is next. Older detail lives in git history and the [implementation log](IMPLEMENTATION_LOG/README.md).
 **Related specifications:** [Index](INDEX.md), [Tracker](FEATURE-TRACKER.md), [Decisions](DECISIONS.md), [Adapters](SOCIAL-ADAPTERS.md), [Release](RELEASE.md).
 **Unresolved feasibility:** Broader device/language fidelity and live playback/social-action qualification remain open. Snapchat fixtures now exist on `develop`, with runtime acceptance recorded separately below. F-05 (direct Drive API integration) remains blocked; separately authorized Android-managed backup is under AS-058.
@@ -181,3 +181,11 @@ Next-session safe trial order and prerequisites are recorded in the [November 10
 Final read-only review leaves an unverified AS-058 admission-versus-concurrent-delivery race candidate for controlled latch testing; no framework overlap was reproduced. Pending-file serialization does not establish atomic transport handoff. Details are retained in the dated log; this remains an experimental gate.
 
 AS-060 closing review also identifies an untested coordinator queue-rejection path that can omit the dismissal acknowledgement and retain `breakDismissPending`; prioritize a saturation/failure regression next session. It is not established as the historical missing-reminder cause; no final-audit production edits were made.
+
+## Reminder backpressure and key-loss recovery (2026-11-11)
+
+AS-060 now admits a user's dismissal asynchronously through a full coordinator queue rather than dropping it through observation `trySend`. Reset and acknowledgement retain serialized ordering, stale reminders remain fenced until reset, duplicate pending service requests are ignored and destroyed services ignore late rendering callbacks. The physical phone passes nine isolated actual-channel checks, including saturation at 256 jobs, FIFO drain, main-thread responsiveness and reset-before-acknowledgement; the existing 14 attached break-control/codec checks also pass. This repairs the inspected rejection path, without establishing the historical trigger-gap cause or accepting the remaining live source/lifecycle cases.
+
+AS-058's new 17-check physical synthetic trial exports profile 3, removes only a task-owned source key, verifies failed reopening preserves source database/wrapper bytes, restores into a separately keyed destination and reopens it with fact ID/origin/totals preserved. Corruption is rejected without changing destination history, and source configurations remain off. This qualifies isolated key-loss recovery, not Android reinstall recovery or maximum-history restore. Concurrent backup admission/delivery remains unqualified.
+
+Types, lint/boundaries, formatting, 99 Jest tests, 88 Python tests, 31 completion and 12 filesystem host checks pass. Final preview/test assembly and preview lint pass with zero errors/67 warnings; an initial redundant test expression failed `-Werror` and was corrected. The installed preview hash and test ownership are verified; task instrumentation and synthetic stores/keys are removed. Original accessibility settings and real history are preserved; automatic backup remains off. No dependency/schema/version change or main merge. See the [dated log](IMPLEMENTATION_LOG/2026-11-11.md) and [evidence](evidence/reminder-recovery-continuation.json). AS-060/AS-058 remain experimental. Next: source end/waiting and negative/lifecycle trials, unsaved schedule-scope UI, controlled backup delivery races and separately isolated framework recovery.

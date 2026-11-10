@@ -431,10 +431,12 @@ class ReelsAccessibilityService : AccessibilityService() {
     }
 
     private fun dismissBreak(choice: String) {
+        if (breakDismissPending || destroyed) return
         breakDismissPending = true
         decide(choice)
         removeIntervention()
         coordinator.dismissReminder {
+            if (destroyed) return@dismissReminder
             breakDismissPending = false
             renderOverlays()
             schedule(0)

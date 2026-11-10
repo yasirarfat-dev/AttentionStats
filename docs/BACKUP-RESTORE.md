@@ -71,4 +71,6 @@ Android documentation warns that some manufacturers may still allow device trans
 
 Acceptance B-01–B-07 and S-01 in [Testing](TESTING.md) includes fresh-device recovery, wrong credentials, corruption, interruption at each stage, format compatibility, permission reactivation and preservation of existing history. Direct-Drive UI must remain blocked/unavailable; Android-managed status must report only its actually verified state.
 
+The [November 11 isolated phone trial](IMPLEMENTATION_LOG/2026-11-11.md) passes 17 synthetic source-key-loss/recovery checks: the unavailable source key cannot silently recreate history, while a profile-3 archive restores into a separately keyed destination and survives reopening with fact ID/origin/totals retained and sources disabled. Corruption preserves the destination. This does not qualify Android framework reinstall recovery, maximum logical history, or concurrent restore-delivery versus backup admission/handoff; those gates remain open under AS-058.
+
 ADR-050 lifetime history, immutable event/origin provenance, future merge/deletion semantics and rebuildable calendar summaries are defined in [Storage and retention](STORAGE-AND-RETENTION.md#lifetime-event-history-and-future-multi-origin-merging). These are design obligations; current preview storage/aggregate/restore limits remain explicit.
