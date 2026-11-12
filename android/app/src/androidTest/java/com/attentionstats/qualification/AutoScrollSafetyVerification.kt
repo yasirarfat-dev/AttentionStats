@@ -127,6 +127,31 @@ internal object AutoScrollSafetyVerification {
                     AutoScrollSession.stop()
                 }
             }
+            // Pending proposal cancellation: a late arrival/deadline cannot revive its old token.
+            // This exercises session fences, not a platform gesture already in flight.
+            for (boundary in listOf("stop", "click", "locked", "service_destroyed")) {
+                main { proposals = 0; AutoScrollSession.configure(true, 1); AutoScrollSession.start() }
+                feed(10, null, "photo")
+                SystemClock.sleep(5_100); feed(10, null, "photo")
+                main {
+                    val pending = AutoScrollSession.revision
+                    expect(proposals == 1 && AutoScrollSession.current(pending))
+                    when (boundary) {
+                        "stop" -> AutoScrollSession.stop()
+                        "click" -> AutoScrollSession.manualInteraction("manual_click")
+                        "locked" -> AutoScrollSession.unavailable("locked")
+                        else -> AutoScrollSession.clear()
+                    }
+                    expect(!AutoScrollSession.current(pending))
+                    AutoScrollSession.expire(pending, SystemClock.elapsedRealtime() + 3_000)
+                    AutoScrollSession.frame(AutoScrollSession.Frame(ReelApp.INSTAGRAM, 1, 11, 1,
+                        SystemClock.elapsedRealtime(), 0.0, true)) { _, _ -> proposals++ }
+                    expect(AutoScrollSession.confirmedTransitions == 0 && proposals == 1)
+                    expect(!AutoScrollSession.current(pending))
+                    if (boundary in listOf("stop", "service_destroyed")) expect(!AutoScrollSession.running)
+                    AutoScrollSession.stop()
+                }
+            }
         } finally {
             main {
                 AutoScrollSession.clear()

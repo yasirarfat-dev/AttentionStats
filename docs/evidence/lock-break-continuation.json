@@ -1,0 +1,74 @@
+{
+  "date": "2026-11-12",
+  "baselineCommit": "c5186ad29816aa83f92c78abbd0dd07d8dd9e4d9",
+  "tasks": ["AS-010", "AS-044", "AS-059", "AS-060"],
+  "status": "experimental",
+  "scope": "Operator-only actual screen-off/keyguard checks, synthetic pending-proposal fences and isolated diary timing/reset integration; product unchanged.",
+  "artifactsSha256": {
+    "preview": "59c6b2dcf5258493624f526dc0e5173f72bb405beafd65d90cacf41a90dc80fe",
+    "test": "d24818d507be9ffaa26a08d37ee520a925b87accce25fac7d5e1341794f043e7"
+  },
+  "physicalLive": {
+    "androidApi": 36,
+    "source": "instagram",
+    "sourceVersion": "455.0.0.51.72",
+    "screenOffWake": {
+      "assertions": 12,
+      "actualHudStart": true,
+      "noninteractiveVerified": true,
+      "oldTokenInvalidated": true,
+      "hudRemoved": true,
+      "runExplicitlyStoppedBeforeWake": true,
+      "wakeState": "keyguard_locked",
+      "credentialsEnteredOrChanged": false,
+      "proposals": 0,
+      "instrumentationCode": -1
+    }
+  },
+  "syntheticPhysical": {
+    "diaryTimingReset": {
+      "assertions": 22,
+      "actualDiaryAndEncryptedStore": true,
+      "syntheticElapsedAndWallClocks": true,
+      "realHistoryOrReminderSettingsChanged": false,
+      "isolatedStoreAndKeyRemoved": true
+    },
+    "autoScrollSafety": 58,
+    "surfaceScheduler": 19,
+    "protectionAttachedControls": 14,
+    "hudBehavior": 27,
+    "instrumentationCode": -1,
+    "sameProductTestPair": true
+  },
+  "host": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "jestTests": 99,
+    "pythonTests": 88,
+    "completionGateChecks": 31,
+    "testApkAssembly": "pass",
+    "documentationPublicArtifactCheck": "pass"
+  },
+  "limitations": [
+    "Screen-off trial starts from an existing playable HUD and stops before wake. Active-run unlock resumption and platform in-flight gesture cancellation remain unqualified.",
+    "The 18 new pending-proposal assertions invoke synthetic session boundaries and count callbacks; they dispatch no platform gesture.",
+    "Diary clocks and signals are synthetic. Real-duration absence, time-triggered source rendering, pause fidelity and full lifecycle remain open.",
+    "Safety output appeared delayed while locked; its explicit 58-check success returned before the app-only stop. Three follow-up invocations refused overlapping instrumentation without actions.",
+    "Two later no-restart invocations hit Android ActiveInstrumentation/null-process command errors after target exit; fresh launches pass the protection/HUD suites.",
+    "Cleanup detects app service selection removal after app-only force-stop. Original app selection/master state is restored after the final restart, with unrelated selections verified unchanged.",
+    "Historical arrival loss is neither reproduced nor repaired; no new source end support, measured resource result, minimum-device or accessibility admission.",
+    "No main merge, product install/change, dependency/schema/version change, signing, upload, Console submission or remote workflow."
+  ],
+  "cleanup": {
+    "originalAccessibilityRestored": true,
+    "ownedTestRemoved": true,
+    "ownedSourceLayoutRemoved": true,
+    "privateBaselineRemoved": true,
+    "backupOff": true,
+    "historyClearedOrReplaced": false,
+    "installedPreviewHashVerified": true,
+    "productUnchanged": true,
+    "debugAppReopened": true
+  }
+}

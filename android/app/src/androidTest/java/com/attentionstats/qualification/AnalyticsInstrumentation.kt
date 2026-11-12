@@ -43,9 +43,13 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var serviceRevocation = false
     private var sourceRevocation = false
     private var autoScrollRestart: String? = null
+    private var autoScrollLock = false
+    private var breakTiming = false
     private var numericAudit: String? = null
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
+        autoScrollLock = arguments?.getString("autoScrollLock") == "true"
+        breakTiming = arguments?.getString("breakTiming") == "true"
         numericAudit = arguments?.getString("numericAudit")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollInterruption = arguments?.getString("autoScrollInterruption") == "true"
         serviceRevocation = arguments?.getString("serviceRevocation") == "true"
@@ -85,6 +89,14 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            if (breakTiming) {
+                result.putString("stream", "PASS: ${BreakTimingVerification.run(this)} isolated diary break timing/reset checks; synthetic clocks, no real history/settings changes")
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (autoScrollLock) {
+                result.putString("stream", "PASS: ${LiveAutoScrollLockVerification.run(this)} actual screen-off/wake safety checks; run stopped before wake, no credentials entered")
+                finish(Activity.RESULT_OK, result); return
+            }
             val restart = autoScrollRestart
             if (restart != null) {
                 result.putString("stream", "PASS: ${LiveAutoScrollRestartVerification.run(this, restart)} process restart $restart checks; operator must pair prepare with app-only force-stop")
