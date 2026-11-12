@@ -112,3 +112,5 @@ The subsequent November 12 real-absence trial passes ten-second retention, reset
 
 
 The November 12 AS-014/AS-018/AS-037 continuation adds a bounded selected-day Insights explorer over existing history, with explicit missing/partial scope and exact hourly alternatives. This is partial C-30/C-36 presentation work, not admission of broader collection, complete provenance/chronology, trends/forecasts or accessibility capability. Unsolicited fixed time equivalents are removed; C-37 remains planned and opt-in.
+
+The follow-on C-30/C-36 app explorer adds name/package search, exact time/open sorting, bounded app pages, per-package daily history and measurement explanation. This does not admit broader source coverage, session chronology, full provenance, forecasts or protection capability. Unknown package/day values stay unavailable; source-level media totals are excluded from package aggregation. Capability status remains experimental.

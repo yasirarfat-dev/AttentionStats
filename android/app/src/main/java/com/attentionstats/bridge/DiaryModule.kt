@@ -21,7 +21,7 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
     private val coordinator get() = ReelsCoordinator.get(context)
     private fun failure(promise: Promise, code: String) = promise.reject(code, "Diary operation unavailable; saved history preserved")
     override fun getSnapshot(days: Double, promise: Promise) {
-        if (days !in listOf(1.0, 7.0, 31.0)) { failure(promise, "INVALID_ARGUMENT"); return }
+        if (days !in listOf(1.0, 7.0, 30.0, 31.0)) { failure(promise, "INVALID_ARGUMENT"); return }
         coordinator.diarySnapshot(days.toInt(), { promise.resolve(com.attentionstats.diary.DiaryPresentationFixture.apply(it)) }, { failure(promise, it) })
     }
     override fun configure(action: String, enabled: Boolean, count: Double, minutes: Double, expectedRevision: String, promise: Promise) {

@@ -56,3 +56,5 @@ ADR-055/AS-050 now adds experimental per-app usage and separate Reels encounter/
 
 
 The November 12 AS-014/AS-037 continuation adds read-only selected-day history inside Insights, without a new tab or serialized history in route parameters. Range/date selection is bounded screen state; refresh/restore resolves removed dates to the latest returned day. Every detailed section follows the selected day, while the leading summary/chart describe the chosen range. Previous/Next controls avoid requiring horizontal dragging.
+
+The follow-on app explorer stays inside Insights with a By day / By app switch. App selection carries only a package key in transient screen state; the snapshot supplies current detail. Search/sort/page survive returning from app detail by its named Back button or Android Back, while range loading resets the app explorer. Selecting a daily app row selects the same civil date in By day. App/page transitions reset the shared scroll position; the keyboard dismisses on app selection. No new route, deep-link mutation or serialized personal history is added.

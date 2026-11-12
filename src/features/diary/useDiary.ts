@@ -8,7 +8,7 @@ import {
   type DiarySnapshot,
 } from '../../platform/diaryStatus';
 
-export function useDiary(days: 1 | 7 | 31 = 1) {
+export function useDiary(days: 1 | 7 | 30 | 31 = 1) {
   const [snapshot, setSnapshot] = useState<DiarySnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

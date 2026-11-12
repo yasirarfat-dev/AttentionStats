@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-12",
+  "tasks": [
+    "AS-014",
+    "AS-018",
+    "AS-037"
+  ],
+  "baselineCommit": "3c418af6b4b19b2cd3df2aec8472c1a2679112ec",
+  "previewSha256": "6e088baf3d9815108a9924fc2dea52034b77ae10b77febd88840d56db8e2ad3b",
+  "productChanges": [
+    "By day / By app exploration within existing Insights",
+    "Transient name/package search and exact time/open/name sorting",
+    "Bounded ten-row app pages with Previous/Next controls",
+    "Per-package seven/30-day recorded time and observed-open subtotals",
+    "Independent daily availability, relative time bars and measurement explanation",
+    "Daily app row links to the matching day overview; named and Android Back",
+    "Last 30 days queries exactly 30 native civil dates; legacy 31-day callers remain supported; all-time remains unavailable"
+  ],
+  "host": {
+    "typecheck": "pass",
+    "lintArchitectureBackupPalette": "pass",
+    "jest": {
+      "suites": 9,
+      "tests": 107,
+      "newDomainTests": 3
+    },
+    "changedSourceFormatting": "pass",
+    "docs": "pass",
+    "diffWhitespace": "pass"
+  },
+  "android": {
+    "assemblePreview": "pass",
+    "lintPreview": "pass",
+    "inPlaceUpdate": true,
+    "bundledNoMetroRequired": true
+  },
+  "liveUi": {
+    "physicalPhoneApi": 36,
+    "installedHashIndependentlyVerified": true,
+    "sevenDayAppHistory": "pass",
+    "thirtyDayAppHistory": "pass",
+    "threeSortSelections": "pass",
+    "unmatchedSearchAndClear": "pass",
+    "appDetail": "pass",
+    "measurementExpandCollapse": "pass",
+    "namedAndAndroidBack": "pass",
+    "monthDailyExpandCollapse": "pass",
+    "appDayLinkMatchesOverviewDate": "pass",
+    "boundedNextPreviousAppPaging": "pass",
+    "backupPreferenceAndAccessibilitySelectionsPreserved": true,
+    "realHistoryPreserved": true,
+    "darkGraphiteAppListLayoutReviewedBeforeFinalRangeRefinement": true
+  },
+  "operatorNotes": [
+    "Initial TypeScript check found React Native's ScrollView instance type differs from the component type; corrected and typecheck passed.",
+    "Early own-UI locator attempts stopped before completing the walkthrough; high-velocity scrolling skipped controls. The local runner uses slower bounded scrolling and selects actionable radio nodes.",
+    "A date-link assertion initially ran before the overview date header was visible; a focused retry scrolled to the header and verified the selected date.",
+    "Private phone trees/settings are not published; the local screenshot and private baseline were removed after review.",
+    "Maintainer range feedback changed Insights from 31 to exactly 30 days; the final preview was rebuilt/linted and installed for a fresh walkthrough."
+  ],
+  "limits": [
+    "No session chronology, complete provenance or per-interval coverage partitions",
+    "No new collection, dependency, schema, consent or protection activation",
+    "No full TalkBack, large-type, RTL, theme matrix, long-history performance or error-injection qualification",
+    "No main merge, release signing, binary publication or remote workflow"
+  ]
+}

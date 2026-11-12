@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { ScrollView, Text, View } from 'react-native';
+import type { ScrollViewInstance } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native-unistyles';
 
@@ -9,12 +10,14 @@ export function Screen({
   title,
   subtitle,
   header = false,
+  scrollRef,
 }: {
   children: ReactNode;
   title?: string;
   subtitle?: string;
   /** True when a navigation header already covers the status bar. */
   header?: boolean;
+  scrollRef?: Ref<ScrollViewInstance>;
 }) {
   const insets = useSafeAreaInsets();
   return (
@@ -25,6 +28,7 @@ export function Screen({
       ]}
     >
       <ScrollView
+        ref={scrollRef}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         contentContainerStyle={[

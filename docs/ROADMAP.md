@@ -13,7 +13,7 @@ During testing, address reported correctness/privacy/data-loss failures first, q
 
 ### Product-delivery direction (2026-11-12)
 
-The maintainer explicitly prioritizes finishing useful product features and improving presentation after several qualification-only batches. Continue with reviewable feature increments: selected-day/app history and accessible presentation (AS-014/AS-018/AS-037), chosen focus/richer protection (AS-015–AS-017), then outstanding supported-source/detail and data-ownership work. Pair implementation with bounded checks necessary for that change. Existing correctness/privacy/data-loss gates remain; repeated harness expansion is not itself visible feature completion. The selected-day Insights explorer is the first increment under this direction. No promise of universal source/platform support follows.
+The maintainer explicitly prioritizes finishing useful product features and improving presentation after several qualification-only batches. Continue with reviewable feature increments: selected-day/app history and accessible presentation (AS-014/AS-018/AS-037), chosen focus/richer protection (AS-015–AS-017), then outstanding supported-source/detail and data-ownership work. Pair implementation with bounded checks necessary for that change. Existing correctness/privacy/data-loss gates remain; repeated harness expansion is not itself visible feature completion. Bounded selected-day and searchable app-history explorers now exist; voluntary focus/richer protection is next, with full chronology/provenance still open. No promise of universal source/platform support follows.
 
 ## Stage 0: documentation foundation
 
