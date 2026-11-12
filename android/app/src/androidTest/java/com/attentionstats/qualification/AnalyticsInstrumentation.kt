@@ -41,12 +41,16 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var scheduleDraft = false
     private var autoScrollInterruption = false
     private var serviceRevocation = false
+    private var sourceRevocation = false
+    private var autoScrollRestart: String? = null
     private var numericAudit: String? = null
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
         numericAudit = arguments?.getString("numericAudit")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollInterruption = arguments?.getString("autoScrollInterruption") == "true"
         serviceRevocation = arguments?.getString("serviceRevocation") == "true"
+        sourceRevocation = arguments?.getString("sourceRevocation") == "true"
+        autoScrollRestart = arguments?.getString("autoScrollRestart")?.takeIf { it in setOf("prepare", "verify") }
         surfaceLifecycle = arguments?.getString("surfaceLifecycle") == "true"
         surfaceSampling = arguments?.getString("surfaceSampling") == "true"
         beta = arguments?.getString("beta") == "true"
@@ -81,6 +85,15 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            val restart = autoScrollRestart
+            if (restart != null) {
+                result.putString("stream", "PASS: ${LiveAutoScrollRestartVerification.run(this, restart)} process restart $restart checks; operator must pair prepare with app-only force-stop")
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (sourceRevocation) {
+                result.putString("stream", "PASS: ${LiveSourceRevocationVerification.run(this)} actual source withdrawal/restoration checks; no source gestures")
+                finish(Activity.RESULT_OK, result); return
+            }
             if (serviceRevocation) {
                 result.putString("stream", "PASS: ${LiveServiceRevocationVerification.run(this)} actual service revocation/reconnection checks; no source gestures")
                 finish(Activity.RESULT_OK, result); return

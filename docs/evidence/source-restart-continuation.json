@@ -1,0 +1,76 @@
+{
+  "date": "2026-11-12",
+  "baselineCommit": "c1155b9",
+  "tasks": ["AS-010", "AS-044", "AS-059"],
+  "status": "experimental",
+  "scope": "Operator-only source withdrawal and paired force-stop/new-process qualification; product unchanged.",
+  "artifactsSha256": {
+    "preview": "59c6b2dcf5258493624f526dc0e5173f72bb405beafd65d90cacf41a90dc80fe",
+    "test": "2f9ce2d2083f9828c9de5f1a82b7b861307b1a7c66ab17b0260a43746c58df65"
+  },
+  "physical": {
+    "androidApi": 36,
+    "source": "instagram",
+    "sourceVersion": "455.0.0.51.72",
+    "sourceWithdrawal": {
+      "cycles": 2,
+      "assertions": 26,
+      "actualHudStart": true,
+      "epochAndTokenInvalidated": true,
+      "hudRemoved": true,
+      "otherSourceChoicesPreserved": true,
+      "originalSourceChoicesRestored": true,
+      "runStoppedBeforeRegrant": true,
+      "sourceGestures": 0,
+      "instrumentationCode": -1
+    },
+    "forceStop": {
+      "actualHudActiveBeforeStop": true,
+      "prepareAssertions": 3,
+      "oldProcessDisappearanceVerified": true,
+      "differentProcessVerifiedDuringVerification": true,
+      "verifyAssertions": 6,
+      "ephemeralChoiceConsentAndRunCleared": true,
+      "automaticResumption": false,
+      "instrumentationCode": -1,
+      "preparationTermination": "Expected app-only force-stop of owned instrumentation during fixed readiness window."
+    }
+  },
+  "syntheticPhysical": {
+    "autoScrollSafety": 40,
+    "surfaceScheduler": 19,
+    "hudBehavior": 27,
+    "instrumentationCode": -1,
+    "sameProductTestPair": true
+  },
+  "host": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "jestTests": 99,
+    "pythonTests": 88,
+    "completionGateChecks": 31,
+    "testApkAssembly": "pass"
+  },
+  "limitations": [
+    "Historical arrival loss is neither reproduced nor repaired; no end-scrolling trial is performed.",
+    "Three initial source trials stop before Start on unavailable playback. One fixed Reels-tab tap and two operator setup swipes precede acceptance.",
+    "Initial paired runner checks PID after instrumentation exits; later setup stops on a missing selected app service after force-stop. Final pair checks PID during verification.",
+    "Source regrant follows explicit Stop; active-run resumption and in-flight cancellation remain unqualified.",
+    "Force-stop is distinct from spontaneous native/JS death, OEM kill, reboot and lock; history continuity is not quantified.",
+    "Source withdrawal/restoration retains genuine consent and coverage records.",
+    "No additional source support, accessibility approval, measured resource result or production readiness.",
+    "No main merge, dependency/schema/version change, product installation, signing, upload or remote workflow."
+  ],
+  "cleanup": {
+    "originalAccessibilityRestored": true,
+    "ownedTestRemoved": true,
+    "ownedSourceLayoutRemoved": true,
+    "privateBaselineRemoved": true,
+    "backupOff": true,
+    "historyClearedOrReplaced": false,
+    "installedPreviewHashVerified": true,
+    "productUnchanged": true,
+    "debugAppReopened": true
+  }
+}
