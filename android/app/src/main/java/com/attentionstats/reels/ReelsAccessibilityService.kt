@@ -508,9 +508,20 @@ class ReelsAccessibilityService : AccessibilityService() {
             hud?.setAutoScrollControl(true, AutoScrollSession.running, false)
             return
         }
-        if (!displayEligible || intervention != null || !coordinator.overlayEnabled || state == null || active != state.app ||
-            visitHudVisibility.hiddenFor(state.app) || state.epoch != coordinator.epoch() || !coordinator.allowed(state.app) ||
-            !interactive()) {
+        val unavailable = when {
+            !displayEligible -> "hud_display_ineligible"
+            intervention != null -> "hud_intervention"
+            !coordinator.overlayEnabled -> "hud_disabled"
+            state == null -> "hud_snapshot_missing"
+            active != state.app -> "hud_source_mismatch"
+            visitHudVisibility.hiddenFor(state.app) -> "hud_hidden"
+            state.epoch != coordinator.epoch() -> "hud_epoch_mismatch"
+            !coordinator.allowed(state.app) -> "hud_consent_unavailable"
+            !interactive() -> "hud_not_interactive"
+            else -> null
+        }
+        if (unavailable != null) {
+            if (AutoScrollSession.running) AutoScrollSession.onDispatchDiagnostic?.invoke(unavailable)
             if (AutoScrollSession.running && intervention == null) {
                 if (transientAcquisition) acquisitionGap("viewer_unavailable")
                 else AutoScrollSession.suspendActions("viewer_unavailable")
@@ -519,7 +530,7 @@ class ReelsAccessibilityService : AccessibilityService() {
         }
         ensureHud()
         hud?.setPausedState(false)
-        hud?.update(state)
+        hud?.update(checkNotNull(state))
         hud?.setAutoScrollControl(true, AutoScrollSession.running, AutoScrollSession.canStart())
     }
 

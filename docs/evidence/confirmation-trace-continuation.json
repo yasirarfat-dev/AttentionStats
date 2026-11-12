@@ -1,0 +1,95 @@
+{
+  "date": "2026-11-12",
+  "tasks": [
+    "AS-044",
+    "AS-059"
+  ],
+  "status": "experimental",
+  "baselineCommit": "595deefd6ad22c0b359b8b21ed3289c4e5fc6a3f",
+  "scope": "Opt-in fixed-code pending-reset/HUD tracing only; no dispatch or renderer eligibility change.",
+  "artifactsSha256": {
+    "preview": "59c6b2dcf5258493624f526dc0e5173f72bb405beafd65d90cacf41a90dc80fe",
+    "test": "0b99283a6af1d32f6069738b835c042b4a78be7f5235e5a72fd2a0663f060b48"
+  },
+  "versions": {
+    "instagram": "455.0.0.51.72",
+    "tiktok": "47.7.3"
+  },
+  "host": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "completionGate": 31,
+    "documentationAndPublicArtifacts": "pass"
+  },
+  "android": {
+    "previewAssembly": "pass",
+    "testAssembly": "pass",
+    "previewLint": {
+      "errors": 0,
+      "warnings": 67
+    }
+  },
+  "live": {
+    "instagram": {
+      "endArrivalStopTrials": 3,
+      "setupSwipes": [
+        1,
+        1,
+        2
+      ],
+      "eachValidationAcceptedCompletedArrival": {
+        "validationPassed": 1,
+        "gestureAccepted": 1,
+        "gestureCompleted": 1,
+        "arrivalConfirmed": 1
+      },
+      "nextPlaybackAvailable": [
+        true,
+        false,
+        true
+      ],
+      "actualCompactControls": 10,
+      "activeShadeAssertions": 30,
+      "instrumentationCode": -1
+    },
+    "tiktok": {
+      "endArrivalStopTrials": 1,
+      "setupSwipes": 1,
+      "validationPassed": 1,
+      "gestureAccepted": 1,
+      "gestureCompleted": 1,
+      "arrivalConfirmed": 1,
+      "settledNextPlaybackAvailable": true,
+      "instrumentationCode": -1
+    }
+  },
+  "limitations": [
+    "Earlier confirmation-loss failures remain unexplained; these passes are not a reproduced fix.",
+    "Second Instagram arrival lacks playback and correctly suspends further dispatch.",
+    "Shade trials stop before source reacquisition; no lock/revocation/process-restart acceptance.",
+    "Facebook/YouTube/Snapchat end-signal gates remain open; no new source support inferred.",
+    "No arbitrary video-duration fallback, provider-control reveal, grant or upload.",
+    "No measured energy/battery result or broader accessibility acceptance."
+  ],
+  "syntheticPhysical": {
+    "autoScrollSafety": 40,
+    "surfaceScheduler": 19,
+    "hudBehavior": 27,
+    "instrumentationCode": -1,
+    "scope": "All run on the same retained product/test APK pair as the live trials; no real source acceptance from synthetic checks."
+  },
+  "cleanup": {
+    "ownedTestRemoved": true,
+    "originalAccessibilityComponentSetRestored": true,
+    "unrelatedAccessibilitySelectionsPreserved": true,
+    "originalAccessibilityMasterRestored": true,
+    "backupOff": true,
+    "historyClearedOrReplaced": false,
+    "ephemeralRunClearedByDebugProcessRestart": true,
+    "installedPreviewHashVerified": true,
+    "debugAppReopened": true,
+    "previewSha256": "59c6b2dcf5258493624f526dc0e5173f72bb405beafd65d90cacf41a90dc80fe",
+    "testSha256": "0b99283a6af1d32f6069738b835c042b4a78be7f5235e5a72fd2a0663f060b48",
+    "privateBaselineAndOwnCapturesRemoved": true
+  }
+}

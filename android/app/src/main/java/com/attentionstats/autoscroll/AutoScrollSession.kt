@@ -51,6 +51,7 @@ internal object AutoScrollSession {
     }
     fun start(): Boolean {
         if (!enabled) return false
+        if (waitingUntil > 0) onDispatchDiagnostic?.invoke("pending_reset_start")
         gate.reset(); target = null; waitingUntil = 0; scrollSettlingUntil = 0; stillSince = 0; running = true; revision++
         attempts = 0; confirmedTransitions = 0
         latest?.takeIf(::ready)?.let {
@@ -62,11 +63,13 @@ internal object AutoScrollSession {
     }
     /** Suspend dispatch and invalidate queued gestures without changing the user's On choice. */
     fun suspendActions(why: String) {
+        if (waitingUntil > 0) onDispatchDiagnostic?.invoke("pending_suspend_$why")
         val changed = target != null || waitingUntil != 0L || reason != why
         target = null; waitingUntil = 0; scrollSettlingUntil = 0; stillSince = 0; gate.reset()
         if (changed) { revision++; reason = why; onChanged() }
     }
     fun stop(why: String = "stopped") {
+        if (waitingUntil > 0) onDispatchDiagnostic?.invoke("pending_stop_$why")
         val changed = running || reason != why
         running = false; target = null; waitingUntil = 0; scrollSettlingUntil = 0; stillSince = 0; gate.reset(); revision++; reason = why
         if (changed) onChanged()
@@ -130,6 +133,7 @@ internal object AutoScrollSession {
             }
             if (key != null && key != previous) {
                 confirmedTransitions++
+                onDispatchDiagnostic?.invoke("arrival_confirmed")
                 if (!ready(value)) { suspendActions("playback_unavailable"); return }
                 target = key; waitingUntil = 0; scrollSettlingUntil = value.atMs + 750
                 // The page transition and readiness to scroll again are separate facts.
