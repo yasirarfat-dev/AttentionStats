@@ -121,5 +121,12 @@
     "previewSha256": "5c3e25486fb3ed89dc5ca8ceda7dd3d1531bb7c323820636644329f2243e0fd9",
     "testSha256": "3a25b6f6ccad43bf0c44a6baee128533bd166b82afa0776aa82aa5c400f58115",
     "privateBaselineAndOwnCapturesRemoved": true
+  },
+  "reviewedImplementationCommit": "94a6a3b42fba5d5ccd79d342cffff0d1aa9dda39",
+  "publication": {
+    "branch": "develop",
+    "remoteHashVerified": true,
+    "mainUnchanged": true,
+    "remoteWorkflowRun": false
   }
 }
