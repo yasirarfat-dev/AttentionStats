@@ -1,0 +1,125 @@
+{
+  "recordedDate": "2026-11-12",
+  "branch": "develop",
+  "sourceBase": "8d400dc192d0aa90b23f026e6f0a608918cc3860",
+  "tasks": [
+    "AS-044",
+    "AS-059"
+  ],
+  "status": "experimental",
+  "environment": {
+    "api": 36,
+    "manufacturer": "samsung",
+    "sources": {
+      "tiktok": "47.7.3",
+      "instagram": "455.0.0.51.72",
+      "facebook": "586.0.0.52.53",
+      "youtube": "21.40.165",
+      "snapchat": "14.31.0.56"
+    }
+  },
+  "finalArtifactsSha256": {
+    "preview": "5c3e25486fb3ed89dc5ca8ceda7dd3d1531bb7c323820636644329f2243e0fd9",
+    "test": "3a25b6f6ccad43bf0c44a6baee128533bd166b82afa0776aa82aa5c400f58115"
+  },
+  "host": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "jest": 99,
+    "pythonUnit": 88,
+    "completionGate": 31,
+    "scope": "Jest/Python/completion baseline precedes the compact UI correction; types/lint/format and architecture pass for subsequent changes."
+  },
+  "android": {
+    "previewAssembly": "pass",
+    "testAssembly": "pass",
+    "previewLint": {
+      "errors": 0,
+      "warnings": 67
+    }
+  },
+  "compactCandidate": {
+    "previewSha256": "ecf53cb3bab03b17e00effdc4034910908432559c6055f03c94b273e9acd5f7a",
+    "testSha256ForLiveControlsAndInstagram": "6d664c9d4ab38ae5292472e0f65f9359f772cd866f45c6a8f12d568b29027494",
+    "hudBehaviorChecks": 27,
+    "actualFacebookControls": 10,
+    "activeInstagramShadeChecks": 30,
+    "compactHeightDp": 64,
+    "visibleWaitingLabel": false,
+    "ownAttachedViewVisuallyReviewed": true,
+    "sourceScreenshotTaken": false,
+    "instagramEndTrial": "pass: validation, gesture accepted/completed, distinct next item, HUD Stop",
+    "facebookAudit": {
+      "viewerSamples": 50,
+      "numericOrFixedPlayerTokenMatches": 0,
+      "sourceGestures": 0,
+      "endAccepted": false
+    },
+    "tiktokEndTrial": "failed after validation and completed gesture: context_changed; no confirmed arrival"
+  },
+  "frameDiagnosticCandidate": {
+    "previewSha256": "9d76e982cf74a9032b66f7273506557cc6aacf34efd0db13cd5e8325a45d8375",
+    "testSha256": "6d664c9d4ab38ae5292472e0f65f9359f772cd866f45c6a8f12d568b29027494",
+    "tiktokEndTrial": "one scoped pass",
+    "followingLongItem": "150-second bound before end; zero proposals; no acceptance"
+  },
+  "cadenceCandidate": {
+    "previewSha256": "9f70ab19bdb03943026f0540a3d50e6abd17642797b2f57baed121c1ec3a56f5",
+    "testSha256": "43280826a483a2e3f6d375a11ec70f64ed4ab3d8a604a3396271eb58c2f4810c",
+    "schedulerAssertions": 19,
+    "tiktokTrial": "scroll interruption before completion; 150-second bound without proposal; no acceptance",
+    "instagramTrial": "gesture accepted/completed, then confirmation lost into waiting_for_playback"
+  },
+  "finalProductSynthetic": {
+    "autoScrollSafety": 40,
+    "surfaceScheduler": 19,
+    "hudBehavior": 27,
+    "instrumentationCode": -1,
+    "runnerSha256": null,
+    "scope": "Runs precede the final test-only live-frame retry/fallback change; their suite bodies and product are unchanged. Earlier runner digest was not retained separately; do not claim these ran against the final test APK bytes.",
+    "suiteSourcesSha256": {
+      "AutoScrollSafetyVerification.kt": "affefd97c58d862e65f8fcbeb949f15d0305c0507f5ec4b5977e863cc3b71607",
+      "SurfaceSamplingVerification.kt": "17963dbcb9b1421e9e5a3e792d51e275ef5669644049d5e3e201ab491278bea0",
+      "HudBehaviorVerification.kt": "3485c455161bf293074a1fbf75242495cb9097829ef16d190a438fa55d81a210"
+    }
+  },
+  "finalProductLive": {
+    "instagramFirstAttempt": "stopped: source window unavailable; no acceptance",
+    "instagramFinalRunnerRetry": {
+      "result": "failed: completed gesture, then waiting_for_playback without confirmed arrival",
+      "validationPassed": 1,
+      "gestureAccepted": 1,
+      "gestureCompleted": 1,
+      "arrivalAcquisitionGapReported": 0,
+      "instrumentationCode": 0,
+      "endAccepted": false
+    },
+    "tiktokEndAccepted": false,
+    "scope": "No final-product all-source end acceptance; live hard-interruption/compact checks on the earlier compact candidate are not relabeled as fresh final-product trials."
+  },
+  "limitations": [
+    "Source reliability is unfinished; historical rejection causes are not established.",
+    "Transient-acquisition tolerance repairs an inspected contract gap but did not resolve the final Instagram trial.",
+    "Final follow-up interrupted by maintainer pack-up; no additional phone trials run afterward.",
+    "Facebook tested viewer exposes no qualified end signal; YouTube/Snapchat support remains unqualified.",
+    "No arbitrary duration fallback, hidden production progress, control-reveal taps or new grant added.",
+    "Redundant acquisition wakeups removed; battery/energy savings are not measured.",
+    "Compact 32dp rows are the ADR-081 overlay exception; broad touch/large-text/TalkBack qualification remains open.",
+    "Initial diagnostic TikTok pass has no separately retained artifact hash and is not final-artifact acceptance."
+  ],
+  "cleanup": {
+    "ownedTestRemoved": true,
+    "originalAccessibilityComponentSetRestored": true,
+    "unrelatedAccessibilitySelectionsPreserved": true,
+    "originalAccessibilityMasterRestored": true,
+    "backupOff": true,
+    "historyClearedOrReplaced": false,
+    "ephemeralRunClearedByDebugProcessRestart": true,
+    "installedPreviewHashVerified": true,
+    "debugAppReopened": true,
+    "previewSha256": "5c3e25486fb3ed89dc5ca8ceda7dd3d1531bb7c323820636644329f2243e0fd9",
+    "testSha256": "3a25b6f6ccad43bf0c44a6baee128533bd166b82afa0776aa82aa5c400f58115",
+    "privateBaselineAndOwnCapturesRemoved": true
+  }
+}

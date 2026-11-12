@@ -24,3 +24,4 @@ Entries:
 
 - [2026-11-10 — parallel reliability repairs and isolated safety checks](2026-11-10.md).
 - [2026-11-11 — reminder backpressure, key-loss recovery and backup admission](2026-11-11.md).
+- [2026-11-12 — compact active HUD and dispatch qualification](2026-11-12.md).

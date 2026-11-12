@@ -75,7 +75,7 @@ The [privacy promise](PRIVACY.md) means no developer recipient, local history by
 
 Use one clear heading, one primary next step per section, labelled groups and predictable back/close actions. Prefer recognition over recall: rule cards show target, trigger and response; review shows exceptions and exits together. Preserve drafts after recoverable errors.
 
-Minimum 48dp targets follow [Android accessibility guidance](https://developer.android.com/guide/topics/ui/accessibility/views/apps-views?hl=en). Apply text/non-text contrast, focus and status semantics using [WCAG 2.2](https://www.w3.org/TR/WCAG22/) as a reference, without claiming native conformance from browser scans. Honor system reduced motion plus a stronger in-app override. [W3C motion guidance](https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html).
+Minimum 48dp targets follow [Android accessibility guidance](https://developer.android.com/guide/topics/ui/accessibility/views/apps-views?hl=en). ADR-081 records the maintainer-requested compact active overlay exception (adjacent 32dp rows); expanded/off/paused controls retain 48dp, and broader touch/large-text/TalkBack qualification remains open. Apply text/non-text contrast, focus and status semantics using [WCAG 2.2](https://www.w3.org/TR/WCAG22/) as a reference, without claiming native conformance from browser scans. Honor system reduced motion plus a stronger in-app override. [W3C motion guidance](https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html).
 
 ## Evaluate what helps
 

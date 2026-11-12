@@ -49,6 +49,37 @@ internal object SurfaceSamplingVerification {
             await(expedited)
             main { wake.close() }
 
+            // Rendering publications must not turn a 200ms poll into a self-triggered hot loop.
+            val firstPublication = CountDownLatch(1)
+            val regularPoll = CountDownLatch(1)
+            val publicationReads = AtomicInteger()
+            val publicationEpoch = java.util.concurrent.atomic.AtomicLong(1)
+            val publicationRevision = java.util.concurrent.atomic.AtomicLong(1)
+            lateinit var publications: SurfaceSamplingLoop
+            publications = loop({
+                val count = publicationReads.incrementAndGet()
+                publications.configurationChanged(publicationEpoch.get(), publicationRevision.get())
+                if (count == 1) firstPublication.countDown() else regularPoll.countDown()
+                if (count == 1) 2_000L else null
+            })
+            main { publications.configurationChanged(1, 1) }
+            await(firstPublication)
+            main { repeat(50) { publications.configurationChanged(1, 1) } }
+            SystemClock.sleep(70)
+            expect(publicationReads.get() == 1)
+            await(regularPoll)
+            SystemClock.sleep(70)
+            expect(publicationReads.get() == 2)
+            main { publicationRevision.set(2); publications.configurationChanged(1, 2) }
+            val revisionUntil = SystemClock.elapsedRealtime() + 2_000
+            while (publicationReads.get() < 3 && SystemClock.elapsedRealtime() < revisionUntil) SystemClock.sleep(10)
+            expect(publicationReads.get() == 3)
+            main { publicationEpoch.set(2); publications.configurationChanged(2, 2) }
+            val epochUntil = SystemClock.elapsedRealtime() + 2_000
+            while (publicationReads.get() < 4 && SystemClock.elapsedRealtime() < epochUntil) SystemClock.sleep(10)
+            expect(publicationReads.get() == 4)
+            main { publications.close() }
+
             // Burst events during a blocked read coalesce into one following read, never overlap.
             val entered = CountDownLatch(1)
             val release = CountDownLatch(1)

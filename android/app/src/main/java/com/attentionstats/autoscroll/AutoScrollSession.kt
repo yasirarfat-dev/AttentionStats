@@ -35,6 +35,8 @@ internal object AutoScrollSession {
     @Volatile var confirmedTransitions = 0
         private set
     var onChanged: () -> Unit = {}
+    /** Operator test hook: fixed stage codes only, never item identity or source content. */
+    var onDispatchDiagnostic: ((String) -> Unit)? = null
 
     /** Source support is evidence-dependent; numeric playback or an explicit photo is required. */
     @Suppress("UNUSED_PARAMETER")
@@ -71,6 +73,16 @@ internal object AutoScrollSession {
     }
     fun clear() { stop("off"); enabled = false; noticeAccepted = false; latest = null; onChanged() }
     fun unavailable(reason: String) { latest = null; if (running) suspendActions(reason) }
+    /** Missing transition data cannot confirm arrival, but need not cancel our already sent swipe. */
+    fun transientUnavailable(why: String, app: ReelApp, epoch: Long) {
+        latest = null
+        if (enabled && running && target?.app == app.key && target?.epoch == epoch &&
+            waitingUntil > 0 && SystemClock.elapsedRealtime() < waitingUntil) {
+            onDispatchDiagnostic?.invoke("arrival_acquisition_gap")
+            return
+        }
+        if (running) suspendActions(why)
+    }
     fun expire(token: Long, now: Long) {
         if (current(token) && waitingUntil > 0 && now >= waitingUntil) suspendActions("next_page_unconfirmed")
     }
@@ -100,9 +112,19 @@ internal object AutoScrollSession {
             return
         }
         if (!enabled || !value.eligible || !fresh(value) || value.app.key != previous.app ||
-            value.window != previous.window || value.epoch != previous.epoch) { suspendActions("context_changed"); return }
+            value.window != previous.window || value.epoch != previous.epoch) {
+            onDispatchDiagnostic?.invoke(when {
+                !enabled -> "frame_disabled"
+                !value.eligible -> "frame_ineligible"
+                !fresh(value) -> "frame_stale"
+                value.app.key != previous.app -> "frame_source_changed"
+                value.window != previous.window -> "frame_window_changed"
+                else -> "frame_epoch_changed"
+            })
+            suspendActions("context_changed"); return
+        }
         if (waitingUntil > 0) {
-            if (value.atMs >= waitingUntil) { suspendActions("next_page_unconfirmed"); return }
+            if (value.atMs >= waitingUntil || SystemClock.elapsedRealtime() >= waitingUntil) { suspendActions("next_page_unconfirmed"); return }
             if (value.position != null && (!value.position.isFinite() || value.position !in 0.0..1.0)) {
                 suspendActions("playback_unavailable"); return
             }

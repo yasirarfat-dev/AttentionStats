@@ -39,8 +39,12 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var surfaceLifecycle = false
     private var surfaceSampling = false
     private var scheduleDraft = false
+    private var autoScrollInterruption = false
+    private var numericAudit: String? = null
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
+        numericAudit = arguments?.getString("numericAudit")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
+        autoScrollInterruption = arguments?.getString("autoScrollInterruption") == "true"
         surfaceLifecycle = arguments?.getString("surfaceLifecycle") == "true"
         surfaceSampling = arguments?.getString("surfaceSampling") == "true"
         beta = arguments?.getString("beta") == "true"
@@ -75,6 +79,15 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            val audit = numericAudit
+            if (audit != null) {
+                result.putString("stream", NumericPlaybackAudit.run(this, audit))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (autoScrollInterruption) {
+                result.putString("stream", "PASS: ${LiveAutoScrollInterruptionVerification.run(this)} actual active-run shade interruption checks; no source gestures")
+                finish(Activity.RESULT_OK, result); return
+            }
             if (surfaceLifecycle) {
                 result.putString("stream", "PASS: ${LiveSurfaceLifecycleVerification.run(this)} actual source/HUD shade-return checks; no source gestures")
                 finish(Activity.RESULT_OK, result); return

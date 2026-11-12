@@ -61,6 +61,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
     private val main = Handler(Looper.getMainLooper())
     private var store: HistoryStore? = null
     private val epoch = AtomicLong()
+    private val acquisitionSettings = AtomicLong()
     private val listeners = CopyOnWriteArraySet<() -> Unit>()
     private val trackers = mutableMapOf<ReelApp, EncounterTracker>()
     private val visits = mutableMapOf<ReelApp, String>()
@@ -115,6 +116,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
     fun addListener(listener: () -> Unit) { listeners.add(listener) }
     fun removeListener(listener: () -> Unit) { listeners.remove(listener) }
     fun epoch(): Long = epoch.get()
+    fun acquisitionSettingsRevision(): Long = acquisitionSettings.get()
     fun allowed(app: ReelApp): Boolean = health == "ready" && app.sourceId in currentNotices &&
         configuration[app.sourceId]?.let { it.enabled && !it.paused } == true
     /** Consented and switched on, but paused by the person (HUD shows a resume pill). */
@@ -189,6 +191,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
         overlayEnabled = display.enabled
         showCounterIcons = display.showIcons
         allAppsToday = display.allAppsToday
+        acquisitionSettings.incrementAndGet()
     }
 
     private fun revision(generation: String, value: Long) = "$generation:$value"
@@ -281,6 +284,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
             catch (_: Exception) { false }
         if (!valid) { failure("INVALID_ARGUMENT"); return@enqueue }
         if (!schedules.save(history, document, expected)) { failure("REVISION_CONFLICT"); return@enqueue }
+        acquisitionSettings.incrementAndGet()
         publish(); success()
     }
 
@@ -298,6 +302,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
             }
             if (action.startsWith("block.")) ReelApp.byKey(action.removePrefix("block."))?.let { allowances.remove(it) }
             if (action == "playback") { playback.clear(); lastPlayback.clear() }
+            acquisitionSettings.incrementAndGet()
             publish()
             success(diary.snapshot(history, 1, blockingAvailable = ::blockingAvailable))
         }

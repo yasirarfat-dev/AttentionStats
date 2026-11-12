@@ -48,8 +48,15 @@ internal object HudBehaviorVerification {
                     control.performClick()
                     expect(toggles == 1 && AutoScrollSession.running)
                     expect(control.text == "Autoscroll" && control.isSelected && control.compoundDrawablesRelative[2] != null && control.visibility == View.VISIBLE)
-                    hud.getChildAt(0).performClick()
                     expect(!hud.expanded && control.visibility == View.VISIBLE && toggles == 1)
+                    expect(texts(hud).none { it.text == "Waiting for playback progress" })
+                    hud.update(ReelsCoordinator.OverlaySnapshot(ReelApp.FACEBOOK, 7, 12, 1))
+                    val width = View.MeasureSpec.makeMeasureSpec(1_000, View.MeasureSpec.AT_MOST)
+                    hud.measure(width, View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+                    hud.layout(0, 0, hud.measuredWidth, hud.measuredHeight)
+                    val compactHeader = hud.getChildAt(0)
+                    expect(control.top == compactHeader.bottom)
+                    expect(hud.measuredHeight <= (64 * hud.resources.displayMetrics.density).toInt() + 1)
                     val started = AutoScrollSession.revision
                     expect(!AutoScrollSession.current(started)) // On choice without a qualified frame cannot dispatch.
                     var dispatches = 0

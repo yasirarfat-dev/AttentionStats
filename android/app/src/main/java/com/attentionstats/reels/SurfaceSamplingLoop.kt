@@ -16,6 +16,7 @@ internal class SurfaceSamplingLoop(
     @Volatile private var closed = false
     private var scanning = false
     private var requestedAt: Long? = null
+    private var configuration: Pair<Long, Long>? = null
     private val tick = Runnable {
         requestedAt = null
         scanning = true
@@ -39,6 +40,16 @@ internal class SurfaceSamplingLoop(
         if (requestedAt?.let { it <= deadline } == true) return
         requestedAt = deadline
         arm()
+    }
+
+    /** Observation publications repaint the HUD; only changed settings/epochs wake acquisition. */
+    fun configurationChanged(epoch: Long, revision: Long) {
+        if (closed) return
+        if (Looper.myLooper() != main.looper) { main.post { configurationChanged(epoch, revision) }; return }
+        val next = epoch to revision
+        if (configuration == next) return
+        configuration = next
+        request(0)
     }
 
     private fun arm() {

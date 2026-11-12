@@ -61,7 +61,15 @@ internal object AutoScrollSafetyVerification {
             for (step in 1..10) { SystemClock.sleep(250); feed(1, step / 10.0) }
             SystemClock.sleep(250); feed(1, 0.0)
             main { expect(proposals == 1) }
+            main {
+                val pending = AutoScrollSession.revision
+                AutoScrollSession.transientUnavailable("synthetic_missing_root", ReelApp.INSTAGRAM, 1)
+                expect(AutoScrollSession.current(pending))
+                expect(AutoScrollSession.reason == "advancing")
+                expect(!AutoScrollSession.canStart())
+            }
             feed(2, null) // A new viewer with no numeric progress is not known to be a photo.
+            main { expect(AutoScrollSession.confirmedTransitions == 1) }
             SystemClock.sleep(5_100); feed(2, null)
             main { expect(proposals == 1) } // Missing video progress must never become a five-second timer.
             main { AutoScrollSession.stop(); expect(!AutoScrollSession.running) }
@@ -78,6 +86,14 @@ internal object AutoScrollSafetyVerification {
             main { expect(proposals == 1) }
             var token = 0L
             main { token = AutoScrollSession.revision; expect(AutoScrollSession.current(token)) }
+            main {
+                AutoScrollSession.transientUnavailable("synthetic_incomplete_layout", ReelApp.INSTAGRAM, 1)
+                expect(AutoScrollSession.current(token))
+                AutoScrollSession.expire(token, SystemClock.elapsedRealtime() + 2_500)
+                expect(!AutoScrollSession.current(token))
+                expect(AutoScrollSession.reason == "next_page_unconfirmed")
+                expect(AutoScrollSession.running)
+            }
             feed(4, null, "photo")
             SystemClock.sleep(5_100); feed(4, null, "video")
             main { expect(proposals == 1) } // A lost/reclassified photo cannot skip a video.
@@ -97,6 +113,20 @@ internal object AutoScrollSafetyVerification {
             main { AutoScrollSession.stop() }
             SystemClock.sleep(3_000); feed(5, null, "photo")
             main { expect(proposals == 0) }
+            // Acquisition gaps must never carry confirmation across a source or privacy epoch.
+            for ((app, epoch) in listOf(ReelApp.TIKTOK to 1L, ReelApp.INSTAGRAM to 2L)) {
+                main { AutoScrollSession.configure(true, 1); AutoScrollSession.start() }
+                feed(6, null, "photo")
+                SystemClock.sleep(5_100); feed(6, null, "photo")
+                main {
+                    val pending = AutoScrollSession.revision
+                    expect(AutoScrollSession.current(pending))
+                    AutoScrollSession.transientUnavailable("synthetic_changed_context", app, epoch)
+                    expect(!AutoScrollSession.current(pending))
+                    expect(AutoScrollSession.running)
+                    AutoScrollSession.stop()
+                }
+            }
         } finally {
             main {
                 AutoScrollSession.clear()

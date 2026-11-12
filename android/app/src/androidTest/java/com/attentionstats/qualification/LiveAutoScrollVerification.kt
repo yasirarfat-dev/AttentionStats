@@ -44,9 +44,7 @@ internal object LiveAutoScrollVerification {
                 original.getInt("reminderMinutes"), revision, success, failure) }
         }
         fun frame(): org.attentionstats.detection.AdapterFrame {
-            for (window in automation.windows) {
-                if (window.type != AccessibilityWindowInfo.TYPE_APPLICATION || !window.isFocused) continue
-                val root = window.root ?: continue
+            fun read(root: android.view.accessibility.AccessibilityNodeInfo): org.attentionstats.detection.AdapterFrame {
                 try {
                     check(app.owns(root.packageName?.toString())) { "selected source left foreground" }
                     val snapshot = SnapshotReader.read(root, app.packages)
@@ -54,6 +52,20 @@ internal object LiveAutoScrollVerification {
                     return AdapterRegistry.of(app).read(snapshot)
                 } finally { SnapshotReader.recycle(root) }
             }
+            val until = SystemClock.elapsedRealtime() + 3_000
+            do {
+                for (window in automation.windows) {
+                    if (window.type != AccessibilityWindowInfo.TYPE_APPLICATION || !window.isFocused) continue
+                    val root = window.root ?: continue
+                    return read(root)
+                }
+                val active = automation.rootInActiveWindow
+                if (active != null) {
+                    if (app.owns(active.packageName?.toString())) return read(active)
+                    SnapshotReader.recycle(active)
+                }
+                SystemClock.sleep(100)
+            } while (SystemClock.elapsedRealtime() < until)
             error("source window unavailable")
         }
         val serviceUntil = SystemClock.elapsedRealtime() + 10_000
@@ -77,6 +89,8 @@ internal object LiveAutoScrollVerification {
             wasEnabled = AutoScrollSession.enabled; hadNotice = AutoScrollSession.noticeAccepted
         }
         val reasons = mutableMapOf<String, Int>()
+        val dispatchStages = java.util.concurrent.ConcurrentHashMap<String, Int>()
+        var originalDiagnostic: ((String) -> Unit)? = null
         var observedAttempts = 0
         var observedTransitions = 0
         var minimum: Double? = null
@@ -84,6 +98,10 @@ internal object LiveAutoScrollVerification {
         var setupSwipes = 0
         var restoreCollapsed = false
         try {
+            main {
+                originalDiagnostic = AutoScrollSession.onDispatchDiagnostic
+                AutoScrollSession.onDispatchDiagnostic = { stage -> dispatchStages.merge(stage, 1, Int::plus) }
+            }
             reminder(false)
             main { AutoScrollSession.configure(true, 1) }
             var started = first
@@ -115,16 +133,23 @@ internal object LiveAutoScrollVerification {
                 SystemClock.sleep(100); hud = LiveHudVerification.state(instrumentation, automation)
             }
             check(hud.header != null) { "visible HUD required before Start" }
-            restoreCollapsed = hud.controls.isEmpty()
+            check(!hud.paused) { "existing counting pause preserved" }
+            restoreCollapsed = !hud.expanded
             if (restoreCollapsed) LiveHudVerification.choose(instrumentation, automation, "header")
             LiveHudVerification.choose(instrumentation, automation, "off")
             check(AutoScrollSession.running) { "HUD Start did not enable run" }
             val began = SystemClock.elapsedRealtime()
             var nextStatus = began + 5_000
             var missingProgressSince = 0L
+            var current = started
+            var nextIndependentScan = 0L
             while (SystemClock.elapsedRealtime() - began < 150_000) {
-                val current = frame()
-                current.progress?.let { minimum = minOf(minimum ?: it, it); maximum = maxOf(maximum ?: it, it) }
+                val sampleAt = SystemClock.elapsedRealtime()
+                if (sampleAt >= nextIndependentScan && AutoScrollSession.attempts == 0) {
+                    current = frame()
+                    current.progress?.let { minimum = minOf(minimum ?: it, it); maximum = maxOf(maximum ?: it, it) }
+                    nextIndependentScan = sampleAt + 1_000
+                }
                 val reason = AutoScrollSession.reason
                 reasons[reason] = (reasons[reason] ?: 0) + 1
                 observedAttempts = AutoScrollSession.attempts
@@ -137,7 +162,9 @@ internal object LiveAutoScrollVerification {
                 check(AutoScrollSession.running) { "operator stopped the run" }
                 check(observedAttempts <= 1) { "more than one automatic attempt" }
                 if (reason in setOf("gesture_cancelled", "gesture_unavailable", "next_page_unconfirmed"))
-                    error("automatic transition failed: $reason")
+                    error("automatic transition failed: $reason; stages=$dispatchStages")
+                if (observedAttempts > 0 && reason != "advancing")
+                    error("completion proposal interrupted: $reason; stages=$dispatchStages")
                 val now = SystemClock.elapsedRealtime()
                 if (current.progress == null && observedAttempts == 0) {
                     if (missingProgressSince == 0L) missingProgressSince = now
@@ -145,14 +172,14 @@ internal object LiveAutoScrollVerification {
                 } else missingProgressSince = 0L
                 if (now >= nextStatus) {
                     instrumentation.sendStatus(1, android.os.Bundle().apply {
-                        putString("stream", "Live $key auto-scroll elapsedSeconds=${(now - began) / 1_000}; attempts=$observedAttempts; confirmed=$observedTransitions; reason=$reason; progress=$minimum..$maximum")
+                        putString("stream", "Live $key auto-scroll elapsedSeconds=${(now - began) / 1_000}; attempts=$observedAttempts; confirmed=$observedTransitions; reason=$reason; progress=$minimum..$maximum; stages=$dispatchStages")
                     })
                     nextStatus = now + 5_000
                 }
                 SystemClock.sleep(200)
             }
             check(observedAttempts == 1 && observedTransitions == 1) {
-                "no confirmed auto transition; attempts=$observedAttempts; reasons=$reasons; progress=$minimum..$maximum"
+                "no confirmed auto transition; attempts=$observedAttempts; reasons=$reasons; progress=$minimum..$maximum; stages=$dispatchStages"
             }
             SystemClock.sleep(2_000)
             check(!AutoScrollSession.running && AutoScrollSession.attempts == 1) { "Stop did not fence later actions" }
@@ -166,7 +193,7 @@ internal object LiveAutoScrollVerification {
             check(settled()) {
                 "next item not settled: ${next.surface}/${next.route}/${next.mediaKind}; progress=${next.progress}; sameIdentity=${next.identity == started.identity}; overlap=${overlap()}; attempts=$observedAttempts; confirmed=$observedTransitions"
             }
-            return "PASS: $key HUD Start, numeric video end, one automatic attempt and one confirmed distinct next item; HUD Stop prevents further attempts; setupSwipes=$setupSwipes; nextPlaybackAvailable=${next.progress != null}; progress=$minimum..$maximum; reasons=$reasons"
+            return "PASS: $key HUD Start, numeric video end, one automatic attempt and one confirmed distinct next item; HUD Stop prevents further attempts; setupSwipes=$setupSwipes; nextPlaybackAvailable=${next.progress != null}; progress=$minimum..$maximum; reasons=$reasons; stages=$dispatchStages"
         } finally {
             try {
                 main { AutoScrollSession.stop() }
@@ -177,6 +204,7 @@ internal object LiveAutoScrollVerification {
                 }
             } finally {
                 main {
+                    AutoScrollSession.onDispatchDiagnostic = originalDiagnostic
                     AutoScrollSession.clear()
                     if (hadNotice || wasEnabled) {
                         AutoScrollSession.configure(true, 1)

@@ -28,7 +28,8 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
     private val autoScroll = TextView(context).apply {
         text = "Autoscroll"
         textSize = 14f; setTextColor(Color.WHITE); gravity = Gravity.CENTER
-        minHeight = dp(48); setPadding(dp(16), dp(8), dp(16), dp(8))
+        minHeight = dp(48); setPadding(dp(12), 0, dp(12), 0)
+        includeFontPadding = false
         isClickable = true; isFocusable = true; visibility = GONE
         compoundDrawablePadding = dp(6)
         setOnClickListener { onAutoScroll?.invoke() }
@@ -37,11 +38,6 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
                 super.onInitializeAccessibilityNodeInfo(host, info); info.className = "android.widget.Button"
             }
         }
-    }
-    private val autoStatus = TextView(context).apply {
-        setText(R.string.autoscroll_waiting)
-        textSize = 11f; setTextColor(Color.WHITE); gravity = Gravity.CENTER
-        setPadding(dp(10), 0, dp(10), dp(8)); visibility = GONE
     }
     private val visit = number()
     private val today = number()
@@ -68,7 +64,6 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
         private set
     private var autoControlAvailable = false
     private var autoControlRunning = false
-    private var autoControlReady = false
     private var countingDescription: CharSequence = ""
     private var showIcons = true
     var moveCounter: (Float, Float) -> Unit = { _, _ -> }
@@ -189,16 +184,16 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
         }
         details.addView(actions)
         addView(autoScroll, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply { gravity = Gravity.CENTER_HORIZONTAL })
-        addView(autoStatus, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply { gravity = Gravity.CENTER_HORIZONTAL })
         addView(details, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
     }
 
     private fun number() = ScrollingCountView(context)
 
     fun setAutoScrollControl(visible: Boolean, running: Boolean, ready: Boolean) {
+        val justStarted = running && !autoControlRunning
         autoControlAvailable = visible
         autoControlRunning = running
-        autoControlReady = ready
+        if (justStarted) setExpanded(false)
         updateAutoVisibility()
         val icon = context.getDrawable(if (running) R.drawable.ic_autoscroll_pause else R.drawable.ic_autoscroll_play)
         icon?.setBounds(0, 0, dp(20), dp(20))
@@ -212,7 +207,14 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
 
     private fun updateAutoVisibility() {
         autoScroll.isVisible = autoControlAvailable && (expanded || autoControlRunning)
-        autoStatus.isVisible = autoScroll.isVisible && autoControlRunning && !autoControlReady
+        val height = dp(if (autoControlRunning && !expanded && !paused) 32 else 48)
+        header.minimumHeight = height
+        if (header.layoutParams.height != height) {
+            header.layoutParams = (header.layoutParams as LayoutParams).apply { this.height = height }
+            for (number in listOf(visit, today))
+                number.layoutParams = (number.layoutParams as LayoutParams).apply { this.height = height }
+        }
+        autoScroll.minHeight = height
     }
 
     private fun icon(symbol: String) = SymbolView(context, symbol, iconColor).apply {
@@ -229,6 +231,7 @@ internal class CounterHudView(context: Context, onOpen: () -> Unit, onPause: () 
         (header.getChildAt(2))?.visibility = if (value) GONE else VISIBLE // divider
         pausedLabel.visibility = if (value) VISIBLE else GONE
         alpha = if (value) 0.85f else 1f
+        updateAutoVisibility()
         updateHeaderDescription()
     }
 

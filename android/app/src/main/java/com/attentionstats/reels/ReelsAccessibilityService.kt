@@ -41,7 +41,11 @@ import java.util.concurrent.atomic.AtomicLong
 class ReelsAccessibilityService : AccessibilityService() {
     private val main = Handler(Looper.getMainLooper())
     private val coordinator by lazy { ReelsCoordinator.get(this) }
-    private val listener: () -> Unit = { main.post { updateEventTargets(); schedule(0); renderOverlays() } }
+    private val listener: () -> Unit = { main.post {
+        updateEventTargets()
+        sampling.configurationChanged(coordinator.epoch(), coordinator.acquisitionSettingsRevision())
+        renderOverlays()
+    } }
     private val worker = Executors.newSingleThreadExecutor()
     @Volatile private var destroyed = false
     private var lastScan = 0L
@@ -51,6 +55,7 @@ class ReelsAccessibilityService : AccessibilityService() {
     /** Source app in front while counting is paused: show the resume pill, count nothing. */
     @Volatile private var pausedApp: ReelApp? = null
     @Volatile private var displayEligible = false
+    @Volatile private var transientAcquisition = false
     @Volatile private var lastFrame: AdapterFrame? = null
     private data class Seen(val app: ReelApp, val window: Int, val atMs: Long, val frame: AdapterFrame, val scroll: Long)
     @Volatile private var lastReels: Seen? = null
@@ -96,7 +101,7 @@ class ReelsAccessibilityService : AccessibilityService() {
         coordinator.acquisitionStatus = "read_failed"
         foregroundPackage = null
         scheduledPackage = null
-        outside(false)
+        outside(false, transient = true)
         1_000L
     }
 
@@ -128,6 +133,7 @@ class ReelsAccessibilityService : AccessibilityService() {
             }
             AccessibilityEvent.TYPE_VIEW_CLICKED -> { AutoScrollSession.manualInteraction("manual_click"); schedule(150) }
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> schedule(60)
+            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> schedule(400)
             else -> schedule(200)
         }
     }
@@ -167,8 +173,9 @@ class ReelsAccessibilityService : AccessibilityService() {
         if (now - lastScan < 180) return 180 - (now - lastScan)
         lastScan = now
         if (!interactive()) { coordinator.acquisitionStatus = "not_interactive"; foregroundPackage = null; scheduledPackage = null; outside(true); return null }
-        val root = providerRoot() ?: run { coordinator.acquisitionStatus = "no_active_root"; foregroundPackage = null; scheduledPackage = null; outside(false); return 1_000L }
+        val root = providerRoot() ?: run { coordinator.acquisitionStatus = "no_active_root"; foregroundPackage = null; scheduledPackage = null; outside(false, transient = true); return 1_000L }
         try {
+            transientAcquisition = false
             val foreground = root.packageName?.toString()
             foregroundPackage = foreground
             coordinator.acquisitionStatus = "root_obtained"
@@ -200,6 +207,7 @@ class ReelsAccessibilityService : AccessibilityService() {
             val capturedEpoch = coordinator.epoch()
             val snapshot = SnapshotReader.read(root, app.packages)
             var frame = AdapterRegistry.of(app).read(snapshot)
+            transientAcquisition = !snapshot.typing && (frame.surface == Surface.OUTSIDE || frame.surface == Surface.UNKNOWN)
             coordinator.acquisitionStatus = "${app.key}:${frame.surface}:${snapshot.nodes.size}:complete=${snapshot.complete}"
             if (!coordinator.countPhotos && frame.mediaKind == "photo") frame = frame.copy(surface = Surface.EXCLUDED)
             val previous = lastReels
@@ -238,7 +246,8 @@ class ReelsAccessibilityService : AccessibilityService() {
         } finally { SnapshotReader.recycle(root) }
     }
 
-    private fun outside(departed: Boolean) {
+    private fun outside(departed: Boolean, transient: Boolean = false) {
+        transientAcquisition = transient
         val app = currentApp
         displayEligible = false
         block = null
@@ -248,7 +257,20 @@ class ReelsAccessibilityService : AccessibilityService() {
             coordinator.observe(it, AdapterFrame.OUTSIDE, ItemFrame(SystemClock.elapsedRealtime(), Surface.OUTSIDE,
                 ReelRoute.VIEWER, null, emptySet(), org.attentionstats.reels.PageCategory.REEL, 0), 0, coordinator.epoch())
         }
-        main.post { AutoScrollSession.unavailable("outside_viewer"); renderOverlays() }
+        main.post {
+            if (transient) acquisitionGap("outside_viewer")
+            else AutoScrollSession.unavailable("outside_viewer")
+            renderOverlays()
+        }
+    }
+
+    /** Only missing acquisition inside this source's already dispatched transition may wait. */
+    private fun acquisitionGap(reason: String) {
+        val app = currentApp
+        if (app != null && coordinator.allowed(app) && coordinator.grantEnabled() &&
+            coordinator.overlayEnabled && !visitHudVisibility.hiddenFor(app) && interactive())
+            AutoScrollSession.transientUnavailable(reason, app, coordinator.epoch())
+        else AutoScrollSession.unavailable(reason)
     }
 
     // ---- Overlays --------------------------------------------------------------------------
@@ -489,7 +511,10 @@ class ReelsAccessibilityService : AccessibilityService() {
         if (!displayEligible || intervention != null || !coordinator.overlayEnabled || state == null || active != state.app ||
             visitHudVisibility.hiddenFor(state.app) || state.epoch != coordinator.epoch() || !coordinator.allowed(state.app) ||
             !interactive()) {
-            if (AutoScrollSession.running && intervention == null) AutoScrollSession.suspendActions("viewer_unavailable")
+            if (AutoScrollSession.running && intervention == null) {
+                if (transientAcquisition) acquisitionGap("viewer_unavailable")
+                else AutoScrollSession.suspendActions("viewer_unavailable")
+            }
             removeHud(); return
         }
         ensureHud()
@@ -546,7 +571,13 @@ class ReelsAccessibilityService : AccessibilityService() {
 
     private fun feedAutoScroll(app: ReelApp, frame: AdapterFrame, window: Int, epoch: Long, now: Long) {
         if (!AutoScrollSession.enabled || frame.route != ReelRoute.VIEWER || frame.surface != Surface.REELS) {
-            if (AutoScrollSession.running) main.post { AutoScrollSession.suspendActions("playback_unavailable") }
+            if (AutoScrollSession.running) {
+                val transient = transientAcquisition
+                main.post {
+                    if (transient) acquisitionGap("playback_unavailable")
+                    else AutoScrollSession.suspendActions("playback_unavailable")
+                }
+            }
             return
         }
         val value = AutoScrollSession.Frame(app, window, frame.identity, epoch, now, frame.progress,
@@ -555,29 +586,39 @@ class ReelsAccessibilityService : AccessibilityService() {
     }
 
     private fun advance(token: Long, expected: AutoScrollSession.Frame) {
-        if (!AutoScrollSession.current(token)) return
-        main.postDelayed({ AutoScrollSession.expire(token, SystemClock.elapsedRealtime()) }, 2_500)
-        if (preparingBreak || intervention != null || hud?.isShown != true || !interactive() || expected.epoch != coordinator.epoch() ||
-            !coordinator.allowed(expected.app) || !coordinator.grantEnabled() ||
-            SystemClock.elapsedRealtime() - expected.atMs !in 0..750) {
-            AutoScrollSession.suspendActions("context_changed"); return
+        fun reject(stage: String, reason: String = "context_changed") {
+            AutoScrollSession.onDispatchDiagnostic?.invoke(stage)
+            AutoScrollSession.suspendActions(reason)
         }
-        val root = providerRoot() ?: return AutoScrollSession.suspendActions("context_changed")
+        if (!AutoScrollSession.current(token)) {
+            AutoScrollSession.onDispatchDiagnostic?.invoke("token_expired"); return
+        }
+        AutoScrollSession.onDispatchDiagnostic?.invoke("validation_started")
+        main.postDelayed({ AutoScrollSession.expire(token, SystemClock.elapsedRealtime()) }, 2_500)
+        if (preparingBreak || intervention != null) return reject("intervention_present")
+        if (hud?.isShown != true) return reject("hud_missing")
+        if (!interactive()) return reject("not_interactive")
+        if (expected.epoch != coordinator.epoch()) return reject("epoch_changed")
+        if (!coordinator.allowed(expected.app) || !coordinator.grantEnabled()) return reject("consent_unavailable")
+        if (SystemClock.elapsedRealtime() - expected.atMs !in 0..750) return reject("frame_stale")
+        val root = providerRoot() ?: return reject("root_missing")
         val bounds = try {
             if (!expected.app.owns(root.packageName?.toString()) || root.windowId != expected.window)
-                return AutoScrollSession.suspendActions("context_changed")
+                return reject("window_rejected")
             val snapshot = SnapshotReader.read(root, expected.app.packages)
             val current = AdapterRegistry.of(expected.app).read(snapshot)
-            if (!snapshot.complete || snapshot.typing || current.surface != Surface.REELS || current.route != ReelRoute.VIEWER ||
-                current.identity != expected.page) return AutoScrollSession.suspendActions("context_changed")
+            if (!snapshot.complete || snapshot.typing) return reject("snapshot_rejected")
+            if (current.surface != Surface.REELS || current.route != ReelRoute.VIEWER) return reject("viewer_rejected")
+            if (current.identity != expected.page) return reject("identity_rejected")
             if (expected.position == null) {
                 if (expected.mediaKind != "photo" || current.mediaKind != "photo" || current.progress != null)
-                    return AutoScrollSession.suspendActions("playback_unavailable")
+                    return reject("photo_rejected", "playback_unavailable")
             } else if (current.progress?.let { it.isFinite() && it in 0.0..1.0 } != true) {
-                return AutoScrollSession.suspendActions("playback_unavailable")
+                return reject("progress_rejected", "playback_unavailable")
             }
-            current.page ?: return AutoScrollSession.suspendActions("context_changed")
+            current.page ?: return reject("page_missing")
         } finally { SnapshotReader.recycle(root) }
+        AutoScrollSession.onDispatchDiagnostic?.invoke("validation_passed")
         try { com.attentionstats.autoscroll.AutoScrollGestureDispatcher.dispatch(this, bounds, token, main) }
         catch (_: RuntimeException) { AutoScrollSession.suspendActions("gesture_unavailable") }
     }

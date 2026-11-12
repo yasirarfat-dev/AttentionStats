@@ -41,8 +41,25 @@ internal object LiveAutoScrollControlsVerification {
             choose("off")
             main { AutoScrollSession.suspendActions("control_verification") }
             expect(AutoScrollSession.running && state().controls.singleOrNull()?.first == "on")
-            if (!AutoScrollSession.canStart()) expect(state().waiting)
-            choose("header")
+            expect(!state().waiting)
+            expect(!state().expanded)
+            val compact = state()
+            val header = checkNotNull(compact.header)
+            val button = compact.controls.single().second
+            val density = instrumentation.targetContext.resources.displayMetrics.density
+            expect(button.top == header.bottom)
+            expect(button.bottom - header.top <= (64 * density).toInt() + 2)
+            if (android.os.Build.VERSION.SDK_INT >= 29) main {
+                val hud = android.view.inspector.WindowInspector.getGlobalWindowViews()
+                    .filterIsInstance<com.attentionstats.reels.CounterHudView>().single()
+                val bitmap = android.graphics.Bitmap.createBitmap(hud.width, hud.height, android.graphics.Bitmap.Config.ARGB_8888)
+                try {
+                    hud.draw(android.graphics.Canvas(bitmap))
+                    java.io.File(instrumentation.targetContext.cacheDir, "compact-hud-attached.png").outputStream().use {
+                        check(bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it))
+                    }
+                } finally { bitmap.recycle() }
+            }
             expect(AutoScrollSession.running && state().controls.singleOrNull()?.first == "on")
             choose("on")
             expect(!AutoScrollSession.running && state().controls.isEmpty() && !state().waiting)
