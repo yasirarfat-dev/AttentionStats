@@ -1,4 +1,4 @@
-import { parseDiarySnapshot } from '../diaryStatus';
+import { parseDiaryHistoryPage, parseDiarySnapshot } from '../diaryStatus';
 
 const value = {
   contractVersion: 2,
@@ -47,6 +47,78 @@ const value = {
     },
   ],
 };
+
+const lifetime = () => ({
+  contractVersion: 1,
+  firstDay: '2026-10-29',
+  lastRecordedDay: '2026-10-29',
+  throughDay: '2026-10-29',
+  zone: 'UTC',
+  dayCount: 1,
+  sources: ['instagram', 'facebook', 'youtube', 'tiktok', 'snapchat'].map(
+    key => ({ key, videos: '9007199254740993', reelsMs: null }),
+  ),
+  pageStart: '2026-10-29',
+  pageEnd: '2026-10-29',
+  olderEnd: null,
+  newerEnd: null,
+  snapshot: value,
+});
+test('lifetime contract preserves exact counts, nullable time and empty-history scope', () => {
+  expect(
+    parseDiaryHistoryPage(JSON.stringify(lifetime())).sources[0]?.videos,
+  ).toBe('9007199254740993');
+  const empty = {
+    ...lifetime(),
+    firstDay: null,
+    lastRecordedDay: null,
+    dayCount: 0,
+  };
+  expect(parseDiaryHistoryPage(JSON.stringify(empty)).firstDay).toBeNull();
+});
+test('lifetime contract validates leap-day contiguous pages and true calendar span', () => {
+  const days = ['2024-02-28', '2024-02-29', '2024-03-01'].map(day => ({
+    ...value.days[0],
+    day,
+  }));
+  const payload = {
+    ...lifetime(),
+    firstDay: '2024-02-28',
+    lastRecordedDay: '2024-03-01',
+    throughDay: '2024-03-01',
+    dayCount: 3,
+    pageStart: '2024-02-28',
+    pageEnd: '2024-03-01',
+    snapshot: { ...value, days },
+  };
+  expect(
+    parseDiaryHistoryPage(JSON.stringify(payload)).snapshot.days,
+  ).toHaveLength(3);
+  expect(() =>
+    parseDiaryHistoryPage(
+      JSON.stringify({
+        ...payload,
+        snapshot: { ...value, days: [days[0], days[2]] },
+      }),
+    ),
+  ).toThrow('History page unavailable');
+});
+test('lifetime contract rejects contradictory bounds, paging, source identities and dates', () => {
+  const payload = lifetime();
+  for (const change of [
+    { dayCount: 30 },
+    { throughDay: '2026-02-30' },
+    { pageEnd: '2026-10-30' },
+    { olderEnd: '2026-10-28' },
+    { newerEnd: '2026-10-30' },
+    { lastRecordedDay: null },
+    { sources: payload.sources.map(() => payload.sources[0]) },
+    { snapshot: { ...value, zone: 'Asia/Dhaka' } },
+  ])
+    expect(() =>
+      parseDiaryHistoryPage(JSON.stringify({ ...payload, ...change })),
+    ).toThrow('History page unavailable');
+});
 test('preserves unavailable timing separately from recorded zero', () => {
   expect(
     parseDiarySnapshot(JSON.stringify(value)).days[0]?.apps[0]?.appMs,

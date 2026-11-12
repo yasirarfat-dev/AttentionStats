@@ -2,9 +2,10 @@ import { useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { ScrollViewInstance } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { reelsSources } from '../../platform';
 import { AppIcon, BarChart } from '../../ui/Charts';
-import { duration, exactCount, hourLabel } from '../../ui/format';
+import { duration, exactCount, hourLabel, sumCounts } from '../../ui/format';
 import {
   Body,
   Button,
@@ -18,7 +19,7 @@ import {
   Title,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
-import { useAppIcons, useDiary, ViewingDetail } from '../diary';
+import { useAppIcons, useDiary, useHistoryPage, ViewingDetail } from '../diary';
 import { AppHistoryExplorer } from './AppHistoryExplorer';
 import {
   historySummary,
@@ -33,6 +34,7 @@ function dateLabel(day: string, short = false) {
     weekday: short ? 'short' : 'long',
     month: 'short',
     day: 'numeric',
+    year: short ? undefined : 'numeric',
   });
 }
 const time = (value: string | null) =>
@@ -40,17 +42,40 @@ const time = (value: string | null) =>
 
 export function InsightsScreen() {
   const scroll = useRef<ScrollViewInstance>(null);
+  const explorerY = useRef(0);
+  const insets = useSafeAreaInsets();
   const toTop = () => scroll.current?.scrollTo({ y: 0, animated: false });
+  const toExplorer = () =>
+    scroll.current?.scrollTo({
+      y: Math.max(0, explorerY.current - insets.top - 16),
+      animated: false,
+    });
   const { theme } = useUnistyles();
-  const [range, setRange] = useState<'7' | '30'>('7');
+  const [range, setRange] = useState<'7' | '30' | 'all'>('7');
+  const [endDay, setEndDay] = useState('');
   const [view, setView] = useState<'day' | 'app'>('day');
   const [selected, setSelected] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
   const [showHours, setShowHours] = useState(false);
-  const diary = useDiary(range === '7' ? 7 : 30);
+  const [showSources, setShowSources] = useState(false);
+  const recent = useDiary(range === '7' ? 7 : 30, range !== 'all');
+  const lifetime = useHistoryPage(range === 'all', endDay);
+  const history = lifetime.history;
+  const diary =
+    range === 'all'
+      ? { ...lifetime, snapshot: history?.snapshot ?? null }
+      : recent;
   const days = orderedDays(diary.snapshot?.days ?? []);
   const day = resolveDay(days, selected);
   const summary = historySummary(days);
+  const allTimeVideos = history
+    ? sumCounts(history.sources.map(source => source.videos))
+    : null;
+  const recordedTimes =
+    history?.sources.flatMap(source =>
+      source.reelsMs === null ? [] : [source.reelsMs],
+    ) ?? [];
+  const allTimeMs = recordedTimes.length ? sumCounts(recordedTimes) : null;
   const daily = days.map(item => historySummary([item]));
   const detail = historySummary(day ? [day] : []);
   const selectedIndex = days.findIndex(item => item.day === day?.day);
@@ -93,13 +118,27 @@ export function InsightsScreen() {
         value={range}
         onChange={value => {
           setRange(value);
+          setEndDay('');
           setShowAll(false);
         }}
         options={[
           { value: '7', label: 'Last 7 days' },
           { value: '30', label: 'Last 30 days' },
+          { value: 'all', label: 'All time' },
         ]}
       />
+      {range === 'all' && endDay !== '' && (
+        <Button
+          label="Return to latest dates"
+          variant="text"
+          disabled={diary.busy}
+          onPress={() => {
+            setEndDay('');
+            setSelected(null);
+            toTop();
+          }}
+        />
+      )}
       {diary.error && (
         <Card tone="warn">
           <Title>History couldn’t refresh</Title>
@@ -124,44 +163,150 @@ export function InsightsScreen() {
       )}
       {diary.snapshot && (
         <>
+          {diary.busy && <Body muted>Refreshing retained observations…</Body>}
           <Card tone="hero">
-            <Text style={styles.eyebrow}>VIDEO ENCOUNTERS · {range} DAYS</Text>
-            <Text style={styles.heroValue}>{exactCount(summary.videos)}</Text>
+            <Text style={styles.eyebrow}>
+              VIDEO ENCOUNTERS ·{' '}
+              {range === 'all' ? 'ALL TIME' : `${range} DAYS`}
+            </Text>
+            <Text style={styles.heroValue}>
+              {exactCount(allTimeVideos ?? summary.videos)}
+            </Text>
             <View style={styles.stats}>
               <Stat
                 inverse
-                value={time(summary.reelsMs)}
-                label="Video surface time"
+                value={time(history ? allTimeMs : summary.reelsMs)}
+                label="Recorded video surface time"
               />
-              <Stat
-                inverse
-                value={time(summary.appMs)}
-                label="Recorded app time"
-              />
+              {range !== 'all' && (
+                <Stat
+                  inverse
+                  value={time(summary.appMs)}
+                  label="Recorded app time"
+                />
+              )}
             </View>
+            {history && (
+              <Text style={styles.heroNote}>
+                {history.firstDay
+                  ? `Since ${history.firstDay} · ${history.dayCount} calendar days through ${history.throughDay}`
+                  : 'No retained observations yet.'}
+              </Text>
+            )}
             <Text style={styles.heroNote}>
               On screen does not mean watched. Missing time is not zero.
             </Text>
           </Card>
-          <Segmented
-            label="Explore history"
-            value={view}
-            onChange={setView}
-            options={[
-              { value: 'day', label: 'By day' },
-              { value: 'app', label: 'By app' },
-            ]}
-          />
+          {history && (
+            <>
+              <Card>
+                <Button
+                  label={
+                    showSources
+                      ? 'Hide all-time sources'
+                      : 'Show all-time sources'
+                  }
+                  variant="tonal"
+                  onPress={() => setShowSources(value => !value)}
+                />
+                {showSources &&
+                  history.sources.map(source => (
+                    <Row
+                      key={source.key}
+                      title={reelsSources[source.key].name}
+                      detail={`${exactCount(source.videos)} video encounters · ${time(source.reelsMs)} recorded surface time`}
+                    />
+                  ))}
+                <Body muted>
+                  Saved observations across retained history, including gaps.
+                  Calendar days are not days of complete coverage. Time is a
+                  known subtotal; missing intervals are not zero. App time is
+                  available in the date pages below.
+                </Body>
+                {history.lastRecordedDay && (
+                  <Body muted>
+                    Last retained observation: {history.lastRecordedDay}.
+                    Grouped in {history.zone}.
+                  </Body>
+                )}
+              </Card>
+              <SectionTitle>Browse retained history</SectionTitle>
+              <Card>
+                <Title>
+                  {history.pageStart} – {history.pageEnd}
+                </Title>
+                <Body muted>
+                  Daily and app details below cover only these {days.length}{' '}
+                  days.
+                </Body>
+                <View style={styles.stats}>
+                  <Stat
+                    value={exactCount(summary.videos)}
+                    label="Video encounters in this page"
+                  />
+                  <Stat
+                    value={time(summary.appMs)}
+                    label="Recorded app time in this page"
+                  />
+                </View>
+                <View style={styles.stats}>
+                  <View style={styles.grow}>
+                    <Button
+                      label="Older dates"
+                      variant="tonal"
+                      disabled={diary.busy || history.olderEnd === null}
+                      onPress={() => {
+                        if (history.olderEnd) {
+                          setEndDay(history.olderEnd);
+                          setSelected(null);
+                          toTop();
+                        }
+                      }}
+                    />
+                  </View>
+                  <View style={styles.grow}>
+                    <Button
+                      label="Newer dates"
+                      variant="tonal"
+                      disabled={diary.busy || history.newerEnd === null}
+                      onPress={() => {
+                        if (history.newerEnd) {
+                          setEndDay(history.newerEnd);
+                          setSelected(null);
+                          toTop();
+                        }
+                      }}
+                    />
+                  </View>
+                </View>
+              </Card>
+            </>
+          )}
+          <View
+            onLayout={event => {
+              explorerY.current = event.nativeEvent.layout.y;
+            }}
+          >
+            <Segmented
+              label="Explore history"
+              value={view}
+              onChange={setView}
+              options={[
+                { value: 'day', label: 'By day' },
+                { value: 'app', label: 'By app' },
+              ]}
+            />
+          </View>
           {view === 'app' ? (
             <>
               <AppHistoryExplorer
                 days={days}
                 zone={diary.snapshot.zone}
-                onNavigate={toTop}
+                onNavigate={toExplorer}
                 onDay={key => {
                   selectDay(key);
                   setView('day');
-                  toTop();
+                  toExplorer();
                 }}
               />
               <Body muted>{usageExplanation(diary.snapshot.usageStatus)}</Body>

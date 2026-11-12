@@ -101,3 +101,91 @@ export function parseDiarySnapshot(payload: unknown): DiarySnapshot {
   }
   throw new Error('Diary unavailable');
 }
+
+const civilDay = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .refine(value => {
+    const date = new Date(value + 'T00:00:00Z');
+    return (
+      Number.isFinite(date.getTime()) &&
+      date.toISOString().slice(0, 10) === value
+    );
+  });
+const shiftDay = (value: string, offset: number) =>
+  new Date(new Date(value + 'T00:00:00Z').getTime() + offset * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+const historyPageSchema = z
+  .strictObject({
+    contractVersion: z.literal(1),
+    firstDay: civilDay.nullable(),
+    lastRecordedDay: civilDay.nullable(),
+    throughDay: civilDay,
+    zone: z.string().min(1).max(100),
+    dayCount: z.number().int().min(0).max(3_000_000),
+    sources: z
+      .array(
+        z.strictObject({
+          key: z.enum(socialKeys),
+          videos: count,
+          reelsMs: count.nullable(),
+        }),
+      )
+      .length(5),
+    pageStart: civilDay,
+    pageEnd: civilDay,
+    olderEnd: civilDay.nullable(),
+    newerEnd: civilDay.nullable(),
+    snapshot: schema,
+  })
+  .refine(value => {
+    const first = value.firstDay ?? value.throughDay;
+    const days = value.snapshot.days;
+    return (
+      new Set(value.sources.map(source => source.key)).size === 5 &&
+      value.zone === value.snapshot.zone &&
+      days.length <= 30 &&
+      first <= value.pageStart &&
+      value.pageStart <= value.pageEnd &&
+      value.pageEnd <= value.throughDay &&
+      value.dayCount ===
+        (value.firstDay === null
+          ? 0
+          : Math.round(
+              (Date.parse(value.throughDay) - Date.parse(first)) / 86_400_000,
+            ) + 1) &&
+      (value.firstDay === null
+        ? value.lastRecordedDay === null
+        : value.lastRecordedDay !== null &&
+          first <= value.lastRecordedDay &&
+          value.lastRecordedDay <= value.throughDay) &&
+      value.pageStart ===
+        (shiftDay(value.pageEnd, -29) < first
+          ? first
+          : shiftDay(value.pageEnd, -29)) &&
+      value.olderEnd ===
+        (value.pageStart > first ? shiftDay(value.pageStart, -1) : null) &&
+      value.newerEnd ===
+        (value.pageEnd < value.throughDay
+          ? shiftDay(value.pageEnd, 30) > value.throughDay
+            ? value.throughDay
+            : shiftDay(value.pageEnd, 30)
+          : null) &&
+      days[0]?.day === value.pageStart &&
+      days[days.length - 1]?.day === value.pageEnd &&
+      days.every((day, index) => day.day === shiftDay(value.pageStart, index))
+    );
+  });
+export type DiaryHistoryPage = Zod.infer<typeof historyPageSchema>;
+export function parseDiaryHistoryPage(payload: unknown): DiaryHistoryPage {
+  try {
+    if (typeof payload === 'string' && payload.length <= 2_000_000) {
+      const result = historyPageSchema.safeParse(JSON.parse(payload));
+      if (result.success) return result.data;
+    }
+  } catch {
+    /* Never include native history in errors. */
+  }
+  throw new Error('History page unavailable');
+}

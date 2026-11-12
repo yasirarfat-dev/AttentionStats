@@ -8,7 +8,7 @@ import {
   type DiarySnapshot,
 } from '../../platform/diaryStatus';
 
-export function useDiary(days: 1 | 7 | 30 | 31 = 1) {
+export function useDiary(days: 1 | 7 | 30 | 31 = 1, enabled = true) {
   const [snapshot, setSnapshot] = useState<DiarySnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -20,7 +20,7 @@ export function useDiary(days: 1 | 7 | 30 | 31 = 1) {
   const refreshAgain = useRef(false);
   const latestRefresh = useRef<() => Promise<void>>(async () => {});
   const refresh = useCallback(async () => {
-    if (!NativeDiary || AppState.currentState !== 'active') return;
+    if (!enabled || !NativeDiary || AppState.currentState !== 'active') return;
     if (pending.current) {
       refreshAgain.current = true;
       return;
@@ -44,7 +44,7 @@ export function useDiary(days: 1 | 7 | 30 | 31 = 1) {
         void latestRefresh.current();
       }
     }
-  }, [days]);
+  }, [days, enabled]);
   latestRefresh.current = refresh;
   useEffect(() => {
     setSnapshot(null);
@@ -57,7 +57,7 @@ export function useDiary(days: 1 | 7 | 30 | 31 = 1) {
     };
   }, []);
   useEffect(() => {
-    if (!focused) return;
+    if (!focused || !enabled) return;
     refresh();
     const subscription = AppState.addEventListener('change', state => {
       if (state === 'active') refresh();
@@ -67,7 +67,7 @@ export function useDiary(days: 1 | 7 | 30 | 31 = 1) {
       subscription.remove();
       clearInterval(timer);
     };
-  }, [focused, refresh]);
+  }, [enabled, focused, refresh]);
   async function configure(
     action:
       | 'usage'

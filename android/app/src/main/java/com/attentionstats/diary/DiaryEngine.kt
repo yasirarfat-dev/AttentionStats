@@ -248,21 +248,28 @@ internal class DiaryEngine(private val context: Context) {
     }
 
     suspend fun snapshot(history: HistoryStore, days: Int, capturedFence: Long = fence.get(),
-        blockingAvailable: (ReelApp) -> Boolean = { false }): String {
-        collect(history, capturedFence)
+        blockingAvailable: (ReelApp) -> Boolean = { false }, endDay: java.time.LocalDate? = null,
+        collectFirst: Boolean = true): String {
+        if (collectFirst) collect(history, capturedFence)
         val dao = history.database.data()
         val config = checkNotNull(dao.diary())
         loadChoices(history)
         val zone = ZoneId.systemDefault()
         val today = Instant.now().atZone(zone).toLocalDate()
-        val first = today.minusDays(days - 1L)
+        val last = endDay ?: today
+        require(!last.isAfter(today) && days in 1..31)
+        val first = last.minusDays(days - 1L)
         val start = first.atStartOfDay(zone).toInstant().toEpochMilli()
-        val now = System.currentTimeMillis()
-        val events = dao.usageEvents(start - 21_600_000, now)
+        val clockNow = System.currentTimeMillis()
+        val now = minOf(clockNow, last.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli())
+        // Historical page tails need the same bounded pairing context as their starts.
+        // A pause just after midnight can confirm time before the page boundary.
+        val eventEnd = minOf(clockNow, now + 21_600_000)
+        val events = dao.usageEvents(start - 21_600_000, eventEnd)
         val timers = dao.timers(start, now)
         val bounded = events.size <= 100_000 && timers.size <= 100_000
         val timeline = if (bounded) events.map { UsageTimeline.Event(it.epoch, it.packageName, it.atMs, it.kind) } else emptyList()
-        val through = minOf(now, config.queryThroughMs.takeIf { config.usageEnabled && !config.grantLost } ?: now)
+        val through = minOf(eventEnd, config.queryThroughMs.takeIf { config.usageEnabled && !config.grantLost } ?: eventEnd)
         val intervals = UsageTimeline.reduce(timeline, through)
         val entries = UsageTimeline.entries(timeline, through)
         val labels = mutableMapOf<String, String>()
@@ -334,6 +341,41 @@ internal class DiaryEngine(private val context: Context) {
                 .put("enabled", app in blockedApps).put("dailyLimit", blockLimits[app] ?: 0)
                 .put("available", blockingAvailable(app)) }))
             .put("zone", zone.id).put("days", rows).toString()
+    }
+
+    /** Fixed-size SQL aggregates plus one bounded date page; never materialize lifetime events. */
+    suspend fun historyPage(history: HistoryStore, endDay: String, capturedFence: Long,
+        blockingAvailable: (ReelApp) -> Boolean): String {
+        collect(history, capturedFence)
+        val dao = history.database.data()
+        val now = System.currentTimeMillis()
+        val zone = ZoneId.systemDefault()
+        val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
+        val bounds = dao.historyBounds(now)
+        val first = bounds.firstMs?.let { Instant.ofEpochMilli(it).atZone(zone).toLocalDate() }
+        val lastRecorded = bounds.lastMs?.let { Instant.ofEpochMilli(it).atZone(zone).toLocalDate() }
+        val end = if (endDay.isEmpty()) today else java.time.LocalDate.parse(endDay)
+        require(!end.isAfter(today) && !end.isBefore(first ?: today))
+        val pageStart = maxOf(first ?: today, end.minusDays(29))
+        val pageDays = java.time.temporal.ChronoUnit.DAYS.between(pageStart, end).toInt() + 1
+        val from = (first ?: today).atStartOfDay(zone).toInstant().toEpochMilli()
+        val videos = dao.videoTotals(from, now).associate { it.appId to it.count }
+        val times = dao.retainedTimerTotals(from, now).associate { it.appId to it.count }
+        val sources = JSONArray(ReelApp.entries.map { app -> JSONObject()
+            .put("key", app.key).put("videos", (videos[app.key] ?: 0L).toString())
+            .put("reelsMs", times[app.key]?.toString() ?: JSONObject.NULL) })
+        val page = JSONObject(snapshot(history, pageDays, capturedFence, blockingAvailable, end, collectFirst = false))
+        val result = JSONObject().put("contractVersion", 1)
+            .put("firstDay", first?.toString() ?: JSONObject.NULL)
+            .put("lastRecordedDay", lastRecorded?.toString() ?: JSONObject.NULL)
+            .put("throughDay", today.toString()).put("zone", zone.id)
+            .put("dayCount", if (first == null) 0 else java.time.temporal.ChronoUnit.DAYS.between(first, today) + 1)
+            .put("sources", sources).put("pageStart", pageStart.toString()).put("pageEnd", end.toString())
+            .put("olderEnd", if (pageStart.isAfter(first ?: today)) pageStart.minusDays(1).toString() else JSONObject.NULL)
+            .put("newerEnd", if (end.isBefore(today)) minOf(today, end.plusDays(30)).toString() else JSONObject.NULL)
+            .put("snapshot", page).toString()
+        check(result.length <= 2_000_000)
+        return result
     }
 
     @Suppress("DEPRECATION")

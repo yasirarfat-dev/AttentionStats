@@ -47,9 +47,11 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var autoScrollRestart: String? = null
     private var autoScrollLock = false
     private var breakTiming = false
+    private var historyPage = false
     private var numericAudit: String? = null
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
+        historyPage = arguments?.getString("historyPage") == "true"
         autoScrollLock = arguments?.getString("autoScrollLock") == "true"
         breakTiming = arguments?.getString("breakTiming") == "true"
         numericAudit = arguments?.getString("numericAudit")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
@@ -93,6 +95,10 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            if (historyPage) {
+                result.putString("stream", "PASS: ${HistoryPageVerification.run(this)} isolated retained-history aggregate/page checks; synthetic facts, user history unchanged")
+                finish(Activity.RESULT_OK, result); return
+            }
             if (breakTiming) {
                 result.putString("stream", "PASS: ${BreakTimingVerification.run(this)} isolated diary break timing/reset checks; synthetic clocks, no real history/settings changes")
                 finish(Activity.RESULT_OK, result); return

@@ -24,6 +24,13 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
         if (days !in listOf(1.0, 7.0, 30.0, 31.0)) { failure(promise, "INVALID_ARGUMENT"); return }
         coordinator.diarySnapshot(days.toInt(), { promise.resolve(com.attentionstats.diary.DiaryPresentationFixture.apply(it)) }, { failure(promise, it) })
     }
+    override fun getHistoryPage(endDay: String, promise: Promise) {
+        if (endDay.isNotEmpty() && (!endDay.matches(Regex("\\d{4}-\\d{2}-\\d{2}")) ||
+                runCatching { java.time.LocalDate.parse(endDay) }.isFailure)) {
+            failure(promise, "INVALID_ARGUMENT"); return
+        }
+        coordinator.diaryHistoryPage(endDay, { promise.resolve(it) }, { failure(promise, it) })
+    }
     override fun configure(action: String, enabled: Boolean, count: Double, minutes: Double, expectedRevision: String, promise: Promise) {
         val revision = expectedRevision.toLongOrNull()
         if (action !in (setOf("usage", "reminder", "onboarding", "ads", "break", "playback", "photos") + org.attentionstats.reels.ReelApp.entries.map { "block.${it.key}" }) || revision == null || revision < 0 ||

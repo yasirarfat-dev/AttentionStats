@@ -3,6 +3,7 @@ import { TurboModuleRegistry } from 'react-native';
 
 export interface Spec extends TurboModule {
   getSnapshot(days: number): Promise<string>;
+  getHistoryPage(endDay: string): Promise<string>;
   configure(
     action: string,
     enabled: boolean,

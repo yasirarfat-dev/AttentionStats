@@ -34,6 +34,7 @@ const dateLabel = (day: string) =>
     weekday: 'short',
     month: 'short',
     day: 'numeric',
+    year: 'numeric',
   });
 
 export function AppHistoryExplorer({
@@ -119,7 +120,7 @@ export function AppHistoryExplorer({
           <Body muted>
             Time values available on {app.timeDays} of {days.length} days; opens
             on {app.opensDays}. These are known subtotals, not complete
-            coverage. Today is still in progress.
+            coverage.
           </Body>
           <Button
             label={

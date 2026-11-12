@@ -292,6 +292,10 @@ internal class ReelsCoordinator private constructor(private val context: Context
         val capturedFence = diary.fence.get()
         enqueue(failure) { success(diary.snapshot(opened(), days, capturedFence, ::blockingAvailable)) }
     }
+    fun diaryHistoryPage(endDay: String, success: (String) -> Unit, failure: (String) -> Unit) {
+        val capturedFence = diary.fence.get()
+        enqueue(failure) { success(diary.historyPage(opened(), endDay, capturedFence, ::blockingAvailable)) }
+    }
     fun configureDiary(action: String, enabled: Boolean, count: Int, minutes: Int, expected: Long,
         success: (String) -> Unit, failure: (String) -> Unit) {
         diary.fence.incrementAndGet() // Fence queued requests as well as the active OS query.

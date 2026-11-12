@@ -177,6 +177,10 @@ data class FactOrigin(val tableName: String, val recordId: String, val originId:
 
 @Dao
 interface AttentionDao {
+    @Query("SELECT MIN(firstMs) AS firstMs, MAX(lastMs) AS lastMs FROM (SELECT MIN(occurredAtMs) AS firstMs, MAX(occurredAtMs) AS lastMs FROM Exposure WHERE occurredAtMs >= 0 AND occurredAtMs < :end UNION ALL SELECT MIN(atMs), MAX(atMs) FROM AppUsageEvent WHERE atMs >= 0 AND atMs < :end UNION ALL SELECT MIN(startMs), MAX(MIN(endMs, :end - 1)) FROM ReelsTimer WHERE startMs >= 0 AND startMs < :end UNION ALL SELECT MIN(atMs), MAX(atMs) FROM InterventionEvent WHERE atMs >= 0 AND atMs < :end)")
+    suspend fun historyBounds(end: Long): HistoryBounds
+    @Query("SELECT appId, SUM(durationMs) AS count FROM ReelsTimer WHERE startMs >= :start AND endMs <= :end GROUP BY appId")
+    suspend fun retainedTimerTotals(start: Long, end: Long): List<AppCount>
     @Query("DELETE FROM FactOrigin") suspend fun deleteOrigins()
     @Query("UPDATE Exposure SET playbackMs = :duration, qualifiedWatch = :qualified, observedCompletion = :completed WHERE id = :id")
     suspend fun updatePlayback(id: String, duration: Long, qualified: Boolean, completed: Boolean)
@@ -275,6 +279,8 @@ interface AttentionDao {
 }
 
 data class CategoryTotal(val category: String, val count: Long)
+
+data class HistoryBounds(val firstMs: Long?, val lastMs: Long?)
 data class AppCount(val appId: String, val count: Long)
 data class PlaybackTotal(val appId: String, val measured: Long, val duration: Long, val qualified: Long, val completed: Long)
 data class HourTotal(val category: Int, val count: Long)

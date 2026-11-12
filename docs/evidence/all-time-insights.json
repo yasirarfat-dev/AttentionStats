@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-12",
+  "tasks": [
+    "AS-014",
+    "AS-018",
+    "AS-037"
+  ],
+  "status": "experimental",
+  "previewSha256": "d831d4c8acfe7bac9221fb891f0b7cea3b49b6b7ae7388ca5d89fbc45998606f",
+  "testApkSha256": "e1be1f1ae04df5b87aa2da2c1127071f51b33c6e00c8c5c90e477e4e6d2f2241",
+  "feature": "All-time retained video/source-time totals with bounded date-page exploration",
+  "checks": {
+    "typecheck": true,
+    "lintArchitectureBackupPalette": true,
+    "jestTests": 110,
+    "jestSuites": 9,
+    "changedSourceFormatting": true,
+    "previewAssemblyAndLint": true,
+    "testApkAssembly": true,
+    "finalUiBuildDurationSeconds": 55,
+    "physicalApi": 36,
+    "isolatedEncryptedStoreNativeAssertions": 24,
+    "nativeScope": [
+      "empty retained bounds and unknown time",
+      "66 synthetic calendar days over three date pages",
+      "stable lifetime source totals and shorter oldest page",
+      "non-revisit video semantics and nullable timer sums",
+      "historical app duration and midnight tail pairing",
+      "invalid future/past page rejection",
+      "usage-only retained bounds"
+    ],
+    "actualOwnUiScope": [
+      "all-time range selection",
+      "actual retained calendar-span arithmetic checked privately",
+      "source expansion/collapse",
+      "date-page boundaries disabled for actual one-page retained history",
+      "app detail scrolled into view",
+      "measurement detail and Android Back",
+      "By day switch",
+      "7/30/all range transitions"
+    ],
+    "darkGraphiteSummaryLayoutReviewedLocally": true,
+    "installedAndLocalPreviewHashIndependentlyMatched": true,
+    "savedBackupChoiceUnchanged": true,
+    "accessibilitySelectionsUnchangedAndMasterRestored": true,
+    "historyPreservedInPlace": true,
+    "privateBaselineAndCaptureRemoved": true
+  },
+  "operatorNotes": [
+    "Initial typecheck found an incorrect Row property and nullable indexed access; corrected before successful checks.",
+    "Initial requested preview AndroidTest wrapper task was unsupported; used the existing debug test task targeting the same debug package. No wrapper/dependency changes.",
+    "Initial UI locator runs were stopped/corrected after slow scrolling or scrolling past asynchronously loaded summary content. Final run waits for summary and checks observed outcomes.",
+    "Native aggregate/page checks use synthetic facts only in a separate encrypted store and remove its owned folder/key. Real history never receives fixture facts.",
+    "Final preservation check found an accessibility-master mismatch after install/instrumentation. Restored the exact original master value from the private baseline without changing selected services; final backup/accessibility comparison passes. Exact platform cause was not investigated."
+  ],
+  "limits": [
+    "All-time app duration/open totals and whole-history app ranking are not implemented; app search and totals cover only the labelled date page.",
+    "SQL aggregates bound returned rows and avoid lifetime row materialization; query cost still scales with retained facts. Durable rollups, million-row latency and coordinator responsiveness need qualification.",
+    "Older/newer enabled UI actions and empty-history UI were not exercised against the real one-page history; native synthetic paging/empty checks are separate evidence.",
+    "Full chronology, coverage/provenance partitions, custom last-X days, TalkBack, large text, RTL, all-theme and injected error-state breadth remain open."
+  ],
+  "publicationScope": "Reviewed regular commit/push to develop only; no main merge, workflow dispatch, release signing or binary publication."
+}
