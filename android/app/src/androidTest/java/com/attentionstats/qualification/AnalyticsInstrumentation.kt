@@ -20,6 +20,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var hudLive = false
     private var protection = false
     private var breakLive = false
+    private var breakTimeLive = false
     private var scheduleLive = false
     private var scheduleSelective = false
     private var autoScrollSafety = false
@@ -61,6 +62,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         hudLive = arguments?.getString("hudLive") == "true"
         protection = arguments?.getString("protection") == "true"
         breakLive = arguments?.getString("breakLive") == "true"
+        breakTimeLive = arguments?.getString("breakTimeLive") == "true"
         scheduleLive = arguments?.getString("scheduleLive") == "true"
         scheduleSelective = arguments?.getString("scheduleSelective") == "true"
         autoScrollSafety = arguments?.getString("autoScrollSafety") == "true"
@@ -191,8 +193,8 @@ class AnalyticsInstrumentation : Instrumentation() {
                 result.putString("stream", LiveScheduleVerification.run(this))
                 finish(Activity.RESULT_OK, result); return
             }
-            if (breakLive) {
-                result.putString("stream", LiveBreakVerification.run(this))
+            if (breakLive || breakTimeLive) {
+                result.putString("stream", LiveBreakVerification.run(this, timeOnly = breakTimeLive))
                 finish(Activity.RESULT_OK, result); return
             }
             if (protection) {

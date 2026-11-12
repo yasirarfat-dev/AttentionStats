@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 
 /** Explicit operator trial: bounded viewer gestures, own break controls, restored reminder choices. */
 internal object LiveBreakVerification {
-    fun run(instrumentation: Instrumentation): String {
+    fun run(instrumentation: Instrumentation, timeOnly: Boolean = false): String {
         val context = instrumentation.targetContext
         val owner = ReelsCoordinator.get(context)
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
@@ -82,6 +82,8 @@ internal object LiveBreakVerification {
         val serviceDeadline = SystemClock.elapsedRealtime() + 10_000
         while (!owner.serviceConnected && SystemClock.elapsedRealtime() < serviceDeadline) SystemClock.sleep(100)
         check(owner.serviceConnected && owner.allowed(app)) { "source/service unavailable" }
+        check(owner.reminder == null) { "existing reminder preserved" }
+        check(!com.attentionstats.autoscroll.AutoScrollSession.running) { "existing auto-scroll run preserved" }
         check(app !in owner.blockChoices()) { "existing viewer block preserved; disable it before this trial" }
         val schedules = await { success, failure -> owner.scheduleSnapshot(success, failure) }
         val plan = com.attentionstats.protection.ScheduleOwner.decode(JSONObject()
@@ -121,6 +123,40 @@ internal object LiveBreakVerification {
         }
         var cycles = 0
         try {
+            if (timeOnly) {
+                val power = context.getSystemService(android.os.PowerManager::class.java)
+                val keyguard = context.getSystemService(android.app.KeyguardManager::class.java)
+                check(power.isInteractive && !keyguard.isKeyguardLocked) { "unlocked phone required" }
+                check(owner.liveOverlay?.app == app) { "existing qualified source HUD required" }
+                configure("break", true, 3, 1)
+                configure("reminder", true, 1000, 1)
+                var started = SystemClock.elapsedRealtime()
+                repeat(2) { cycle ->
+                    val deadline = started + 95_000
+                    while (!ownButton("I'm done for now") && SystemClock.elapsedRealtime() < deadline) {
+                        check(power.isInteractive && !keyguard.isKeyguardLocked && owner.serviceConnected && owner.allowed(app)) {
+                            "time trial interrupted; no wake or permission changes attempted"
+                        }
+                        SystemClock.sleep(250)
+                    }
+                    val pending = owner.reminder
+                    check(ownButton("I'm done for now") && pending?.app == app && pending.reason == "time" &&
+                        pending.durationMs >= 60_000 && pending.count < 1000) {
+                        "live minute trigger missing or wrong reason; cycle=${cycle + 1}; scan=${owner.acquisitionStatus}"
+                    }
+                    check(SystemClock.elapsedRealtime() - started >= 59_000) { "time trigger arrived early after reset" }
+                    instrumentation.sendStatus(1, android.os.Bundle().apply {
+                        putString("stream", "Live minute trigger ${cycle + 1}: native time reason and actual reminder visible; no setup swipes")
+                    })
+                    SystemClock.sleep(15_000)
+                    check(ownButton("Keep watching", true)) { "delayed time-reminder Continue unavailable" }
+                    started = SystemClock.elapsedRealtime()
+                    SystemClock.sleep(4_000)
+                    check(owner.reminder == null && !ownButton("I'm done for now")) { "time reminder survived dismissal" }
+                    cycles++
+                }
+                return "PASS: $cycles real-minute reminder/render/delayed-dismissal cycles; no source gestures; reminder preferences restored"
+            }
             configure("reminder", true, 5, 240)
             configure("break", true, 3, 15)
             repeat(3) { cycle ->
@@ -159,6 +195,9 @@ internal object LiveBreakVerification {
         } finally {
             configure("break", true, original.getInt("breakSeconds"), original.getInt("reminderMinutes"))
             configure("reminder", original.getBoolean("reminderEnabled"), original.getInt("reminderCount"), original.getInt("reminderMinutes"))
+            val restored = snapshot()
+            for (key in listOf("breakSeconds", "reminderEnabled", "reminderCount", "reminderMinutes"))
+                check(restored.get(key) == original.get(key)) { "reminder preference restoration failed: $key" }
         }
     }
 }

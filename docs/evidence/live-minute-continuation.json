@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-12",
+  "baselineCommit": "cef7ef3f654666cc956c8cd5986eb2736c79a478",
+  "tasks": [
+    "AS-060",
+    "AS-044",
+    "AS-059"
+  ],
+  "status": "experimental",
+  "scope": "Operator-only real-minute trigger, renderer, delayed dismissal and preference restoration; unchanged product; scoped arrival-tracing retest.",
+  "artifactsSha256": {
+    "preview": "59c6b2dcf5258493624f526dc0e5173f72bb405beafd65d90cacf41a90dc80fe",
+    "test": "513bbf2b85d6dc63a753b52252a002d3475e8e5ec5cec0b4f79a9772322cf4e7"
+  },
+  "physicalLive": {
+    "androidApi": 36,
+    "source": "instagram",
+    "sourceVersion": "455.0.0.51.72",
+    "minuteBreak": {
+      "cycles": 2,
+      "minuteThreshold": 1,
+      "countThreshold": 1000,
+      "minimumNativeDurationMs": 60000,
+      "nativeReason": "time",
+      "actualReminderVisible": true,
+      "delayedKeepWatchingSeconds": 15,
+      "secondCycleWithoutRuleEdit": true,
+      "pendingAndRendererCleared": true,
+      "originalPreferencesRestoredAndVerified": true,
+      "sourceGestures": 0,
+      "instrumentationCode": -1
+    },
+    "autoScrollArrival": {
+      "cycles": 1,
+      "actualHudStartStop": true,
+      "setupSwipes": 0,
+      "attempts": 1,
+      "platformGestureAcceptedAndCompleted": true,
+      "confirmedDistinctArrival": true,
+      "nextPlaybackAvailable": true,
+      "instrumentationCode": -1
+    }
+  },
+  "host": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "jestTests": 99,
+    "pythonTests": 88,
+    "completionGateChecks": 31,
+    "testApkAssembly": "pass",
+    "documentationPublicArtifactCheck": "pass"
+  },
+  "limitations": [
+    "No production behavior or product APK change.",
+    "No automatic-pause fidelity or full-screen-versus-compact renderer classification is inferred from the visible own reminder.",
+    "Real five-minute absence, source/device breadth, accessibility and full lifecycle remain open.",
+    "One positive end/arrival retest does not reproduce or explain historical intermittent arrival loss.",
+    "No main merge, product install, version/schema/dependency change, signing, upload, Console submission or remote workflow."
+  ],
+  "syntheticPhysical": {
+    "autoScrollSafety": 58,
+    "diaryTimingReset": 22,
+    "protectionAttachedControls": 14,
+    "hudBehavior": 27,
+    "instrumentationCode": -1,
+    "sameProductTestPair": true
+  },
+  "cleanup": {
+    "ownedTestRemoved": true,
+    "ownedSourceLayoutRemoved": true,
+    "privateBaselineRemoved": true,
+    "originalAccessibilityRestored": true,
+    "unrelatedSelectionsPreserved": true,
+    "backupOff": true,
+    "historyClearedOrReplaced": false,
+    "originalReminderPreferencesVerified": true,
+    "installedPreviewHashVerified": true,
+    "productUnchanged": true,
+    "debugAppReopened": true
+  }
+}
