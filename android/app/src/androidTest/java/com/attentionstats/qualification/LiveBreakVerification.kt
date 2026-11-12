@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 
 /** Explicit operator trial: bounded viewer gestures, own break controls, restored reminder choices. */
 internal object LiveBreakVerification {
-    fun run(instrumentation: Instrumentation, timeOnly: Boolean = false): String {
+    fun run(instrumentation: Instrumentation, timeOnly: Boolean = false, absenceOnly: Boolean = false): String {
         val context = instrumentation.targetContext
         val owner = ReelsCoordinator.get(context)
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
@@ -123,6 +123,92 @@ internal object LiveBreakVerification {
         }
         var cycles = 0
         try {
+            if (absenceOnly) {
+                val power = context.getSystemService(android.os.PowerManager::class.java)
+                val keyguard = context.getSystemService(android.app.KeyguardManager::class.java)
+                fun available() = power.isInteractive && !keyguard.isKeyguardLocked && owner.serviceConnected && owner.allowed(app)
+                fun focusedPackage(): String? {
+                    for (window in automation.windows) {
+                        if (window.type != AccessibilityWindowInfo.TYPE_APPLICATION || !window.isFocused) continue
+                        val root = window.root ?: continue
+                        try { return root.packageName?.toString() } finally { SnapshotReader.recycle(root) }
+                    }
+                    return null
+                }
+                fun viewer(): Boolean {
+                    for (window in automation.windows) {
+                        if (window.type != AccessibilityWindowInfo.TYPE_APPLICATION || !window.isFocused) continue
+                        val root = window.root ?: continue
+                        try {
+                            if (!app.owns(root.packageName?.toString())) return false
+                            val captured = SnapshotReader.read(root, app.packages)
+                            val frame = AdapterRegistry.of(app).read(captured)
+                            return captured.complete && !captured.typing && frame.surface == Surface.REELS && frame.route == ReelRoute.VIEWER
+                        } finally { SnapshotReader.recycle(root) }
+                    }
+                    return false
+                }
+                fun waitFor(timeout: Long, predicate: () -> Boolean) {
+                    val until = SystemClock.elapsedRealtime() + timeout
+                    while (!predicate()) {
+                        check(available()) { "absence trial interrupted; no wake or permission changes attempted" }
+                        check(SystemClock.elapsedRealtime() < until) { "absence trial condition timed out; scan=${owner.acquisitionStatus}" }
+                        SystemClock.sleep(250)
+                    }
+                    check(available())
+                }
+                fun status(message: String) = instrumentation.sendStatus(1, android.os.Bundle().apply { putString("stream", message) })
+                val homeIntent = android.content.Intent(android.content.Intent.ACTION_MAIN).addCategory(android.content.Intent.CATEGORY_HOME)
+                val home = checkNotNull(context.packageManager.resolveActivity(homeIntent, 0)?.activityInfo?.packageName)
+                check(!app.owns(home) && home != context.packageName) { "distinct launcher required" }
+                check(available() && viewer() && owner.liveOverlay?.app == app) { "unlocked qualified viewer/HUD required" }
+                check(!LiveHudVerification.state(instrumentation, automation).paused) { "existing counting pause preserved" }
+                val sourcePackage = checkNotNull(focusedPackage())
+                val resume = checkNotNull(context.packageManager.getLaunchIntentForPackage(sourcePackage))
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                fun away(duration: Long): Long {
+                    android.os.ParcelFileDescriptor.AutoCloseInputStream(automation.executeShellCommand("input keyevent 3")).use { it.readBytes() }
+                    waitFor(8_000) { focusedPackage() == home && LiveHudVerification.state(instrumentation, automation).header == null }
+                    val until = SystemClock.elapsedRealtime() + duration
+                    var nextReport = SystemClock.elapsedRealtime() + 60_000
+                    while (SystemClock.elapsedRealtime() < until) {
+                        check(available() && focusedPackage() == home && owner.reminder == null) { "absence interrupted; launcher, service, unlock and pending state required" }
+                        if (SystemClock.elapsedRealtime() >= nextReport) {
+                            status("Real absence: another elapsed minute on launcher; still unlocked and service connected")
+                            nextReport += 60_000
+                        }
+                        SystemClock.sleep(500)
+                    }
+                    val returned = SystemClock.elapsedRealtime()
+                    context.startActivity(resume)
+                    waitFor(8_000) { viewer() && owner.liveOverlay?.app == app && LiveHudVerification.state(instrumentation, automation).header != null }
+                    return returned
+                }
+                configure("break", true, 3, 1)
+                configure("reminder", true, 1000, 1)
+                waitFor(45_000) { (owner.liveOverlay?.breakProgress ?: -1f) in .4f.. .65f }
+                check(owner.reminder == null)
+                val before = checkNotNull(owner.liveOverlay).breakProgress
+                away(10_000)
+                waitFor(5_000) { (owner.liveOverlay?.breakProgress ?: -1f) >= before }
+                check(checkNotNull(owner.liveOverlay).breakProgress < before + .15f && owner.reminder == null) { "short absence charged or lost previous progress" }
+                status("PASS: ten-second real absence retains prior progress without charging launcher time")
+                val returned = away(310_000)
+                // No rule edits, dismissal, screen lock or service restart between the two absences.
+                waitFor(5_000) { (owner.liveOverlay?.breakProgress ?: -1f) in 0f.. .15f }
+                check(owner.reminder == null && !ownButton("I'm done for now")) { "old reminder survived long absence" }
+                status("PASS: 310-second real absence resets progress on qualified viewer return")
+                waitFor(95_000) {
+                    if (ownButton("I'm done for now")) true
+                    else { check(viewer()) { "qualified viewer lost after return" }; false }
+                }
+                val pending = owner.reminder
+                check(pending?.app == app && pending.reason == "time" && pending.durationMs >= 60_000 && pending.count < 1000)
+                check(SystemClock.elapsedRealtime() - returned >= 59_000) { "old progress or absence time reached next trigger" }
+                check(ownButton("Keep watching", true)) { "post-absence Keep watching unavailable" }
+                waitFor(5_000) { owner.reminder == null && !ownButton("I'm done for now") }
+                return "PASS: real 10-second retention, 310-second absence reset and fresh minute-trigger/render/dismissal; no source swipes; original preferences restored"
+            }
             if (timeOnly) {
                 val power = context.getSystemService(android.os.PowerManager::class.java)
                 val keyguard = context.getSystemService(android.app.KeyguardManager::class.java)

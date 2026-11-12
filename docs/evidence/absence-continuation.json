@@ -1,0 +1,73 @@
+{
+  "date": "2026-11-12",
+  "baselineCommit": "2f84ee8f6ca5c9d4eb5f1d79874b51f9b62603d4",
+  "tasks": ["AS-060"],
+  "status": "experimental",
+  "scope": "Operator-only real-duration short-absence retention, longer-than-five-minute reset and fresh minute trigger/render/dismissal; unchanged product.",
+  "artifactsSha256": {
+    "preview": "59c6b2dcf5258493624f526dc0e5173f72bb405beafd65d90cacf41a90dc80fe",
+    "test": "642c741919df0999996cc9b650722b355f233f31cc012482d5c630b7e0fae404"
+  },
+  "physicalLive": {
+    "androidApi": 36,
+    "source": "instagram",
+    "sourceVersion": "455.0.0.51.72",
+    "trials": 1,
+    "minuteThreshold": 1,
+    "countThreshold": 1000,
+    "initialProgressRange": [0.4, 0.65],
+    "shortAbsenceSeconds": 10,
+    "shortAbsenceRetainsProgress": true,
+    "shortAbsenceProgressIncreaseBelow": 0.15,
+    "longAbsenceSeconds": 310,
+    "launcherOwnershipUnlockAndAvailabilityPollMs": 500,
+    "returnRequiresQualifiedViewerAndHud": true,
+    "returnProgressAtMost": 0.15,
+    "nextReminderMinimumNativeDurationMs": 60000,
+    "nextReminderEarliestRelaunchOffsetMs": 59000,
+    "nextReminderWaitBoundMs": 95000,
+    "nextReminderReason": "time",
+    "nextReminderVisible": true,
+    "keepWatchingClearsNativeAndRenderedReminder": true,
+    "interveningRuleEditDismissalLockOrDeliberateRestart": false,
+    "sourceSwipes": 0,
+    "fixedReelsNavigationSetupTaps": 1,
+    "originalPreferencesRestoredAndCompared": true,
+    "displayOrLockSettingsChanged": false,
+    "instrumentationCode": -1
+  },
+  "syntheticPhysical": {
+    "diaryTimingReset": 22,
+    "protectionAttachedControls": 14,
+    "sameProductTestPair": true,
+    "instrumentationCode": -1
+  },
+  "host": {
+    "testApkAssembly": "pass",
+    "typecheck": "pass",
+    "lint": "pass",
+    "documentationPublicArtifactCheck": "pass",
+    "diffReview": "pass"
+  },
+  "cleanup": {
+    "ownedTestRemovedAfterHashVerification": true,
+    "ownedLayoutsRemoved": true,
+    "originalAccessibilityRestored": true,
+    "unrelatedSelectionsPreserved": true,
+    "privateBaselineRemoved": true,
+    "installedPreviewHashVerified": true,
+    "backupOff": true,
+    "historyClearedOrReplaced": false,
+    "productUnchanged": true,
+    "debugAppReopened": true
+  },
+  "limitations": [
+    "One observed source/version on one physical API36 phone; no broader device, language or source acceptance.",
+    "Exact five-minute boundary evidence remains synthetic; this live absence is 310 seconds.",
+    "Foreground, unlock and service/source availability are checked at observed polling points, not continuously guaranteed by Android.",
+    "No automatic-pause fidelity, renderer mode classification, process death, reboot or broader lifecycle/accessibility acceptance.",
+    "No production behavior change, product installation, dependency/schema/version change or full host regression rerun.",
+    "No auto-scroll trial or explanation of historical intermittent arrival loss.",
+    "No main merge, signing, binary publication, Console submission, backup transport request or remote workflow."
+  ]
+}
