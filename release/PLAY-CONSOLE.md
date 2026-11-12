@@ -1,6 +1,8 @@
 # Attention Stats — Google Play Console information
 
-Everything to paste into Play Console for **attention.stats** 1.0.0 (versionCode 10). Updated 30 October 2026. A copy lives at the maintainer's private release folder (outside the repository) next to the signed bundle.
+Reviewed preparation draft for **attention.stats**, updated 12 November 2026. The reported closed beta is 1.0.0 (versionCode 10); the Console artifact/source mapping is not independently verified. A historical copy lives in the maintainer's private release folder (outside the repository). This repository copy does not update Console or that private archive.
+
+**Production hold:** resolve the [release gates](../docs/RELEASE.md#readiness-assessment-2026-11-07) on a concrete candidate before submission. The development branch adds Android-managed backup, schedules and optional auto-scroll; its listing, Data safety answers, accessibility declaration and reviewer video must describe the actual uploaded binary. Do not copy the historical no-transmission answers or claim every route is qualified. Source still declares 1.0.0 / 10; choose the next unused version code only after inspecting Console.
 
 ## App details
 
@@ -35,14 +37,15 @@ Count Reels, Shorts & TikToks. Breaks and blocks you choose. Private, no ads.
 **Full description** (≤ 4000):
 
 ```text
-How many Reels did you really watch today?
+How many short videos did you scroll through today?
 
-Attention Stats counts the short videos you scroll through on Instagram, Facebook, YouTube Shorts, TikTok and Snapchat Spotlight, and shows how you spend time on your phone. Then it gives you gentle tools to take back your attention. Free, open source, no ads, and nothing ever leaves your phone.
+Attention Stats estimates short-video encounters on supported screens in Instagram, Facebook, YouTube Shorts, TikTok and Snapchat Spotlight, and shows local activity summaries. Choose your own breaks and limits. Free, open source, no ads, and no developer account or telemetry.
 
-COUNTS EVERY SHORT VIDEO
-• Reels, Shorts, TikToks and Spotlight, however you reach them: the Reels tab, a video tapped in your feed, Explore, profiles or shared links
-• Videos in your Instagram and Facebook feeds count too
-• Each video counts once: scrolling back is a revisit, not a new count
+COUNTS ON SUPPORTED SCREENS
+• Recognises supported short-video players and some Instagram and Facebook feed layouts
+• Support varies with app version, language and screen; missed or misclassified items are possible
+• Returning to a recognised item within an unlock session is treated as a revisit
+• An encounter counts a visible item; it does not prove that you watched it
 • Ads and photos are counted separately, and you choose whether ads count
 
 A LIVE COUNTER THAT STAYS OUT OF THE WAY
@@ -52,7 +55,7 @@ A LIVE COUNTER THAT STAYS OUT OF THE WAY
 
 SEE YOUR DAY CLEARLY
 • Short videos and watching time per app, with each app's logo
-• Screen time and opens for every app
+• Screen time and observed app opens when you allow Usage Access
 • Your daily rhythm by hour, and 7- and 30-day trends
 • What that time could have been: pages read, kilometres walked
 
@@ -63,13 +66,15 @@ GENTLE TOOLS YOU CHOOSE
 • Home-screen widget with today's count
 
 PRIVATE BY DESIGN
-• No account, no servers, no ads, no analytics
-• The app does not request Internet access, so your data cannot leave your phone
-• History is encrypted on your device; delete it any time
+• No developer account, servers, ads or telemetry
+• Local history is encrypted on your device; delete it any time
+• The app has no Internet permission. Android backup and your chosen file provider can still transfer data
+• Android-managed backup starts on unless you saved an off choice; turn it off in Settings
+• Backup files use a public app key, which provides no secrecy to anyone holding the file. Protect external copies
 • 100% open source, so anyone can check: github.com/yasirarfat-dev/AttentionStats
 
 HOW IT WORKS
-Attention Stats uses Android's Accessibility service to recognise short-video screens in the five supported apps and tell one video from the next. It processes the screen in memory and never records, stores or sends what you watch, type or message. Usage Access (optional) adds screen time per app.
+With your consent, Attention Stats uses Android's Accessibility service to recognise supported short-video screens and distinguish items. Labels are processed in memory and discarded; local records keep encounter facts, not captions, names, messages or typed input. User-chosen protection can cover selected apps or leave a blocked player with Back. Optional session auto-scroll swipes only when its supported playback or photo signal qualifies; it may remain unavailable. Usage Access (optional) adds screen time per app.
 
 Attention Stats is not a medical app and does not diagnose anything. It simply helps you see your habits and choose your own limits.
 ```
@@ -91,9 +96,8 @@ Attention Stats is not a medical app and does not diagnose anything. It simply h
 
 ### Data safety
 
-- **Does your app collect or share any of the required user data types?** No. (All processing happens on the device and nothing is transmitted; Google's definition of "collection" covers data transmitted off the device.)
-- **Is all data encrypted in transit?** Not applicable; no data is transmitted.
-- **Do you provide a way for users to request that their data is deleted?** Yes: in-app **Settings → Delete all history**, and uninstalling removes everything.
+- **Collection/sharing and transit encryption:** pending candidate-specific review. The old no-transmission rationale cannot be reused for the development build: Android-managed backup and picker providers can transfer history without an Internet permission in this app. Check applicable exceptions and provider handling against [Google's Data safety guidance](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en), then record the exact answers for the selected artifact. No final answers or Console changes are made here.
+- **Deletion:** in-app **Settings → Delete all history** removes local history and disables future app backup participation. Uninstalling removes local data; neither action guarantees deletion of external files or provider-held backup copies. See the [deletion policy](../policies/DATA-DELETION.md).
 
 ### Sensitive permissions and APIs
 
@@ -103,10 +107,10 @@ Attention Stats is not a medical app and does not diagnose anything. It simply h
 - Description to paste:
 
 ```plain
-Attention Stats is a digital wellbeing app. With the user's consent, its AccessibilityService reads the screen structure and on-screen labels of five apps only (Instagram, Facebook, YouTube, TikTok, Snapchat), only while they are in the foreground, to detect when a short-video player or a feed video is visible and to distinguish one video from the next. This powers the core feature: counting short videos and time spent watching them. The service also draws an overlay counter, shows break reminders the user configures, and, only when the user enables blocking for an app, performs a Back action to leave that app's short-video player. All processing is on-device; no screen content is stored or transmitted (the app has no Internet permission). A prominent in-app disclosure explains this and requires explicit agreement before any data is accessed, and the user must separately enable the service in Android settings.
+Attention Stats is a digital wellbeing app. With affirmative source consent, its AccessibilityService reads foreground screen structure and labels in selected Instagram, Facebook, YouTube, TikTok and Snapchat screens to estimate encounters and visible time. Labels are processed in memory and discarded; encounter facts are stored locally. It draws the optional counter and user-configured break reminders. User-chosen blocks can leave a short-video player with Back. Selected app/group schedules inspect foreground package ownership only and show a cover with an immediate allowance. Separately disclosed session auto-scroll uses a visible Start/Stop control and deterministic qualifying playback/photo signals for a single upward swipe; unsupported signals suspend actions. It never likes, comments, follows or messages. The app has no Internet permission or developer telemetry. Android-managed backup and user-selected file providers may transfer logical history under the disclosed backup choices. In-app accessibility disclosure and Android service enablement are separate from source and convenience choices.
 ```
 
-- Video: record a 30–60 s screen capture showing: onboarding disclosure → "I agree" → Accessibility settings → enabling the service → counter on Instagram Reels → a break screen → Settings → Delete all history. Upload it unlisted (e.g. YouTube) and paste the link.
+- Reviewer video: demonstrate the actual candidate's prominent disclosure, Android enablement, supported counter, break and safe escape, schedule allowance and separately disclosed auto-scroll Start/Stop if shipped. Use synthetic history and no private source content. Keep recording/upload outside this preparation task. Changed API uses require an accurate updated declaration and video; see [AccessibilityService policy](https://support.google.com/googleplay/android-developer/answer/10964491?hl=en).
 
 **Usage access (PACKAGE_USAGE_STATS)**: optional screen-time feature; granted by the user in system settings after an in-app explanation.
 
@@ -122,9 +126,26 @@ Attention Stats is a digital wellbeing app. With the user's consent, its Accessi
 Release notes (≤ 500):
 
 ```text
-First release of Attention Stats: count Reels, Shorts, TikToks and Spotlight from any screen, see screen time per app, and use gentle mindful breaks, daily limits and per-app blocks. Private by design: no account, no ads, no Internet access, open source. Found a screen that isn't counted? Use Settings → Report a problem.
+Attention Stats estimates short-video encounters on supported screens, shows local activity summaries and offers breaks and blocks you choose. No developer account, ads or telemetry. Support varies by app version and layout. Review Settings for backup choices and data handling. Report detection issues through Settings → Report a problem.
 ```
 
 ## Testers
 
 New personal developer accounts need at least 12 testers opted in for 14 continuous days before applying for production. Share the closed-test opt-in link from Console with friends who use the supported apps, and ask them to use **Settings → Report a problem** for anything missed. Never fabricate engagement.
+
+## Production-access application preparation — 12 November 2026
+
+The maintainer confirms the uploaded beta is 1.0.0 / versionCode 10 and expects the test period to finish on 13 November; this is a reported date, not verified Console eligibility. [Current Google guidance](https://support.google.com/googleplay/android-developer/answer/14151465?hl=en) requires eligible new personal accounts to have at least 12 continuously opted-in testers for the preceding 14 days at application time. The application asks about testing, engagement, feedback, changes and readiness; review usually takes seven days or less but can take longer. Access approval and a production rollout are separate steps.
+
+Prepare these facts privately before applying:
+
+| Item | Evidence still needed |
+|---|---|
+| Eligibility | Console's eligible action, continuous tester count/dates and account-specific requirements |
+| Tested build | Actual track/version code, artifact SHA-256 and source mapping; do not substitute local preview results |
+| Engagement and feedback | Real tester participation, tested journeys, feedback channels and recurring problems; exclude tester identities from Git |
+| Changes made | Link fixes to feedback and identify which build testers actually received; develop-only fixes are not beta-tested fixes |
+| Readiness | Accurate supported scope, remaining limitations and applicable candidate checks; current assessment remains on hold |
+| Declarations | Candidate-matched privacy/Data safety, accessibility form/video and outstanding Console warnings |
+
+No application answers about tester engagement or readiness are invented here. The historical release table above is not a new upload instruction.

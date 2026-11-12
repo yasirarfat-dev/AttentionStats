@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-12",
+  "baselineCommit": "6306820",
+  "tasks": ["AS-010", "AS-044", "AS-046", "AS-059"],
+  "status": "experimental",
+  "scope": "Test-only service revocation qualification and corrected release preparation; installed product unchanged.",
+  "artifactsSha256": {
+    "preview": "59c6b2dcf5258493624f526dc0e5173f72bb405beafd65d90cacf41a90dc80fe",
+    "test": "de05867d99e53f12aad456582aedb686f1b7dd08c17ade9ae0c11213331aaaa2"
+  },
+  "reportedConsole": {
+    "versionName": "1.0.0",
+    "versionCode": 10,
+    "expectedTestPeriodEnd": "2026-11-13",
+    "source": "maintainer report; no independent Console inspection",
+    "eligibilityAndWarningsVerified": false,
+    "artifactSourceMappingVerified": false
+  },
+  "live": {
+    "source": "instagram",
+    "version": "455.0.0.51.72",
+    "serviceRevocation": {
+      "cycles": 2,
+      "assertions": 26,
+      "actualHudStart": true,
+      "initialTokenValid": true,
+      "serviceTeardownAndHudRemoval": true,
+      "oldTokenInvalidated": true,
+      "ephemeralStateCleared": true,
+      "reconnectionDoesNotRestart": true,
+      "sourceGestures": 0,
+      "instrumentationCode": -1
+    },
+    "endArrivalStop": {
+      "trials": 1,
+      "internalSetupSwipes": 0,
+      "validationPassed": 1,
+      "gestureAccepted": 1,
+      "gestureCompleted": 1,
+      "arrivalConfirmed": 1,
+      "settledNextPlaybackAvailable": false,
+      "furtherActionsSuspended": true,
+      "instrumentationCode": -1
+    }
+  },
+  "syntheticPhysical": {
+    "autoScrollSafety": 40,
+    "surfaceScheduler": 19,
+    "hudBehavior": 27,
+    "instrumentationCode": -1,
+    "sameFinalPreviewTestPair": true
+  },
+  "host": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "jestTests": 99,
+    "pythonTests": 88,
+    "completionGateChecks": 31,
+    "testApkAssembly": "pass",
+    "documentationAndPublicArtifacts": "pass"
+  },
+  "limitations": [
+    "Historical intermittent arrival loss was not reproduced or repaired.",
+    "Initial shell quoting and startup/master-state harness failures and Home-route preflight stops supply no acceptance.",
+    "One operator setup swipe and a fixed Reels-tab tap precede the accepted viewer trials.",
+    "No lock, process-death, reboot, source-choice revocation or in-flight end-gesture cancellation qualification.",
+    "No additional source end support, actual framework reinstall recovery, broader accessibility or resource measurement.",
+    "Production remains on hold; no main merge, signing, upload, remote workflow or version/schema/dependency change.",
+    "Console declarations, reviewer video and final Data safety answers remain candidate-specific work.",
+    "Detailed numeric and structural diagnostic results remain local and are not included here."
+  ],
+  "cleanup": {
+    "originalAccessibilityRestored": true,
+    "ownedTestRemoved": true,
+    "ownedSourceLayoutRemoved": true,
+    "privateBaselineRemoved": true,
+    "backupOff": true,
+    "historyClearedOrReplaced": false,
+    "installedPreviewHashVerified": true,
+    "productUnchanged": true,
+    "ephemeralStateClearedByDebugProcessRestart": true,
+    "debugAppReopened": true
+  }
+}

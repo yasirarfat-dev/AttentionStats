@@ -1,9 +1,30 @@
 # Release and distribution
 
-**Status:** Maintainer reports closed-beta publication of the MVP; Console details have not been independently inspected in this continuation. Updated 2026-11-07.
+**Status:** Maintainer confirms uploaded beta 1.0.0 / 10; broader Console details have not been independently inspected. Production readiness remains on hold. Updated 2026-11-12.
 **Responsibility:** Defines public repository publishing, Android distribution, signing and release gates.
 **Related specifications:** [Testing](TESTING.md), [Security](SECURITY.md), [Dependencies](DEPENDENCIES.md), [Contributing](CONTRIBUTING.md), [State](STATE.md).
 **Unresolved feasibility:** F-01–F-04 and F-08 in [Decisions](DECISIONS.md); exact Console artifact/source mapping, review status and broader qualification remain to be verified separately from the publication report.
+
+## Production-access continuation (2026-11-12)
+
+The maintainer confirms the uploaded closed-test version is **1.0.0 / versionCode 10**, and expects the test period to end on November 13. This confirms the reported version, not artifact/source mapping, continuous tester eligibility, Console warnings or approval. The source on `develop` contains subsequent changes which are not established as distributed to those testers.
+
+[Google's testing guidance](https://support.google.com/googleplay/android-developer/answer/14151465?hl=en), rechecked November 12, requires eligible new personal accounts to have at least 12 testers continuously opted in for the preceding 14 days when applying. The application asks about engagement, feedback, improvements and readiness; review usually takes seven days or less but can take longer. Eligibility to apply, access approval and release rollout are separate milestones. Continue closed testing while resolving issues; do not present develop-only device trials as feedback on an uploaded beta update.
+
+The current readiness decision remains **hold** against the nine gates below. Recent scoped source, HUD, queue-pressure and key-loss checks reduce particular uncertainties; they do not close intermittent auto-scroll confirmation loss, framework fresh-install recovery, minimum-device qualification, accessibility or resource/soak gates. Keep the existing **4–8 focused engineering week** allowance as a low-confidence planning estimate for the current Android scope, with test/review waiting possibly extending elapsed time. No completion percentage or full-vision date is justified by current task states.
+
+| Work package to finish | Concrete next deliverable |
+|---|---|
+| Source and convenience reliability | Reproduce the traced arrival failure; complete supported source/route and pause/seek/manual-input negative matrix; explicitly retain unavailable sources |
+| Protection and lifecycle | Permission/service/process/lock trials, five-minute reset and time-trigger checks, overlaps/allowances and safe exits |
+| Recovery and preservation | Isolated actual framework fresh-install recovery, maximum-history restore and interruption/low-space preservation; never reinstall the real-history debug package |
+| Usability and compatibility | Core TalkBack/large-type/RTL/theme journeys, widget configuration, minimum API and declared additional devices/locales |
+| Resource and security evidence | Bounded long-history measurements, seven-day resource comparison, candidate manifest/egress/log/dependency and deletion audits |
+| Candidate and application | Source/artifact/signature mapping, truthful declarations/reviewer video, tester feedback summary and reviewed signed build |
+
+The [Console preparation draft](../release/PLAY-CONSOLE.md) now removes universal-route and no-transmission claims, describes Android-managed backup and external-copy deletion limits, and leaves final Data safety answers pending review. Lack of Internet permission does not establish absence of OS/provider transfers. These edits update repository preparation only; Console, public `main` policy URLs and the private release archive are not changed by a develop push.
+
+Recommended next display version is **1.1.0** for the accumulated features; **1.0.1** fits a smaller fixes-only candidate. This is a recommendation, not a version reservation or source change. [Android versioning](https://developer.android.com/studio/publish/versioning) requires a higher internal versionCode for successive releases and prohibits reusing an uploaded code; 11 is a candidate only after confirming no higher/used code in Console. Version naming does not qualify an untested binary. A concrete candidate still needs maintainer agreement before main merge, and signing/upload/rollout remain separate actions.
 
 Current develop backup exception (ADR-073/ADR-079/AS-058): `allowBackup=true` is paired with an automatic-by-default protected-transport agent that preserves saved opt-outs, and a one-file include list; live databases/keys/preferences and device transfer remain excluded. Qualify the merged manifest/resources and actual recovery before release. The older 0.1.0 `tools/release_candidate.py` guards still intentionally describe that historical all-backup-disabled candidate; they are not acceptance tooling for this schema-9 development build. No release upload or main merge is authorized by the current checks.
 

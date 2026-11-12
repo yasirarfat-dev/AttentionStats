@@ -40,11 +40,13 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var surfaceSampling = false
     private var scheduleDraft = false
     private var autoScrollInterruption = false
+    private var serviceRevocation = false
     private var numericAudit: String? = null
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
         numericAudit = arguments?.getString("numericAudit")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollInterruption = arguments?.getString("autoScrollInterruption") == "true"
+        serviceRevocation = arguments?.getString("serviceRevocation") == "true"
         surfaceLifecycle = arguments?.getString("surfaceLifecycle") == "true"
         surfaceSampling = arguments?.getString("surfaceSampling") == "true"
         beta = arguments?.getString("beta") == "true"
@@ -79,6 +81,10 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            if (serviceRevocation) {
+                result.putString("stream", "PASS: ${LiveServiceRevocationVerification.run(this)} actual service revocation/reconnection checks; no source gestures")
+                finish(Activity.RESULT_OK, result); return
+            }
             val audit = numericAudit
             if (audit != null) {
                 result.putString("stream", NumericPlaybackAudit.run(this, audit))
@@ -201,7 +207,9 @@ class AnalyticsInstrumentation : Instrumentation() {
             result.putString("stream", "PASS: analytics and encounter checks; $count isolated beta archive checks; $hudChecks HUD choice/view-state checks; $backupUi attached backup UI checks")
             finish(Activity.RESULT_OK, result)
         } catch (failure: Throwable) {
-            result.putString("stream", "FAIL: ${failure.javaClass.simpleName}: ${failure.message?.take(160)}")
+            val location = failure.stackTrace.firstOrNull { it.className.startsWith("com.attentionstats.") }
+                ?.let { " (${it.fileName}:${it.lineNumber})" }.orEmpty()
+            result.putString("stream", "FAIL: ${failure.javaClass.simpleName}: ${failure.message?.take(160)}$location")
             finish(Activity.RESULT_CANCELED, result)
         }
     }
