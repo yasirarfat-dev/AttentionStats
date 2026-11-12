@@ -11,6 +11,10 @@ ADR-067 preserves `main` as the beta release line and uses `develop` for integra
 
 During testing, address reported correctness/privacy/data-loss failures first, qualify missing source/locale/lifecycle behavior, complete encrypted export/restore and its storage prerequisites, then finish history/accessibility and richer voluntary protection. Keep each change independently reviewable and verified. Testing duration is a planning window, not evidence that all product gates can be completed by its end. Remaining optional analytics and blocked Google backup retain their existing dependencies.
 
+### Product-delivery direction (2026-11-12)
+
+The maintainer explicitly prioritizes finishing useful product features and improving presentation after several qualification-only batches. Continue with reviewable feature increments: selected-day/app history and accessible presentation (AS-014/AS-018/AS-037), chosen focus/richer protection (AS-015–AS-017), then outstanding supported-source/detail and data-ownership work. Pair implementation with bounded checks necessary for that change. Existing correctness/privacy/data-loss gates remain; repeated harness expansion is not itself visible feature completion. The selected-day Insights explorer is the first increment under this direction. No promise of universal source/platform support follows.
+
 ## Stage 0: documentation foundation
 
 The [feature vision delivery sequence](FEATURE-VISION.md#delivery-sequence-and-exit-evidence) connects these engineering stages to useful product increments: trustworthy counters, daily diary, chosen protection, complete data ownership, then deeper independently qualified detail. ADR-047 prioritizes entry-route coverage and honest encounter/playback semantics within the existing AS-013/AS-041 work. It does not replace unresolved prerequisites.

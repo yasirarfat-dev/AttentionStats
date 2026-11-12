@@ -1,0 +1,65 @@
+{
+  "date": "2026-11-12",
+  "tasks": [
+    "AS-014",
+    "AS-018",
+    "AS-037"
+  ],
+  "baselineCommit": "89fde47714eadb680cd0889f252b4a46066f2058",
+  "previewSha256": "b97a3e906e6e3a5a10312867cab503ac1c0a2c0dedbd0434b7cf722a6dea09ab",
+  "productChanges": [
+    "Read-only selected-day explorer in Insights for seven/31-day history",
+    "Per-source video encounters and surface duration; package-level app time and observed opens",
+    "Selected-day hourly chart plus exact hourly list; media/playback and mindful-break detail",
+    "Visible missing/partial, loading, retry and retained-stale explanations",
+    "Removed unsolicited fixed activity equivalents",
+    "Wrapped statistic labels; 48dp segmented controls; zero-share meters have no fill"
+  ],
+  "host": {
+    "typecheck": "pass",
+    "lintArchitectureBackupPalette": "pass",
+    "jest": {
+      "suites": 9,
+      "tests": 104,
+      "newDomainTests": 5
+    },
+    "changedSourceFormatting": "pass",
+    "docs": "pass",
+    "diffWhitespace": "pass"
+  },
+  "android": {
+    "assemblePreview": "pass",
+    "lintPreview": "pass",
+    "physicalPhone": true,
+    "api": 36,
+    "inPlaceUpdate": true,
+    "bundledNoMetroRequired": true
+  },
+  "liveUi": {
+    "sevenDayHistory": "pass",
+    "thirtyOneDayHistory": "pass",
+    "selectedDateChangesAndReturns": "pass",
+    "newestNextDayDisabled": "pass",
+    "olderNextDayEnabled": "pass",
+    "hourlyListExpandCollapse": "pass",
+    "dayAppAndMediaSectionsReachable": "pass",
+    "mainTabNavigation": "pass",
+    "currentDarkGraphiteLayoutReviewed": "pass",
+    "backupPreferencePreserved": "pass",
+    "accessibilitySelectionsPreserved": "pass",
+    "noHistoryDeletionOrReplacement": true,
+    "noGrantOrSourceChoiceChanges": true
+  },
+  "operatorNotes": [
+    "An initial own-label assertion did not normalize uppercase section headings; corrected the local runner without product change.",
+    "An immediate assertion after switching range ran during loading; later loaded 31-day and seven-day states were explicitly checked.",
+    "No raw phone history, screenshots, identifiers or private settings are published. Local own-screen capture was removed."
+  ],
+  "limits": [
+    "No episode chronology, comprehensive app/source filtering, provenance explorer or forecasts",
+    "Initial failure/stale/loading branch acceptance not fully injected on the phone",
+    "No new full TalkBack, text-scale, RTL, light/accent matrix or performance qualification",
+    "No auto-scroll, source detection, backup-framework or protection capability admission",
+    "No main merge, release signing, binary publication or remote workflow"
+  ]
+}

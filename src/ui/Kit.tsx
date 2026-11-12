@@ -219,10 +219,7 @@ export function Stat({
       >
         {value}
       </Text>
-      <Text
-        style={[styles.statLabel, inverse && styles.inverseMuted]}
-        numberOfLines={1}
-      >
+      <Text style={[styles.statLabel, inverse && styles.inverseMuted]}>
         {label}
       </Text>
     </View>
@@ -407,7 +404,7 @@ export function Meter({ value, color }: { value: number; color: string }) {
         style={[
           styles.meterFill,
           {
-            width: `${Math.max(2, Math.min(100, value * 100))}%`,
+            width: `${Math.max(0, Math.min(100, value * 100))}%`,
             backgroundColor: color,
           },
         ]}
@@ -546,7 +543,7 @@ const styles = StyleSheet.create(theme => ({
   },
   segment: {
     flex: 1,
-    minHeight: 40,
+    minHeight: 48,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
