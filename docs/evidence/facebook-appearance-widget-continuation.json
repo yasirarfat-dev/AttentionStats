@@ -191,5 +191,13 @@
     "allPackagedAssetsIncludingJsBundleByteIdentical": true,
     "assetsCompared": 1
   },
-  "sourcePublication": "reviewed checkpoint publication recorded in dated log; no main merge or binary publication"
+  "sourcePublication": {
+    "branch": "develop",
+    "commit": "3e62c5b19a9dbf745d6fddf11948c855d470d421",
+    "originDevelopIndependentlyMatched": true,
+    "mainMerged": false,
+    "binaryPublished": false,
+    "remoteWorkflowDispatched": false
+  },
+  "reviewedSourceCommit": "3e62c5b19a9dbf745d6fddf11948c855d470d421"
 }
