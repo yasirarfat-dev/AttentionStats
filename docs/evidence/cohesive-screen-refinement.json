@@ -87,5 +87,12 @@
     "returnedToToday": true,
     "backupScope": "No backup controls or provider operations performed; original system-backup preferences were not independently captured for a byte comparison."
   },
-  "finalChoiceCorrection": "Preserve an explicitly chosen focus type when selecting an allow-oriented suggested group; native payload unchanged. Two additional chooser behavior tests raise Jest total to 127."
+  "finalChoiceCorrection": "Preserve an explicitly chosen focus type when selecting an allow-oriented suggested group; native payload unchanged. Two additional chooser behavior tests raise Jest total to 127.",
+  "publication": {
+    "sourceCommit": "dde900aca6014288fe1ac71c3abee698950018c4",
+    "remote": "origin/develop",
+    "remoteHashVerified": true,
+    "main": "1fc538221adfa3e66c1d94bdb9a0258509dc188c",
+    "scope": "Regular reviewed source push; no main merge, remote workflow or binary publication."
+  }
 }
