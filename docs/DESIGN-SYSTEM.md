@@ -1,6 +1,6 @@
 # Design system
 
-**Status:** Accepted visual direction; experimental native shell, shared panels/icons and counter exist; full accessibility/performance qualification remains open. Updated 2026-10-28.
+**Status:** Accepted visual direction; experimental native shell, shared panels/icons and counter exist; full accessibility/performance qualification remains open. Updated 2026-11-13.
 **Responsibility:** Defines hierarchy, semantic tokens, primitives, charts, themes and purposeful motion.
 **Related specifications:** [Human factors](HUMAN-FACTORS.md), [UX](UX-SPEC.md), [Navigation](NAVIGATION.md), [Settings](SETTINGS-SPEC.md), [Preview](../design/prototype/README.md), [Conventions](CONVENTIONS.md).
 **Unresolved feasibility:** F-03 in [Decisions](DECISIONS.md); Android font metrics, frame pacing and TalkBack require native verification. Browser checks do not certify native accessibility.
@@ -116,3 +116,9 @@ ADR-084 applies Title Case to shared native-app section headings, row/stat title
 Maintainer inline-bar refinement (2026-11-13): the block bar uses Off / sun + Limit / Always / clock + Slot, with full Daily Limit and Time Slots accessibility names. Labels stay on one line; larger system text uses two columns instead of forcing four cramped controls. This supersedes the earlier literal Daily Limit/⏱ Slot display wording, with unchanged rule values and navigation.
 
 Final Quick Actions presentation (maintainer clarification, 2026-11-13): a lightning icon is centered vertically beside the combined date/Today header block. It opens a centered floating card of action rows over a dimmed screen, rather than a bottom sheet or literal hamburger menu. Close, outside tap, Android Back and return focus remain. No shortcut starts focus or changes settings without its existing review flow. This supersedes earlier ADR-084 bottom/header-menu presentation wording.
+
+
+ADR-087 requires deliberate visual composition across screens and widgets: choose hierarchy, spacing, type and chart form for the metric and task. Five purpose-specific launcher widgets supersede the six generic widget styles. Expanded overview grids keep complete rows and reserve a labelled full-width section for recorded screen time and its comparable Reels-app whole-app share. Inspect actual native renders in relevant sizes/themes and repair awkward proportions, clipping and weak readability before acceptance; layout assertions alone do not establish good design. [Widgets](WIDGETS-SPEC.md) owns detailed time and availability semantics.
+
+
+ADR-089 uses card-level Settings help: one named info control at each section heading, with a progressive definition list immediately below that heading, before controls. Each concept has its own bold term, concise description and separator; Hide Explanations offers an explicit exit. Routine per-row descriptions/info controls are removed, while actual health/status and deletion warnings remain visible. Switches are the final controls at the right edge. Help changes only presentation. Today, Viewing Details and paired Insights/app-history statistics gain subtle partial-height decorative separators, with no new spoken nodes or metric changes.

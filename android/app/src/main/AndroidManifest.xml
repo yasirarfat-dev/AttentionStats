@@ -41,6 +41,7 @@
         android:exported="false"
         android:label="Encrypted backup"
         android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+      <activity android:name=".widget.WidgetGalleryActivity" android:exported="false" android:label="Home Screen Widgets" android:theme="@android:style/Theme.Material.NoActionBar" />
       <activity
         android:name=".widget.WidgetConfigureActivity"
         android:exported="true"
@@ -54,6 +55,22 @@
         android:exported="false">
         <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
         <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_today_info" />
+      </receiver>
+      <receiver android:name=".widget.StatWidget" android:label="@string/widget_stat_title" android:exported="false">
+        <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+        <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_stat_info" />
+      </receiver>
+      <receiver android:name=".widget.ScreenTimeWidget" android:label="@string/widget_screen_time_title" android:exported="false">
+        <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+        <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_screen_time_info" />
+      </receiver>
+      <receiver android:name=".widget.ReelsAppsWidget" android:label="@string/widget_reels_apps_title" android:exported="false">
+        <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+        <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_reels_apps_info" />
+      </receiver>
+      <receiver android:name=".widget.RhythmWidget" android:label="@string/widget_rhythm_title" android:exported="false">
+        <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+        <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_rhythm_info" />
       </receiver>
       <activity
         android:name=".MainActivity"

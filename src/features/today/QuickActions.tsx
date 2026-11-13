@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Icon } from '../../ui/Icon';
 import { Button, Row } from '../../ui/Kit';
+import { FocusQuickActions, type QuickFocusRequest } from '../protection';
 
 export type QuickDestination = 'Focus' | 'Breaks' | 'Blocks';
 
@@ -19,7 +20,10 @@ export type QuickDestination = 'Focus' | 'Breaks' | 'Blocks';
 export function QuickActions({
   onNavigate,
 }: {
-  onNavigate: (destination: QuickDestination) => void;
+  onNavigate: (
+    destination: QuickDestination,
+    quickStart?: QuickFocusRequest,
+  ) => void;
 }) {
   const { theme } = useUnistyles();
   const [visible, setVisible] = useState(false);
@@ -34,9 +38,12 @@ export function QuickActions({
         if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
       });
   };
-  const open = (destination: QuickDestination) => {
+  const open = (
+    destination: QuickDestination,
+    quickStart?: QuickFocusRequest,
+  ) => {
     close(false);
-    onNavigate(destination);
+    onNavigate(destination, quickStart);
   };
   return (
     <>
@@ -97,10 +104,13 @@ export function QuickActions({
               >
                 Quick Actions
               </Text>
+              {visible && (
+                <FocusQuickActions onSelect={choice => open('Focus', choice)} />
+              )}
               <Row
                 icon="clock"
-                title="Choose a focus session"
-                detail="Pick apps and duration, then review before starting."
+                title="Choose a Focus Session"
+                detail="Customize apps, groups and duration, then review."
                 onPress={() => open('Focus')}
               />
               <Row

@@ -191,12 +191,12 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
             promise.resolve(true)
         } catch (_: RuntimeException) { promise.resolve(false) }
     }
-    /** Asks the launcher to add the home-screen widget (Android 8+ launchers that support pinning). */
+    /** Opens the widget gallery; adding a chosen widget still requires launcher confirmation. */
     override fun pinWidget(promise: Promise) {
-        val manager = context.getSystemService(android.appwidget.AppWidgetManager::class.java)
-        val provider = android.content.ComponentName(context, com.attentionstats.widget.TodayWidget::class.java)
-        promise.resolve(android.os.Build.VERSION.SDK_INT >= 26 && manager?.isRequestPinAppWidgetSupported == true &&
-            manager.requestPinAppWidget(provider, null, null))
+        try {
+            context.startActivity(Intent(context, com.attentionstats.widget.WidgetGalleryActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            promise.resolve(true)
+        } catch (_: RuntimeException) { promise.resolve(false) }
     }
     companion object {
         const val NAME = "NativeDiary"

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,19 +10,19 @@
     android:paddingEnd="11dp"
     android:paddingBottom="10dp">
 
-    <LinearLayout
+    <android.widget.LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="5dp"
         android:paddingBottom="4dp">
-        <ImageView
+        <android.widget.ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:contentDescription="@null"
             android:src="@mipmap/ic_launcher_round" />
-        <TextView
+        <android.widget.TextView
             android:id="@+id/widget_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -33,41 +33,41 @@
             android:text="@string/widget_today"
             android:textColor="#FFB7E4D6"
             android:textSize="13sp" />
-    </LinearLayout>
+    </android.widget.LinearLayout>
 
-    <LinearLayout
+    <android.widget.LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:orientation="horizontal">
-        <LinearLayout style="@style/WidgetCell">
-            <TextView android:id="@+id/ov_videos" style="@style/WidgetValue" />
-            <TextView style="@style/WidgetLabel" android:text="@string/widget_label_videos" />
-        </LinearLayout>
-        <LinearLayout style="@style/WidgetCell">
-            <TextView android:id="@+id/ov_watching" style="@style/WidgetValue" />
-            <TextView style="@style/WidgetLabel" android:text="@string/widget_label_watching" />
-        </LinearLayout>
-    </LinearLayout>
+        <android.widget.LinearLayout style="@style/WidgetCell">
+            <android.widget.TextView android:id="@+id/ov_videos" style="@style/WidgetValue" />
+            <android.widget.TextView style="@style/WidgetLabel" android:text="@string/widget_label_videos" />
+        </android.widget.LinearLayout>
+        <android.widget.LinearLayout style="@style/WidgetCell">
+            <android.widget.TextView android:id="@+id/ov_watching" style="@style/WidgetValue" />
+            <android.widget.TextView style="@style/WidgetLabel" android:text="@string/widget_label_watching" />
+        </android.widget.LinearLayout>
+    </android.widget.LinearLayout>
 
-    <LinearLayout
+    <android.widget.LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:orientation="horizontal">
-        <LinearLayout style="@style/WidgetCell">
-            <TextView android:id="@+id/ov_screen" style="@style/WidgetValue" />
-            <TextView style="@style/WidgetLabel" android:text="@string/widget_label_screen" />
-        </LinearLayout>
-        <LinearLayout style="@style/WidgetCell">
-            <TextView android:id="@+id/ov_session" style="@style/WidgetValue" />
-            <TextView style="@style/WidgetLabel" android:text="@string/widget_label_session" />
-        </LinearLayout>
-    </LinearLayout>
+        <android.widget.LinearLayout style="@style/WidgetCell">
+            <android.widget.TextView android:id="@+id/ov_screen" style="@style/WidgetValue" />
+            <android.widget.TextView style="@style/WidgetLabel" android:text="@string/widget_label_screen" />
+        </android.widget.LinearLayout>
+        <android.widget.LinearLayout style="@style/WidgetCell">
+            <android.widget.TextView android:id="@+id/ov_session" style="@style/WidgetValue" />
+            <android.widget.TextView style="@style/WidgetLabel" android:text="@string/widget_label_session" />
+        </android.widget.LinearLayout>
+    </android.widget.LinearLayout>
 
-    <TextView
+    <android.widget.TextView
         android:id="@+id/widget_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -78,4 +78,4 @@
         android:paddingTop="4dp"
         android:textColor="#FFA9C4BC"
         android:textSize="12sp" />
-</LinearLayout>
+</android.widget.LinearLayout>

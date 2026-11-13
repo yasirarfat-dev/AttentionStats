@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import {
@@ -13,14 +13,17 @@ import {
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
 import { AppSelection } from './AppSelection';
+import { focusChoices, type QuickFocusRequest } from './focusChoices';
 import { useSchedules } from './useSchedules';
 
 export function FocusScreen({
   onBack,
   onSchedules,
+  quickStart,
 }: {
   onBack: () => void;
   onSchedules: () => void;
+  quickStart?: QuickFocusRequest;
 }) {
   const schedules = useSchedules();
   const { snapshot, apps, busy, error, refresh } = schedules;
@@ -35,6 +38,40 @@ export function FocusScreen({
     allowOnly: boolean;
   } | null>(null);
 
+  const applied = useRef<number | null>(null);
+  const [shortcutNotice, setShortcutNotice] = useState<string | null>(null);
+  useEffect(() => {
+    if (
+      !focused ||
+      !quickStart ||
+      !snapshot ||
+      busy ||
+      applied.current === quickStart.request
+    )
+      return;
+    applied.current = quickStart.request;
+    if (snapshot.focus) return;
+    const choice = focusChoices(snapshot.groups, apps).find(
+      item => item.kind === quickStart.kind && item.id === quickStart.id,
+    );
+    if (!choice) {
+      setShortcutNotice(
+        'This group is no longer available. Choose apps to continue.',
+      );
+      setReview(null);
+      return;
+    }
+    setShortcutNotice(null);
+    setPackages(choice.packages);
+    setMinutes(25);
+    setAllowOnly(false);
+    setReview({
+      packages: [...choice.packages],
+      minutes: 25,
+      revision: snapshot.revision,
+      allowOnly: false,
+    });
+  }, [focused, quickStart, snapshot, apps, busy]);
   const active = snapshot?.focus;
   useEffect(() => {
     if (!focused) return;
@@ -52,6 +89,7 @@ export function FocusScreen({
   return (
     <Screen title="Focus session" subtitle="A little space for what you choose">
       <Button label="Back to Protect" variant="text" onPress={onBack} />
+      {shortcutNotice && <Body muted>{shortcutNotice}</Body>}
       {error && (
         <Card tone="warn">
           <Body>{error}</Body>

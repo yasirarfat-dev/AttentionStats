@@ -2,7 +2,7 @@
 
 > Development additions (2026-11-03, ADR-068/ADR-069): Room 6→7 adds `ProtectionConfiguration` (revision and bounded validated group/window document). Room 7→8 adds `Exposure.mediaKind` (`unknown` for historical rows), `playbackMs` (-1 for unknown), `qualifiedWatch` and `observedCompletion` (initially false), plus `DiaryConfiguration.measurePlayback` (off) and `countPhotos` (compatible on). Ad category and media kind are independent facets. Encounters, opted-in per-visit playback and completions are distinct. Imported current-device enablement stays disabled; old unknown playback is never backfilled from surface time. Schema snapshots and actual migration/device evidence govern acceptance.
 
-**Status:** Logical schema accepted; SQL/Room implementation and migrations pending. Updated 2026-10-29.
+**Status:** Logical schema accepted; SQL/Room implementation and migrations pending. Updated 2026-11-13.
 **Responsibility:** Defines entities, invariants, time, provenance and schema evolution.
 **Related specifications:** [Storage](STORAGE-AND-RETENTION.md), [Contracts](NATIVE-CONTRACTS.md), [Tracking](TRACKING-SPEC.md), [Backup](BACKUP-RESTORE.md).
 **Unresolved feasibility:** F-03 and F-04 in [Decisions](DECISIONS.md); Room 3/SQLCipher and archive envelope selected for prototype qualification; entity serialization, schema/migrations and integration remain unimplemented.
@@ -117,3 +117,6 @@ ADR-076 extends the schema-9 store's existing `ProtectionConfiguration.document`
 
 
 ADR-082's experimental timed focus is nested in the existing encrypted `ProtectionConfiguration.document`, alongside groups/windows, without a table migration. `focus` is null or one record with UUID `id`, frozen unique `packages` (1–100), decimal-string `startedMs`, `deadlineMs`, `elapsedStart`, `elapsedDeadline`, and integer Android boot count. Both duration differences agree and are bounded to integer 1–180 minutes; system/recovery targets are rejected. Same-boot elapsed time owns expiry; later-boot UTC fallback cannot extend beyond the original deadline. Expired metadata may remain inert until the next explicit start/end. Session state is not behavioral attention evidence. Ordinary configuration saves preserve it; archive replacement clears it before activation.
+
+
+ADR-087/ADR-088 adds per-instance native widget display preferences (version 2, version-1 compatible) keyed by AppWidget ID: purpose/layout, ordered statistic keys, theme/accent, optional source names, opacity, corner shape, stat number size and update-time visibility. They contain no observed values or personal history and are separate from encrypted authoritative facts; example previews are in-memory only. Deleting a widget removes its display preferences without deleting observations. Detailed validation and behavior belong to [Contracts](NATIVE-CONTRACTS.md#widget-gallery-and-display-configuration-adr-087adr-088) and [Widgets](WIDGETS-SPEC.md).

@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import type { DiarySnapshot } from '../../platform/diaryStatus';
-import { Card, Explanation, Stat } from '../../ui/Kit';
+import { Card, Explanation, Stat, StatDivider } from '../../ui/Kit';
 import { duration, exactCount } from '../../ui/format';
 
 /** Media type, advertising and playback are separate facets; totals must not be added together. */
@@ -33,6 +33,7 @@ export function ViewingDetail({ days }: { days: DiarySnapshot['days'] }) {
             value={exactCount(sum('photoCount'))}
             label="Photos encountered"
           />
+          <StatDivider />
           <Stat value={exactCount(sum('adCount'))} label="Ads encountered" />
         </View>
         <View style={styles.row}>
@@ -40,6 +41,7 @@ export function ViewingDetail({ days }: { days: DiarySnapshot['days'] }) {
             value={measured ? exactCount(sum('watchCount')) : '—'}
             label="3-second watches"
           />
+          <StatDivider />
           <Stat
             value={measured ? exactCount(sum('completionCount')) : '—'}
             label="Observed completions"
@@ -50,6 +52,7 @@ export function ViewingDetail({ days }: { days: DiarySnapshot['days'] }) {
             value={measured ? duration(Number(sum('playbackMs'))) : '—'}
             label="Confirmed playback"
           />
+          <StatDivider />
           <Stat
             value={measured ? exactCount(sum('measuredVideoCount')) : '—'}
             label="Measured visits"

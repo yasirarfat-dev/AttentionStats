@@ -2,7 +2,7 @@
 
 > **Current behavior (1.0.0):** [ADR-066](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30) supersedes version-pinned detectors, per-app notices 3–5, structure-check diagnostics and the five-tab preview described below where they conflict. See [State](STATE.md) and the public [privacy policy](../policies/PRIVACY.md).
 
-**Status:** AS-045 implements an experimental native five-tab shell; most domain features remain unavailable. Updated 2026-10-28.
+**Status:** AS-045 implements an experimental native five-tab shell; most domain features remain unavailable. Updated 2026-11-13.
 **Responsibility:** Defines journeys, screen states, permissions, chart semantics and accessible interactions.
 **Related specifications:** [Human factors](HUMAN-FACTORS.md), [Navigation](NAVIGATION.md), [Design](DESIGN-SYSTEM.md), [Settings](SETTINGS-SPEC.md), [Product](PRODUCT.md), [Privacy](PRIVACY.md).
 **Unresolved feasibility:** F-01, F-02 and F-06 in [Decisions](DECISIONS.md); native grant routes, detectors and provider flows require device validation.
@@ -134,3 +134,9 @@ AS-027/ADR-086 widget continuation is underway at the maintainer's request: mult
 Maintainer grouping clarification: the app picker is one All Apps list, with expandable in-place group headers and group-wide selection switches, followed by ungrouped apps. Shared members intentionally appear in each relevant expanded group and reflect the same selected package set; no extra duplicate appears in the ungrouped portion. Expanding a header changes only presentation; selecting a group selects its members. Search includes group and member names. This replaces separate App Groups / Other Apps sections in the picker.
 
 Final Quick Actions presentation (maintainer clarification, 2026-11-13): a lightning icon is centered vertically beside the combined date/Today header block. It opens a centered floating card of action rows over a dimmed screen, rather than a bottom sheet or literal hamburger menu. Close, outside tap, Android Back and return focus remain. No shortcut starts focus or changes settings without its existing review flow. This supersedes earlier ADR-084 bottom/header-menu presentation wording.
+
+
+ADR-088 adds quick focus suggestions based only on installed approved Reels targets and existing saved groups. Quick Actions resolves a selected choice into a 25-minute Block Apps review with explicit Start and the existing editing path. Active sessions remain visible/endable; suggestions do not silently create groups or rules. Widget picker/configuration previews show clearly labelled examples and the product's actual visual structure, with native per-instance layout/stat/order/appearance/opacity controls under [Widgets](WIDGETS-SPEC.md). Actual rendering review remains required.
+
+
+ADR-089 uses card-level Settings help: one named info control at each section heading, with a progressive definition list immediately below that heading, before controls. Each concept has its own bold term, concise description and separator; Hide Explanations offers an explicit exit. Routine per-row descriptions/info controls are removed, while actual health/status and deletion warnings remain visible. Switches are the final controls at the right edge. Help changes only presentation. Today, Viewing Details and paired Insights/app-history statistics gain subtle partial-height decorative separators, with no new spoken nodes or metric changes.

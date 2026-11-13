@@ -19,6 +19,7 @@ import {
   SectionTitle,
   Segmented,
   Stat,
+  StatDivider,
   Title,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
@@ -264,11 +265,14 @@ export function InsightsScreen() {
                 label="Recorded video surface time"
               />
               {!history && (
-                <Stat
-                  inverse
-                  value={time(summary.appMs)}
-                  label="Recorded app time"
-                />
+                <>
+                  <StatDivider inverse />
+                  <Stat
+                    inverse
+                    value={time(summary.appMs)}
+                    label="Recorded app time"
+                  />
+                </>
               )}
             </View>
             {history && (
@@ -321,6 +325,7 @@ export function InsightsScreen() {
                     value={exactCount(summary.videos)}
                     label="Video encounters in this page"
                   />
+                  <StatDivider />
                   <Stat
                     value={time(summary.appMs)}
                     label="Recorded app time in this page"
@@ -441,6 +446,7 @@ export function InsightsScreen() {
                         value={exactCount(detail.videos)}
                         label="Video encounters"
                       />
+                      <StatDivider />
                       <Stat
                         value={time(detail.reelsMs)}
                         label="Video surface time"
@@ -621,6 +627,7 @@ export function InsightsScreen() {
                         )}
                         label="Reminders recorded"
                       />
+                      <StatDivider />
                       <Stat
                         value={String(day?.interventions['break.left'] ?? 0)}
                         label="Chose to leave"

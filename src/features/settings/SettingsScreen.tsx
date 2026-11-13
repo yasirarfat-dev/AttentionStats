@@ -14,9 +14,7 @@ import {
   Body,
   Button,
   Caption,
-  Card,
   Divider,
-  Explanation,
   Pill,
   Row,
   SectionTitle,
@@ -24,6 +22,8 @@ import {
   ToggleRow,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
+import { SettingsGroup } from './SettingsGroup';
+import { settingsHelp } from './settingsHelp';
 import { useAppIcons, useDiary } from '../diary';
 import { useDeleteHistory } from './DeleteHistory';
 import { useReels } from '../sources';
@@ -124,8 +124,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
 
   return (
     <Screen title="Settings">
-      <SectionTitle>Counting</SectionTitle>
-      <Card padded={false}>
+      <SettingsGroup title="Counting" entries={settingsHelp.counting}>
         {reelsSourceKeys.map((key, index) => {
           const source = snapshot?.sources.find(item => item.app === key);
           const detail = !source?.installed
@@ -173,7 +172,6 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <ToggleRow
           icon="pause"
           title="Pause all counting"
-          detail="Nothing is counted until you resume."
           value={paused}
           onChange={value => reels.setPaused(value)}
           disabled={!snapshot}
@@ -182,22 +180,20 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <ToggleRow
           icon="chart"
           title="Count ads as videos"
-          detail="Ads are always tallied separately too."
           value={!!diary.snapshot?.includeRecognizedAds}
           onChange={value => diary.configure('ads', value)}
           disabled={!diary.snapshot}
         />
-      </Card>
+      </SettingsGroup>
 
-      <SectionTitle>Permissions</SectionTitle>
-      <Card padded={false}>
+      <SettingsGroup title="Permissions" entries={settingsHelp.permissions}>
         <Row
           icon="eye"
           title="Accessibility"
           detail={
             snapshot?.accessibilityEnabled && !snapshot?.serviceConnected
               ? 'Disconnected. Turn this service off, then on in Android Settings.'
-              : 'Needed to recognise short videos'
+              : undefined
           }
           trailing={
             <Pill
@@ -211,7 +207,6 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <Row
           icon="clock"
           title="Usage access"
-          detail="For screen time per app"
           trailing={
             <Pill
               label={
@@ -236,7 +231,6 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <Row
           icon="battery"
           title="Battery"
-          detail="Some phones stop helpers in the background; choose “Unrestricted” if counting stops."
           trailing={
             <Pill
               label={
@@ -247,27 +241,22 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
           }
           onPress={() => NativeDiary?.openBatterySettings()}
         />
-      </Card>
+      </SettingsGroup>
 
-      <Explanation title="What to Measure & Extras">
-        Choose which observations to save and which optional tools to show. Text
-        posts, likes, reactions and submitted comments are not measured.
-      </Explanation>
-      <Card padded={false}>
+      <SettingsGroup
+        title="What to Measure & Extras"
+        entries={settingsHelp.measurement}
+      >
         <ToggleRow
-          discloseDetail
           icon="layers"
           title="Count photo encounters"
-          detail="Count recognized photos and carousels separately from videos in your enabled sources. One carousel post is one encounter."
           value={diary.snapshot?.countPhotos ?? true}
           disabled={!diary.snapshot}
           onChange={value => diary.configure('photos', value)}
         />
         <ToggleRow
-          discloseDetail
           icon="play"
           title="Measure confirmed playback (experimental)"
-          detail="Use exposed numeric player times for 3-second watches, playback time and observed completions. Pauses and missing signals add no time; availability varies by app and layout."
           value={diary.snapshot?.measurePlayback ?? false}
           disabled={!diary.snapshot}
           onChange={value => diary.configure('playback', value)}
@@ -275,10 +264,8 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <View style={styles.subgroup}>
           <SectionTitle>Extras</SectionTitle>
           <ToggleRow
-            discloseDetail
             icon="play"
             title="Auto-scroll (experimental)"
-            detail="Adds a button to the floating counter that moves to the next video when one ends, where the player exposes progress. Without readable progress, automatic swipes pause. Tap the same button to stop."
             value={autoScroll}
             onChange={async value => {
               try {
@@ -297,7 +284,6 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <Row
           icon="layers"
           title="Add a home-screen widget"
-          detail="Six styles, 12 stats and automatic layouts. Long-press a placed widget to customize."
           onPress={async () => {
             const ok = await NativeDiary?.pinWidget();
             if (!ok)
@@ -307,14 +293,13 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
               );
           }}
         />
-      </Card>
+      </SettingsGroup>
 
-      <SectionTitle>Data & Privacy</SectionTitle>
-      <Card padded={false}>
+      <SettingsGroup title="Data & Privacy" entries={settingsHelp.privacy}>
         <Row
           icon="lock"
           title="Backup & restore"
-          detail="Automatic Android backup starts enabled. Manage backup, recovery and manual files."
+          detail="Android backup and encrypted files"
           onPress={async () => {
             if (!(await NativeDiary?.openBackup()))
               Alert.alert(
@@ -327,7 +312,6 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <Row
           icon="lock"
           title="Privacy policy"
-          detail="Local history, automatic Android backup and your controls."
           onPress={() => Linking.openURL(PRIVACY)}
         />
         <Divider />
@@ -339,21 +323,18 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         />
         <Divider />
         <Row
-          icon="info"
-          title="Encrypted local history"
-          detail="No data sent to us. Android can back up history to your device backup account. Manual files use a public app key. Local erase turns backup off; external copies may remain."
-        />
-        <Divider />
-        <Row
           icon="trash"
           title="Erase history"
           detail="Permanent. Three confirmations."
           onPress={deleter.start}
         />
-      </Card>
+      </SettingsGroup>
       {deleter.dialog}
-      <SectionTitle>Appearance</SectionTitle>
-      <Card>
+      <SettingsGroup
+        title="Appearance"
+        entries={settingsHelp.appearance}
+        padded
+      >
         <Segmented
           label="Theme"
           value={appearance.mode}
@@ -376,22 +357,14 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
           onChange={accent => void chooseAppearance({ ...appearance, accent })}
         />
         <ToggleRow
-          discloseDetail
           title="Gentle animations"
-          detail="Soft transitions between tabs. Your phone’s reduced-motion setting takes priority."
           value={appearance.motion}
           onChange={motion => void chooseAppearance({ ...appearance, motion })}
         />
-      </Card>
+      </SettingsGroup>
 
-      <SectionTitle>Help & feedback</SectionTitle>
-      <Card padded={false}>
-        <Row
-          icon="bug"
-          title="Report a problem"
-          detail="Counting missed something? Tell us which app and screen."
-          onPress={reportProblem}
-        />
+      <SettingsGroup title="Help & Feedback" entries={settingsHelp.help}>
+        <Row icon="bug" title="Report a problem" onPress={reportProblem} />
         <Divider />
         <Row
           icon="heart"
@@ -410,7 +383,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         />
         <Divider />
         <Row icon="info" title="Show the welcome tour" onPress={onWelcome} />
-      </Card>
+      </SettingsGroup>
 
       <View style={styles.footer}>
         <Text style={styles.brand}>

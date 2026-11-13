@@ -1,0 +1,85 @@
+<android.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="12dp" android:background="@drawable/widget_panel_dark">
+    <android.widget.LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+        <android.widget.ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@mipmap/ic_launcher" android:layout_marginEnd="8dp" android:contentDescription="@string/app_name" />
+        <android.widget.TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/widget_rhythm_title" android:textColor="#D5D7DD" android:textSize="13sp" android:fontFamily="sans-serif-medium" />
+    </android.widget.LinearLayout>
+    <android.widget.LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical" android:gravity="center_vertical" android:paddingTop="4dp">
+        <android.widget.TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/widget_preview_128_encounters_today" android:textColor="#F1F2F4" android:textSize="18sp" android:maxLines="1" android:ellipsize="end" />
+        <android.widget.LinearLayout android:layout_width="match_parent" android:layout_height="50dp" android:orientation="horizontal" android:gravity="bottom">
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="2dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="2dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="2dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="2dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="2dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="2dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="2dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="2dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="31dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="40dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="5dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="14dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="22dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="31dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="40dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="5dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="14dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="22dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="31dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="40dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="5dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="14dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="22dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="bottom" android:paddingStart="2dp" android:paddingEnd="2dp">
+                <android.widget.ImageView android:layout_width="match_parent" android:layout_height="31dp" android:background="#D5D7DD" />
+            </android.widget.LinearLayout>
+        </android.widget.LinearLayout>
+        <android.widget.TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/widget_preview_12am_6am_12pm_6pm" android:textColor="#B9BCC5" android:textSize="10sp" android:maxLines="1" android:ellipsize="end" />
+    </android.widget.LinearLayout>
+    <android.widget.TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/widget_preview_example" android:textColor="#B9BCC5" android:textSize="10sp" android:layout_marginTop="4dp" />
+</android.widget.LinearLayout>

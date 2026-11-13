@@ -1,0 +1,21 @@
+<android.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="12dp" android:background="@drawable/widget_panel_dark">
+    <android.widget.LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+        <android.widget.ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@mipmap/ic_launcher" android:layout_marginEnd="8dp" android:contentDescription="@string/app_name" />
+        <android.widget.TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/widget_title" android:textColor="#D5D7DD" android:textSize="13sp" android:fontFamily="sans-serif-medium" />
+    </android.widget.LinearLayout>
+    <android.widget.LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical" android:gravity="center_vertical" android:paddingTop="4dp">
+        <android.widget.LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="horizontal">
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="3dp" android:padding="4dp" android:orientation="vertical" android:gravity="center_vertical" android:background="@drawable/widget_tile_dark">
+                <android.widget.TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/widget_preview_12" android:textColor="#F1F2F4" android:textSize="24sp" android:maxLines="1" android:ellipsize="end" />
+                <android.widget.TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/widget_preview_this_session" android:textColor="#B9BCC5" android:textSize="11sp" android:maxLines="1" android:ellipsize="end" />
+            </android.widget.LinearLayout>
+            <android.widget.LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="3dp" android:padding="4dp" android:orientation="vertical" android:gravity="center_vertical" android:background="@drawable/widget_tile_dark">
+                <android.widget.TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/widget_preview_128" android:textColor="#F1F2F4" android:textSize="24sp" android:maxLines="1" android:ellipsize="end" />
+                <android.widget.TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/widget_preview_short_videos" android:textColor="#B9BCC5" android:textSize="11sp" android:maxLines="1" android:ellipsize="end" />
+            </android.widget.LinearLayout>
+        </android.widget.LinearLayout>
+        <android.widget.TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/widget_preview_screen_time_4h_0m" android:textColor="#F1F2F4" android:textSize="16sp" android:maxLines="1" android:ellipsize="end" />
+        <android.widget.ProgressBar style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="5dp" android:max="1000" android:progress="375" android:progressTint="#D5D7DD" android:progressBackgroundTint="#3B3D45" android:layout_marginTop="6dp" android:layout_marginBottom="6dp" />
+    </android.widget.LinearLayout>
+    <android.widget.TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/widget_preview_example" android:textColor="#B9BCC5" android:textSize="10sp" android:layout_marginTop="4dp" />
+</android.widget.LinearLayout>

@@ -104,8 +104,14 @@ function MainTabs({ onWelcome }: { onWelcome: () => void }) {
             onProtect={() =>
               navigation.navigate('Protect', { screen: 'Overview' })
             }
-            onQuickAction={screen =>
-              navigation.navigate('Protect', { screen, initial: false })
+            onQuickAction={(screen, quickStart) =>
+              screen === 'Focus'
+                ? navigation.navigate('Protect', {
+                    screen,
+                    params: { quickStart },
+                    initial: false,
+                  })
+                : navigation.navigate('Protect', { screen, initial: false })
             }
           />
         )}

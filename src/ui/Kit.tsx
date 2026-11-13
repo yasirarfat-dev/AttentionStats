@@ -257,12 +257,31 @@ export function ToggleRow({
   return (
     <View>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <View style={{ flex: 1 }}>{row}</View>
+        <View style={{ flex: 1 }}>
+          <Row
+            icon={icon}
+            leading={leading}
+            title={title}
+            onPress={disabled ? undefined : () => onChange(!value)}
+            trailing={<View />}
+            accessibilityLabel={`${title}, ${value ? 'on' : 'off'}`}
+          />
+        </View>
         <InfoButton
           label={title}
           expanded={expanded}
           onPress={() => setExpanded(!expanded)}
         />
+        <View style={{ paddingRight: 12 }}>
+          <Switch
+            accessibilityLabel={title}
+            value={value}
+            disabled={disabled}
+            onValueChange={onChange}
+            trackColor={{ true: theme.accentFill, false: theme.track }}
+            thumbColor={value ? theme.onAccent : theme.surface}
+          />
+        </View>
       </View>
       {expanded && (
         <View style={{ paddingHorizontal: 12, paddingBottom: 12 }}>
@@ -275,6 +294,25 @@ export function ToggleRow({
 
 export function Divider() {
   return <View style={styles.divider} />;
+}
+
+/** Short visual separator; decorative and excluded from accessibility traversal. */
+export function StatDivider({ inverse = false }: { inverse?: boolean }) {
+  const { theme } = useUnistyles();
+  return (
+    <View
+      accessible={false}
+      importantForAccessibility="no"
+      pointerEvents="none"
+      style={{
+        width: 1,
+        height: 30,
+        alignSelf: 'center',
+        backgroundColor: inverse ? theme.heroMuted : theme.border,
+        opacity: inverse ? 0.3 : 0.65,
+      }}
+    />
+  );
 }
 
 /** Large number with a small label, for KPI tiles. */

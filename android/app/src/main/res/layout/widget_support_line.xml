@@ -1,0 +1,4 @@
+<android.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/w_tile" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="32dp" android:gravity="center_vertical" android:orientation="horizontal" android:paddingStart="6dp" android:paddingEnd="6dp">
+ <android.widget.TextView android:id="@+id/w_label" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textSize="12sp" android:maxLines="1" android:ellipsize="end" />
+ <android.widget.TextView android:id="@+id/w_value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" android:fontFamily="sans-serif-medium" android:maxLines="1" />
+</android.widget.LinearLayout>

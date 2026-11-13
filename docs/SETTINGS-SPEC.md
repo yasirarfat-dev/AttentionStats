@@ -1,6 +1,6 @@
 # Settings specification
 
-**Status:** Planned catalog with working narrow Reels controls and experimental settings routes; broader preferences remain unimplemented. Updated 2026-10-29.
+**Status:** Planned catalog with working narrow Reels controls and experimental settings routes; broader preferences remain unimplemented. Updated 2026-11-13.
 **Responsibility:** Defines user controls, defaults, persistence owner and change effects.
 **Related specifications:** [UX](UX-SPEC.md), [Privacy](PRIVACY.md), [Protection](PROTECTION-SPEC.md), [Backup](BACKUP-RESTORE.md), [Models](DATA-MODELS.md).
 **Unresolved feasibility:** F-01–F-08 in [Decisions](DECISIONS.md); unavailable settings must state the gate rather than appear functional.
@@ -110,3 +110,12 @@ Order: Counting → Permissions → What to Measure & Extras (one card, Extras i
 
 
 AS-027/ADR-086 widget continuation is underway at the maintainer's request: multiple adaptive styles, ordered stat choices, per-instance appearance and native preview, preserving bounded updates and source/consent ownership. See [Widget specification](WIDGETS-SPEC.md). Experimental; actual artifact/host/launcher results follow separately.
+
+
+Widget controls (ADR-087/ADR-088, AS-027) are native and per-instance: five launcher products, seven selectable layouts, ordered statistics, theme/accent, optional source identity, background opacity, corner shape, stat number size and update timestamp. Configuration uses illustrative example previews or explicitly selected current stats, explicit Save/Cancel and version-1-compatible version-2 display preferences. Settings' Add Widget entry opens the five-preview native gallery; the launcher picker also offers all five named products. A display change never enables tracking, focus, consent or network transfer. [Widgets](WIDGETS-SPEC.md) owns exact behavior and acceptance.
+
+
+ADR-089 uses card-level Settings help: one named info control at each section heading, with a progressive definition list immediately below that heading, before controls. Each concept has its own bold term, concise description and separator; Hide Explanations offers an explicit exit. Routine per-row descriptions/info controls are removed, while actual health/status and deletion warnings remain visible. Switches are the final controls at the right edge. Help changes only presentation. Today, Viewing Details and paired Insights/app-history statistics gain subtle partial-height decorative separators, with no new spoken nodes or metric changes.
+
+
+ADR-090 keeps the native widget appearance page concise: preview/opacity/Theme/Accent first, with finer controls behind More Options and Tiles/List behind More Layouts. Current templates are curated rather than capped; changing presentation preserves chosen stats. Detailed options remain available without flooding the default view.

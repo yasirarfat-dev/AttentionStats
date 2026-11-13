@@ -14,6 +14,7 @@ import {
   SectionTitle,
   Segmented,
   Stat,
+  StatDivider,
   Title,
 } from '../../ui/Kit';
 import { useAppIcons } from '../diary';
@@ -108,6 +109,7 @@ export function AppHistoryExplorer({
           </View>
           <View style={styles.stats}>
             <Stat value={time(app.appMs)} label="Recorded app time" />
+            <StatDivider />
             <Stat
               value={app.appOpens === null ? '—' : exactCount(app.appOpens)}
               label="Observed opens"

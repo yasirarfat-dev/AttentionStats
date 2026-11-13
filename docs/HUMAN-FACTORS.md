@@ -1,6 +1,6 @@
 # Human factors and wellbeing design
 
-**Status:** Accepted experience direction applied to the scoped Android MVP and beta continuation; full human-factors/device qualification remains open. Updated 2026-11-04.
+**Status:** Accepted experience direction applied to the scoped Android MVP and beta continuation; full human-factors/device qualification remains open. Updated 2026-11-13.
 **Responsibility:** Governs supportive engagement, psychological rationale, language, trust, interruptions and humane evaluation.
 **Related specifications:** [Vision](VISION.md), [Product](PRODUCT.md), [UX](UX-SPEC.md), [Design system](DESIGN-SYSTEM.md), [Protection](PROTECTION-SPEC.md), [Privacy](PRIVACY.md), [Preview](../design/prototype/README.md).
 **Unresolved feasibility:** F-01–F-04, F-08 and F-09 in [Decisions](DECISIONS.md); no psychological benefit, device smoothness or universal emotional response to this design has been demonstrated.
@@ -34,6 +34,8 @@ Repeated reopening, long sessions and late-night use can be useful observations.
 Do not infer intent from app category. A future optional intention-setting flow must allow skip/edit; storing personal free text needs a model/privacy update first. The preview collects no personal intentions, moods, journal entries or questionnaires.
 
 ## Engagement and restraint
+
+Maintainer design direction (2026-11-13): tasteful presentation is a requirement throughout the product. Select visual form for meaning and usefulness, with deliberate hierarchy, whitespace, proportion, typography and supportive language. Review cognitive load, psychological effect, accessibility and beauty together. Inspect actual rendered native screens/widgets at relevant sizes and appearances; repair awkward composition and clipping before acceptance. Numerical assertions supplement this visual review. Avoid filling spare space with an unrelated statistic or implying a goal, health score or time composition unsupported by the measurements.
 
 - Favor a finite useful summary, predictable controls and a clear stopping point. No infinite insight feed, collectible badges, randomized praise or slot-machine reveals.
 - No streak loss, leaderboards, guilt, scarcity, urgency or red badges to pull people back. A missed check-in has no penalty.
@@ -86,3 +88,6 @@ Success questions: can the person understand the evidence, choose a useful bound
 Do not optimize daily active users, notification opens, time in Attention Stats, guilt-driven retention or blanket reductions in all phone use. No remote analytics or hidden experiments are added for evaluation. Future local personal review measures need consent/storage/deletion specifications first. Public feedback must use synthetic context and exclude personal histories.
 
 X-04–X-07 in [Testing](TESTING.md) define design acceptance. AS-033 verifies a browser prototype only; AS-018 owns native implementation and manual/device review.
+
+
+ADR-090 refines the maintainer's broad quality direction: consider useful needs the person may not have anticipated, while keeping the main experience modest. Curate defaults and reveal advanced choices on demand. There is no fixed widget-template quota or ceiling; a new template should serve a distinct useful purpose. More features and more visible controls do not automatically improve usability. Preserve current selections when changing presentation.

@@ -1,0 +1,95 @@
+{
+  "date": "2026-11-13",
+  "tasks": [
+    "AS-027",
+    "AS-015",
+    "AS-017",
+    "AS-018",
+    "AS-045"
+  ],
+  "status": "experimental",
+  "product": {
+    "sha256": "3fc29747d06517e41d1114abc6e8bab0faacd64b34c16a2c6e6186c30408ce90",
+    "variant": "preview",
+    "package": "com.attentionstats.debug",
+    "scope": "Installed and independently hash-verified phone checkpoint; includes statistic dividers and card-level Settings help."
+  },
+  "test": {
+    "sha256": "54b3adadf95fb684e97cae357f16bcb6a8e5d5069a4d5e3ba3d5aff189ad23ef",
+    "variant": "debugAndroidTest",
+    "scope": "433-check installed test artifact; removed during cleanup."
+  },
+  "device": {
+    "kind": "physical phone",
+    "api": 36,
+    "scope": "single device; no emulator"
+  },
+  "changes": [
+    "Five distinct launcher providers and an in-app populated example gallery",
+    "Seven selectable layouts; twelve supported metric choices; order, theme and accent per instance",
+    "Background-only opacity, corners, stat number size and update-time visibility",
+    "New overview defaults put This Session before Short Videos; expanded layout uses a screen-time band",
+    "Version-1-compatible version-2 display preferences; no database change",
+    "Suggested installed Reels Apps and saved-group focus shortcuts lead to explicit review; no silent Start",
+    "Persistent product-wide quality and actual-render review expectations in agent guidance",
+    "Short decorative dividers in Today, Viewing Details and paired Insights/app history statistics",
+    "Six Settings card-level definition lists replace routine row explanations; switches last",
+    "Five curated templates remain; no fixed template cap. Optional layouts/finer appearance are disclosed progressively; changing layout preserves statistics/order"
+  ],
+  "verification": {
+    "widgetAssertions": 433,
+    "widgetResult": "PASS; INSTRUMENTATION_CODE -1",
+    "hostMatrix": "Seven layouts \u00d7 light/dark \u00d7 six responsive sizes; attached native hosts with synthetic values only",
+    "configuration": "Five temporary providers: defaults, preview metadata, Save/reopen, stat changes, opacity slider, corners/size/theme/accent, preview resize, Cancel and original preference preservation",
+    "renderChecks": "Scope-safe time ratios; opaque foreground at 0/50/100 percent panel opacity; timestamp hiding; unknown versus zero; extreme counts; source deduplication; independent configs; version-1 readback; session-first new defaults; bounded responsive parcel",
+    "visualReview": "Actual attached native renders inspected in light and dark for all five widget types. One Stat and Screen Time revised after initial visual review.",
+    "javascriptTests": 117,
+    "typecheck": "pass",
+    "lintBoundariesBackupPalette": "pass",
+    "format": "pass",
+    "docs": "pass",
+    "android": "Latest preview/test/lint assembly passes; no latest-candidate install or acceptance claimed. Installed checkpoint passes 433 checks.",
+    "androidLint": {
+      "Warning": 161
+    }
+  },
+  "phoneUi": {
+    "installedCheckpointSha256": "3fc29747d06517e41d1114abc6e8bab0faacd64b34c16a2c6e6186c30408ce90",
+    "settings": "All six card-level definition lists open and close; visible switch choices compare unchanged and switches remain at the right edge. Actual collapsed/help layouts reviewed locally.",
+    "stats": "Actual Today and Viewing Details separators reviewed; Insights inspected and cramped Start Date wrapping found. Detailed app-history separators are source/type/build checked, not separately phone-accepted.",
+    "focusAndGallery": "Earlier same-source candidates pass suggested/saved focus review, edit/cancel, and five populated gallery Add-control traversal; no focus Start or rule save.",
+    "launcher": "Earlier actual Add confirmation requested and cancelled without placement; exposed static preview clipping. Compact replacement is compiled and resource-inflated by host tests; final launcher visual retest pending.",
+    "pending": "Latest progressive menus/advanced pickers, compact launcher confirmation and Insights date-layout repair."
+  },
+  "failuresAndRepairs": [
+    "Initial build interrupted by server restart; no completion claimed",
+    "Kotlin -Werror rejected unnecessary non-null assertions; removed",
+    "Small 180x110 host left no value height; compact layout threshold repaired",
+    "Historical bitmap/chart failure traced to AppCompatImageView substitution rejecting RemoteViews methods; explicit android.widget views fix the host/context boundary",
+    "Temporary native-view XML conversion mismatch repaired before successful build",
+    "Configuration harness corrected to assert Switch state changes and match title-cased controls without case sensitivity",
+    "Initial One Stat whitespace and secondary-stat-dominated Screen Time presentation repaired after actual-render inspection",
+    "New test TypeScript optional-index warning repaired; preview labels moved to string resources",
+    "Actual launcher confirmation clipped the large static preview; compact replacement compiled, final launcher visual check pending",
+    "Settings UI runner initially used an incomplete swipe coordinate sequence; corrected and six panels/switch preservation then pass",
+    "A simultaneous diagnostic UI dump was stopped; serial phone operation used for the completed trial"
+  ],
+  "preservation": "Owned test APK and temporary host preferences removed. Original backup preference and exact Accessibility selection/master values compare equal to the baseline. Own service reconnected only where originally selected/enabled, preserving unrelated selections. App returned to Today; private captures and baseline deleted. Real history, saved groups/schedules and launcher placement preserved; no synthetic history or real focus Start.",
+  "remaining": [
+    "Actual launcher add/reconfigure/resize breadth and Android 24/25 behavior",
+    "TalkBack, large text, RTL, orientation and all accents",
+    "Refresh/process/reboot/restore and broader resource/battery qualification",
+    "Active-focus shortcut and missing-choice UI injection not exercised in this scoped phone trial",
+    "Earlier unrelated screen refinement/group/icon/permission/protection gates remain scoped to their prior evidence",
+    "Latest progressive configuration runtime and native configuration render-sheet review",
+    "Fix cramped Start/End date layout observed in Insights; then verify on phone"
+  ],
+  "publication": "Reviewed develop checkpoint awaiting normal commit/push at user-requested conclusion; no main merge, remote workflow or binary publication.",
+  "checkpoint": "User requested concluding because the session limit is approaching. Latest progressive widget menus are compiled, not device-accepted.",
+  "latestBuiltCandidate": {
+    "productSha256": "11e3471691897eb8b4cd7ead4925bf6d9ea26d44b5c170a61b74dd4d986c24e5",
+    "testSha256": "e3e1f80f6e0606a008560e9dee35a6f41cdd6cdfad837aa77ec29e6f5e2b8357",
+    "status": "compiled only; progressive configuration and capture helpers need final runtime trial",
+    "build": "preview/test/lint pass in 1m6s; latest test-only assembly 23s"
+  }
+}

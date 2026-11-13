@@ -60,24 +60,40 @@ internal object WidgetRenderer {
         val accent = if (config.accent == "app") AppearanceOwner.snapshot(context).getString("accent") else config.accent
         val palette = PaletteTokens.resolve(dark, accent)
         val current = data?.takeIf { it.day == LocalDate.now().toString() }
-        val compact = height < 110 || width < 160
+        val compact = height < 140 || width < 160
         val style = if (compact) WidgetStyle.SPOTLIGHT else config.style
         val root = RemoteViews(context.packageName, R.layout.widget_flexible)
-        root.setInt(R.id.widget_root, "setBackgroundResource", if (dark) R.drawable.widget_panel_dark else R.drawable.widget_panel_light)
-        root.setTextViewText(R.id.widget_title, when (style) { WidgetStyle.APPS -> "Reels By Apps"; WidgetStyle.RHYTHM -> "Hourly Encounters"; else -> "Attention Stats · Today" })
+        val panel = when (config.corners) {
+            "soft" -> if (dark) R.drawable.widget_panel_dark_soft else R.drawable.widget_panel_light_soft
+            "square" -> if (dark) R.drawable.widget_panel_dark_square else R.drawable.widget_panel_light_square
+            else -> if (dark) R.drawable.widget_panel_dark else R.drawable.widget_panel_light
+        }
+        root.setImageViewResource(R.id.widget_background, panel)
+        root.setInt(R.id.widget_background, "setImageAlpha", config.opacity * 255 / 100)
+        root.setTextViewText(R.id.widget_title, when (style) { WidgetStyle.APPS -> "Reels By Apps"; WidgetStyle.RHYTHM -> "Hourly Encounters"; WidgetStyle.SCREEN -> "Screen Time · Today"; else -> "Attention Stats · Today" })
         root.setTextColor(R.id.widget_title, palette.accent)
         root.setTextColor(R.id.widget_detail, palette.muted)
-        root.setViewVisibility(R.id.widget_title, if (compact) View.GONE else View.VISIBLE)
-        root.setViewVisibility(R.id.widget_detail, if (compact) View.GONE else View.VISIBLE)
-        root.setViewPadding(R.id.widget_root, dp(context, if (compact) 6 else 12), dp(context, if (compact) 6 else 12), dp(context, if (compact) 6 else 12), dp(context, if (compact) 6 else 12))
+        root.setViewVisibility(R.id.widget_header, if (compact) View.GONE else View.VISIBLE)
+        root.setViewVisibility(R.id.widget_detail, if (compact || !config.timestamp) View.GONE else View.VISIBLE)
+        root.setViewPadding(R.id.widget_content, dp(context, if (compact) 6 else 12), dp(context, if (compact) 6 else 12), dp(context, if (compact) 6 else 12), dp(context, if (compact) 6 else 12))
         root.setTextViewText(R.id.widget_detail, if (current == null) "Open App to Load Today's Stats" else "Updated " +
             Instant.ofEpochMilli(current.updatedMs).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("h:mma")))
         if (interactive) root.setOnClickPendingIntent(R.id.widget_root, open(context, null))
         root.removeAllViews(R.id.widget_body)
-        fun tile(stat: WidgetStat, list: Boolean = false): RemoteViews = RemoteViews(context.packageName, if (list) R.layout.widget_flex_line else R.layout.widget_flex_tile).apply {
+        fun tile(stat: WidgetStat, list: Boolean = false): RemoteViews = RemoteViews(context.packageName, if (list) R.layout.widget_flex_line else if (style == WidgetStyle.SPOTLIGHT) when {
+            compact -> R.layout.widget_spotlight_compact
+            config.numberSize == "small" -> R.layout.widget_spotlight_small
+            config.numberSize == "large" -> R.layout.widget_spotlight_large
+            else -> R.layout.widget_spotlight_normal
+        } else when (config.numberSize) {
+            "small" -> R.layout.widget_flex_tile_small; "large" -> R.layout.widget_flex_tile_large; else -> R.layout.widget_flex_tile
+        }).apply {
             setTextViewText(R.id.w_label, stat.title); setTextViewText(R.id.w_value, value(stat, current))
             setTextColor(R.id.w_label, palette.muted); setTextColor(R.id.w_value, palette.text)
-            if (!list) setInt(R.id.w_tile, "setBackgroundResource", if (dark) R.drawable.widget_tile_dark else R.drawable.widget_tile_light)
+            if (!list && style != WidgetStyle.SPOTLIGHT) {
+                if (config.opacity == 100) setInt(R.id.w_tile, "setBackgroundResource", if (dark) R.drawable.widget_tile_dark else R.drawable.widget_tile_light)
+                else setInt(R.id.w_tile, "setBackgroundColor", android.graphics.Color.TRANSPARENT)
+            }
             setContentDescription(R.id.w_tile, "${stat.title}: ${value(stat, current)}. ${stat.description}")
             if (interactive) setOnClickPendingIntent(R.id.w_tile, open(context, stat))
         }
@@ -86,51 +102,86 @@ internal object WidgetRenderer {
         }
         val columns = if (width >= 300) 3 else if (width >= 180) 2 else 1
         val rows = ((height - if (compact) 12 else 58) / 55).coerceIn(1, 3)
+        fun screenBand(featured: Boolean = false) {
+            val band = RemoteViews(context.packageName, if (featured) R.layout.widget_screen_focus else R.layout.widget_screen_band)
+            band.setTextViewText(R.id.w_screen_value, if (featured) duration(current?.screenMs) else "Screen Time  ${duration(current?.screenMs)}")
+            band.setTextViewText(R.id.w_screen_caption, "Reels Apps  ${duration(current?.reelsAppsMs)} · Whole-App Time")
+            band.setTextColor(R.id.w_screen_value, palette.text)
+            band.setTextColor(R.id.w_screen_caption, palette.muted)
+            val total = current?.screenMs
+            val part = current?.reelsAppsMs
+            val comparable = total != null && part != null && total > 0 && part in 0..total
+            band.setViewVisibility(R.id.w_screen_bar, if (comparable) View.VISIBLE else View.GONE)
+            band.setProgressBar(R.id.w_screen_bar, 1000, if (comparable) (part.toDouble() / total * 1000).toInt() else 0, false)
+            band.setContentDescription(R.id.w_screen_band, "Recorded screen time ${duration(total)}. Reels-app whole-app time ${duration(part)}. Includes non-video screens; partial recorded totals, not confirmed playback.")
+            if (interactive) band.setOnClickPendingIntent(R.id.w_screen_band, open(context, WidgetStat.SCREEN))
+            root.addView(R.id.widget_body, band)
+        }
         when (style) {
             WidgetStyle.LIST -> config.stats.take(((height - 48) / 34).coerceIn(1, 9)).forEach { root.addView(R.id.widget_body, tile(it, true)) }
             WidgetStyle.SPOTLIGHT -> {
                 root.addView(R.id.widget_body, row(config.stats.take(1)))
                 if (!compact && height >= 180 && config.stats.size > 1) root.addView(R.id.widget_body, row(config.stats.drop(1).take(columns)))
             }
-            WidgetStyle.APPS, WidgetStyle.RHYTHM -> {
-                root.addView(R.id.widget_body, row(config.stats.take(columns)))
-                if (height >= 150) {
-                    val chartViews = RemoteViews(context.packageName, R.layout.widget_flex_chart)
-                    val bitmap = chart(current, config, style, palette.accent, palette.muted, width.coerceIn(110, 400))
-                    chartViews.setImageViewBitmap(R.id.w_chart, bitmap)
-                    chartViews.setContentDescription(R.id.w_chart, if (current == null) "No Current Observations" else if (style == WidgetStyle.RHYTHM)
-                        "Recorded media encounters by hour, including photos and ads. " + current.hours.mapIndexed { hour, count -> "$hour:00 $count" }.joinToString(", ")
-                        else current.topVideoApps.filter { it.second > 0 }.take(4).mapIndexed { index, source -> "${if (config.names) source.first else "App ${index + 1}"}: ${source.second} video encounters" }.joinToString(", ").ifEmpty { "No Saved Video Encounters" })
-                    root.addView(R.id.widget_body, chartViews)
+            WidgetStyle.SCREEN -> {
+                screenBand(featured = height >= 230)
+                if (height >= 230) config.stats.filter { it != WidgetStat.SCREEN && it != WidgetStat.REELS_APPS }.take(2).forEach { stat ->
+                    root.addView(R.id.widget_body, RemoteViews(context.packageName, R.layout.widget_support_line).apply {
+                        setTextViewText(R.id.w_label, stat.title); setTextViewText(R.id.w_value, value(stat, current))
+                        setTextColor(R.id.w_label, palette.muted); setTextColor(R.id.w_value, palette.text)
+                        setContentDescription(R.id.w_tile, "${stat.title}: ${value(stat, current)}. ${stat.description}")
+                        if (interactive) setOnClickPendingIntent(R.id.w_tile, open(context, stat))
+                    })
                 }
             }
-            WidgetStyle.ADAPTIVE, WidgetStyle.TILES -> config.stats.take(columns * rows).chunked(columns).forEach { root.addView(R.id.widget_body, row(it)) }
+            WidgetStyle.APPS -> {
+                if (height >= 230) root.addView(R.id.widget_body, row(config.stats.take(columns)))
+                val sources = current?.topVideoApps?.filter { it.second > 0 }?.take(if (height >= 230) 4 else 2).orEmpty()
+                if (sources.isEmpty()) root.addView(R.id.widget_body, tile(config.stats.first(), true))
+                val max = sources.maxOfOrNull { it.second } ?: 1L
+                sources.forEachIndexed { index, source ->
+                    val name = if (config.names) source.first else "App ${index + 1}"
+                    root.addView(R.id.widget_body, RemoteViews(context.packageName, R.layout.widget_app_row).apply {
+                        setTextViewText(R.id.w_label, name)
+                        setTextViewText(R.id.w_value, count(source.second))
+                        setTextColor(R.id.w_label, palette.muted); setTextColor(R.id.w_value, palette.text)
+                        setProgressBar(R.id.w_app_bar, 1000, (source.second.toDouble() / max * 1000).toInt(), false)
+                        setContentDescription(R.id.w_app_row, "$name: ${source.second} video encounters. Bar relative to the highest source count.")
+                        if (interactive) setOnClickPendingIntent(R.id.w_app_row, open(context, WidgetStat.VIDEOS))
+                    })
+                }
+            }
+            WidgetStyle.RHYTHM -> {
+                if (height >= 190) root.addView(R.id.widget_body, row(config.stats.take(columns)))
+                val chartViews = RemoteViews(context.packageName, R.layout.widget_flex_chart)
+                chartViews.setImageViewBitmap(R.id.w_chart, chart(current, palette.accent, width.coerceIn(110, 400)))
+                listOf(R.id.w_axis_0, R.id.w_axis_1, R.id.w_axis_2, R.id.w_axis_3).forEach { chartViews.setTextColor(it, palette.muted) }
+                chartViews.setContentDescription(R.id.w_chart, if (current == null) "No Current Observations" else
+                    "Recorded media encounters by hour, including photos and ads. " + current.hours.mapIndexed { hour, count -> "$hour:00 $count" }.joinToString(", "))
+                root.addView(R.id.widget_body, chartViews)
+            }
+            WidgetStyle.ADAPTIVE, WidgetStyle.TILES -> {
+                val band = style == WidgetStyle.ADAPTIVE && height >= 230
+                val capacity = columns * (if (band) rows - 1 else rows)
+                var selected = config.stats.take(capacity)
+                // Keep a multi-column dashboard balanced; resizing reveals another complete row.
+                if (columns > 1 && selected.size > columns && selected.size % columns == 1) selected = selected.dropLast(1)
+                selected.chunked(columns).forEach { root.addView(R.id.widget_body, row(it)) }
+                if (band) screenBand()
+            }
         }
         return root
     }
 
-    private fun chart(data: WidgetData?, config: WidgetConfiguration, style: WidgetStyle, accent: Int, muted: Int, width: Int): Bitmap {
+    private fun chart(data: WidgetData?, accent: Int, width: Int): Bitmap {
         val bitmap = Bitmap.createBitmap(width, 80, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap); val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        paint.color = muted; paint.textSize = 10f
-        if (data == null) { canvas.drawText("No Current Observations", 4f, 40f, paint); return bitmap }
-        if (style == WidgetStyle.RHYTHM) {
-            val max = (data.hours.maxOrNull() ?: 0).coerceAtLeast(1)
-            val step = bitmap.width / 24f
-            paint.color = accent
-            data.hours.forEachIndexed { index, value -> canvas.drawRoundRect(index * step + 2, 64 - value.toFloat() / max * 56, (index + 1) * step - 2, 64f, 2f, 2f, paint) }
-            paint.color = muted
-            listOf(0 to "12AM", 6 to "6AM", 12 to "12PM", 18 to "6PM").forEach { (hour, label) -> canvas.drawText(label, hour * step + 2, 77f, paint) }
-        } else {
-            val sources = data.topVideoApps.filter { it.second > 0 }.take(4)
-            if (sources.isEmpty()) { canvas.drawText("No Saved Video Encounters", 4f, 40f, paint); return bitmap }
-            val max = sources.maxOf { it.second }.coerceAtLeast(1)
-            sources.forEachIndexed { index, source ->
-                val top = index * 19.5f
-                paint.color = muted; canvas.drawText(if (config.names) source.first else "App ${index + 1}", 3f, top + 9, paint)
-                val value = count(source.second); canvas.drawText(value, bitmap.width - paint.measureText(value) - 3, top + 9, paint)
-                paint.color = accent; canvas.drawRoundRect(3f, top + 12, 3 + (bitmap.width - 6) * source.second.toFloat() / max, top + 15.5f, 3f, 3f, paint)
-            }
+        if (data == null) return bitmap
+        val max = (data.hours.maxOrNull() ?: 0).coerceAtLeast(1)
+        val step = bitmap.width / 24f
+        paint.color = accent
+        data.hours.forEachIndexed { index, value ->
+            if (value > 0) canvas.drawRoundRect(index * step + 2, 80 - value.toFloat() / max * 76, (index + 1) * step - 2, 80f, 2f, 2f, paint)
         }
         return bitmap
     }

@@ -1,0 +1,11 @@
+<android.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w_screen_band" android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:padding="6dp">
+    <android.widget.TextView android:id="@+id/w_screen_value" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textSize="18sp" android:fontFamily="sans-serif-medium" android:maxLines="1" android:ellipsize="end" />
+    <android.widget.ProgressBar android:id="@+id/w_screen_bar" style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent" android:layout_height="6dp" android:layout_marginTop="8dp"
+        android:progressTint="#898C96" android:progressBackgroundTint="#50535D" />
+    <android.widget.TextView android:id="@+id/w_screen_caption" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="6dp" android:textSize="11sp" android:maxLines="2" android:ellipsize="end" />
+</android.widget.LinearLayout>

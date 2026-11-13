@@ -11,6 +11,12 @@ internal data class WidgetData(
     val hours: List<Long>, val day: String, val updatedMs: Long,
 ) {
     companion object {
+        /** Example projections are preview-only; never enter authoritative history or placed widgets. */
+        fun example() = WidgetData(128, 12, 2_520_000, 14_400_000, 5_400_000, 36, 3, 24, 8, null, null, 9,
+            listOf("Source One" to 64L, "Source Two" to 40L, "Source Three" to 24L), null,
+            List(24) { if (it in 8..22) ((it * 7) % 23).toLong() else 0L },
+            java.time.LocalDate.now().toString(), System.currentTimeMillis())
+
         fun fromSnapshot(snapshot: JSONObject, session: Long, focusRemaining: Long?, now: Long): WidgetData {
             val day = snapshot.getJSONArray("days").getJSONObject(0)
             val rows = day.getJSONArray("apps").let { values -> (0 until values.length()).map { values.getJSONObject(it) } }

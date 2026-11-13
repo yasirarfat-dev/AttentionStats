@@ -8,7 +8,7 @@ import android.os.Bundle
 import com.attentionstats.reels.ReelsCoordinator
 
 /** Independently configured, home-screen-only instances backed by native summaries. */
-class TodayWidget : AppWidgetProvider() {
+open class TodayWidget : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         ids.forEach { runCatching { renderOne(context, manager, it) } }
         ReelsCoordinator.get(context).refreshWidget()
@@ -33,6 +33,15 @@ class TodayWidget : AppWidgetProvider() {
         onUpdate(context, AppWidgetManager.getInstance(context), newIds)
     }
     companion object {
+        internal val providers = listOf(TodayWidget::class.java, StatWidget::class.java, ScreenTimeWidget::class.java, ReelsAppsWidget::class.java, RhythmWidget::class.java)
+        internal fun styleFor(name: String?): WidgetStyle = when (name) {
+            StatWidget::class.java.name -> WidgetStyle.SPOTLIGHT
+            ScreenTimeWidget::class.java.name -> WidgetStyle.SCREEN
+            ReelsAppsWidget::class.java.name -> WidgetStyle.APPS
+            RhythmWidget::class.java.name -> WidgetStyle.RHYTHM
+            else -> WidgetStyle.ADAPTIVE
+        }
+        internal fun owns(context: Context, component: ComponentName?) = providers.any { component == ComponentName(context, it) }
         private val listeners = java.util.concurrent.CopyOnWriteArraySet<() -> Unit>()
         internal fun addListener(listener: () -> Unit) { listeners.add(listener) }
         internal fun removeListener(listener: () -> Unit) { listeners.remove(listener) }
@@ -43,7 +52,7 @@ class TodayWidget : AppWidgetProvider() {
         internal fun render(context: Context, data: WidgetData? = null) {
             if (data != null) latest = data
             val manager = AppWidgetManager.getInstance(context)
-            manager.getAppWidgetIds(ComponentName(context, TodayWidget::class.java)).forEach { runCatching { renderOne(context, manager, it) } }
+            providers.forEach { provider -> manager.getAppWidgetIds(ComponentName(context, provider)).forEach { runCatching { renderOne(context, manager, it) } } }
             listeners.forEach { runCatching { it() } }
         }
         internal fun renderOne(context: Context, manager: AppWidgetManager, id: Int) {
@@ -54,3 +63,8 @@ class TodayWidget : AppWidgetProvider() {
         }
     }
 }
+
+class StatWidget : TodayWidget()
+class ScreenTimeWidget : TodayWidget()
+class ReelsAppsWidget : TodayWidget()
+class RhythmWidget : TodayWidget()

@@ -20,7 +20,9 @@ import {
   Row,
   SectionTitle,
   Stat,
+  StatDivider,
 } from '../../ui/Kit';
+import type { QuickFocusRequest } from '../protection';
 import { QuickActions, type QuickDestination } from './QuickActions';
 import { Screen } from '../../ui/Screen';
 import { useAppIcons, useDiary, ViewingDetail } from '../diary';
@@ -59,7 +61,10 @@ export function TodayScreen({
 }: {
   onSetup: () => void;
   onProtect: () => void;
-  onQuickAction: (destination: QuickDestination) => void;
+  onQuickAction: (
+    destination: QuickDestination,
+    quickStart?: QuickFocusRequest,
+  ) => void;
 }) {
   const { theme } = useUnistyles();
   const diary = useDiary(1);
@@ -154,7 +159,9 @@ export function TodayScreen({
             value={exactCount(String(session))}
             label="This session"
           />
+          <StatDivider inverse />
           <Stat inverse value={duration(reelsMs)} label="On screen" />
+          <StatDivider inverse />
           <Stat
             inverse
             value={String(breaks)}
@@ -164,6 +171,7 @@ export function TodayScreen({
         <View style={styles.deviceSection}>
           <View style={styles.heroStats}>
             <Stat inverse value={duration(videoAppMs)} label="Reels Apps" />
+            <StatDivider inverse />
             <Stat
               inverse
               value={duration(
@@ -173,6 +181,7 @@ export function TodayScreen({
               )}
               label="Screen Time"
             />
+            <StatDivider inverse />
             <Stat
               inverse
               value={

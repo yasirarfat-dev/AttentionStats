@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import type { QuickFocusRequest } from './focusChoices';
 import { FocusScreen } from './FocusScreen';
 import { ProtectionToolScreen } from './ProtectionToolScreen';
 import { ProtectScreen } from './ProtectScreen';
@@ -6,7 +7,7 @@ import { SchedulesScreen } from './SchedulesScreen';
 
 export type ProtectionRoutes = {
   Overview: undefined;
-  Focus: undefined;
+  Focus: { quickStart?: QuickFocusRequest } | undefined;
   Breaks: undefined;
   Blocks: undefined;
   Counter: undefined;
@@ -41,8 +42,9 @@ export function ProtectionNavigator() {
         </Stack.Screen>
       ))}
       <Stack.Screen name="Focus">
-        {({ navigation }) => (
+        {({ navigation, route }) => (
           <FocusScreen
+            quickStart={route.params?.quickStart}
             onBack={() =>
               navigation.reset({ index: 0, routes: [{ name: 'Overview' }] })
             }

@@ -1,1 +1,9 @@
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/w_chart" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitXY" android:adjustViewBounds="false" />
+<android.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical">
+    <android.widget.ImageView android:id="@+id/w_chart" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitXY" android:adjustViewBounds="false" />
+    <android.widget.LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+        <android.widget.TextView android:id="@+id/w_axis_0" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/widget_preview_12am" android:textSize="10sp" android:maxLines="1" />
+        <android.widget.TextView android:id="@+id/w_axis_1" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/widget_preview_6am" android:textSize="10sp" android:maxLines="1" />
+        <android.widget.TextView android:id="@+id/w_axis_2" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/widget_preview_12pm" android:textSize="10sp" android:maxLines="1" />
+        <android.widget.TextView android:id="@+id/w_axis_3" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/widget_preview_6pm" android:textSize="10sp" android:maxLines="1" />
+    </android.widget.LinearLayout>
+</android.widget.LinearLayout>

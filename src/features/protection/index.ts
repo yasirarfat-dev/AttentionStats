@@ -3,3 +3,6 @@ export {
   ProtectionNavigator,
   type ProtectionRoutes,
 } from './ProtectionNavigator';
+
+export { FocusQuickActions } from './FocusQuickActions';
+export type { QuickFocusRequest } from './focusChoices';
