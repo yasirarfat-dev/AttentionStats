@@ -1,5 +1,6 @@
 {
   "date": "2026-11-14",
+  "reviewedSourceCommit": "bb388664a773075b529d1f95202d50ca42afdcca",
   "decision": "ADR-093",
   "tasks": ["AS-044", "AS-059", "AS-064"],
   "status": "experimental; publication held; final live next-page confirmation fails",
