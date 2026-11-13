@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-13",
+  "tasks": ["AS-044", "AS-046", "AS-059"],
+  "readiness": "hold; Facebook video-end auto-scroll unresolved",
+  "productionBehaviorChanged": false,
+  "product": {
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "sha256": "006c5981b640d6c567f865df0a6962da908de6a6265ad0272b524659c22c6241",
+    "installedHashMatched": true,
+    "platform": "physical Android API36",
+    "source": "Facebook",
+    "sourceVersion": "586.0.0.52.53"
+  },
+  "tests": {
+    "existingTestSha256": "94df56c4c674cd6ba8bec50da43e657e4b509c4960f655bb97e87cd5e00e2988",
+    "numericAudit": {
+      "qualifiedRuns": 3,
+      "samplesPerRun": 50,
+      "qualifiedViewerSamples": 150,
+      "numericOrFixedPlayerTokenMatches": 0,
+      "operatorSetupSwipesBetweenQualifiedRuns": 2,
+      "sourceGesturesFromProbe": 0,
+      "instrumentationCodes": [-1, -1, -1],
+      "interpretation": "No exposed numeric/fixed-player signal in these sampled items; not universal source infeasibility or end acceptance."
+    },
+    "numericMediaSessionProbe": {
+      "testSha256": "10b5403cbfea6dd1fcf93aade09fffc7d730d2658fdece163fee1a7347175bfa",
+      "samples": 30,
+      "qualifiedViewerRequiredEachSample": true,
+      "matchingSessionSamples": 0,
+      "ambiguousSessionSamples": 0,
+      "positiveDurationSamples": 0,
+      "playingStateSamples": 0,
+      "usableNumericSamples": 0,
+      "sourceGestures": 0,
+      "mediaMetadataTextOrArtworkRead": false,
+      "productionPermissionAdded": false,
+      "temporaryShellPermissionDroppedInFinally": true,
+      "instrumentationCode": -1,
+      "interpretation": "Probe completed, but no selected-source session exists in this bounded trial; no production signal admitted."
+    },
+    "stoppedOrNonqualifyingTrials": [
+      "Initial deep-link attempts remain on Home after a source sleep notice; two audits have zero recognized viewers and accept nothing. Notice dismissed without changing source settings; actual Reels tab used afterward.",
+      "Older playbackProbe mode fails source-window acquisition with instrumentation code 0; no playback acceptance.",
+      "First automatic end-trial precheck fails service connection, code 0. After own-service reconnection, the next precheck refuses existing enabled source schedule, code 0; no rule disabled or rewritten, no end trial accepted."
+    ]
+  },
+  "verificationRegistry": {
+    "path": "docs/FEATURE-VERIFICATION.md",
+    "trackedTasks": 63,
+    "taskAcceptanceMirrorsTracker": true,
+    "productCodeAndScopedVerificationSeparated": true,
+    "dateFormat": "DD/MM/YY",
+    "regressionsInvalidateAffectedVerification": true,
+    "historicalPassesRetainOriginalArtifacts": true,
+    "taskStatusPromoted": false
+  },
+  "checks": {
+    "androidTestAssembly": "pass; 1m1s; product APK unchanged",
+    "documentationAndPublicArtifacts": "pass; 79 Markdown files, 41 core documents, complete 63-task inventory",
+    "whitespace": "pass"
+  },
+  "cleanup": {
+    "originalAccessibilityMasterOffRestored": true,
+    "originalAccessibilitySelectionsRestored": true,
+    "unrelatedServicesPreserved": true,
+    "ownedTestRemoved": true,
+    "privateBaselineAndNavigationCaptureRemoved": true,
+    "backupPreferenceByteComparedUnchangedOff": true,
+    "sourceSchedulesChanged": false,
+    "historyClearedOrReplaced": false,
+    "originalProductHashUnchanged": true,
+    "appReopened": true
+  },
+  "limits": [
+    "No Facebook video-end fix established; actual end/arrival/Stop not accepted on this candidate.",
+    "No new Instagram/TikTok/YouTube/Snapchat trials; prior artifact-scoped results remain historical.",
+    "No arbitrary video timer, production provider-control reveal, hidden-range admission, notification listener, screen-capture collection or new production grant.",
+    "Actual absence of a signal on sampled items does not prove no valid signal can ever exist on Facebook.",
+    "Existing release lifecycle, data-preservation, accessibility, source fidelity and store gates remain open.",
+    "No merge, version change, signing, binary publication or remote workflow run."
+  ]
+}

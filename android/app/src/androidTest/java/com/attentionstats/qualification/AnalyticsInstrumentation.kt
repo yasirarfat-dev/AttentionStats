@@ -52,6 +52,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var widgets = false
     private var historyPage = false
     private var numericAudit: String? = null
+    private var numericMediaProbe: String? = null
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
         widgets = arguments?.getString("widgets") == "true"
@@ -59,6 +60,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         autoScrollLock = arguments?.getString("autoScrollLock") == "true"
         breakTiming = arguments?.getString("breakTiming") == "true"
         numericAudit = arguments?.getString("numericAudit")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
+        numericMediaProbe = arguments?.getString("numericMediaProbe")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollInterruption = arguments?.getString("autoScrollInterruption") == "true"
         serviceRevocation = arguments?.getString("serviceRevocation") == "true"
         sourceRevocation = arguments?.getString("sourceRevocation") == "true"
@@ -101,6 +103,10 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            numericMediaProbe?.let { source ->
+                result.putString("stream", NumericMediaSessionProbe.run(this, source))
+                finish(Activity.RESULT_OK, result); return
+            }
             if (widgets) {
                 result.putString("stream", "PASS: ${WidgetVerification.run(this)} widget projection/configuration/attached-host checks; synthetic host only, real widgets unchanged")
                 finish(Activity.RESULT_OK, result); return

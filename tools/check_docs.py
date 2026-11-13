@@ -21,7 +21,7 @@ REQUIRED = (
     "SETTINGS-SPEC ARCHITECTURE FILE-STRUCTURE NATIVE-CONTRACTS DATA-MODELS "
     "STORAGE-AND-RETENTION PRIVACY SECURITY CRYPTO-ARCHIVE-DESIGN PERMISSIONS BACKUP-RESTORE "
     "CONVENTIONS DEPENDENCIES TESTING DEVELOPMENT RELEASE CONTRIBUTING "
-    "IOS-CONTRIBUTION-GUIDE AGENT-RULES ROADMAP FEATURE-TRACKER STATE QUEUE DECISIONS"
+    "IOS-CONTRIBUTION-GUIDE AGENT-RULES ROADMAP FEATURE-TRACKER FEATURE-VERIFICATION STATE QUEUE DECISIONS"
 ).split()
 METADATA = ("Status", "Responsibility", "Related specifications", "Unresolved feasibility")
 ERRORS: list[str] = []
@@ -170,6 +170,22 @@ def main() -> int:
     for row in re.findall(r"^\| AS-\d{3}\b.*$", tracker, re.M):
         if not re.search(r"\| (planned|experimental|blocked|implemented) \|", row):
             fail(tracker_path, f"task missing explicit status: {row[:40]}")
+    verification_path = DOCS / "FEATURE-VERIFICATION.md"
+    inventory = markdown.get(verification_path, "")
+    inventory_rows = re.findall(r"^\| (AS-\d{3})\b.*$", inventory, re.M)
+    if len(inventory_rows) != len(set(inventory_rows)) or set(inventory_rows) != set(tasks):
+        fail(verification_path, "task acceptance checklist must contain every tracker task exactly once")
+    tracker_rows = {row.split("|")[1].strip().split()[0]: row.split("|")
+                    for row in re.findall(r"^\| AS-\d{3}\b.*$", tracker, re.M)}
+    for row in re.findall(r"^\| AS-\d{3}\b.*$", inventory, re.M):
+        cells = [cell.strip() for cell in row.split("|")[1:-1]]
+        source = tracker_rows.get(cells[0].split()[0])
+        if source is None:
+            continue  # The missing/extra-ID check above reports this.
+        status = source[3].strip()
+        expected = "[x]" if status == "implemented" else "[ ]"
+        if len(cells) != 4 or cells[0] != source[1].strip() or cells[1] != status or cells[2] != expected:
+            fail(verification_path, f"task acceptance differs from tracker: {cells[0].split()[0]}")
     decisions = markdown.get(DOCS / "DECISIONS.md", "")
     feasibility_ids = set(re.findall(r"^\| (F-\d{2})\b", decisions, re.M))
     for gate in references(all_text, "F") - feasibility_ids:

@@ -73,6 +73,7 @@ The earlier [interactive design study](../design/prototype/README.md), scaffold 
 | Workflow | [AGENT-RULES.md](AGENT-RULES.md) | Equal agent/human rules, precedence and continuity |
 | Stages | [ROADMAP.md](ROADMAP.md) | Foundation, feasibility, MVP, expansion and evolution gates |
 | Backlog | [FEATURE-TRACKER.md](FEATURE-TRACKER.md) | Stable prioritized AS tasks and evidence |
+| Verification checklist | [FEATURE-VERIFICATION.md](FEATURE-VERIFICATION.md) | Separate code/verified boxes, dates, versions, artifacts, known failures and complete task acceptance inventory |
 | Truth now | [STATE.md](STATE.md) | Current artifacts, checks, limitations and next work |
 | Intake | [QUEUE.md](QUEUE.md) | Reviewed ideas and unscheduled design questions |
 | Choices | [DECISIONS.md](DECISIONS.md) | Accepted ADRs and unresolved F gates |

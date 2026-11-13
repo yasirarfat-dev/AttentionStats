@@ -88,6 +88,8 @@ Select and document Play App Signing and upload-key responsibilities before publ
 
 ## Binary release gates
 
+**2026-11-13 assessment: hold the next merge/publication candidate.** The maintainer reports Facebook auto-scroll still failing; current-artifact physical investigation finds no readable numeric playback signal in 150 qualified viewer samples and no selected-source media session in a separate 30-sample probe. No fix or actual end/arrival/Stop acceptance is established. Existing source schedules are preserved when the live trial refuses its precondition. See [investigation evidence](evidence/publication-readiness.json) and the [complete feature/verification checklist](FEATURE-VERIFICATION.md). A build can succeed while this release gate remains open. Do not relabel historical baseline/source passes as current candidate readiness. A changed release scope requires an explicit decision and truthful unavailable behavior; it is not inferred from these negative probes.
+
 1. Select candidate from passing code/review and accurate tracker/specs. Re-resolve latest only in a reviewed update task; release builds consume the reviewed lockfile.
 2. Build signed release AAB/APK reproducibly from clean state using frozen-lockfile and pinned native toolchain. Record any reproducibility limitation, including signing timestamps. Inspect merged manifest, exported components, permissions, backup exclusions and dependency notices.
 3. Pass relevant [acceptance scenarios](TESTING.md), including real-device lifecycle, enforcement escape routes, crypto/restore failure, egress/log checks and OS cloud/device transfer exclusions. Unsupported detectors remain disabled with declared ranges.

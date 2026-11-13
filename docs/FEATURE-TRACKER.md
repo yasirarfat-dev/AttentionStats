@@ -1,5 +1,7 @@
 # Feature tracker
 
+For separate implementation/verification boxes, dates, versions and known failures, read the [feature verification checklist](FEATURE-VERIFICATION.md). Historical passes do not clear a later regression or qualify a different artifact.
+
 **Status:** MVP 1.0.0 implemented within its documented scope; maintainer reports closed beta. AS-052 establishes continuation on `develop`; export/restore, broader qualification and remaining full-product work are open. Updated 2026-11-13.
 **Responsibility:** Owns stable task IDs, priorities, dependencies, capability mapping and completion evidence.
 **Related specifications:** [Roadmap](ROADMAP.md), [State](STATE.md), [Capabilities](CAPABILITY-MATRIX.md), [Tests](TESTING.md), [Decisions](DECISIONS.md).
