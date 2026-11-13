@@ -67,7 +67,7 @@ internal object LiveServiceRevocationVerification {
         try {
             repeat(2) {
                 check(components(selected()) == original) { "concurrent accessibility change preserved" }
-                main { AutoScrollSession.configure(true, 1) }
+                main { AutoScrollSession.configure(true, 2) }
                 check(waitFor { state().header != null })
                 check(waitFor { AutoScrollSession.canStart() }) { "fresh playable item required" }
                 if (!state().expanded) LiveHudVerification.choose(instrumentation, automation, "header")
@@ -107,8 +107,8 @@ internal object LiveServiceRevocationVerification {
             main {
                 AutoScrollSession.clear()
                 if (hadNotice || wasEnabled) {
-                    AutoScrollSession.configure(true, 1)
-                    if (!wasEnabled) AutoScrollSession.configure(false, 1)
+                    AutoScrollSession.configure(true, 2)
+                    if (!wasEnabled) AutoScrollSession.configure(false, 2)
                 }
             }
             if (waitFor { state().header != null } && state().expanded != initial.expanded)

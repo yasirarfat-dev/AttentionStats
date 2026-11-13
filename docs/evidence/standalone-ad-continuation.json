@@ -1,0 +1,101 @@
+{
+  "date": "2026-11-14",
+  "decision": "ADR-093",
+  "tasks": ["AS-044", "AS-059", "AS-064"],
+  "status": "experimental; publication held; final live next-page confirmation fails",
+  "product": {
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "sha256": "2608e5cd843a00f3826feb5363b44ec1748412cc440166d0b97d6822a844b644",
+    "installedHashMatched": true,
+    "platform": "physical Android API36",
+    "source": "Facebook",
+    "sourceVersion": "586.0.0.52.53",
+    "testSha256": "f334f608ac9303113bc5242a37cb2fec8ebfde2676b4288b76231435a80d3d59"
+  },
+  "implementation": {
+    "separateSkipStandaloneAdsChoice": true,
+    "defaultOff": true,
+    "requiresAutoScrollPermissionAndHudStart": true,
+    "separateAllowCancelDisclosures": true,
+    "nativeActionContract": 2,
+    "noticeRevision": 2,
+    "newAndroidPermission": false,
+    "productionProviderButtonClicks": false,
+    "newDependencyOrDatabaseSchema": false,
+    "qualifiedRoute": "candidate English Facebook dedicated Reels tab, full settled page, small native Ad information pill and two bounded publisher/caption anchors",
+    "sameAdProposalFence": "Same page or overlapping source-specific anchors do not authorize retry or confirm arrival; generic full-page wrappers excluded from ad continuity anchors.",
+    "confirmationCandidates": "Selected Reels tab without settled viewer stays unknown; frame display eligibility published before observation; bounded existing confirmation may survive transient acquisition/missing HUD publication. No new gesture from a gap."
+  },
+  "checks": {
+    "typecheck": "pass",
+    "lintArchitectureBackupPalette": "pass",
+    "format": "pass",
+    "jest": 134,
+    "hostCompletionGate": 31,
+    "encounterHost": 56,
+    "detectorFixtures": 238,
+    "androidPreviewAndTestAssembly": "pass; final build 57 seconds",
+    "androidLintErrors": 0,
+    "androidLintWarnings": 167,
+    "finalPhysicalSyntheticSafety": {
+      "checks": 77,
+      "instrumentationCode": -1,
+      "scope": "Product session decisions on physical ART with synthetic frames; no source gestures. Includes opt-out, notice revocation, same-ad metadata drift/retry and unavailable-context cases."
+    }
+  },
+  "finalLive": {
+    "actualHudStartAndStop": true,
+    "qualifiedStandaloneAdBeforeStart": true,
+    "operatorSourceGesturesAfterStart": 0,
+    "trialDeadlineSeconds": 15,
+    "proposals": 1,
+    "validationPassed": 1,
+    "platformGestureAccepted": 1,
+    "platformGestureCompleted": 1,
+    "nativeConfirmedTransitions": 0,
+    "samples": 15,
+    "adUnknownSamples": 1,
+    "subsequentRecognizedVideoSamples": 14,
+    "numericPlaybackSamples": 14,
+    "pendingViewerUnavailableSuspensions": 1,
+    "instrumentationCode": 0,
+    "result": "FAIL: swipe executes and a normal numeric video is sampled, but native arrival confirmation is lost. No end-to-end or continuous-scroll acceptance."
+  },
+  "ui": {
+    "finalCandidateSettingsVisuallyReviewed": true,
+    "bothSessionChoicesOffAfterCleanup": true,
+    "separateAllowCancelAndEnabledControlsReviewedOnPredecessor": true,
+    "predecessorUiProductSha256": "7447ce99f552b935b2f459f87e75d885c10f5bf44032e3264422fa35113a7cef"
+  },
+  "priorTrials": [
+    "Deep-link shortcut leaves Home; actual Reels tab, loaded playback and manual source-pager advancement visually confirmed before this continuation's trials.",
+    "Eight consecutive operator manual swipes with local visual captures; manual inputs are not auto-scroll evidence.",
+    "Standalone video ad, a different standalone ad/CTA layout, and an ad overlay over an ordinary video observed; nonqualifying ad-overlay precondition rejected.",
+    "Old harness rejects all future saved windows; current guard checks active protection without changing saved schedules. Instrumentation reconnect/Start race repaired with test-only setup settling.",
+    "First immediate-ad candidate records more than one proposal and is not accepted; a same-ad origin/anchor fence is added. Subsequent candidates execute one gesture but lose confirmation.",
+    "Earlier ad layout requires exact Ad child label; second observed native Ad button has an unlabelled inner ViewGroup. Both sanitized source layouts have host coverage; no generalized sponsored-caption skipping.",
+    "Generic full-screen accessibility wrapper labels shared across unrelated ads are excluded from source-specific action continuity anchors.",
+    "No fresh Instagram/TikTok/YouTube/Snapchat acceptance, genuine provider Skip Ad trial or complete final three-transition pass."
+  ],
+  "cleanup": {
+    "ownedTestRemoved": true,
+    "originalAccessibilitySelectionAndMasterComparedRestored": true,
+    "unrelatedSelectionsPreserved": true,
+    "backupPreferenceByteComparedUnchangedOff": true,
+    "historyClearedOrReplaced": false,
+    "savedSourceRulesChanged": false,
+    "updatedProductInstalledInPlaceAndHashVerified": true,
+    "activeConvenienceAndAdChoiceCleared": true,
+    "phoneInspectionCacheRemoved": true,
+    "privateBaselineAndCapturesRemoved": true,
+    "appReturnedToToday": true
+  },
+  "next": [
+    "Diagnose the exact ordered renderer/acquisition state that still emits pending_suspend_viewer_unavailable after the completed swipe; counters alone are insufficient. Preserve main/worker state coherence and hard exclusion boundaries.",
+    "Require independent next-page identity plus native confirmation and actual Stop on the exact candidate, then repeated mixed-video/ad transitions and negative/lifecycle cases.",
+    "Qualify other sources/ads/locales separately; unknown progress is not an interval-based completion signal.",
+    "Genuine provider Skip Ad buttons remain unavailable feasibility research with separate consent/control-identity/policy gates.",
+    "Complete concrete-candidate release/history/accessibility/store gates and obtain explicit merge agreement before main/publication."
+  ]
+}

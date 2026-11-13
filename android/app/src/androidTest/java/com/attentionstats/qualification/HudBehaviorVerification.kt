@@ -31,7 +31,7 @@ internal object HudBehaviorVerification {
                     hud = CounterHudView(instrumentation.targetContext, {}, {}, {}, {
                         toggles++
                         if (AutoScrollSession.running) AutoScrollSession.stop() else {
-                            if (!AutoScrollSession.enabled) AutoScrollSession.configure(true, 1)
+                            if (!AutoScrollSession.enabled) AutoScrollSession.configure(true, 2)
                             AutoScrollSession.start()
                         }
                         hud.setAutoScrollControl(true, AutoScrollSession.running, AutoScrollSession.canStart())
@@ -110,8 +110,8 @@ internal object HudBehaviorVerification {
                 } finally {
                     AutoScrollSession.clear()
                     if (hadNotice || wasEnabled) {
-                        AutoScrollSession.configure(true, 1)
-                        if (!wasEnabled) AutoScrollSession.configure(false, 1)
+                        AutoScrollSession.configure(true, 2)
+                        if (!wasEnabled) AutoScrollSession.configure(false, 2)
                     }
                     AutoScrollSession.onChanged = observer
                 }

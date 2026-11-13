@@ -54,7 +54,7 @@ internal object LiveAutoScrollLockVerification {
         fun expect(value: Boolean) { check(value) { "live lock ${checks + 1}" }; checks++ }
         var slept = false
         try {
-            main { AutoScrollSession.configure(true, 1) }
+            main { AutoScrollSession.configure(true, 2) }
             check(waitFor { AutoScrollSession.canStart() }) { "fresh playable item required" }
             if (!state().expanded) LiveHudVerification.choose(instrumentation, automation, "header")
             LiveHudVerification.choose(instrumentation, automation, "off")
@@ -91,8 +91,8 @@ internal object LiveAutoScrollLockVerification {
             main {
                 AutoScrollSession.clear()
                 if (hadNotice || wasEnabled) {
-                    AutoScrollSession.configure(true, 1)
-                    if (!wasEnabled) AutoScrollSession.configure(false, 1)
+                    AutoScrollSession.configure(true, 2)
+                    if (!wasEnabled) AutoScrollSession.configure(false, 2)
                 }
             }
             if (slept) shell("input keyevent 224")

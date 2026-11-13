@@ -15,9 +15,12 @@ import javax.xml.parsers.DocumentBuilderFactory
  */
 object FixtureTests {
     data class Expect(val surface: Surface, val route: ReelRoute? = null, val category: PageCategory? = null,
-        val identified: Boolean = surface == Surface.REELS, val mediaKind: String? = null)
+        val identified: Boolean = surface == Surface.REELS, val mediaKind: String? = null,
+        val standaloneAd: Boolean? = null)
 
     private val expectations: Map<String, Expect> = mapOf(
+        "facebook/standalone_reels_video_ad.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.AD, standaloneAd = true),
+        "facebook/standalone_reels_video_ad_blank_child.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.AD, standaloneAd = true),
         "facebook/feed_photo_button_ad.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.AD, mediaKind = "photo"),
         "facebook/feed_photo_button_album.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.PHOTO, mediaKind = "photo"),
         "facebook/feed_panorama_photo.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.PHOTO, mediaKind = "photo"),
@@ -108,6 +111,7 @@ object FixtureTests {
             expect.route?.let { require(frame.route == it, "route $it") }
             expect.category?.let { require(frame.category == it, "category $it") }
             expect.mediaKind?.let { require(frame.mediaKind == it, "media kind $it") }
+            expect.standaloneAd?.let { require(frame.standaloneAd == it, "standalone advertisement $it") }
             require((frame.identity != null) == expect.identified, "identified=${expect.identified}")
             val full = parse(file)
             val truncated = ScreenSnapshot(full.packageName, full.windowId, full.screen, full.nodes, complete = false, typing = false)
@@ -124,6 +128,47 @@ object FixtureTests {
         checks++
         // Synthetic aspect-ratio/album variations of an observed photo; not live format qualification.
         val facebook = AdapterRegistry.of(ReelApp.FACEBOOK)
+        val standalone = parse(File(root, "facebook/standalone_reels_video_ad.xml"))
+        val pill = standalone.nodes.single { it.cls == "android.widget.Button" && it.label == "Ad" }
+        val pillChild = standalone.nodes.single { it.parent == pill.index && it.label == "Ad" }
+        fun modifiedAd(change: (ScreenNode) -> ScreenNode): AdapterFrame = facebook.read(ScreenSnapshot(
+            standalone.packageName, standalone.windowId, standalone.screen, standalone.nodes.map(change), true, false))
+        fun marker(node: ScreenNode, cls: String = node.cls, label: String? = node.label,
+            bounds: LayoutBounds = node.bounds, clickable: Boolean = node.clickable): ScreenNode = ScreenNode(
+            node.index, node.parent, node.depth, node.id, cls, label, bounds, node.scrollable, clickable,
+            node.selected, node.key, node.range)
+        for (change in listOf<(ScreenNode) -> ScreenNode>(
+            { if (it === pill) marker(it, cls = "android.view.ViewGroup") else it },
+            { if (it === pill) marker(it, clickable = false) else it },
+            { if (it === pill) marker(it, label = "Sponsored") else it },
+            { if (it === pill) marker(it, bounds = LayoutBounds(23, 200, 112, 245)) else it },
+            { if (it === pill) marker(it, bounds = LayoutBounds(400, 1315, 489, 1360)) else it },
+            { if (it === pill) marker(it, bounds = LayoutBounds(23, 1315, 600, 1360)) else it },
+            { if (it === pillChild) marker(it, label = "synthetic-caption") else it },
+            { if (it.selected && it.label?.startsWith("Reels,") == true) marker(it, label = "synthetic-other-tab") else it },
+        )) {
+            check(!modifiedAd(change).standaloneAd) { "Caption/sponsored text or misplaced/unqualified marker must not authorize ad skipping" }
+            checks++
+        }
+        check(!facebook.read(ScreenSnapshot(standalone.packageName, standalone.windowId, standalone.screen,
+            standalone.nodes, false, false)).standaloneAd)
+        check(!facebook.read(ScreenSnapshot(standalone.packageName, standalone.windowId, standalone.screen,
+            standalone.nodes, true, true)).standaloneAd)
+        checks += 2
+        val pager = standalone.nodes.first { it.scrollable }
+        val listShaped = standalone.nodes.map { node -> if (node === pager) ScreenNode(node.index, node.parent,
+            node.depth, "list", node.cls, node.label, node.bounds, node.scrollable, node.clickable,
+            node.selected, node.key, node.range) else node }
+        val listFrame = facebook.read(ScreenSnapshot(standalone.packageName, standalone.windowId, standalone.screen,
+            listShaped, true, false))
+        check(listFrame.surface == Surface.REELS && listFrame.route == ReelRoute.VIEWER)
+        val unsettled = standalone.nodes.map { node -> marker(node, clickable = false) }.map { node ->
+            if (node.selected && node.label?.startsWith("Reels,") == true) marker(node, clickable = true) else node }
+        val transition = facebook.read(ScreenSnapshot(standalone.packageName, standalone.windowId, standalone.screen,
+            unsettled, true, false))
+        check(transition.surface == Surface.UNKNOWN && transition.route == ReelRoute.VIEWER &&
+            transition.identity == null && !transition.standaloneAd)
+        checks += 2
         val buttonAlbum = facebook.read(parse(File(root, "facebook/feed_photo_button_album.xml")))
         check(buttonAlbum.page == LayoutBounds(0, 531, 720, 1251)) {
             "observed photo-role buttons must group into one album, not focus an individual tile"

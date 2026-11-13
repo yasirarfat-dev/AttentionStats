@@ -56,6 +56,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
     reelsSourceKeys.map(key => reelsSources[key].packageName),
   );
   const [autoScroll, setAutoScroll] = useState(false);
+  const [skipAds, setSkipAds] = useState(false);
   const appearance = useAppearance();
   const appearancePending = useRef(false);
   async function chooseAppearance(next: typeof appearance) {
@@ -74,7 +75,11 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
   }
   useEffect(() => {
     NativeReels?.getAutoScrollSnapshot()
-      .then(raw => setAutoScroll(parseAutoScrollStatus(raw).enabled))
+      .then(raw => {
+        const status = parseAutoScrollStatus(raw);
+        setAutoScroll(status.enabled);
+        setSkipAds(status.skipStandaloneAds);
+      })
       .catch(() => {});
   }, []);
   const paused = !!snapshot?.sources.some(
@@ -297,16 +302,66 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
             icon="play"
             title="Auto-scroll (experimental)"
             value={autoScroll}
-            onChange={async value => {
-              try {
-                setAutoScroll(
-                  parseAutoScrollStatus(
-                    await NativeReels!.configureAutoScroll(value, 1),
-                  ).enabled,
-                );
-              } catch {
-                /* unchanged */
+            onChange={value => {
+              const configure = async () => {
+                try {
+                  const status = parseAutoScrollStatus(
+                    await NativeReels!.configureAutoScroll(value, 2),
+                  );
+                  setAutoScroll(status.enabled);
+                  setSkipAds(status.skipStandaloneAds);
+                } catch {
+                  Alert.alert(
+                    'Could not change auto-scroll',
+                    'Please try again.',
+                  );
+                }
+              };
+              if (!value) {
+                void configure();
+                return;
               }
+              Alert.alert(
+                'Allow auto-scroll for this session?',
+                'After you press Start on the floating counter, Attention Stats swipes past finished videos when readable playback confirms the end. Unknown video progress waits. You can separately choose to skip recognized standalone ads. Use the same counter control to stop. Permission clears when the tracking service restarts.',
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  { text: 'Allow', onPress: () => void configure() },
+                ],
+              );
+            }}
+          />
+          <ToggleRow
+            icon="play"
+            title="Skip standalone ads (experimental)"
+            value={skipAds}
+            disabled={!autoScroll}
+            onChange={value => {
+              const configure = async () => {
+                try {
+                  const status = parseAutoScrollStatus(
+                    await NativeReels!.configureAutoScrollAds(value, 2),
+                  );
+                  setSkipAds(status.skipStandaloneAds);
+                } catch {
+                  Alert.alert(
+                    'Could not change ad skipping',
+                    'Please try again.',
+                  );
+                }
+              };
+              if (!value) {
+                void configure();
+                return;
+              }
+              Alert.alert(
+                'Skip recognized standalone ads?',
+                'During a started auto-scroll session, immediately swipe past positively recognized standalone Facebook Reels ads. No ad links are opened. Ads playing in front of another video and provider Skip Ad buttons are not included. This choice is temporary and starts off.',
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  { text: 'Allow', onPress: () => void configure() },
+                ],
+              );
             }}
           />
         </View>

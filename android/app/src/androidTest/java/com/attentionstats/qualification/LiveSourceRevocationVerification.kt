@@ -72,7 +72,7 @@ internal object LiveSourceRevocationVerification {
         fun expect(value: Boolean) { check(value) { "live source revocation ${checks + 1}" }; checks++ }
         try {
             repeat(2) {
-                main { AutoScrollSession.configure(true, 1) }
+                main { AutoScrollSession.configure(true, 2) }
                 check(waitFor { AutoScrollSession.canStart() }) { "fresh playable item required" }
                 if (!state().expanded) LiveHudVerification.choose(instrumentation, automation, "header")
                 LiveHudVerification.choose(instrumentation, automation, "off")
@@ -111,8 +111,8 @@ internal object LiveSourceRevocationVerification {
                 main {
                     AutoScrollSession.clear()
                     if (hadNotice || wasEnabled) {
-                        AutoScrollSession.configure(true, 1)
-                        if (!wasEnabled) AutoScrollSession.configure(false, 1)
+                        AutoScrollSession.configure(true, 2)
+                        if (!wasEnabled) AutoScrollSession.configure(false, 2)
                     }
                 }
             }

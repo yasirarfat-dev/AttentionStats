@@ -53,6 +53,8 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var historyPage = false
     private var numericAudit: String? = null
     private var numericMediaProbe: String? = null
+    private var autoScrollContinuous: String? = null
+    private var standaloneAdLive = false
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
         widgets = arguments?.getString("widgets") == "true"
@@ -61,6 +63,8 @@ class AnalyticsInstrumentation : Instrumentation() {
         breakTiming = arguments?.getString("breakTiming") == "true"
         numericAudit = arguments?.getString("numericAudit")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         numericMediaProbe = arguments?.getString("numericMediaProbe")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
+        autoScrollContinuous = arguments?.getString("autoScrollContinuous")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
+        standaloneAdLive = arguments?.getString("standaloneAdLive") == "true"
         autoScrollInterruption = arguments?.getString("autoScrollInterruption") == "true"
         serviceRevocation = arguments?.getString("serviceRevocation") == "true"
         sourceRevocation = arguments?.getString("sourceRevocation") == "true"
@@ -103,6 +107,10 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            autoScrollContinuous?.let { source ->
+                result.putString("stream", LiveAutoScrollContinuousVerification.run(this, source, standaloneAdLive))
+                finish(Activity.RESULT_OK, result); return
+            }
             numericMediaProbe?.let { source ->
                 result.putString("stream", NumericMediaSessionProbe.run(this, source))
                 finish(Activity.RESULT_OK, result); return

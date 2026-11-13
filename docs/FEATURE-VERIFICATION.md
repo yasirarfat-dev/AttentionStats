@@ -1,6 +1,6 @@
 # Feature implementation and verification checklist
 
-**Status:** Release held; Facebook video-end auto-scroll remains unresolved. Updated 2026-11-13.
+**Status:** Release held; Facebook video-end auto-scroll remains unresolved. Updated 2026-11-14.
 **Responsibility:** Provides a scannable implementation/verification record, known regressions and links to exact evidence. Task acceptance remains owned by the tracker.
 **Related specifications:** [Tracker](FEATURE-TRACKER.md), [State](STATE.md), [Testing](TESTING.md), [Release](RELEASE.md), [Auto-scroll](AUTOSCROLL-SPEC.md).
 **Unresolved feasibility:** Source playback signals, remaining lifecycle/accessibility/data-preservation gates and store approval are not established by a successful build.
@@ -17,10 +17,11 @@ The product rows cover delivered and proposed user-facing behavior. The complete
 
 | Key | Attention Stats version / artifact | Evidence scope |
 |---|---|---|
-| P0 | 1.0.0-reels-preview / code 10; SHA-256 `006c5981b640d6c567f865df0a6962da908de6a6265ad0272b524659c22c6241` | Current installed candidate; [compact focus](evidence/compact-focus.json). Not an uploaded release. |
+| P0 | 1.0.0-reels-preview / code 10; SHA-256 `006c5981b640d6c567f865df0a6962da908de6a6265ad0272b524659c22c6241` | Historical candidate; [compact focus](evidence/compact-focus.json). Not an uploaded release. |
 | P1 | 1.0.0-reels-preview / code 10; final `577943f18782b28cdf86633b266e4c7e8f22e6728258b773cb786f58cb4c97d9`, native-tested predecessor `fc3abc6badbb006f2d01d1bceda160f5eca883deea29f2104a5887b72d2fc642` | [Cohesive screens](evidence/cohesive-screen-refinement.json); each check retains its actual artifact. |
 | A1 | Historical development preview `59c6b2dcf5258493624f526dc0e5173f72bb405beafd65d90cacf41a90dc80fe` | [Auto-scroll tracing](evidence/confirmation-trace-continuation.json), 12/11/26; no implied rerun on P0. |
 | B0 | Historical 1.0.0 / code 10 baseline; Console-to-source mapping not independently established | [30 October runtime scope](STATE.md#verification-2026-10-30). Baseline evidence, not final-candidate qualification. |
+| P2 | 1.0.0-reels-preview / code 10; `2608e5cd843a00f3826feb5363b44ec1748412cc440166d0b97d6822a844b644` | Current installed standalone-ad candidate; final gesture executes but arrival confirmation fails. [Evidence](evidence/standalone-ad-continuation.json). |
 
 ## Product behavior
 
@@ -39,7 +40,7 @@ The product rows cover delivered and proposed user-facing behavior. The complete
 | App usage time and observed opens; AS-011/AS-050 | [x] | [x] | Historical development artifact | Scoped physical app-entry/time checks; not exact launches, attention or complete device union. [Evidence](evidence/diary-preview.json). |
 | Floating counter, categories, pause/resume, hide and drag; AS-034/AS-059 | [x] | [x] | 10–12/11/26; linked artifacts | Scoped HUD/control/scheduler and actual source-return trials; broader pause/lifecycle/accessibility remain. [HUD evidence](evidence/surface-recovery-continuation.json). |
 | Instagram video-end auto-scroll; AS-044/AS-059 | [x] | [ ] | Last scoped passes 12/11/26; A1; Instagram 455.0.0.51.72 | Three actual Start/end/arrival/Stop passes; earlier intermittent confirmation loss unresolved, P0 end matrix unrun. [Evidence](evidence/confirmation-trace-continuation.json). |
-| Facebook video-end auto-scroll; AS-044/AS-059 | [x] | [ ] | 13/11/26; P0; Facebook 586.0.0.52.53 | **Known failure / publication hold.** Three 50-sample viewer audits expose no readable numeric signal. Automatic end trial is not accepted. [Current investigation](evidence/publication-readiness.json). |
+| Facebook video-end auto-scroll; AS-044/AS-059 | [x] | [ ] | 13/11/26; P0; Facebook 586.0.0.52.53 | **Known failure / publication hold.** Earlier zero-progress probes are item/layout-scoped. P2 executes an ad swipe and reads numeric progress on the next video, but still loses native arrival confirmation. No continuous/end acceptance. [Initial probes](evidence/publication-readiness.json), [current trial](evidence/standalone-ad-continuation.json). |
 | TikTok video-end auto-scroll; AS-044/AS-059 | [x] | [ ] | Last scoped pass 12/11/26; A1; TikTok 47.7.3 | One confirmed end/arrival/Stop trial; prior failures/repeated-end/negative cases and P0 matrix remain. [Evidence](evidence/confirmation-trace-continuation.json). |
 | YouTube/Snapchat video-end auto-scroll; AS-044/AS-059 | [x] | [ ] | 11/11/26; historical probes | End support unavailable/unqualified; YouTube has recognized viewers without usable progress; zero-viewer Snapchat probe accepts nothing. [Auto-scroll scope](AUTOSCROLL-SPEC.md). |
 | Explicit photo/image-ad five-second auto-scroll; AS-044 | [x] | [ ] | Historical synthetic coverage | Positively classified photos only; no fallback video timer. Final live source matrix remains. [Auto-scroll](AUTOSCROLL-SPEC.md). |
@@ -59,10 +60,12 @@ The product rows cover delivered and proposed user-facing behavior. The complete
 | Three-stage local erase; AS-019 | [x] | [x] | 30/10/26 B0; 13/11/26 P1 cancellation | B0 actual erase/re-onboarding; P1 all stages cancelled safely. Current real-history deletion deliberately not repeated. External copies remain separate. [State](STATE.md#verification-2026-10-30), [screens](evidence/cohesive-screen-refinement.json). |
 | Manual archive export/restore; AS-020 | [x] | [x] | 05/11/26; historical bounded evidence | Isolated archive checks and recorded picker scope; fresh-install/max-logical-restore/scalability gates remain. Public app key is not a secret password. [Evidence](evidence/beta-continuation.json). |
 | Android-managed automatic backup/recovery; AS-058 | [x] | [x] | 04–11/11/26; linked artifacts | App-scoped transport handoff and isolated storage/recovery checks; actual framework fresh-install recovery/overlap/max restore remain. [Evidence](evidence/automatic-backup.json). |
+| Standalone Facebook Reels ad skip and separate permission; AS-064 | [x] | [ ] | 14/11/26; P2; Facebook 586.0.0.52.53 | Final Settings render and 77 synthetic safety checks pass. One actual validated/accepted/completed swipe, but native arrival confirmation is zero: live trial fails. Genuine provider Skip Ad controls remain unavailable. [Evidence](evidence/standalone-ad-continuation.json). |
 | Direct Google Drive API backup; AS-028 | [ ] | [ ] | Blocked F-05 | Separate from Android-managed backup; policy clearance remains required. [Tracker](FEATURE-TRACKER.md). |
 | Offline protection PIN/recovery/supervised exceptions; AS-063 | [ ] | [ ] | Planned ADR-092 | Design only; no runtime PIN/uninstall-resistance promise. [Protection](PROTECTION-SPEC.md). |
 | Broader device-wide statistics, network/content/action outcomes; AS-023/AS-036/AS-041/AS-062 | [ ] | [ ] | Planned/experimental subsets | Research/calculation fixtures do not establish collectors. Text posts/likes/reactions/submitted comments not measured. [Tracker](FEATURE-TRACKER.md), [metric catalog](METRIC-CATALOG.md). |
 | Personal equivalents, forecasts/topics and iOS; AS-030/AS-031/AS-032/AS-040 | [ ] | [ ] | Planned/experimental | No accepted complete end-user implementation from research/studies. [Tracker](FEATURE-TRACKER.md). |
+
 
 ## Candidate release checklist
 
@@ -144,3 +147,4 @@ Completion here mirrors tracker task acceptance. Experimental tasks can contain 
 | AS-061 Pause-before-breather safety and accessible playback fallback | experimental | [ ] | [Scope and evidence](FEATURE-TRACKER.md) |
 | AS-062 Device-wide usage statistics and cross-app media feasibility | planned | [ ] | [Scope and evidence](FEATURE-TRACKER.md) |
 | AS-063 Offline protection PIN and supervised exceptions | planned | [ ] | [Scope and evidence](FEATURE-TRACKER.md) |
+| AS-064 Immediate standalone-ad scrolling and genuine Skip Ad feasibility | experimental | [ ] | [Scope and evidence](FEATURE-TRACKER.md) |

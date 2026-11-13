@@ -49,7 +49,7 @@ internal object LiveAutoScrollRestartVerification {
         main { check(!AutoScrollSession.running) { "existing run preserved" } }
         var prepared = false
         try {
-            main { AutoScrollSession.configure(true, 1) }
+            main { AutoScrollSession.configure(true, 2) }
             check(waitFor { AutoScrollSession.canStart() }) { "fresh playable item required" }
             if (!state().expanded) LiveHudVerification.choose(instrumentation, automation, "header")
             LiveHudVerification.choose(instrumentation, automation, "off")

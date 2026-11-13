@@ -54,15 +54,25 @@ class ReelsModule(private val context: ReactApplicationContext) : NativeReelsSpe
         context.runOnUiQueueThread { promise.resolve(autoScrollSnapshot()) }
     }
     override fun configureAutoScroll(enabled: Boolean, noticeRevision: Double, promise: Promise) {
-        if (noticeRevision != 1.0) { fail(promise, "INVALID_ARGUMENT"); return }
+        if (noticeRevision != 2.0) { fail(promise, "INVALID_ARGUMENT"); return }
         context.runOnUiQueueThread {
-            com.attentionstats.autoscroll.AutoScrollSession.configure(enabled, 1)
+            com.attentionstats.autoscroll.AutoScrollSession.configure(enabled, 2)
             promise.resolve(autoScrollSnapshot())
         }
     }
     override fun stopAutoScroll(promise: Promise) {
         context.runOnUiQueueThread {
             com.attentionstats.autoscroll.AutoScrollSession.stop()
+            promise.resolve(autoScrollSnapshot())
+        }
+    }
+    override fun configureAutoScrollAds(enabled: Boolean, noticeRevision: Double, promise: Promise) {
+        if (noticeRevision != 2.0) { fail(promise, "INVALID_ARGUMENT"); return }
+        context.runOnUiQueueThread {
+            if (enabled && !com.attentionstats.autoscroll.AutoScrollSession.enabled) {
+                fail(promise, "INVALID_ARGUMENT"); return@runOnUiQueueThread
+            }
+            com.attentionstats.autoscroll.AutoScrollSession.configureAds(enabled, 2)
             promise.resolve(autoScrollSnapshot())
         }
     }

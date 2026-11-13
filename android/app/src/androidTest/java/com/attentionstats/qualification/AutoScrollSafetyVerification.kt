@@ -56,7 +56,7 @@ internal object AutoScrollSafetyVerification {
             expect(decisions(middleToEnd, middleToEnd.lastIndex - 1).none { it })
             expect(decisions(listOf(Double.NaN) + List(10) { .999 }).none { it })
             expect(decisions(listOf(-.1, 1.1) + List(10) { .999 }).none { it })
-            main { AutoScrollSession.configure(true, 1); expect(AutoScrollSession.start()) }
+            main { AutoScrollSession.configure(true, 2); expect(AutoScrollSession.start()) }
             feed(1, 0.0)
             for (step in 1..10) { SystemClock.sleep(250); feed(1, step / 10.0) }
             SystemClock.sleep(250); feed(1, 0.0)
@@ -67,6 +67,8 @@ internal object AutoScrollSafetyVerification {
                 expect(AutoScrollSession.current(pending))
                 expect(AutoScrollSession.reason == "advancing")
                 expect(!AutoScrollSession.canStart())
+                AutoScrollSession.transientUnavailable("hud_snapshot_missing", ReelApp.INSTAGRAM, 1)
+                expect(AutoScrollSession.current(pending) && AutoScrollSession.reason == "advancing")
             }
             feed(2, null) // A new viewer with no numeric progress is not known to be a photo.
             main { expect(AutoScrollSession.confirmedTransitions == 1) }
@@ -77,7 +79,7 @@ internal object AutoScrollSafetyVerification {
             main { expect(proposals == 1) }
 
             // Starting on a known photo works even without a previous video transition.
-            main { proposals = 0; AutoScrollSession.configure(true, 1); expect(AutoScrollSession.start()) }
+            main { proposals = 0; AutoScrollSession.configure(true, 2); expect(AutoScrollSession.start()) }
             feed(3, null, "photo")
             main { expect(AutoScrollSession.reason == "still_item") }
             SystemClock.sleep(2_000); feed(3, null, "photo")
@@ -102,7 +104,7 @@ internal object AutoScrollSafetyVerification {
             main { expect(proposals == 1) }
 
             // Starting from the last fresh photo also works; interruption restarts its dwell.
-            main { proposals = 0; AutoScrollSession.configure(true, 1) }
+            main { proposals = 0; AutoScrollSession.configure(true, 2) }
             feed(5, null, "photo")
             main { expect(AutoScrollSession.canStart()); expect(AutoScrollSession.start()) }
             SystemClock.sleep(3_000)
@@ -115,7 +117,7 @@ internal object AutoScrollSafetyVerification {
             main { expect(proposals == 0) }
             // Acquisition gaps must never carry confirmation across a source or privacy epoch.
             for ((app, epoch) in listOf(ReelApp.TIKTOK to 1L, ReelApp.INSTAGRAM to 2L)) {
-                main { AutoScrollSession.configure(true, 1); AutoScrollSession.start() }
+                main { AutoScrollSession.configure(true, 2); AutoScrollSession.start() }
                 feed(6, null, "photo")
                 SystemClock.sleep(5_100); feed(6, null, "photo")
                 main {
@@ -130,7 +132,7 @@ internal object AutoScrollSafetyVerification {
             // Pending proposal cancellation: a late arrival/deadline cannot revive its old token.
             // This exercises session fences, not a platform gesture already in flight.
             for (boundary in listOf("stop", "click", "locked", "service_destroyed")) {
-                main { proposals = 0; AutoScrollSession.configure(true, 1); AutoScrollSession.start() }
+                main { proposals = 0; AutoScrollSession.configure(true, 2); AutoScrollSession.start() }
                 feed(10, null, "photo")
                 SystemClock.sleep(5_100); feed(10, null, "photo")
                 main {
@@ -152,12 +154,73 @@ internal object AutoScrollSafetyVerification {
                     AutoScrollSession.stop()
                 }
             }
+            // Separate full-page ads can advance without numeric playback, but only with
+            // the source-qualified marker and the same fresh context/one-shot fences.
+            fun adFrame(marked: Boolean = true, app: ReelApp = ReelApp.FACEBOOK,
+                eligible: Boolean = true, at: Long = SystemClock.elapsedRealtime(), page: Long = 700) =
+                AutoScrollSession.Frame(app, 1, page, 1, at, null, eligible, "unknown", marked)
+            main {
+                AutoScrollSession.stop()
+                expect(runCatching { AutoScrollSession.configure(true, 1) }.isFailure)
+                proposals = 0; AutoScrollSession.configure(true, 2); AutoScrollSession.start()
+                expect(!AutoScrollSession.skipStandaloneAds)
+                AutoScrollSession.frame(adFrame()) { _, _ -> proposals++ }
+                AutoScrollSession.frame(adFrame()) { _, _ -> proposals++ }
+                expect(proposals == 0)
+                AutoScrollSession.configureAds(true, 2)
+                AutoScrollSession.frame(adFrame()) { _, _ -> proposals++ }
+                AutoScrollSession.frame(adFrame()) { _, _ -> proposals++ }
+                expect(proposals == 1 && AutoScrollSession.attempts == 1)
+                AutoScrollSession.frame(adFrame()) { _, _ -> proposals++ }
+                expect(proposals == 1)
+                AutoScrollSession.frame(adFrame(marked = false, page = 701)) { _, _ -> proposals++ }
+                expect(AutoScrollSession.confirmedTransitions == 1 && proposals == 1)
+                AutoScrollSession.stop()
+                AutoScrollSession.frame(adFrame()) { _, _ -> proposals++ }
+                expect(proposals == 1)
+                for (unsafe in listOf(adFrame(marked = false), adFrame(app = ReelApp.YOUTUBE),
+                    adFrame(eligible = false), adFrame(at = SystemClock.elapsedRealtime() - 1_000))) {
+                    proposals = 0; AutoScrollSession.configure(true, 2); AutoScrollSession.start()
+                    AutoScrollSession.frame(unsafe) { _, _ -> proposals++ }
+                    AutoScrollSession.frame(unsafe) { _, _ -> proposals++ }
+                    expect(proposals == 0)
+                }
+                proposals = 0; AutoScrollSession.configure(true, 2); AutoScrollSession.start()
+                AutoScrollSession.frame(adFrame()) { _, _ -> proposals++ }
+                AutoScrollSession.frame(adFrame(marked = false)) { _, _ -> proposals++ }
+                expect(proposals == 0)
+                AutoScrollSession.configure(true, 2); AutoScrollSession.start()
+                AutoScrollSession.configureAds(true, 2)
+                AutoScrollSession.frame(adFrame()) { _, _ -> proposals++ }
+                AutoScrollSession.frame(adFrame()) { _, _ -> proposals++ }
+                val pendingAd = AutoScrollSession.revision
+                AutoScrollSession.configureAds(false, 2)
+                expect(!AutoScrollSession.current(pendingAd) && !AutoScrollSession.skipStandaloneAds)
+                AutoScrollSession.configure(false, 2)
+                expect(!AutoScrollSession.skipStandaloneAds && !AutoScrollSession.running)
+                expect(runCatching { AutoScrollSession.configureAds(true, 2) }.isFailure)
+                proposals = 0; AutoScrollSession.configure(true, 2); AutoScrollSession.configureAds(true, 2); AutoScrollSession.start()
+                val adOrigin = adFrame().copy(itemKeys = setOf(1, 2, 3))
+                AutoScrollSession.frame(adOrigin) { _, _ -> proposals++ }
+                AutoScrollSession.frame(adOrigin) { _, _ -> proposals++ }
+                val changedCta = adFrame(page = 701).copy(itemKeys = setOf(1, 2, 3, 4))
+                AutoScrollSession.frame(changedCta) { _, _ -> proposals++ }
+                expect(proposals == 1 && AutoScrollSession.confirmedTransitions == 0)
+                AutoScrollSession.suspendActions("synthetic_ad_gap")
+                AutoScrollSession.frame(changedCta) { _, _ -> proposals++ }
+                AutoScrollSession.frame(changedCta) { _, _ -> proposals++ }
+                expect(proposals == 1)
+                val differentAd = adFrame(page = 702).copy(itemKeys = setOf(10, 11, 12))
+                AutoScrollSession.frame(differentAd) { _, _ -> proposals++ }
+                AutoScrollSession.frame(differentAd) { _, _ -> proposals++ }
+                expect(proposals == 2)
+            }
         } finally {
             main {
                 AutoScrollSession.clear()
                 if (hadNotice || wasEnabled) {
-                    AutoScrollSession.configure(true, 1)
-                    if (!wasEnabled) AutoScrollSession.configure(false, 1)
+                    AutoScrollSession.configure(true, 2)
+                    if (!wasEnabled) AutoScrollSession.configure(false, 2)
                 }
                 AutoScrollSession.onChanged = checkNotNull(observer)
             }

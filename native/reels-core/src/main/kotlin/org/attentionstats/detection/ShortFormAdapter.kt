@@ -25,6 +25,9 @@ data class AdapterFrame(
     val mediaKind: String = if (category == PageCategory.PHOTO) "photo" else if (category == PageCategory.REEL) "video" else "unknown",
     val positionMs: Long? = null,
     val durationMs: Long? = null,
+    /** Separate full-page advertisement, positively qualified by a source-specific UI marker. */
+    val standaloneAd: Boolean = false,
+    val standaloneAdKeys: Set<Long> = emptySet(),
 ) {
     companion object {
         val OUTSIDE = AdapterFrame(Surface.OUTSIDE)

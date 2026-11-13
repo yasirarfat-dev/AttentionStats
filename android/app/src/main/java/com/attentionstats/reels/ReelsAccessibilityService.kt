@@ -246,9 +246,10 @@ class ReelsAccessibilityService : AccessibilityService() {
             val counted = if (decision != null || breakCoversPlayer) frame.copy(surface = Surface.EXCLUDED) else frame
             val item = ItemFrame(now, counted.surface, counted.route, counted.identity, counted.keys, counted.category,
                 scrollSequence.getOrPut(app) { AtomicLong() }.get(), sameSlot, counted.slotKey)
-            coordinator.observe(app, counted, item, snapshot.windowId, capturedEpoch)
             displayEligible = decision == null && (frame.surface == Surface.REELS ||
                 (frame.route == ReelRoute.HOME && frame.method.endsWith(".feed")))
+            // observe publishes asynchronous snapshots; publish this frame's eligibility first.
+            coordinator.observe(app, counted, item, snapshot.windowId, capturedEpoch)
             // Time slots retain their cover and immediate allowance inside the chosen viewer.
             // Navigating Back here races the renderer and removes the schedule explanation.
             if (decision != null && decision.kind != "schedule") main.post { enforceBlock(decision) }
@@ -542,7 +543,14 @@ class ReelsAccessibilityService : AccessibilityService() {
         if (unavailable != null) {
             if (AutoScrollSession.running) AutoScrollSession.onDispatchDiagnostic?.invoke(unavailable)
             if (AutoScrollSession.running && intervention == null) {
-                if (transientAcquisition) acquisitionGap("viewer_unavailable")
+                // The asynchronous count snapshot can briefly be absent after our swipe
+                // while the new source page is already valid. Preserve only the existing
+                // bounded confirmation token; hidden/disabled/foreign contexts still stop.
+                val validViewerAwaitingDisplay = unavailable == "hud_display_ineligible" && block == null &&
+                    scheduledPackage == null && !preparingBreak && lastFrame?.let {
+                        it.surface == Surface.REELS && it.route == ReelRoute.VIEWER
+                    } == true
+                if (transientAcquisition || unavailable == "hud_snapshot_missing" || validViewerAwaitingDisplay) acquisitionGap("viewer_unavailable")
                 else AutoScrollSession.suspendActions("viewer_unavailable")
             }
             removeHud(); return
@@ -560,7 +568,7 @@ class ReelsAccessibilityService : AccessibilityService() {
                 when {
                     AutoScrollSession.running -> AutoScrollSession.stop()
                     AutoScrollSession.enabled -> AutoScrollSession.start()
-                    AutoScrollSession.noticeAccepted -> { AutoScrollSession.configure(true, 1); AutoScrollSession.start() }
+                    AutoScrollSession.noticeAccepted -> { AutoScrollSession.configure(true, 2); AutoScrollSession.start() }
                     else -> openConvenience()
                 }
             })
@@ -611,7 +619,8 @@ class ReelsAccessibilityService : AccessibilityService() {
             return
         }
         val value = AutoScrollSession.Frame(app, window, frame.identity, epoch, now, frame.progress,
-            coordinator.overlayEnabled && !visitHudVisibility.hiddenFor(app), frame.mediaKind)
+            coordinator.overlayEnabled && !visitHudVisibility.hiddenFor(app), frame.mediaKind, frame.standaloneAd,
+            if (frame.standaloneAd) frame.standaloneAdKeys else frame.keys)
         main.post { AutoScrollSession.frame(value) { expected, token -> advance(token, expected) } }
     }
 
@@ -640,7 +649,10 @@ class ReelsAccessibilityService : AccessibilityService() {
             if (!snapshot.complete || snapshot.typing) return reject("snapshot_rejected")
             if (current.surface != Surface.REELS || current.route != ReelRoute.VIEWER) return reject("viewer_rejected")
             if (current.identity != expected.page) return reject("identity_rejected")
-            if (expected.position == null) {
+            if (expected.standaloneAd && AutoScrollSession.skipStandaloneAds) {
+                if (expected.app != ReelApp.FACEBOOK || !current.standaloneAd)
+                    return reject("standalone_ad_rejected", "playback_unavailable")
+            } else if (expected.position == null) {
                 if (expected.mediaKind != "photo" || current.mediaKind != "photo" || current.progress != null)
                     return reject("photo_rejected", "playback_unavailable")
             } else if (current.progress?.let { it.isFinite() && it in 0.0..1.0 } != true) {

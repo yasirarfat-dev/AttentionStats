@@ -34,7 +34,7 @@ internal object LiveAutoScrollControlsVerification {
         check(!initial.paused) { "counting pause preserved; resume separately before expanded-control trial" }
         val wasExpanded = initial.expanded
         try {
-            main { AutoScrollSession.configure(true, 1) }
+            main { AutoScrollSession.configure(true, 2) }
             SystemClock.sleep(200)
             if (!wasExpanded) choose("header")
             expect(state().controls.singleOrNull()?.first == "off")
@@ -72,8 +72,8 @@ internal object LiveAutoScrollControlsVerification {
                 main {
                     AutoScrollSession.clear()
                     if (hadNotice || wasEnabled) {
-                        AutoScrollSession.configure(true, 1)
-                        if (!wasEnabled) AutoScrollSession.configure(false, 1)
+                        AutoScrollSession.configure(true, 2)
+                        if (!wasEnabled) AutoScrollSession.configure(false, 2)
                     }
                 }
             }

@@ -82,7 +82,7 @@ internal object LiveHudVerification {
         instrumentation.runOnMainSync {
             check(!AutoScrollSession.running)
             wasEnabled = AutoScrollSession.enabled
-            AutoScrollSession.configure(true, 1) // Explicit operator session Allow; never a production consent bypass.
+            AutoScrollSession.configure(true, 2) // Explicit operator session Allow; never a production consent bypass.
         }
         try {
             SystemClock.sleep(700)
@@ -108,7 +108,7 @@ internal object LiveHudVerification {
             expect(state(instrumentation, automation).controls.singleOrNull()?.first == "off")
             scan(instrumentation, automation, HEADER)
         } finally {
-            instrumentation.runOnMainSync { AutoScrollSession.stop(); AutoScrollSession.configure(wasEnabled, 1) }
+            instrumentation.runOnMainSync { AutoScrollSession.stop(); AutoScrollSession.configure(wasEnabled, 2) }
         }
         return checks
     }

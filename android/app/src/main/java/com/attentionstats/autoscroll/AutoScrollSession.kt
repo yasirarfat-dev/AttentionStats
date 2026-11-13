@@ -9,13 +9,16 @@ import org.json.JSONObject
 /** Ephemeral convenience session. Never changes observation consent, counts or history. Main thread only. */
 internal object AutoScrollSession {
     data class Frame(val app: ReelApp, val window: Int, val page: Long?, val epoch: Long,
-        val atMs: Long, val position: Double?, val eligible: Boolean, val mediaKind: String = "unknown") {
+        val atMs: Long, val position: Double?, val eligible: Boolean, val mediaKind: String = "unknown",
+        val standaloneAd: Boolean = false, val itemKeys: Set<Long> = emptySet()) {
         fun key() = page?.let { CompletionGate.Context(app.key, window, it, epoch) }
     }
     private val gate = CompletionGate()
     @Volatile var enabled = false
         private set
     var noticeAccepted = false
+        private set
+    var skipStandaloneAds = false
         private set
     @Volatile var running = false
         private set
@@ -24,6 +27,7 @@ internal object AutoScrollSession {
     @Volatile var reason = "off"
         private set
     private var latest: Frame? = null
+    private var lastAdProposal: Frame? = null
     private var target: CompletionGate.Context? = null
     private var waitingUntil = 0L
     private var scrollSettlingUntil = 0L
@@ -42,18 +46,29 @@ internal object AutoScrollSession {
     @Suppress("UNUSED_PARAMETER")
     fun candidate(app: ReelApp, version: String): Boolean = true
     fun configure(value: Boolean, notice: Int) {
-        require(!value || notice == 1)
+        require(!value || notice == 2)
         stop(if (value) "ready" else "off")
         latest = null
+        lastAdProposal = null
         enabled = value
+        if (!value) skipStandaloneAds = false
         if (value) noticeAccepted = true
         onChanged()
+    }
+    fun configureAds(value: Boolean, notice: Int) {
+        require(!value || (enabled && notice == 2))
+        if (skipStandaloneAds == value) return
+        // Invalidate any queued proposal before applying a changed action choice.
+        if (running) suspendActions("ad_choice_changed")
+        skipStandaloneAds = value
+        revision++; onChanged()
     }
     fun start(): Boolean {
         if (!enabled) return false
         if (waitingUntil > 0) onDispatchDiagnostic?.invoke("pending_reset_start")
         gate.reset(); target = null; waitingUntil = 0; scrollSettlingUntil = 0; stillSince = 0; running = true; revision++
         attempts = 0; confirmedTransitions = 0
+        lastAdProposal = null
         latest?.takeIf(::ready)?.let {
             target = it.key()
             if (still(it)) stillSince = it.atMs
@@ -74,7 +89,7 @@ internal object AutoScrollSession {
         running = false; target = null; waitingUntil = 0; scrollSettlingUntil = 0; stillSince = 0; gate.reset(); revision++; reason = why
         if (changed) onChanged()
     }
-    fun clear() { stop("off"); enabled = false; noticeAccepted = false; latest = null; onChanged() }
+    fun clear() { stop("off"); enabled = false; noticeAccepted = false; skipStandaloneAds = false; latest = null; lastAdProposal = null; onChanged() }
     fun unavailable(reason: String) { latest = null; if (running) suspendActions(reason) }
     /** Missing transition data cannot confirm arrival, but need not cancel our already sent swipe. */
     fun transientUnavailable(why: String, app: ReelApp, epoch: Long) {
@@ -94,7 +109,11 @@ internal object AutoScrollSession {
         it.isFinite() && it in 0.0..1.0
     } == true && fresh(frame)
     private fun still(frame: Frame): Boolean = frame.mediaKind == "photo" && frame.position == null
-    private fun ready(frame: Frame): Boolean = usable(frame) || (frame.eligible && still(frame) && fresh(frame))
+    private fun sameAd(a: Frame, b: Frame): Boolean = a.app == b.app && a.window == b.window && a.epoch == b.epoch &&
+        (a.page == b.page || org.attentionstats.reels.EncounterTracker.overlap(a.itemKeys, b.itemKeys) >= .25)
+    private fun advert(frame: Frame): Boolean = skipStandaloneAds && frame.app == ReelApp.FACEBOOK && frame.standaloneAd &&
+        lastAdProposal?.let { sameAd(it, frame) } != true
+    private fun ready(frame: Frame): Boolean = usable(frame) || (frame.eligible && (still(frame) || advert(frame)) && fresh(frame))
     fun manualInteraction(reason: String) {
         // Our swipe can deliver pager callbacks after the new page is first visible.
         // Suppress only that bounded scroll tail. Clicks, context changes and Stop
@@ -132,6 +151,9 @@ internal object AutoScrollSession {
                 suspendActions("playback_unavailable"); return
             }
             if (key != null && key != previous) {
+                // Dynamic ad CTAs can change the raw fingerprint before the pager has moved.
+                // They neither confirm arrival nor authorize a second swipe of the same ad.
+                if (lastAdProposal?.let { it.key() == previous && sameAd(it, value) } == true) return
                 confirmedTransitions++
                 onDispatchDiagnostic?.invoke("arrival_confirmed")
                 if (!ready(value)) { suspendActions("playback_unavailable"); return }
@@ -145,6 +167,16 @@ internal object AutoScrollSession {
             return
         }
         if (key != null && key != previous) { suspendActions("manual_page_change"); return }
+        if (key != null && advert(value)) {
+            // A separately qualified ad page has no underlying reel to wait for. Never tap its CTA.
+            // Let the preceding own swipe settle before another fresh, independently validated proposal.
+            if (value.atMs < scrollSettlingUntil) return
+            lastAdProposal = value.copy(itemKeys = value.itemKeys.toSet())
+            attempts++; stillSince = 0
+            waitingUntil = value.atMs + 2_500; reason = "advancing"; onChanged()
+            next(value, revision)
+            return
+        }
         if (key != null && still(value)) {
             if (stillSince == 0L) stillSince = value.atMs
             if (value.atMs - stillSince >= STILL_ITEM_MS) {
@@ -166,8 +198,9 @@ internal object AutoScrollSession {
     fun canStart(): Boolean = enabled && latest?.let {
         it.page != null && ready(it)
     } == true
-    fun snapshot(versions: (ReelApp) -> String): String = JSONObject().put("contract", 1)
+    fun snapshot(versions: (ReelApp) -> String): String = JSONObject().put("contract", 2)
         .put("enabled", enabled).put("running", running).put("reason", reason)
+        .put("skipStandaloneAds", skipStandaloneAds)
         .put("sessionOnly", true).put("sources", JSONArray(ReelApp.entries.map { app ->
             JSONObject().put("app", app.key).put("candidate", candidate(app, versions(app)))
         })).toString()

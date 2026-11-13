@@ -31,6 +31,10 @@ export interface Spec extends TurboModule {
     noticeRevision: number,
   ): Promise<string>;
   stopAutoScroll(): Promise<string>;
+  configureAutoScrollAds(
+    enabled: boolean,
+    noticeRevision: number,
+  ): Promise<string>;
 }
 
 export default TurboModuleRegistry.get<Spec>('NativeReels');

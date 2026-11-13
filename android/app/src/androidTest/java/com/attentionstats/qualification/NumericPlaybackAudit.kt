@@ -31,6 +31,9 @@ internal object NumericPlaybackAudit {
         val matches = mutableMapOf<String, Int>()
         val values = mutableMapOf<String, MutableSet<Double>>()
         var viewers = 0
+        var progressSamples = 0
+        var standaloneAds = 0
+        val classifications = mutableMapOf<String, Int>()
         fun sourceRoot(): AccessibilityNodeInfo {
             val until = SystemClock.elapsedRealtime() + 5_000
             do {
@@ -57,8 +60,16 @@ internal object NumericPlaybackAudit {
                 val snapshot = SnapshotReader.read(root, app.packages)
                 val frame = AdapterRegistry.of(app).read(snapshot)
                 check(snapshot.complete && !snapshot.typing) { "incomplete/editable viewer" }
-                if (frame.surface != Surface.REELS || frame.route != ReelRoute.VIEWER) return@repeat
-                viewers++
+                classifications.merge("${frame.surface.name}/${frame.route.name}/${frame.category.name}/${frame.mediaKind}", 1, Int::plus)
+                // Include a selected-source ordinary watch page in no-action skip-control research.
+                // It never becomes an eligible auto-scroll viewer from this audit.
+                if (frame.surface == Surface.REELS && frame.route == ReelRoute.VIEWER) viewers++
+                if (frame.progress != null) progressSamples++
+                if (frame.standaloneAd) standaloneAds++
+                val viewer = frame.surface == Surface.REELS && frame.route == ReelRoute.VIEWER
+                val publicWatchAd = app == ReelApp.YOUTUBE && snapshot.has("watch_player") &&
+                    snapshot.has("ad_details_container_layout") && !snapshot.has("comment_composer")
+                if (!viewer && !publicWatchAd) return@repeat
                 val queue = ArrayDeque<AccessibilityNodeInfo>(); queue.add(root)
                 var count = 0
                 try {
@@ -79,6 +90,10 @@ internal object NumericPlaybackAudit {
                                 PlaybackTimeParser.parse(label)?.let { (position, duration) -> found(field, position.toDouble() / duration) }
                                 PlaybackTimeParser.elapsed(label)?.let { found("$field-clock", it.toDouble()) }
                                 if (label?.toString() in setOf("Play", "Pause", "Replay", "Replay video", "Watch again")) found("fixed_player_token")
+                                if (label?.toString() in setOf("Skip ad", "Skip ads", "Skip Ad", "Skip Ads", "Skip")) {
+                                    found("skip_label")
+                                    if (node.isClickable && node.isEnabled) found("skip_label_clickable_enabled")
+                                }
                             }
                             node.rangeInfo?.let { range ->
                                 if (range.min.isFinite() && range.max.isFinite() && range.max > range.min && range.current in range.min..range.max)
@@ -92,6 +107,8 @@ internal object NumericPlaybackAudit {
             SystemClock.sleep(200)
         }
         return JSONObject().put("viewerSamples", viewers).put("samples", 50).put("matches", JSONObject(matches as Map<*, *>))
+            .put("classifications", JSONObject(classifications as Map<*, *>)).put("progressSamples", progressSamples)
+            .put("standaloneAdSamples", standaloneAds)
             .put("distinctValues", JSONObject(values.mapValues { it.value.size } as Map<*, *>))
             .put("sourceGestures", 0).put("rawLabelsRetained", false).toString()
     }

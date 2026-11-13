@@ -4,6 +4,7 @@ type ReelsSourceKey = (typeof reelsSourceKeys)[number];
 export type AutoScrollStatus = {
   enabled: boolean;
   running: boolean;
+  skipStandaloneAds: boolean;
   reason: string;
   sources: { app: ReelsSourceKey; candidate: boolean }[];
 };
@@ -11,12 +12,14 @@ export function parseAutoScrollStatus(raw: string): AutoScrollStatus {
   if (raw.length > 4096) throw new Error('Auto-scroll status unavailable');
   const value = JSON.parse(raw);
   if (
-    value?.contract !== 1 ||
-    Object.keys(value).length !== 6 ||
+    value?.contract !== 2 ||
+    Object.keys(value).length !== 7 ||
     value.sessionOnly !== true ||
     typeof value.enabled !== 'boolean' ||
     typeof value.running !== 'boolean' ||
     (value.running && !value.enabled) ||
+    typeof value.skipStandaloneAds !== 'boolean' ||
+    (value.skipStandaloneAds && !value.enabled) ||
     typeof value.reason !== 'string' ||
     !/^[a-z_]{1,48}$/.test(value.reason) ||
     !Array.isArray(value.sources) ||

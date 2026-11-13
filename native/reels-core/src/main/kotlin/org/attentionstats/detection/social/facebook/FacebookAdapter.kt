@@ -29,8 +29,40 @@ object FacebookAdapter : ShortFormAdapter {
         if (!snapshot.complete) return AdapterFrame(Surface.UNKNOWN)
         if (snapshot.typing) return AdapterFrame.TYPING
         if (snapshot.nodes.any { it.selected && it.label?.startsWith("Marketplace,", ignoreCase = true) == true }) return AdapterFrame.OUTSIDE
+        val dedicatedTab = snapshot.nodes.any { node -> node.selected && node.clickable &&
+            node.label?.matches(Regex("Reels, [Tt]ab [0-9]+ of [0-9]+(?:,.*)?")) == true }
         val knownFeed = snapshot.withId("list").firstOrNull { it.scrollable }
-        if (knownFeed == null) ViewerLocator.locate(snapshot)?.let { return ViewerLocator.frame(snapshot, it, "facebook.viewer") }
+        if (knownFeed == null || dedicatedTab) ViewerLocator.locate(snapshot)?.let { viewer ->
+            val frame = ViewerLocator.frame(snapshot, viewer, "facebook.viewer")
+            val page = viewer.page ?: return frame
+            // Facebook's standalone-Reels ad information pill: small clickable native Button,
+            // bottom left of a settled full-page viewer, with its own exact Ad label child.
+            // Broad sponsored classification/captions never authorize immediate skipping.
+            val markers = snapshot.within(page.bounds).filter { node ->
+                node.cls == "android.widget.Button" && node.clickable && node.label == "Ad" &&
+                    node.bounds.left < page.bounds.left + page.bounds.width * .2 &&
+                    node.bounds.top > page.bounds.top + page.bounds.height * .8 &&
+                    node.bounds.width in 1..(page.bounds.width / 4) &&
+                    node.bounds.height in 1..(page.bounds.height / 12) &&
+                    snapshot.descendants(node).any { child -> child.cls == "android.view.ViewGroup" &&
+                        (child.label == "Ad" || child.label == null) && !child.clickable &&
+                        node.bounds.contains(child.bounds) && child.bounds.width in 1..node.bounds.width &&
+                        child.bounds.height in 1..node.bounds.height }
+            }
+            // Full-screen accessibility wrappers share generic labels across unrelated ads.
+            // Use bounded lower-page publisher/caption anchors for action continuity instead.
+            val anchors = snapshot.within(page.bounds).filter { node -> node.label != null &&
+                node.bounds.left < page.bounds.left + page.bounds.width * .25 &&
+                node.bounds.top > page.bounds.top + page.bounds.height * .6 &&
+                node.bounds.width >= page.bounds.width * .15 && node.bounds.height <= page.bounds.height * .2 }
+            val keys = org.attentionstats.detection.shared.Fingerprint.of(anchors)?.keys ?: emptySet()
+            return frame.copy(standaloneAd = dedicatedTab && frame.category == org.attentionstats.reels.PageCategory.AD &&
+                markers.size == 1 && keys.size >= 2, standaloneAdKeys = keys)
+        }
+        // Reels temporarily exposes list-shaped wrappers while its pager moves. A selected
+        // Reels tab without a settled viewer is unknown, not evidence of the Home feed.
+        // This can withhold confirmation until the existing deadline, never authorize input.
+        if (dedicatedTab) return AdapterFrame(Surface.UNKNOWN, ReelRoute.VIEWER, method = "facebook.viewer.transition")
         val list = knownFeed ?: FeedLocator.list(snapshot)
             ?: return AdapterFrame.OUTSIDE
         val screen = snapshot.screen

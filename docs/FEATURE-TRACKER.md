@@ -2,7 +2,7 @@
 
 For separate implementation/verification boxes, dates, versions and known failures, read the [feature verification checklist](FEATURE-VERIFICATION.md). Historical passes do not clear a later regression or qualify a different artifact.
 
-**Status:** MVP 1.0.0 implemented within its documented scope; maintainer reports closed beta. AS-052 establishes continuation on `develop`; export/restore, broader qualification and remaining full-product work are open. Updated 2026-11-13.
+**Status:** MVP 1.0.0 implemented within its documented scope; maintainer reports closed beta. AS-052 establishes continuation on `develop`; export/restore, broader qualification and remaining full-product work are open. Updated 2026-11-14.
 **Responsibility:** Owns stable task IDs, priorities, dependencies, capability mapping and completion evidence.
 **Related specifications:** [Roadmap](ROADMAP.md), [State](STATE.md), [Capabilities](CAPABILITY-MATRIX.md), [Tests](TESTING.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-10 gate relevant tasks; dependencies below are required, not optional recommendations.
@@ -165,3 +165,13 @@ ADR-091 final evidence: 127 Jest, type/lint/format/mobile/docs checks, preview/t
 | AS-063 Offline protection PIN and supervised exceptions | P1 / maintainer-requested protection | planned | Proposed extension of C-21/C-30; no runtime admission | AS-007/AS-015/AS-017; explicit guardian scope, native action-bound authorization, every equivalent bypass/config/reset/restore route, verified recovery decision, slow verifier/retry persistence, archive exclusion and device/lifecycle/emergency/accessibility checks. Uninstall resistance separately requires management/API/policy feasibility; no settings interception or administration authorized by this planning row |
 
 ADR-092 continues experimental AS-015/AS-017/AS-018/AS-045/AS-053 with a Today Focus Now button alongside existing actions, shared Protect chooser, mode-specific starter visibility, full-catalog disclosure and a bounded compact list with a visible primary action. Final checks and scoped phone evidence are recorded in State and the dated log; no PIN implementation or capability promotion.
+
+
+## Source-qualified standalone-ad scrolling (ADR-093)
+
+| Task | Priority / stage | Status | Capability coverage | Prerequisites / concrete completion evidence |
+|---|---|---|---|---|
+| AS-064 Immediate standalone-ad scrolling and genuine Skip Ad feasibility | P0 / maintainer-prioritized reliability | experimental | C-32 subset; AS-044/AS-059 convenience | ADR-093; explicit revision-2 session disclosure, source-specific full-page ad marker and fresh final validation, unchanged Stop/context/arrival fences; Final Facebook candidate executes one validated/completed ad swipe but loses native arrival confirmation (code0); 77 physical synthetic safety checks pass. [Current evidence](evidence/standalone-ad-continuation.json). Genuine provider Skip Ad actions remain research-only until separately qualified; no CTA clicks, arbitrary timer or universal source claim |
+
+
+November 14 concluding continuation: AS-044/AS-059/AS-064 remain experimental. Separate temporary ad permission, strict source marker/anchors, current-protection test preconditions and bounded confirmation candidates are implemented; final one-swipe execution still has zero native arrival confirmations. The [64-task checklist](FEATURE-VERIFICATION.md) keeps its verification box unchecked and [dated checkpoint](IMPLEMENTATION_LOG/2026-11-14.md) defines the next publication blockers. No main merge or binary publication.

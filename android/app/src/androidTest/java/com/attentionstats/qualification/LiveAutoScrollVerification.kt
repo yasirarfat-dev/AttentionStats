@@ -73,15 +73,21 @@ internal object LiveAutoScrollVerification {
         check(owner.serviceConnected) { "accessibility service not connected" }
         check(owner.allowed(app)) { "source consent unavailable" }
         check(owner.overlayEnabled) { "HUD disabled" }
-        check(app !in owner.blockChoices()) { "existing source block preserved" }
         val schedules = await { success, failure -> owner.scheduleSnapshot(success, failure) }
         val plan = com.attentionstats.protection.ScheduleOwner.decode(JSONObject().put("groups", schedules.getJSONArray("groups"))
             .put("windows", schedules.getJSONArray("windows")).toString())
-        check(plan.windows.none { window -> window.enabled && plan.groups.any {
-            it.id == window.groupId && it.packages.any(app::owns)
-        } }) { "existing source schedules preserved" }
         val first = frame()
         check(first.surface == Surface.REELS && first.route == ReelRoute.VIEWER) { "dedicated viewer required" }
+        check(owner.blockDecision(app, first, app.packages.first()) == null) { "currently blocked source preserved" }
+        check(app.packages.none { packageName -> plan.matching(packageName, java.time.ZonedDateTime.now(),
+            emptySet(), org.attentionstats.protection.BlockScope.APP, app.packages.toSet()).isNotEmpty() }) {
+            "currently active whole-app schedule preserved"
+        }
+        schedules.optJSONObject("focus")?.let { focus ->
+            val members = focus.getJSONArray("packages")
+            val included = (0 until members.length()).any { app.owns(members.getString(it)) }
+            check(if (focus.getBoolean("allowOnly")) included else !included) { "active source focus preserved" }
+        }
         var wasEnabled = false
         var hadNotice = false
         main {
@@ -103,7 +109,7 @@ internal object LiveAutoScrollVerification {
                 AutoScrollSession.onDispatchDiagnostic = { stage -> dispatchStages.merge(stage, 1, Int::plus) }
             }
             reminder(false)
-            main { AutoScrollSession.configure(true, 1) }
+            main { AutoScrollSession.configure(true, 2) }
             var started = first
             for (attempt in 1..if (useCurrent) 0 else 3) {
                 val setup = frame()
@@ -207,8 +213,8 @@ internal object LiveAutoScrollVerification {
                     AutoScrollSession.onDispatchDiagnostic = originalDiagnostic
                     AutoScrollSession.clear()
                     if (hadNotice || wasEnabled) {
-                        AutoScrollSession.configure(true, 1)
-                        if (!wasEnabled) AutoScrollSession.configure(false, 1)
+                        AutoScrollSession.configure(true, 2)
+                        if (!wasEnabled) AutoScrollSession.configure(false, 2)
                     }
                 }
                 reminder(original.getBoolean("reminderEnabled"))

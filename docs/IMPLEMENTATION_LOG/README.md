@@ -27,3 +27,4 @@ Entries:
 - [2026-11-12 — compact active HUD and dispatch qualification](2026-11-12.md).
 
 - [2026-11-13 — voluntary timed focus](2026-11-13.md).
+- [2026-11-14 — standalone-ad choice and publication checkpoint](2026-11-14.md).

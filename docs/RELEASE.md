@@ -1,6 +1,6 @@
 # Release and distribution
 
-**Status:** Maintainer confirms uploaded beta 1.0.0 / 10; broader Console details have not been independently inspected. Production readiness remains on hold. Updated 2026-11-12.
+**Status:** Maintainer confirms uploaded beta 1.0.0 / 10; broader Console details have not been independently inspected. Production readiness remains on hold. Updated 2026-11-14.
 **Responsibility:** Defines public repository publishing, Android distribution, signing and release gates.
 **Related specifications:** [Testing](TESTING.md), [Security](SECURITY.md), [Dependencies](DEPENDENCIES.md), [Contributing](CONTRIBUTING.md), [State](STATE.md).
 **Unresolved feasibility:** F-01–F-04 and F-08 in [Decisions](DECISIONS.md); exact Console artifact/source mapping, review status and broader qualification remain to be verified separately from the publication report.
@@ -87,6 +87,8 @@ Release maintainers own permanent application ID/namespace, package signing, Pla
 Select and document Play App Signing and upload-key responsibilities before publishing to a store. Record certificate fingerprints only if needed as public distribution metadata; no private key paths/secrets in logs. Every artifact has versionName/versionCode, source commit, exact locked dependency/toolchain manifest, license notices and checksum. Never reuse or decrement Android version codes.
 
 ## Binary release gates
+
+**2026-11-14 concluding assessment: HOLD.** Separate off-by-default standalone-ad permission is implemented, but the final actual-HUD trial still loses next-page confirmation after one validated/accepted/completed swipe. Synthetic safety/build passing does not clear that failed runtime gate. Genuine provider Skip Ad controls and full mixed-source continuous scrolling remain unaccepted. [Exact candidate and results](evidence/standalone-ad-continuation.json), [next-session plan](IMPLEMENTATION_LOG/2026-11-14.md). No source merge/publication approval is inferred.
 
 **2026-11-13 assessment: hold the next merge/publication candidate.** The maintainer reports Facebook auto-scroll still failing; current-artifact physical investigation finds no readable numeric playback signal in 150 qualified viewer samples and no selected-source media session in a separate 30-sample probe. No fix or actual end/arrival/Stop acceptance is established. Existing source schedules are preserved when the live trial refuses its precondition. See [investigation evidence](evidence/publication-readiness.json) and the [complete feature/verification checklist](FEATURE-VERIFICATION.md). A build can succeed while this release gate remains open. Do not relabel historical baseline/source passes as current candidate readiness. A changed release scope requires an explicit decision and truthful unavailable behavior; it is not inferred from these negative probes.
 

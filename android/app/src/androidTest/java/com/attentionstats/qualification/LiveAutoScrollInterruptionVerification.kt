@@ -58,7 +58,7 @@ internal object LiveAutoScrollInterruptionVerification {
         var shadeOpen = false
         try {
             repeat(3) {
-                main { AutoScrollSession.configure(true, 1) }
+                main { AutoScrollSession.configure(true, 2) }
                 check(waitFor { state().header != null })
                 check(waitFor { AutoScrollSession.canStart() }) { "fresh playable item required before interruption trial" }
                 if (!state().expanded) LiveHudVerification.choose(instrumentation, automation, "header")
@@ -84,8 +84,8 @@ internal object LiveAutoScrollInterruptionVerification {
             main {
                 AutoScrollSession.clear()
                 if (hadNotice || wasEnabled) {
-                    AutoScrollSession.configure(true, 1)
-                    if (!wasEnabled) AutoScrollSession.configure(false, 1)
+                    AutoScrollSession.configure(true, 2)
+                    if (!wasEnabled) AutoScrollSession.configure(false, 2)
                 }
             }
             if (shadeOpen) shade(false)

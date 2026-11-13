@@ -54,7 +54,12 @@ export const settingsHelp = {
     {
       term: 'Auto-scroll',
       detail:
-        'Experimental and optional. Adds a control to the floating counter to move to the next video when readable progress confirms the end. Missing progress suspends automatic swipes. Use the same control to stop.',
+        'Experimental and optional for this session. Start on the floating counter to move past finished videos with readable progress. Missing video progress waits. Use the same control to stop.',
+    },
+    {
+      term: 'Skip Standalone Ads',
+      detail:
+        'Separate, off-by-default permission for a started auto-scroll session. Immediately swipes past positively recognized standalone Facebook Reels ads. No ad links are opened. Pre-roll ads and provider Skip Ad buttons are not included. Turning auto-scroll off clears this choice.',
     },
     {
       term: 'Home-screen Widgets',

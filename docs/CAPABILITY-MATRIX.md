@@ -5,6 +5,8 @@
 **Related specifications:** [Tracking](TRACKING-SPEC.md), [Social](SOCIAL-MEDIA-SPEC.md), [Protection](PROTECTION-SPEC.md), [Tests](TESTING.md), [Tracker](FEATURE-TRACKER.md).
 **Unresolved feasibility:** F-01–F-10 in [Decisions](DECISIONS.md). Public API availability is not device verification.
 
+ADR-093/AS-064 adds an experimental C-32 convenience subset: separately allowed, source-qualified standalone Facebook Reels ad-page swiping, with revised session disclosure and unchanged final-validation/Stop/arrival fences. No capability admission advances from source or fixtures; actual artifact/device scope is recorded separately. Genuine provider Skip Ad clicking remains unavailable research. [Action scope](AUTOSCROLL-SPEC.md#standalone-ad-choice-adr-093--as-064-2026-11-14).
+
 ADR-073/ADR-074 add the experimental AS-058 Android-managed backup route, automatic by default on foreground entry under ADR-079, with saved opt-outs preserved and distinct from blocked Drive API integration. Public-package archives require no remembered key and provide no privacy against file holders. Schema-9 fact origins preserve future merge inputs; no merge/sync capability is admitted.
 
 November 12 source-choice withdrawal and paired force-stop/new-process checks add scoped AS-010/AS-044/AS-059 safety evidence only; see [bounded results](evidence/source-restart-continuation.json). No capability state advances. Full lifecycle, source fidelity and intermittent arrival-loss qualification remain open.
