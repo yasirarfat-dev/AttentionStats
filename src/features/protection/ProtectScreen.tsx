@@ -1,97 +1,67 @@
-import { useEffect, useRef, useState } from 'react';
-import { Text, View } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
-import {
-  reelsSources,
-  reelsSourceKeys,
-  type ReelsSourceKey,
-} from '../../platform';
-import { AppIcon } from '../../ui/Charts';
-import {
-  Body,
-  Card,
-  Divider,
-  SectionTitle,
-  Row,
-  Segmented,
-  Stepper,
-  ToggleRow,
-} from '../../ui/Kit';
+import { useEffect } from 'react';
+import { AppState } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
+import { Body, Button, Card, Row, SectionTitle } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
-import { useAppIcons, useDiary } from '../diary';
-import { useReels } from '../sources';
-
-type BlockMode = 'off' | 'limit' | 'always';
-/** Native contract: count 1000 means "always block"; 1..999 is a daily limit. */
-const ALWAYS = 1000;
+import type { ProtectionTool } from './ProtectionToolScreen';
+import { useSchedules } from './useSchedules';
 
 export function ProtectScreen({
-  onSchedules,
   onFocus,
+  onSchedules,
+  onTool,
 }: {
-  onSchedules: (packageName?: string) => void;
   onFocus: () => void;
+  onSchedules: () => void;
+  onTool: (tool: ProtectionTool) => void;
 }) {
-  const diary = useDiary(1);
-  const reels = useReels();
-  const snapshot = diary.snapshot;
-  const icons = useAppIcons(
-    reelsSourceKeys.map(key => reelsSources[key].packageName),
-  );
-  const [count, setCount] = useState(20);
-  const [minutes, setMinutes] = useState(15);
-  const [seconds, setSeconds] = useState(10);
-  const [limits, setLimits] = useState<Partial<Record<ReelsSourceKey, number>>>(
-    {},
-  );
+  const { snapshot, refresh, focus, busy, error } = useSchedules(false);
+  const focused = useIsFocused();
   useEffect(() => {
-    if (!snapshot) return;
-    setCount(snapshot.reminderCount);
-    setMinutes(snapshot.reminderMinutes);
-    setSeconds(snapshot.breakSeconds);
-  }, [snapshot?.revision]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-    },
-    [],
-  );
-  /** Steppers save once the person stops tapping, not on every tap. */
-  const later = (save: () => unknown) => {
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => void save(), 700);
-  };
-  const saveReminder = (
-    enabled: boolean,
-    nextCount = count,
-    nextMinutes = minutes,
-  ) => diary.configure('reminder', enabled, nextCount, nextMinutes);
-  const blocker = (app: ReelsSourceKey) =>
-    snapshot?.blockers.find(item => item.app === app);
-  const modeOf = (app: ReelsSourceKey): BlockMode => {
-    const rule = blocker(app);
-    if (!rule?.enabled) return 'off';
-    return rule.dailyLimit > 0 ? 'limit' : 'always';
-  };
-  const setBlock = (
-    app: ReelsSourceKey,
-    mode: BlockMode,
-    limit = blocker(app)?.dailyLimit || 30,
-  ) =>
-    diary.configure(
-      `block.${app}`,
-      mode !== 'off',
-      mode === 'always' ? ALWAYS : limit,
-    );
-  const installed = new Set(
-    reels.snapshot?.sources.filter(s => s.installed).map(s => s.app),
-  );
-
+    if (!focused) return;
+    void refresh(false);
+    const timer = setInterval(() => {
+      if (AppState.currentState === 'active') void refresh(false);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [focused, refresh]);
+  const active = snapshot?.focus;
   return (
     <Screen title="Protect" subtitle="Gentle tools you choose">
-      <SectionTitle>Time to focus</SectionTitle>
+      {error && (
+        <Card tone="warn">
+          <Body>{error}</Body>
+          <Button
+            label="Refresh protection"
+            onPress={() => void refresh(false)}
+            disabled={busy}
+          />
+        </Card>
+      )}
+      {active && (
+        <Card tone="soft">
+          <Body>
+            Focus · {Math.ceil(Number(active.remainingMs) / 60_000)} minutes
+            remaining
+          </Body>
+          <Body muted>
+            {snapshot.accessibility
+              ? 'Accessibility is connected. Blocking is best effort.'
+              : 'Blocking is unavailable while Accessibility is disconnected. The timer continues.'}
+          </Body>
+          <Button
+            label="View focus session"
+            variant="tonal"
+            onPress={onFocus}
+          />
+          <Button
+            label="End focus now"
+            onPress={() => void focus(null)}
+            disabled={busy}
+          />
+        </Card>
+      )}
+      <SectionTitle>Focus & schedules</SectionTitle>
       <Card padded={false}>
         <Row
           icon="clock"
@@ -99,197 +69,37 @@ export function ProtectScreen({
           detail="Choose an app group and a duration. End whenever you need."
           onPress={onFocus}
         />
+        <Row
+          icon="layers"
+          title="App groups & schedules"
+          detail="Choose apps together. Set recurring periods or all-day blocks."
+          onPress={onSchedules}
+        />
       </Card>
-      <SectionTitle>App schedules</SectionTitle>
+      <SectionTitle>Short-video boundaries</SectionTitle>
       <Card padded={false}>
         <Row
-          icon="clock"
-          title="Distracting apps & productive time"
-          detail="Group any apps, then block them together during custom time slots or all day."
-          onPress={() => onSchedules()}
-        />
-      </Card>
-      <SectionTitle>Mindful breaks</SectionTitle>
-      <Card>
-        <ToggleRow
           icon="heart"
-          title="Offer a break"
-          detail="A gentle pause after a run of short videos. You can always keep watching."
-          value={!!snapshot?.reminderEnabled}
-          onChange={value => {
-            if (timer.current) clearTimeout(timer.current);
-            void saveReminder(value);
-          }}
-          disabled={!snapshot}
+          title="Mindful breaks"
+          detail="Set a gentle pause after a number of videos or minutes."
+          onPress={() => onTool('Breaks')}
         />
-        {snapshot?.reminderEnabled && (
-          <View style={styles.controls}>
-            <Text style={styles.label}>After this many videos</Text>
-            <Stepper
-              label="Videos before a break"
-              value={count}
-              min={5}
-              max={300}
-              step={5}
-              suffix="videos"
-              onChange={value => {
-                setCount(value);
-                later(() => saveReminder(true, value, minutes));
-              }}
-            />
-            <Text style={styles.label}>Or after this much watching</Text>
-            <Stepper
-              label="Minutes before a break"
-              value={minutes}
-              min={5}
-              max={120}
-              step={5}
-              suffix="minutes"
-              onChange={value => {
-                setMinutes(value);
-                later(() => saveReminder(true, count, value));
-              }}
-            />
-            <Text style={styles.label}>
-              Pause before “Keep watching” unlocks
-            </Text>
-            <Stepper
-              label="Pause length"
-              value={seconds}
-              min={3}
-              max={30}
-              step={1}
-              suffix="seconds"
-              onChange={value => {
-                setSeconds(value);
-                later(() => diary.configure('break', true, value));
-              }}
-            />
-            <Body muted>
-              A run starts over when you lock your phone or spend 5 minutes away
-              from short videos. After a break, the next run begins. If the
-              player cannot be safely paused, a compact reminder leaves its
-              controls available and skips the wait.
-            </Body>
-          </View>
-        )}
+        <Row
+          icon="block"
+          title="Short-video blocks"
+          detail="Set daily video limits or block the player in selected apps."
+          onPress={() => onTool('Blocks')}
+        />
       </Card>
-
-      <SectionTitle>Short-video blocks</SectionTitle>
-      <Card>
-        <Body muted>
-          Choose per app. A block leaves the short-video player and shows a
-          pause screen. Everything else in the app keeps working, and you can
-          allow 5 minutes when you really need it.
-        </Body>
-        <Body muted>
-          Daily limits count videos. Time slots can block the whole app or short
-          videos during periods such as 5–11 AM and 6–11 PM. Saved slots apply
-          separately, even when the control below is Off.
-        </Body>
-        {reelsSourceKeys
-          .filter(key => installed.has(key) || modeOf(key) !== 'off')
-          .map((key, index) => {
-            const mode = modeOf(key);
-            return (
-              <View key={key} style={styles.block}>
-                {index > 0 && <Divider />}
-                <View style={styles.blockHead}>
-                  <AppIcon
-                    uri={icons[reelsSources[key].packageName]}
-                    mark={reelsSources[key].mark}
-                    color={reelsSources[key].color}
-                    size={36}
-                  />
-                  <Text style={styles.appName}>
-                    {reelsSources[key].observation}
-                  </Text>
-                </View>
-                <Segmented
-                  label={`${reelsSources[key].observation} block`}
-                  value={mode}
-                  onChange={next => setBlock(key, next)}
-                  options={[
-                    { value: 'off', label: 'Off' },
-                    { value: 'limit', label: 'Daily limit' },
-                    { value: 'always', label: 'Always' },
-                  ]}
-                />
-                <Row
-                  icon="clock"
-                  title="+ Time slots"
-                  detail="Multiple periods · whole app or short videos"
-                  onPress={() => onSchedules(reelsSources[key].packageName)}
-                />
-                {mode === 'limit' && (
-                  <Stepper
-                    label={`${reelsSources[key].name} daily limit`}
-                    value={limits[key] ?? (blocker(key)?.dailyLimit || 30)}
-                    min={5}
-                    max={500}
-                    step={5}
-                    suffix="videos a day"
-                    onChange={value => {
-                      setLimits({ ...limits, [key]: value });
-                      later(() => setBlock(key, 'limit', value));
-                    }}
-                  />
-                )}
-              </View>
-            );
-          })}
-      </Card>
-
-      <SectionTitle>Live counter</SectionTitle>
-      <Card>
-        <ToggleRow
+      <SectionTitle>In the moment</SectionTitle>
+      <Card padded={false}>
+        <Row
           icon="eye"
-          title="Show the floating counter"
-          detail="A small, see-through count on top of short videos. Tap it for more; drag to move."
-          value={!!reels.snapshot?.overlayEnabled}
-          onChange={value => reels.setOverlay(value)}
-          disabled={!reels.snapshot}
-        />
-        <ToggleRow
-          icon="layers"
-          title="Today’s total across all apps"
-          detail="Off shows only the current app’s count for today."
-          value={!!reels.snapshot?.counterAppearance.allAppsToday}
-          onChange={value =>
-            reels.setAppearance(
-              !!reels.snapshot?.counterAppearance.showIcons,
-              value,
-            )
-          }
-          disabled={!reels.snapshot}
-        />
-        <ToggleRow
-          icon="info"
-          title="Show icons on the counter"
-          value={!!reels.snapshot?.counterAppearance.showIcons}
-          onChange={value =>
-            reels.setAppearance(
-              value,
-              !!reels.snapshot?.counterAppearance.allAppsToday,
-            )
-          }
-          disabled={!reels.snapshot}
+          title="Live counter"
+          detail="Choose when the floating counter appears and what it shows."
+          onPress={() => onTool('Counter')}
         />
       </Card>
-      {diary.error ? <Body muted>{diary.error}</Body> : null}
     </Screen>
   );
 }
-
-const styles = StyleSheet.create(theme => ({
-  controls: { gap: 10, paddingHorizontal: 12 },
-  label: { color: theme.muted, fontSize: 13, fontWeight: '600', marginTop: 4 },
-  block: { gap: 10 },
-  blockHead: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 6,
-  },
-  appName: { color: theme.text, fontSize: 16, fontWeight: '700' },
-}));

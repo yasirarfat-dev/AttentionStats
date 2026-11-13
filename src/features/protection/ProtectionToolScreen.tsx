@@ -1,0 +1,306 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { Text, View } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
+import {
+  reelsSources,
+  reelsSourceKeys,
+  type ReelsSourceKey,
+} from '../../platform';
+import { AppIcon } from '../../ui/Charts';
+import {
+  Body,
+  Button,
+  Card,
+  Divider,
+  SectionTitle,
+  Row,
+  Segmented,
+  Stepper,
+  ToggleRow,
+} from '../../ui/Kit';
+import { Screen } from '../../ui/Screen';
+import { useAppIcons, useDiary } from '../diary';
+import { useReels } from '../sources';
+
+type BlockMode = 'off' | 'limit' | 'always';
+/** Native contract: count 1000 means "always block"; 1..999 is a daily limit. */
+const ALWAYS = 1000;
+
+export type ProtectionTool = 'Breaks' | 'Blocks' | 'Counter';
+const titles: Record<ProtectionTool, string> = {
+  Breaks: 'Mindful breaks',
+  Blocks: 'Short-video blocks',
+  Counter: 'Live counter',
+};
+
+export function ProtectionToolScreen({
+  tool,
+  onBack,
+  onSchedules,
+}: {
+  tool: ProtectionTool;
+  onBack: () => void;
+  onSchedules: (packageName?: string) => void;
+}) {
+  const diary = useDiary(1);
+  const reels = useReels();
+  const snapshot = diary.snapshot;
+  const icons = useAppIcons(
+    reelsSourceKeys.map(key => reelsSources[key].packageName),
+  );
+  const [count, setCount] = useState(20);
+  const [minutes, setMinutes] = useState(15);
+  const [seconds, setSeconds] = useState(10);
+  const [limits, setLimits] = useState<Partial<Record<ReelsSourceKey, number>>>(
+    {},
+  );
+  useEffect(() => {
+    if (!snapshot) return;
+    setCount(snapshot.reminderCount);
+    setMinutes(snapshot.reminderMinutes);
+    setSeconds(snapshot.breakSeconds);
+  }, [snapshot?.revision]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSave = useRef<(() => unknown) | null>(null);
+  const flushSave = useCallback(() => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+    const save = pendingSave.current;
+    pendingSave.current = null;
+    if (save) void save();
+  }, []);
+  // Moving to another tool must not discard the last stepper tap.
+  useFocusEffect(useCallback(() => flushSave, [flushSave]));
+  /** Steppers save once the person stops tapping, or when leaving the screen. */
+  const later = (save: () => unknown) => {
+    if (timer.current) clearTimeout(timer.current);
+    pendingSave.current = save;
+    timer.current = setTimeout(flushSave, 700);
+  };
+  const saveReminder = (
+    enabled: boolean,
+    nextCount = count,
+    nextMinutes = minutes,
+  ) => diary.configure('reminder', enabled, nextCount, nextMinutes);
+  const blocker = (app: ReelsSourceKey) =>
+    snapshot?.blockers.find(item => item.app === app);
+  const modeOf = (app: ReelsSourceKey): BlockMode => {
+    const rule = blocker(app);
+    if (!rule?.enabled) return 'off';
+    return rule.dailyLimit > 0 ? 'limit' : 'always';
+  };
+  const setBlock = (
+    app: ReelsSourceKey,
+    mode: BlockMode,
+    limit = blocker(app)?.dailyLimit || 30,
+  ) =>
+    diary.configure(
+      `block.${app}`,
+      mode !== 'off',
+      mode === 'always' ? ALWAYS : limit,
+    );
+  const installed = new Set(
+    reels.snapshot?.sources.filter(s => s.installed).map(s => s.app),
+  );
+
+  return (
+    <Screen title={titles[tool]}>
+      <Button label="Back to Protect" variant="text" onPress={onBack} />
+      {tool === 'Breaks' && (
+        <>
+          <SectionTitle>Mindful breaks</SectionTitle>
+          <Card>
+            <ToggleRow
+              icon="heart"
+              title="Offer a break"
+              detail="A gentle pause after a run of short videos. You can always keep watching."
+              value={!!snapshot?.reminderEnabled}
+              onChange={value => {
+                if (timer.current) clearTimeout(timer.current);
+                pendingSave.current = null;
+                void saveReminder(value);
+              }}
+              disabled={!snapshot}
+            />
+            {snapshot?.reminderEnabled && (
+              <View style={styles.controls}>
+                <Text style={styles.label}>After this many videos</Text>
+                <Stepper
+                  label="Videos before a break"
+                  value={count}
+                  min={5}
+                  max={300}
+                  step={5}
+                  suffix="videos"
+                  onChange={value => {
+                    setCount(value);
+                    later(() => saveReminder(true, value, minutes));
+                  }}
+                />
+                <Text style={styles.label}>Or after this much watching</Text>
+                <Stepper
+                  label="Minutes before a break"
+                  value={minutes}
+                  min={5}
+                  max={120}
+                  step={5}
+                  suffix="minutes"
+                  onChange={value => {
+                    setMinutes(value);
+                    later(() => saveReminder(true, count, value));
+                  }}
+                />
+                <Text style={styles.label}>
+                  Pause before “Keep watching” unlocks
+                </Text>
+                <Stepper
+                  label="Pause length"
+                  value={seconds}
+                  min={3}
+                  max={30}
+                  step={1}
+                  suffix="seconds"
+                  onChange={value => {
+                    setSeconds(value);
+                    later(() => diary.configure('break', true, value));
+                  }}
+                />
+                <Body muted>
+                  A run starts over when you lock your phone or spend 5 minutes
+                  away from short videos. After a break, the next run begins. If
+                  the player cannot be safely paused, a compact reminder leaves
+                  its controls available and skips the wait.
+                </Body>
+              </View>
+            )}
+          </Card>
+        </>
+      )}
+      {tool === 'Blocks' && (
+        <>
+          <SectionTitle>Short-video blocks</SectionTitle>
+          <Card>
+            <Body muted>
+              Choose per app. A block leaves the short-video player and shows a
+              pause screen. Everything else in the app keeps working, and you
+              can allow 5 minutes when you really need it.
+            </Body>
+            <Body muted>
+              Daily limits count videos. Time slots can block the whole app or
+              short videos during periods such as 5–11 AM and 6–11 PM. Saved
+              slots apply separately, even when the control below is Off.
+            </Body>
+            {reelsSourceKeys
+              .filter(key => installed.has(key) || modeOf(key) !== 'off')
+              .map((key, index) => {
+                const mode = modeOf(key);
+                return (
+                  <View key={key} style={styles.block}>
+                    {index > 0 && <Divider />}
+                    <View style={styles.blockHead}>
+                      <AppIcon
+                        uri={icons[reelsSources[key].packageName]}
+                        mark={reelsSources[key].mark}
+                        color={reelsSources[key].color}
+                        size={36}
+                      />
+                      <Text style={styles.appName}>
+                        {reelsSources[key].observation}
+                      </Text>
+                    </View>
+                    <Segmented
+                      label={`${reelsSources[key].observation} block`}
+                      value={mode}
+                      onChange={next => setBlock(key, next)}
+                      options={[
+                        { value: 'off', label: 'Off' },
+                        { value: 'limit', label: 'Daily limit' },
+                        { value: 'always', label: 'Always' },
+                      ]}
+                    />
+                    <Row
+                      icon="clock"
+                      title="+ Time slots"
+                      detail="Multiple periods · whole app or short videos"
+                      onPress={() => onSchedules(reelsSources[key].packageName)}
+                    />
+                    {mode === 'limit' && (
+                      <Stepper
+                        label={`${reelsSources[key].name} daily limit`}
+                        value={limits[key] ?? (blocker(key)?.dailyLimit || 30)}
+                        min={5}
+                        max={500}
+                        step={5}
+                        suffix="videos a day"
+                        onChange={value => {
+                          setLimits({ ...limits, [key]: value });
+                          later(() => setBlock(key, 'limit', value));
+                        }}
+                      />
+                    )}
+                  </View>
+                );
+              })}
+          </Card>
+        </>
+      )}
+      {tool === 'Counter' && (
+        <>
+          <SectionTitle>Live counter</SectionTitle>
+          <Card>
+            <ToggleRow
+              icon="eye"
+              title="Show the floating counter"
+              detail="A small, see-through count on top of short videos. Tap it for more; drag to move."
+              value={!!reels.snapshot?.overlayEnabled}
+              onChange={value => reels.setOverlay(value)}
+              disabled={!reels.snapshot}
+            />
+            <ToggleRow
+              icon="layers"
+              title="Today’s total across all apps"
+              detail="Off shows only the current app’s count for today."
+              value={!!reels.snapshot?.counterAppearance.allAppsToday}
+              onChange={value =>
+                reels.setAppearance(
+                  !!reels.snapshot?.counterAppearance.showIcons,
+                  value,
+                )
+              }
+              disabled={!reels.snapshot}
+            />
+            <ToggleRow
+              icon="info"
+              title="Show icons on the counter"
+              value={!!reels.snapshot?.counterAppearance.showIcons}
+              onChange={value =>
+                reels.setAppearance(
+                  value,
+                  !!reels.snapshot?.counterAppearance.allAppsToday,
+                )
+              }
+              disabled={!reels.snapshot}
+            />
+          </Card>
+        </>
+      )}
+      {reels.error ? <Body muted>{reels.error}</Body> : null}
+      {diary.error ? <Body muted>{diary.error}</Body> : null}
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create(theme => ({
+  controls: { gap: 10, paddingHorizontal: 12 },
+  label: { color: theme.muted, fontSize: 13, fontWeight: '600', marginTop: 4 },
+  block: { gap: 10 },
+  blockHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 6,
+  },
+  appName: { color: theme.text, fontSize: 16, fontWeight: '700' },
+}));

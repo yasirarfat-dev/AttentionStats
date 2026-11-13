@@ -222,3 +222,8 @@ Build the current preview and test APKs, verify physical-phone/test ownership an
 
 
 The operator-only `focusLive=true` mode reuses the installed-calculator cover trial with a pre-existing explicit calculator-only focus. It refuses missing Accessibility or an overlapping whole-app schedule that could mask focus. It launches only the selected calculator, traverses this app's accessibility-overlay nodes to press Allow 5 minutes, and checks cover removal plus target package ownership without reading calculator content. It creates/changes no schedule or focus configuration; the operator must end the task session afterward. Require raw instrumentation code -1 and the explicit PASS. This is a scoped cover/allowance result, not full expiry/reboot/accessibility acceptance.
+
+
+### Hub and quick-action navigation qualification
+
+ADR-083 checks all five Protect entries, named and Android Back, three new tool deep links, all three Today sheet shortcuts, visible Close/outside-tap/Android-Back dismissal, and per-app time-slot navigation without saving rules. Separately start only the existing calculator group and end from the hub to verify active-state visibility/release. Where reminders are already enabled, change one stepper value and leave immediately, then verify persistence and restore the original value through the same UI. Otherwise report that trial unrun. Compare private original backup/Accessibility state after the in-place update. Require installed/local artifact hash matching. No target content or personal history enters public evidence; broad TalkBack/focus return, large text, landscape/RTL and device/performance acceptance remain separate.

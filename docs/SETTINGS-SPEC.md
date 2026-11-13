@@ -101,3 +101,5 @@ ADR-061 reserves a disabled per-app timer affordance in Today/History. Per-app b
 
 
 ADR-082 exposes voluntary focus in Protect, initially inactive. UI duration starts at 25 minutes and allows 5–180 minutes in five-minute steps; an existing app group is required and targets are reviewed before Start. The native session continues independently of this screen. End focus now has no delay or reason requirement. Existing schedule/count rules remain active after ending focus; cover-based Allow 5 minutes is an immediate package-scoped visit allowance. Disconnected Accessibility is reported as unavailable enforcement, with the session timer continuing. No new grant or source activation follows focus selection.
+
+Current navigation refinement (ADR-083): Protect now links to dedicated Mindful breaks, Short-video blocks and Live counter screens. Their native preferences/defaults and independent schedule semantics are unchanged. Pending stepper changes flush when leaving a tool. Today Quick actions opens these editors or focus setup; opening/dismissing the sheet never changes a preference or begins a session.

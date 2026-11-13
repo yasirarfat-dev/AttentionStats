@@ -20,6 +20,7 @@ import {
   SectionTitle,
   Stat,
 } from '../../ui/Kit';
+import { QuickActions, type QuickDestination } from './QuickActions';
 import { Screen } from '../../ui/Screen';
 import { useAppIcons, useDiary, ViewingDetail } from '../diary';
 import { countingReady, useReels } from '../sources';
@@ -53,9 +54,11 @@ export function sourceDay(
 export function TodayScreen({
   onSetup,
   onProtect,
+  onQuickAction,
 }: {
   onSetup: () => void;
   onProtect: () => void;
+  onQuickAction: (destination: QuickDestination) => void;
 }) {
   const { theme } = useUnistyles();
   const diary = useDiary(1);
@@ -96,6 +99,7 @@ export function TodayScreen({
 
   return (
     <Screen title="Today" subtitle={date}>
+      <QuickActions onNavigate={onQuickAction} />
       {reels.snapshot && !ready && (
         <Card tone="warn">
           <Text style={styles.warnTitle}>Counting is not on yet</Text>

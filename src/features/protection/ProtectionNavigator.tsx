@@ -1,11 +1,15 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { FocusScreen } from './FocusScreen';
+import { ProtectionToolScreen } from './ProtectionToolScreen';
 import { ProtectScreen } from './ProtectScreen';
 import { SchedulesScreen } from './SchedulesScreen';
 
 export type ProtectionRoutes = {
   Overview: undefined;
   Focus: undefined;
+  Breaks: undefined;
+  Blocks: undefined;
+  Counter: undefined;
   Schedules: { packageName?: string } | undefined;
 };
 const Stack = createNativeStackNavigator<ProtectionRoutes>();
@@ -16,12 +20,26 @@ export function ProtectionNavigator() {
         {({ navigation }) => (
           <ProtectScreen
             onFocus={() => navigation.navigate('Focus')}
-            onSchedules={packageName =>
-              navigation.navigate('Schedules', { packageName })
-            }
+            onTool={tool => navigation.navigate(tool)}
+            onSchedules={() => navigation.navigate('Schedules')}
           />
         )}
       </Stack.Screen>
+      {(['Breaks', 'Blocks', 'Counter'] as const).map(tool => (
+        <Stack.Screen key={tool} name={tool}>
+          {({ navigation }) => (
+            <ProtectionToolScreen
+              tool={tool}
+              onBack={() =>
+                navigation.reset({ index: 0, routes: [{ name: 'Overview' }] })
+              }
+              onSchedules={packageName =>
+                navigation.navigate('Schedules', { packageName })
+              }
+            />
+          )}
+        </Stack.Screen>
+      ))}
       <Stack.Screen name="Focus">
         {({ navigation }) => (
           <FocusScreen

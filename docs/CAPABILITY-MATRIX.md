@@ -119,3 +119,6 @@ November 12 AS-014/AS-037 All-time Insights extends the experimental C-30/C-36 e
 
 
 ADR-082 adds an experimental C-17/C-21 timed-focus subset under AS-015/AS-017: frozen group targets, explicit review, encrypted native deadlines, immediate session end and existing package-scoped five-minute allowance. No whole-app minute budget, full conflict/override, reboot/expiry or broad accessibility capability is admitted; see State for actual build/phone scope.
+
+
+ADR-083/AS-018/AS-045 refines the experimental C-30 navigation subset: four primary tabs, grouped Protect hub, dedicated breaks/blocks/counter routes, active focus ending and Today Quick actions sheet. Existing C-17/C-19/C-20/C-32 owners and consent semantics stay unchanged. Bounded navigation evidence does not qualify full accessibility/performance or expand collection/enforcement admission. See [State](STATE.md#navigation-growth-continuation-2026-11-13).

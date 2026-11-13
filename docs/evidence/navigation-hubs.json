@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-13",
+  "tasks": [
+    "AS-018",
+    "AS-045"
+  ],
+  "decision": "ADR-083",
+  "sourceBaseline": "f5c5eba",
+  "branch": "develop",
+  "status": "experimental",
+  "productSha256": "b2e4a6ebc04d19f26f05780fe937b1d1859fdf0d390813e24a822224e31bf4ef",
+  "artifact": "Bundled arm64 preview installed in place; installed/local SHA256 independently matched.",
+  "checks": {
+    "typecheck": "pass",
+    "lintArchitectureBackupPalette": "pass",
+    "jest": "110 tests / 9 suites pass",
+    "sourceFormatting": "pass",
+    "previewAssemblyLint": "pass; final recovery build 58 seconds"
+  },
+  "phone": {
+    "scope": "One connected physical debug phone; own UI only. No emulator or source content acquisition.",
+    "completed": [
+      "Tool Android Back",
+      "Per-app schedule opens from Blocks; Android Back returns to Blocks",
+      "Today sheet break shortcut returns to Protect on Android Back",
+      "Active calculator-only focus: native remaining time visible on hub, immediate End, final session inactive",
+      "Android Back cancels unsaved new-group draft",
+      "Visible sheet Close button and local Dark Graphite layout review",
+      "Final hub layout reviewed locally"
+    ],
+    "unrun": [
+      "Stepper departure/persistence trial: reminders already off; original preference left unchanged"
+    ],
+    "api": 36,
+    "preservation": "Original backup preference and exact Accessibility services/master compare unchanged across both installs. Reminder choice remains off. No history reset or fixtures inserted. No rules saved; calculator-only focus ended. Private baseline/captures and device UI XML removed."
+  },
+  "remaining": [
+    "Full TalkBack and focus-return qualification",
+    "200% text, RTL, landscape and other devices",
+    "Low/mid-range frame pacing",
+    "Existing enforcement/source/lifecycle qualification gates"
+  ],
+  "privacy": "No personal history, device identifier, private capture or credentials in public evidence. No schema, dependency, permission or collection change.",
+  "earlierCandidate": {
+    "sha256": "57cd9ea7221538c83fdf87b4e8154ec07b537613077eaeed492240fdc9a23733",
+    "passed": [
+      "All five Protect hub entries and named Back to Protect",
+      "Three new tool deep links and named hub return",
+      "All three Today shortcuts open existing editors",
+      "Android Back/outside dismissal",
+      "Visible Close button independently selected",
+      "Active focus remaining time and hub End; session ended"
+    ],
+    "stopped": [
+      "Nested schedule Android Back reset Overview instead of returning to Blocks; repaired before final build",
+      "First dismissal locator also matched backdrop; visible button subsequently selected independently"
+    ]
+  },
+  "stoppedBuilds": [
+    "Typecheck catches native component-ref and callback mismatches, corrected",
+    "Schedules focused-name collision caught by types and a concurrently started 43-second Babel build, corrected to screenFocused",
+    "Daemon interruption stops a subsequent build; process absence checked before restarting"
+  ]
+}

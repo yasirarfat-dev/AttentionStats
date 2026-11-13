@@ -2,12 +2,20 @@
 
 > **Current behavior (1.0.0):** [ADR-066](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30) supersedes version-pinned detectors, per-app notices 3–5, structure-check diagnostics and the five-tab preview described below where they conflict. See [State](STATE.md) and the public [privacy policy](../policies/PRIVACY.md).
 
-**Status:** Experimental native five-tab shell and 20 routes are implemented; all 20 routes pass own-window physical-phone traversal; broader accessibility/performance qualification remains open. Updated 2026-10-28.
+**Status:** Experimental native four-tab navigation with feature-owned protection routes and Today quick actions. Historical five-tab evidence remains below; current scoped evidence is in State. Broader accessibility/performance qualification remains open. Updated 2026-11-13.
 **Responsibility:** Defines route ownership, hierarchy, parameters, back behavior and external entrypoints.
 **Related specifications:** [UX](UX-SPEC.md), [Design](DESIGN-SYSTEM.md), [Contracts](NATIVE-CONTRACTS.md), [Settings](SETTINGS-SPEC.md).
 **Unresolved feasibility:** F-03 in [Decisions](DECISIONS.md); the current ARM64 build/traversal passes; minimum API, wider devices and full accessibility remain open.
 
-## Hierarchy
+## Current four-tab hierarchy (ADR-083)
+
+This section supersedes the historical five-tab shell below. Current primary destinations are **Today, Insights, Protect, Settings**. Growing features stay within feature-owned stacks; no drawer is added. Today Quick actions opens a dismissible modal bottom sheet with shortcuts into Focus, Breaks and Blocks. It never starts a session, grants access or changes settings by opening or selecting navigation.
+
+Protect → Overview groups Focus session, App groups & schedules, Mindful breaks, Short-video blocks and Live counter. Breaks/Blocks/Counter are typed native-stack routes. Named Back to Protect resets to Overview; normal Android Back pops the current stack. Today shortcuts initialize Overview beneath a tool when needed. Existing per-app time-slot shortcuts open Schedules with only a package key. Active focus remains visible/endable on Overview. Bottom tabs stay available while ordinary tool content scrolls; the modal sheet temporarily overlays the app until closed or a destination is chosen.
+
+Deep links: `attentionstats://protect/breaks`, `/protect/blocks`, `/protect/counter`, alongside existing `/protect/focus` and `/protect/schedules`. Links only navigate. Route parameters never carry settings documents or history. Physical traversal and broad accessibility acceptance are recorded separately.
+
+## Historical five-tab hierarchy
 
 ADR-037/AS-045 replaces the earlier Reels-only entry with **Today, History, Patterns, Protect and Settings**, each retaining its own native stack and a persistent bottom bar. The 20-route shell includes the five hubs, Reels, diary, pattern explanation, categories, focus, rules, sources/health, storage, backup, appearance, counter appearance, convenience, about, welcome and privacy. Today shows actual saved viewer-page estimates through the Reels feature API. Unconnected time/history/protection/recovery/customization features explain unavailability rather than using synthetic activity or successful activation states.
 

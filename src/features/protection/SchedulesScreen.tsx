@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useIsFocused } from '@react-navigation/native';
 import { BackHandler, Text, View } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
 import {
@@ -46,22 +47,23 @@ export function SchedulesScreen({
   const schedules = useSchedules();
   const { snapshot, apps, busy, error } = schedules;
   const { theme } = useUnistyles();
+  const screenFocused = useIsFocused();
   const [draft, setDraft] = useState<Draft | null>(null);
   const icons = useAppIcons(
     packageName ? [packageName] : apps.slice(0, 80).map(app => app.packageName),
   );
   useEffect(() => {
+    if (!screenFocused) return;
     const listener = BackHandler.addEventListener('hardwareBackPress', () => {
       if (busy) return true;
       if (draft) {
         setDraft(null);
         return true;
       }
-      onBack();
-      return true;
+      return false;
     });
     return () => listener.remove();
-  }, [draft, busy, onBack]);
+  }, [draft, busy, screenFocused]);
   async function commit(next: ProtectionSnapshot) {
     if (await schedules.save(next)) setDraft(null);
   }

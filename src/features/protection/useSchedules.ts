@@ -8,7 +8,7 @@ import {
   type ProtectableApp,
 } from '../../platform/protectionStatus';
 
-export function useSchedules() {
+export function useSchedules(loadCatalog = true) {
   const [snapshot, setSnapshot] = useState<ProtectionSnapshot | null>(null);
   const [apps, setApps] = useState<ProtectableApp[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -42,16 +42,16 @@ export function useSchedules() {
   }, []);
   useEffect(() => {
     alive.current = true;
-    void refresh();
+    void refresh(loadCatalog);
     const listener = AppState.addEventListener('change', state => {
-      if (state === 'active') void refresh();
+      if (state === 'active') void refresh(loadCatalog);
     });
     return () => {
       alive.current = false;
       generation.current++;
       listener.remove();
     };
-  }, [refresh]);
+  }, [loadCatalog, refresh]);
   async function save(
     next: ProtectionSnapshot,
     expectedRevision = next.revision,

@@ -42,7 +42,14 @@ const linking: LinkingOptions<Tabs> = {
       Insights: 'insights',
       Protect: {
         path: 'protect',
-        screens: { Overview: '', Focus: 'focus', Schedules: 'schedules' },
+        screens: {
+          Overview: '',
+          Focus: 'focus',
+          Schedules: 'schedules',
+          Breaks: 'breaks',
+          Blocks: 'blocks',
+          Counter: 'counter',
+        },
       },
       Settings: { path: 'settings', alias: ['convenience', 'reels'] },
     },
@@ -94,7 +101,12 @@ function MainTabs({ onWelcome }: { onWelcome: () => void }) {
         {({ navigation }) => (
           <TodayScreen
             onSetup={onWelcome}
-            onProtect={() => navigation.navigate('Protect')}
+            onProtect={() =>
+              navigation.navigate('Protect', { screen: 'Overview' })
+            }
+            onQuickAction={screen =>
+              navigation.navigate('Protect', { screen, initial: false })
+            }
           />
         )}
       </Tab.Screen>
