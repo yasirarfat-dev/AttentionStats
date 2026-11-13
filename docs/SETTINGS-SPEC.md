@@ -1,6 +1,6 @@
 # Settings specification
 
-**Status:** Planned catalog with working narrow Reels controls and experimental settings routes; broader preferences remain unimplemented. Updated 2026-11-13.
+**Status:** Planned catalog with working narrow Reels controls and experimental settings routes; broader preferences remain unimplemented. Updated 2026-11-14.
 **Responsibility:** Defines user controls, defaults, persistence owner and change effects.
 **Related specifications:** [UX](UX-SPEC.md), [Privacy](PRIVACY.md), [Protection](PROTECTION-SPEC.md), [Backup](BACKUP-RESTORE.md), [Models](DATA-MODELS.md).
 **Unresolved feasibility:** F-01–F-08 in [Decisions](DECISIONS.md); unavailable settings must state the gate rather than appear functional.
@@ -133,3 +133,8 @@ ADR-093/AS-064 adds a separate off-by-default **Skip Standalone Ads (Experimenta
 
 
 Planned, unavailable in the runtime: optional guardian PIN setup/confirmation, protected-action selection, verified offline recovery, change/disable and action-scoped challenge/reset screens. Protection owns exact rule/exception behavior; Security owns verifiers/recovery/rate limits and platform restrictions. Until qualified, no working PIN/uninstall toggle or child-protection guarantee. Self-managed daily exceptions must preserve usage and show scope/reset. Existing immediate allowances remain unchanged by the focus-menu delivery.
+
+
+ADR-094 groups Appearance into Theme, a visibly labelled Presets panel and a separate Custom Colors panel containing scope selection and the palette. Explain preset reset and draft Save next to those controls. Appearance extends beyond accents: Color (text/numbers), Background (canvas/derived cards) and Accent (buttons/highlights) select independent optional hex overrides using a full hue strip and draggable saturation/brightness canvas. Hex/RGB controls remain available for precision and accessibility. Presets/reset clear overrides; per-scope preset clears only that override. Drafts require Save. Exact chosen background is retained; derived foreground/accent tones adapt for contrast, leaving warning/deletion meanings intact. Native palette consumers use the same optional preferences; prior saved preferences default both new scopes empty. No grant, collector, rule or history change.
+
+During a palette touch, Settings suspends its parent scrolling so vertical/diagonal drags select brightness rather than moving the page; release/cancel/unmount restores scrolling. Native bounds are measured afresh for every drag. Preset choices use a two-column grid, the normal scope row reserves extra width for Background, and large-text choices stack without label wrapping.

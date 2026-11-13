@@ -39,7 +39,7 @@ internal data class WidgetConfiguration(
     val style: WidgetStyle = WidgetStyle.ADAPTIVE,
     val stats: List<WidgetStat> = listOf(WidgetStat.SESSION, WidgetStat.VIDEOS, WidgetStat.WATCHING,
         WidgetStat.REELS_APPS, WidgetStat.LAUNCHES, WidgetStat.BREAKS),
-    val theme: String = "app", val accent: String = "app", val names: Boolean = false,
+    val theme: String = "app", val accent: String = "app", val names: Boolean = true,
     val opacity: Int = 100, val corners: String = "rounded", val numberSize: String = "normal", val timestamp: Boolean = true,
 ) {
     fun validate() {
@@ -49,7 +49,7 @@ internal data class WidgetConfiguration(
     }
     fun encode(): String {
         validate()
-        return JSONObject().put("version", 2).put("style", style.key).put("stats", JSONArray(stats.map { it.key }))
+        return JSONObject().put("version", 3).put("style", style.key).put("stats", JSONArray(stats.map { it.key }))
             .put("theme", theme).put("accent", accent).put("names", names).put("opacity", opacity).put("corners", corners).put("numberSize", numberSize).put("timestamp", timestamp).toString()
     }
     companion object {
@@ -64,18 +64,18 @@ internal data class WidgetConfiguration(
             require(raw.length <= 4096)
             val value = JSONObject(raw)
             val version = value.get("version")
-            require(version == 1 || version == 2)
-            val keys = setOf("version", "style", "stats", "theme", "accent", "names") + if (version == 2) setOf("opacity", "corners", "numberSize", "timestamp") else emptySet()
+            require(version == 1 || version == 2 || version == 3)
+            val keys = setOf("version", "style", "stats", "theme", "accent", "names") + if (version != 1) setOf("opacity", "corners", "numberSize", "timestamp") else emptySet()
             require(value.keys().asSequence().toSet() == keys && value.get("names") is Boolean)
-            if (version == 2) require(value.get("opacity") is Int && value.get("timestamp") is Boolean)
+            if (version != 1) require(value.get("opacity") is Int && value.get("timestamp") is Boolean)
             val rows = value.getJSONArray("stats")
             return WidgetConfiguration(requireNotNull(WidgetStyle.byKey(value.getString("style"))),
                 (0 until rows.length()).map { requireNotNull(WidgetStat.byKey(rows.getString(it))) },
-                value.getString("theme"), value.getString("accent"), value.getBoolean("names"),
-                if (version == 2) value.getInt("opacity") else 100,
-                if (version == 2) value.getString("corners") else "rounded",
-                if (version == 2) value.getString("numberSize") else "normal",
-                if (version == 2) value.getBoolean("timestamp") else true).also { it.validate() }
+                value.getString("theme"), value.getString("accent"), if (version == 3) value.getBoolean("names") else true,
+                if (version != 1) value.getInt("opacity") else 100,
+                if (version != 1) value.getString("corners") else "rounded",
+                if (version != 1) value.getString("numberSize") else "normal",
+                if (version != 1) value.getBoolean("timestamp") else true).also { it.validate() }
         }
         fun load(context: Context, id: Int): WidgetConfiguration {
             val prefs = TodayWidget.prefs(context)

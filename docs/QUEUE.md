@@ -62,3 +62,6 @@ Q-025 / 2026-11-13: Maintainer requests optional offline protection PIN for quot
 
 
 Q-026 / 2026-11-13: Observe varied video/ad playback on tracked sources; immediately pass positively identified standalone ads while auto-scroll is enabled, and investigate pressing genuine provider Skip Ad controls when they appear. ADR-093/AS-064 admits a Facebook structural standalone-ad candidate. Provider-button skipping remains feasibility-only; no CTA, hidden interception or invented completion support.
+
+
+Q-027 / 2026-11-14: Full-spectrum draggable foreground/background/accent customization alongside clearly grouped presets, readable narrow-screen controls and actual widget source names instead of App 1/App 2. Promoted through ADR-094 under existing experimental AS-027/AS-057/AS-018; presentation changes never enable observation or actions.

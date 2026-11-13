@@ -40,6 +40,7 @@ const STORE = 'https://play.google.com/store/apps/details?id=attention.stats';
 
 export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
   const [counter, setCounter] = useState(false);
+  const [colorDragging, setColorDragging] = useState(false);
   const focused = useIsFocused();
   useEffect(() => {
     if (!focused || !counter) return;
@@ -151,7 +152,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
       />
     );
   return (
-    <Screen title="Settings">
+    <Screen title="Settings" scrollEnabled={!colorDragging}>
       <SettingsGroup title="Counting" entries={settingsHelp.counting}>
         {reelsSourceKeys.map((key, index) => {
           const source = snapshot?.sources.find(item => item.app === key);
@@ -420,7 +421,11 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         entries={settingsHelp.appearance}
         padded
       >
-        <AppearanceEditor value={appearance} onSave={chooseAppearance} />
+        <AppearanceEditor
+          value={appearance}
+          onSave={chooseAppearance}
+          onDragChange={setColorDragging}
+        />
       </SettingsGroup>
 
       <SettingsGroup title="Help & Feedback" entries={settingsHelp.help}>

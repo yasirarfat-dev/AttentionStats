@@ -26,6 +26,7 @@ import { WelcomeScreen } from '../features/onboarding';
 import { NavIcon, type NavSymbol } from '../ui/NavIcon';
 import { applyAppearance, useAppearance } from '../ui/theme';
 import { loadAppearance } from '../platform/appearance';
+import { luminance } from '../ui/customPalette';
 import { useUnistyles } from 'react-native-unistyles';
 
 type Tabs = {
@@ -175,8 +176,8 @@ export default function App() {
       active = false;
     };
   }, []);
-  const { theme: colors, rt } = useUnistyles();
-  const dark = rt.themeName === 'dark';
+  const { theme: colors } = useUnistyles();
+  const dark = luminance(colors.canvas) < 0.179;
   const base = dark ? DarkTheme : DefaultTheme;
   return (
     <SafeAreaProvider>

@@ -109,7 +109,7 @@ class WidgetConfigureActivity : ComponentActivity() {
                     page.button("Number Size · ${draft.numberSize}") { navigate("numbers") }
                     page.toggle(Switch(this).apply { text = "Show Update Time"; isChecked = draft.timestamp; setOnCheckedChangeListener { _, value -> draft = draft.copy(timestamp = value) } })
                     val names = Switch(this).apply { text = "Show App Names"; isChecked = draft.names; setOnCheckedChangeListener { _, value -> draft = draft.copy(names = value) } }
-                    page.toggle(names); page.text("App names appear on your home screen only when you choose this.", 13f)
+                    page.toggle(names); page.text("App names identify each source. Turn this off to hide them on your home screen.", 13f)
                 }
             }
             "theme" -> listOf("app" to "Match App", "light" to "Light", "dark" to "Dark").forEach { (key, label) ->

@@ -672,7 +672,9 @@ internal class ReelsCoordinator private constructor(private val context: Context
         val now = SystemClock.elapsedRealtime()
         if (!force && now - widgetAt < 20_000) return@enqueue
         val manager = android.appwidget.AppWidgetManager.getInstance(context)
-        if (manager.getAppWidgetIds(android.content.ComponentName(context, com.attentionstats.widget.TodayWidget::class.java)).isEmpty())
+        if (com.attentionstats.widget.TodayWidget.providers.none {
+                manager.getAppWidgetIds(android.content.ComponentName(context, it)).isNotEmpty()
+            })
             return@enqueue // No widget placed: skip the work entirely.
         widgetAt = now
         val history = opened()

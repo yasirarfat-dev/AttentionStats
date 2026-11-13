@@ -172,6 +172,7 @@ internal object AutoScrollSession {
             // Let the preceding own swipe settle before another fresh, independently validated proposal.
             if (value.atMs < scrollSettlingUntil) return
             lastAdProposal = value.copy(itemKeys = value.itemKeys.toSet())
+            onDispatchDiagnostic?.invoke("proposal_standalone_ad")
             attempts++; stillSince = 0
             waitingUntil = value.atMs + 2_500; reason = "advancing"; onChanged()
             next(value, revision)
@@ -180,6 +181,7 @@ internal object AutoScrollSession {
         if (key != null && still(value)) {
             if (stillSince == 0L) stillSince = value.atMs
             if (value.atMs - stillSince >= STILL_ITEM_MS) {
+                onDispatchDiagnostic?.invoke("proposal_photo")
                 attempts++; stillSince = 0
                 waitingUntil = value.atMs + 2_500; reason = "advancing"; onChanged()
                 next(value, revision)
@@ -189,6 +191,7 @@ internal object AutoScrollSession {
         stillSince = 0
         if (key == null || value.position == null || !usable(value)) { suspendActions("playback_unavailable"); return }
         if (gate.sample(key, value.atMs, value.position, true)) {
+            onDispatchDiagnostic?.invoke("proposal_video_end")
             attempts++
             waitingUntil = value.atMs + 2_500; reason = "advancing"; onChanged()
             next(value, revision)

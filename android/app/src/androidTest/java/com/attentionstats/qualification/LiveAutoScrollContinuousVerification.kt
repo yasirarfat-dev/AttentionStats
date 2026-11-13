@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 
 /** Actual HUD Start, up to three consecutive automatic transitions, then actual Stop. No source input. */
 internal object LiveAutoScrollContinuousVerification {
-    fun run(instrumentation: Instrumentation, key: String, adOnly: Boolean = false): String {
+    fun run(instrumentation: Instrumentation, key: String, adOnly: Boolean = false, mixedAds: Boolean = false): String {
         val required = if (adOnly) 1 else 3
         val owner = ReelsCoordinator.get(instrumentation.targetContext)
         val app = checkNotNull(ReelApp.byKey(key))
@@ -76,13 +76,16 @@ internal object LiveAutoScrollContinuousVerification {
         check(owner.blockDecision(app, initial, app.packages.first()) == null) { "active source protection preserved" }
         // Observe rather than bypass whole-app schedules/focus: a visible unpaused own HUD is required.
         // Production enforcement remains active throughout; saved schedules are never modified here.
-        var wasEnabled = false; var hadNotice = false
+        var wasEnabled = false; var hadNotice = false; var hadAdChoice = false
         main {
             check(!AutoScrollSession.running) { "existing active run preserved" }
             wasEnabled = AutoScrollSession.enabled; hadNotice = AutoScrollSession.noticeAccepted
+            hadAdChoice = AutoScrollSession.skipStandaloneAds
         }
         var expandedByTest = false
         val stages = java.util.concurrent.ConcurrentHashMap<String, Int>()
+        val trace = java.util.Collections.synchronizedList(mutableListOf<String>())
+        val traceStart = SystemClock.elapsedRealtime()
         var previousHook: ((String) -> Unit)? = null
         var samples = 0; var numeric = 0; var unknown = 0; var independent = 0
         var previous = initial
@@ -91,9 +94,12 @@ internal object LiveAutoScrollContinuousVerification {
             reminders(false)
             main {
                 previousHook = AutoScrollSession.onDispatchDiagnostic
-                AutoScrollSession.onDispatchDiagnostic = { stages.merge(it, 1, Int::plus) }
+                AutoScrollSession.onDispatchDiagnostic = {
+                    stages.merge(it, 1, Int::plus)
+                    if (trace.size < 160) trace.add("${SystemClock.elapsedRealtime()-traceStart}:$it")
+                }
                 AutoScrollSession.configure(true, 2)
-                if (adOnly) AutoScrollSession.configureAds(true, 2)
+                if (adOnly || mixedAds) AutoScrollSession.configureAds(true, 2)
             }
             val hudUntil = SystemClock.elapsedRealtime() + 5_000
             var hud = LiveHudVerification.state(instrumentation, automation)
@@ -141,6 +147,7 @@ internal object LiveAutoScrollContinuousVerification {
             val attemptsAtStop = AutoScrollSession.attempts
             SystemClock.sleep(2_000)
             check(!AutoScrollSession.running && AutoScrollSession.attempts == attemptsAtStop) { "Stop did not fence later actions" }
+            instrumentation.sendStatus(1, android.os.Bundle().apply { putString("stream", "Ordered fixed-code trace=$trace") })
             check(independent == required && attemptsAtStop == required && AutoScrollSession.confirmedTransitions == required) {
                 "continuous scrolling not achieved; seconds=${(SystemClock.elapsedRealtime()-start)/1_000}; attempts=$attemptsAtStop; confirmed=${AutoScrollSession.confirmedTransitions}; independent=$independent; samples=$samples; numeric=$numeric; unavailable=$unknown; kinds=$kinds; stages=$stages"
             }
@@ -159,6 +166,7 @@ internal object LiveAutoScrollContinuousVerification {
                     AutoScrollSession.clear()
                     if (hadNotice || wasEnabled) {
                         AutoScrollSession.configure(true, 2)
+                        if (hadAdChoice) AutoScrollSession.configureAds(true, 2)
                         if (!wasEnabled) AutoScrollSession.configure(false, 2)
                     }
                 }

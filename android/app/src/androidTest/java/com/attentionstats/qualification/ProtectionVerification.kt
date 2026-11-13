@@ -44,6 +44,18 @@ internal object ProtectionVerification {
                 val before = appearancePrefs.all.toMap()
                 expect(runCatching { owner.configure(appearanceContext, doc.put("corners", 200).toString()) }.isFailure && appearancePrefs.all == before)
             }
+            for (background in listOf("#000000", "#FFFFFF", "#757575", "#FFFF00", "#123456")) {
+                val doc = owner.snapshot(appearanceContext).put("backgroundColor", background).put("foregroundColor", "#00FF00").put("customColor", "#FF0000")
+                val saved = JSONObject(owner.configure(appearanceContext, doc.toString()))
+                expect(saved.getString("backgroundColor") == background && saved.getString("foregroundColor") == "#00FF00")
+                val palette = owner.palette(appearanceContext)
+                expect(palette.canvas == android.graphics.Color.parseColor(background))
+                expect(listOf(palette.canvas, palette.surface, palette.surfaceAlt, palette.raised).all {
+                    androidx.core.graphics.ColorUtils.calculateContrast(palette.text, it) >= 4.5 && androidx.core.graphics.ColorUtils.calculateContrast(palette.accent, it) >= 4.5
+                })
+                val before = appearancePrefs.all.toMap()
+                expect(runCatching { owner.configure(appearanceContext, doc.put("foregroundColor", "#xyzxyz").toString()) }.isFailure && appearancePrefs.all == before)
+            }
         } finally { appearancePrefs.edit().clear().commit(); instrumentation.targetContext.deleteSharedPreferences("qualification-appearance") }
         val legacy = """{"groups":[{"id":"social","name":"Social","packages":["com.example.social"]}],"windows":[{"id":"morning","groupId":"social","days":127,"startMinute":300,"endMinute":660,"enabled":true}]}"""
         val decoded = ScheduleOwner.decode(legacy)

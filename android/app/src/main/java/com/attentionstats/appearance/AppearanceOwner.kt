@@ -12,6 +12,7 @@ internal object AppearanceOwner {
         val prefs = context.getSharedPreferences("appearance", Context.MODE_PRIVATE)
         return JSONObject().put("mode", prefs.getString("mode", "system"))
             .put("accent", prefs.getString("accent", "graphite")).put("motion", prefs.getBoolean("motion", true))
+            .put("foregroundColor", prefs.getString("foregroundColor", "")).put("backgroundColor", prefs.getString("backgroundColor", ""))
             .put("customColor", prefs.getString("customColor", "")).put("corners", prefs.getInt("corners", 24))
             .put("spacing", prefs.getInt("spacing", 20)).put("numberSize", prefs.getInt("numberSize", 30))
     }
@@ -24,7 +25,12 @@ internal object AppearanceOwner {
     fun configure(context: Context, document: String): String {
         require(document.length <= 1024)
         val json = JSONObject(document)
-        require(json.keys().asSequence().toSet() == setOf("mode", "accent", "motion", "customColor", "corners", "spacing", "numberSize"))
+        val legacyKeys = setOf("mode", "accent", "motion", "customColor", "corners", "spacing", "numberSize")
+        val keys = json.keys().asSequence().toSet()
+        require(keys == legacyKeys || keys == legacyKeys + setOf("foregroundColor", "backgroundColor"))
+        if (keys != legacyKeys) require(listOf("foregroundColor", "backgroundColor").all { json.get(it) is String })
+        val foreground = json.optString("foregroundColor"); val background = json.optString("backgroundColor")
+        require(listOf(foreground, background).all { it.isEmpty() || it.matches(Regex("#[0-9a-fA-F]{6}")) })
         val mode = json.getString("mode"); val accent = json.getString("accent"); val color = json.getString("customColor")
         require(mode in setOf("system", "light", "dark") && accent in setOf("graphite", "blue", "teal", "violet"))
         require(color.isEmpty() || color.matches(Regex("#[0-9a-fA-F]{6}")))
@@ -33,6 +39,7 @@ internal object AppearanceOwner {
         require(json.getInt("corners") in 0..32 && json.getInt("spacing") in 12..24 && json.getInt("numberSize") in 24..40)
         check(context.getSharedPreferences("appearance", Context.MODE_PRIVATE).edit()
             .putString("mode", mode).putString("accent", accent).putBoolean("motion", json.getBoolean("motion"))
+            .putString("foregroundColor", foreground).putString("backgroundColor", background)
             .putString("customColor", color).putInt("corners", json.getInt("corners"))
             .putInt("spacing", json.getInt("spacing")).putInt("numberSize", json.getInt("numberSize")).commit())
         return snapshot(context).toString()
@@ -43,24 +50,46 @@ internal object AppearanceOwner {
     }
     fun palette(context: Context): NativePalette {
         val dark = dark(context); val prefs = snapshot(context)
-        val base = PaletteTokens.resolve(dark, prefs.getString("accent"))
-        val color = prefs.optString("customColor")
-        if (!color.matches(Regex("#[0-9a-fA-F]{6}"))) return base
-        val chosen = android.graphics.Color.parseColor(color)
+        var base = PaletteTokens.resolve(dark, prefs.getString("accent"))
+        fun valid(value: String) = value.matches(Regex("#[0-9a-fA-F]{6}"))
         fun blend(a: Int, b: Int, amount: Float) = androidx.core.graphics.ColorUtils.blendARGB(a, b, amount)
-        fun readable(against: List<Int>, toward: Int): Int {
+        val foreground = prefs.optString("foregroundColor"); val background = prefs.optString("backgroundColor")
+        val scoped = valid(foreground) || valid(background)
+        val canvas = if (valid(background)) android.graphics.Color.parseColor(background) else base.canvas
+        val effectiveDark = if (scoped) androidx.core.graphics.ColorUtils.calculateLuminance(canvas) < 0.179 else dark
+        val toward = if (effectiveDark) android.graphics.Color.WHITE else android.graphics.Color.BLACK
+        fun readable(chosen: Int, against: List<Int>, destination: Int): Int {
             for (i in 0..100) {
-                val candidate = blend(chosen, toward, i / 100f)
+                val candidate = blend(chosen, destination, i / 100f)
                 if (against.all { androidx.core.graphics.ColorUtils.calculateContrast(candidate, it) >= 4.5 }) return candidate
             }
-            return toward
+            return destination
         }
-        val soft = blend(chosen, if (dark) 0xFF141518.toInt() else android.graphics.Color.WHITE, if (dark) 0.83f else 0.92f)
-        val accent = readable(listOf(soft, base.surfaceAlt, base.surface), if (dark) android.graphics.Color.WHITE else android.graphics.Color.BLACK)
-        val fill = readable(listOf(android.graphics.Color.WHITE), android.graphics.Color.BLACK)
-        return base.copy(accent = accent, accentFill = fill, accentSoft = soft, onAccent = android.graphics.Color.WHITE,
-            hero = blend(fill, 0xFF08090B.toInt(), 0.45f), onHero = android.graphics.Color.WHITE, heroMuted = 0xFFEEEEEE.toInt(), tint = soft)
+        val panelTone = if (effectiveDark) android.graphics.Color.BLACK else android.graphics.Color.WHITE
+        if (valid(background)) base = base.copy(canvas = canvas, surface = blend(canvas, panelTone, .035f),
+            surfaceAlt = blend(canvas, panelTone, .07f), raised = blend(canvas, panelTone, .1f))
+        val backgrounds = listOf(base.canvas, base.surface, base.surfaceAlt, base.raised)
+        if (scoped) {
+            val ink = if (valid(foreground)) android.graphics.Color.parseColor(foreground) else base.text
+            val text = readable(ink, backgrounds, toward)
+            val muted = readable(blend(text, canvas, .25f), backgrounds, toward)
+            base = base.copy(text = text, muted = muted, faint = muted, border = blend(canvas, text, .22f), track = blend(canvas, text, .18f))
+        }
+        val color = prefs.optString("customColor")
+        if (valid(color)) {
+            val chosen = android.graphics.Color.parseColor(color)
+            val soft = if (scoped) blend(chosen, canvas, .94f) else blend(chosen, if (effectiveDark) 0xFF141518.toInt() else android.graphics.Color.WHITE, if (effectiveDark) .83f else .92f)
+            val accent = readable(chosen, listOf(soft, base.surfaceAlt, base.surface) + if (scoped) backgrounds else emptyList(), toward)
+            val fill = readable(chosen, listOf(android.graphics.Color.WHITE), android.graphics.Color.BLACK)
+            base = base.copy(accent = accent, accentFill = fill, accentSoft = soft, onAccent = android.graphics.Color.WHITE,
+                hero = blend(fill, 0xFF08090B.toInt(), .45f), onHero = android.graphics.Color.WHITE, heroMuted = 0xFFEEEEEE.toInt(), tint = soft)
+        } else if (scoped) {
+            val soft = blend(base.accent, canvas, .94f)
+            base = base.copy(accentSoft = soft, tint = soft, accent = readable(base.accent, backgrounds + soft, toward))
+        }
+        return base
     }
+
     fun prepare(activity: Activity) {
         val dark = dark(activity)
         val style = when (snapshot(activity).getString("accent")) {

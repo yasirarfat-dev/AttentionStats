@@ -105,9 +105,9 @@ export const settingsHelp = {
       detail: 'Choose Light, Dark or follow the phone’s System appearance.',
     },
     {
-      term: 'Accent Color',
+      term: 'Color, Background & Accent',
       detail:
-        'Use a starting color or mix your own with RGB controls or a hex value. Preview before saving; accent shades adapt for readability. Expand layout controls for card corners, spacing and statistic size.',
+        'Keep a preset or drag across the full color canvas and hue strip. Color changes text, Background changes pages and cards, and Accent changes buttons and highlights. Hex and RGB controls provide precision. Preview before saving; text tones adapt for readability. Layout controls adjust card corners, spacing and statistic size.',
     },
     {
       term: 'Gentle Animations',

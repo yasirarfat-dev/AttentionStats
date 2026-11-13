@@ -57,6 +57,9 @@ class ReelsAccessibilityService : AccessibilityService() {
     @Volatile private var displayEligible = false
     @Volatile private var transientAcquisition = false
     @Volatile private var lastFrame: AdapterFrame? = null
+    /** One completed acquisition publication: never combine a prior frame with a new gap flag. */
+    private data class HudAcquisition(val frame: AdapterFrame? = null, val eligible: Boolean = false, val transient: Boolean = false)
+    @Volatile private var hudAcquisition = HudAcquisition()
     private data class Seen(val app: ReelApp, val window: Int, val atMs: Long, val frame: AdapterFrame, val scroll: Long)
     @Volatile private var lastReels: Seen? = null
 
@@ -191,7 +194,6 @@ class ReelsAccessibilityService : AccessibilityService() {
         if (!interactive()) { coordinator.acquisitionStatus = "not_interactive"; foregroundPackage = null; scheduledPackage = null; outside(true); return null }
         val root = providerRoot() ?: run { coordinator.acquisitionStatus = "no_active_root"; foregroundPackage = null; scheduledPackage = null; outside(false, transient = true); return 1_000L }
         try {
-            transientAcquisition = false
             val foreground = root.packageName?.toString()
             foregroundPackage = foreground
             coordinator.acquisitionStatus = "root_obtained"
@@ -208,6 +210,7 @@ class ReelsAccessibilityService : AccessibilityService() {
             if (app != null && coordinator.pausedSource(app)) {
                 if (currentApp != app) outside(true)
                 currentApp = app; pausedApp = app; displayEligible = false
+                hudAcquisition = HudAcquisition()
                 main.post { renderOverlays() }
                 return 1_500L
             }
@@ -248,6 +251,7 @@ class ReelsAccessibilityService : AccessibilityService() {
                 scrollSequence.getOrPut(app) { AtomicLong() }.get(), sameSlot, counted.slotKey)
             displayEligible = decision == null && (frame.surface == Surface.REELS ||
                 (frame.route == ReelRoute.HOME && frame.method.endsWith(".feed")))
+            hudAcquisition = HudAcquisition(frame, displayEligible, transientAcquisition)
             // observe publishes asynchronous snapshots; publish this frame's eligibility first.
             coordinator.observe(app, counted, item, snapshot.windowId, capturedEpoch)
             // Time slots retain their cover and immediate allowance inside the chosen viewer.
@@ -269,6 +273,7 @@ class ReelsAccessibilityService : AccessibilityService() {
         displayEligible = false
         block = null
         lastFrame = null
+        hudAcquisition = HudAcquisition(transient = transient)
         if (departed) { lastReels = null; currentApp = null; pausedApp = null; coordinator.pauseDiarySurface() }
         app?.let {
             coordinator.observe(it, AdapterFrame.OUTSIDE, ItemFrame(SystemClock.elapsedRealtime(), Surface.OUTSIDE,
@@ -519,6 +524,7 @@ class ReelsAccessibilityService : AccessibilityService() {
     }
 
     private fun renderHud() {
+        val acquisition = hudAcquisition
         val state = coordinator.liveOverlay
         val active = currentApp
         val pausedHere = pausedApp != null && pausedApp == active && coordinator.overlayEnabled && intervention == null &&
@@ -529,7 +535,7 @@ class ReelsAccessibilityService : AccessibilityService() {
             return
         }
         val unavailable = when {
-            !displayEligible -> "hud_display_ineligible"
+            !acquisition.eligible -> "hud_display_ineligible"
             intervention != null -> "hud_intervention"
             !coordinator.overlayEnabled -> "hud_disabled"
             state == null -> "hud_snapshot_missing"
@@ -547,10 +553,11 @@ class ReelsAccessibilityService : AccessibilityService() {
                 // while the new source page is already valid. Preserve only the existing
                 // bounded confirmation token; hidden/disabled/foreign contexts still stop.
                 val validViewerAwaitingDisplay = unavailable == "hud_display_ineligible" && block == null &&
-                    scheduledPackage == null && !preparingBreak && lastFrame?.let {
+                    scheduledPackage == null && !preparingBreak && acquisition.frame?.let {
                         it.surface == Surface.REELS && it.route == ReelRoute.VIEWER
                     } == true
-                if (transientAcquisition || unavailable == "hud_snapshot_missing" || validViewerAwaitingDisplay) acquisitionGap("viewer_unavailable")
+                AutoScrollSession.onDispatchDiagnostic?.invoke("renderer_${acquisition.frame?.surface?.name ?: "absent"}_${acquisition.frame?.route?.name ?: "absent"}_${if (acquisition.transient) "gap" else "settled"}_${if (block == null) "clear" else "blocked"}")
+                if (acquisition.transient || unavailable == "hud_snapshot_missing" || validViewerAwaitingDisplay) acquisitionGap("viewer_unavailable")
                 else AutoScrollSession.suspendActions("viewer_unavailable")
             }
             removeHud(); return

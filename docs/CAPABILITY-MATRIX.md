@@ -139,3 +139,6 @@ ADR-087/ADR-088 supersedes the six-generic-style interpretation of AS-027 with f
 
 
 ADR-091 refines existing experimental presentation, focus, protection and appearance capabilities without changing capability admission or adding a collector/permission. Scoped native/phone results and remaining accessibility/device/lifecycle/performance limits are in [cohesive screen evidence](evidence/cohesive-screen-refinement.json); builds and attached-host checks do not promote the broader capabilities to implemented.
+
+
+November 14 C-30/C-32/AS-027/AS-057 continuation: full-spectrum presentation and actual widget source-name defaults remain experimental with scoped native/UI evidence. The C-32 standalone Facebook subset passes one actual Start/confirmed-next-page/Stop trial; it does not admit universal video-end or provider Skip Ad support. [Exact artifacts and remaining gates](evidence/facebook-appearance-widget-continuation.json). No capability status promotion.

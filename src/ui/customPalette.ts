@@ -21,7 +21,11 @@ export function contrast(a: string, b: string): number {
     y = luminance(b);
   return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
 }
-function readable(color: string, against: string | string[], toward: string) {
+export function readable(
+  color: string,
+  against: string | string[],
+  toward: string,
+) {
   for (let i = 0; i <= 100; i++) {
     const candidate = blend(color, toward, i / 100);
     if (
@@ -56,5 +60,58 @@ export function customPalette(color: string, dark: boolean) {
     onHero: '#ffffff',
     heroMuted: '#eeeeee',
     tint: soft,
+  };
+}
+
+/** Independent canvas/ink preferences, adapting ink only when needed for readability. */
+export function scopedPalette<T extends typeof tokens.base.light>(
+  base: T,
+  foreground = '',
+  background = '',
+  accent = '',
+) {
+  const valid = (value: string) => /^#[0-9a-f]{6}$/i.test(value);
+  if (!valid(foreground) && !valid(background))
+    return {
+      ...base,
+      ...customPalette(accent, luminance(base.canvas) < 0.179),
+    };
+  const canvas = valid(background) ? background : base.canvas;
+  const dark = luminance(canvas) < 0.179;
+  const toward = dark ? '#ffffff' : '#000000';
+  const panelTone = dark ? '#000000' : '#ffffff';
+  const surface = valid(background)
+    ? blend(canvas, panelTone, 0.035)
+    : base.surface;
+  const surfaceAlt = valid(background)
+    ? blend(canvas, panelTone, 0.07)
+    : base.surfaceAlt;
+  const raised = valid(background)
+    ? blend(canvas, panelTone, 0.1)
+    : base.raised;
+  const backgrounds = [canvas, surface, surfaceAlt, raised];
+  const ink = valid(foreground) ? foreground : base.text;
+  const text = readable(ink, backgrounds, toward);
+  const muted = readable(blend(text, canvas, 0.25), backgrounds, toward);
+  const roles = { ...base, ...customPalette(accent, dark) };
+  roles.accentSoft = blend(valid(accent) ? accent : roles.accent, canvas, 0.94);
+  roles.tint = roles.accentSoft;
+  const accentText = readable(
+    valid(accent) ? accent : roles.accent,
+    [...backgrounds, roles.accentSoft],
+    toward,
+  );
+  return {
+    ...roles,
+    canvas,
+    surface,
+    surfaceAlt,
+    raised,
+    text,
+    muted,
+    faint: muted,
+    accent: accentText,
+    border: blend(canvas, text, 0.22),
+    track: blend(canvas, text, 0.18),
   };
 }

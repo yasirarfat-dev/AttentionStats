@@ -1,0 +1,195 @@
+{
+  "date": "2026-11-14",
+  "status": "experimental; publication held; concluding maintainer-requested checkpoint",
+  "decisions": [
+    "ADR-093",
+    "ADR-094"
+  ],
+  "tasks": [
+    "AS-027",
+    "AS-057",
+    "AS-018",
+    "AS-044",
+    "AS-059",
+    "AS-064"
+  ],
+  "product": {
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "sha256": "5297690115455a8336f089c302242facb56ea019b69966e87201ba078522a218",
+    "testSha256": "00be43e4d74dd155a8382d95428fb4f5a6e356c596095bab95797aa3fe3b8332",
+    "physicalApi": 36,
+    "source": "Facebook",
+    "sourceVersion": "586.0.0.52.53"
+  },
+  "implementation": {
+    "coherentHudAcquisitionPublication": true,
+    "videoTimerFallback": false,
+    "sourceAndPrivacyFencesRetained": true,
+    "providerSkipAdClicking": false,
+    "widgetNames": "Actual source names by default, including migration of versions 1/2; version 3 preserves an explicit hide choice. Source One/Two are illustrative preview labels only.",
+    "appearance": "Separate Presets and Custom Colors panels; two-column presets, weighted one-line Color/Background/Accent selector, full HSV canvas/hue strip, RGB/hex alternatives, explicit Save and independent native-persisted scope fields. Large text stacks choices. Parent Settings scrolling locks during palette touch; release/cancel/unmount restores scrolling.",
+    "newDependencyPermissionHistorySchemaVersion": false,
+    "widgetRefresh": "All five owned providers count as a placed widget for refresh admission; an original-Today-only guard was causing the actual Reels By Apps-only launcher to remain unavailable after app update."
+  },
+  "liveTrials": [
+    {
+      "artifact": "1f993f153f92ebeb115cff853dfbd26f6812754d5aa4c51166a1e8b2ec892ea4",
+      "kind": "actual HUD continuous video-end; 180 second bound",
+      "attempts": 1,
+      "nativeArrivals": 1,
+      "independentArrivals": 1,
+      "required": 3,
+      "result": "not accepted; next reel encounters an advertising overlay and paused playback, not a qualified standalone page",
+      "operatorSourceSwipesAfterStart": 0
+    },
+    {
+      "artifact": "1f993f153f92ebeb115cff853dfbd26f6812754d5aa4c51166a1e8b2ec892ea4",
+      "kind": "standalone ad",
+      "attempts": 1,
+      "nativeArrivals": 1,
+      "independentArrivals": 1,
+      "actualHudStartStop": true,
+      "instrumentationCode": -1,
+      "result": "pass before coherent publication repair"
+    },
+    {
+      "artifact": "23e529964443eec1d513f17589ceaaea98585908671eaf2a1b15012ec41a38bb",
+      "kind": "standalone ad, final reconnected service",
+      "attempts": 1,
+      "nativeArrivals": 1,
+      "independentArrivals": 1,
+      "actualHudStartStop": true,
+      "operatorSourceSwipesAfterStart": 0,
+      "instrumentationCode": -1,
+      "samples": 3,
+      "numericSamples": 0,
+      "classes": {
+        "AD/unknown": 2,
+        "REEL/video": 1
+      },
+      "orderedCodes": [
+        "proposal_standalone_ad",
+        "validation_started",
+        "validation_passed",
+        "gesture_accepted",
+        "gesture_completed",
+        "arrival_acquisition_gap",
+        "renderer_UNKNOWN_VIEWER_gap_clear",
+        "arrival_confirmed",
+        "pending_suspend_playback_unavailable"
+      ],
+      "result": "pass; new video without numeric progress confirms arrival then suspends later actions"
+    },
+    {
+      "artifact": "5297690115455a8336f089c302242facb56ea019b69966e87201ba078522a218",
+      "kind": "final standalone ad after widget-refresh repair",
+      "attempts": 1,
+      "nativeArrivals": 1,
+      "independentArrivals": 1,
+      "actualHudStartStop": true,
+      "operatorSourceSwipesAfterStart": 0,
+      "instrumentationCode": -1,
+      "samples": 3,
+      "numericSamples": 0,
+      "classes": {
+        "AD/unknown": 1,
+        "REEL/video": 2
+      },
+      "orderedCodes": [
+        "proposal_standalone_ad",
+        "validation_started",
+        "validation_passed",
+        "gesture_accepted",
+        "gesture_completed",
+        "arrival_confirmed",
+        "pending_suspend_playback_unavailable"
+      ],
+      "result": "pass; new numeric-unavailable reel confirms arrival then suspends later actions"
+    }
+  ],
+  "checks": {
+    "typecheck": "pass",
+    "jsLintArchitectureBackupPalette": "pass",
+    "jest": 136,
+    "jestSuites": 16,
+    "finalPreviewAssemblyAndLint": "pass; final widget-refresh preview/test/lint build 2m17s",
+    "nativeLintErrors": 0,
+    "nativeLintWarnings": 167,
+    "physicalNativePredecessor": {
+      "sha256": "d4dffdb88c4ea12bf56c0697e516ebf8a04820a32619bd8b2a37e467c4911795",
+      "syntheticSafety": 77,
+      "appearanceProtection": 88,
+      "widgetProjectionConfigurationAttachedHost": 469,
+      "instrumentationCode": -1,
+      "scope": "Native code unchanged after this run; later changes are React Native grouping and pointer handling. Test APK identical. Do not relabel these as a rerun on final APK."
+    },
+    "hostCompletionGate": 31
+  },
+  "stoppedOrFailedOperatorTrials": [
+    "Sequential --no-restart attachment stalls after synthetic safety; stopped only own app and retried isolated checks with normal instrumentation restart.",
+    "Final source trials initially unavailable after process restarts removed this app selection; original own component restored while preserving others, then actual final ad trial passes.",
+    "Initial palette touch/save persisted three colors, but endpoint values were not accepted due possible manual interference and clipped locator bounds; fresh measured coordinates added and controlled final check required.",
+    "Fast adb keyboard text dropped characters; disabled Save correctly prevented an invalid value. Slower per-character input with field readback passes actual Save. Negative off-screen coordinates and initiating outside painted bounds were also corrected in the operator driver."
+  ],
+  "appearanceLive": {
+    "artifact": "3a10513915f5460cc5d17230d618fa8b0fa77e1ceeb3c515e49872c7cad47620",
+    "controlledHueCanvasDragEndpointMatched": true,
+    "selected": "#2a81d1",
+    "expectedRgb": [
+      42,
+      129,
+      209
+    ],
+    "separatePresetCustomGroupsVisuallyReviewed": true,
+    "graphiteAndBackgroundNotWrapped": true,
+    "threeScopeExplicitUiSaveAndNativeReadback": true,
+    "mode": "dark",
+    "foregroundColor": "#e9efed",
+    "backgroundColor": "#101516",
+    "accent": "#78b8a6",
+    "actualTodayAndStatusBarsVisuallyReviewed": true,
+    "limits": "System large text/TalkBack/RTL and a broad drag/device matrix remain open.",
+    "savedStylePersistedAcrossFinalUpdateAndRestart": true
+  },
+  "launcherLive": {
+    "artifact": "5297690115455a8336f089c302242facb56ea019b69966e87201ba078522a218",
+    "existingReelsByAppsOnlyInstance": true,
+    "actualFacebookNameAndCountVisuallyReviewed": true,
+    "app1App2OrSource1Source2OnActualWidget": false,
+    "instanceRecreated": false,
+    "otherSourceNameRendering": "Static source map and predecessor attached native Instagram check; not a live all-source launcher claim."
+  },
+  "remaining": [
+    "Repeated mixed videos/ads and multiple video-end arrivals on final candidate",
+    "Unknown numeric playback, in-stream overlay ads and genuine provider Skip Ad controls remain unavailable or unqualified",
+    "Broader source/device/lifecycle/accessibility/data-preservation and store provenance/release gates"
+  ],
+  "privacy": "No raw source capture, phone identifier, personal history or private baseline published; source fixtures remain synthetic/sanitized.",
+  "cleanup": {
+    "originalAccessibilityRestored": true,
+    "backupUnchangedOff": true,
+    "installedCandidateHashVerified": true,
+    "updatedProductInPlace": true,
+    "ownedTestRemoved": true,
+    "historyClearedOrReplaced": false,
+    "taskOwnedPhoneRenderCapturesRemoved": true,
+    "temporaryAutoScrollAndAdChoicesCleared": true,
+    "userAuthorizedAppearanceRetained": "dark charcoal, off-white foreground, muted teal accent"
+  },
+  "adLiveArtifact": "5297690115455a8336f089c302242facb56ea019b69966e87201ba078522a218",
+  "nativePayloadComparison": {
+    "adTrialProduct": "23e529964443eec1d513f17589ceaaea98585908671eaf2a1b15012ec41a38bb",
+    "uiCandidate": "3a10513915f5460cc5d17230d618fa8b0fa77e1ceeb3c515e49872c7cad47620",
+    "allDexAndNativeLibrariesByteIdentical": true,
+    "entriesCompared": 52,
+    "scope": "Comparison applies to P3 ad APK and P4 appearance APK only; later final widget-refresh repair changes coordinator bytecode and must have its own artifact/live evidence."
+  },
+  "appearancePayloadComparison": {
+    "appearanceTrialProduct": "3a10513915f5460cc5d17230d618fa8b0fa77e1ceeb3c515e49872c7cad47620",
+    "finalProduct": "5297690115455a8336f089c302242facb56ea019b69966e87201ba078522a218",
+    "allPackagedAssetsIncludingJsBundleByteIdentical": true,
+    "assetsCompared": 1
+  },
+  "sourcePublication": "reviewed checkpoint publication recorded in dated log; no main merge or binary publication"
+}

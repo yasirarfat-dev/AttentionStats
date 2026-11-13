@@ -126,7 +126,7 @@ internal class NativePage(private val activity: Activity) {
         activity.window.decorView.setBackgroundColor(palette.canvas)
         if (Build.VERSION.SDK_INT >= 30) {
             val flags = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
-            activity.window.insetsController?.setSystemBarsAppearance(if (AppearanceOwner.dark(activity)) 0 else flags, flags)
+            activity.window.insetsController?.setSystemBarsAppearance(if (androidx.core.graphics.ColorUtils.calculateLuminance(palette.canvas) < .179) 0 else flags, flags)
         }
         bindings.forEach { it(palette) }
     }

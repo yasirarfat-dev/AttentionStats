@@ -55,6 +55,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var numericMediaProbe: String? = null
     private var autoScrollContinuous: String? = null
     private var standaloneAdLive = false
+    private var mixedAdsLive = false
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
         widgets = arguments?.getString("widgets") == "true"
@@ -65,6 +66,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         numericMediaProbe = arguments?.getString("numericMediaProbe")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollContinuous = arguments?.getString("autoScrollContinuous")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         standaloneAdLive = arguments?.getString("standaloneAdLive") == "true"
+        mixedAdsLive = arguments?.getString("mixedAdsLive") == "true"
         autoScrollInterruption = arguments?.getString("autoScrollInterruption") == "true"
         serviceRevocation = arguments?.getString("serviceRevocation") == "true"
         sourceRevocation = arguments?.getString("sourceRevocation") == "true"
@@ -108,7 +110,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         val result = Bundle()
         try {
             autoScrollContinuous?.let { source ->
-                result.putString("stream", LiveAutoScrollContinuousVerification.run(this, source, standaloneAdLive))
+                result.putString("stream", LiveAutoScrollContinuousVerification.run(this, source, standaloneAdLive, mixedAdsLive))
                 finish(Activity.RESULT_OK, result); return
             }
             numericMediaProbe?.let { source ->

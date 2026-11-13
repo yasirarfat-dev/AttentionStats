@@ -9,6 +9,14 @@ const schema = z.strictObject({
     .string()
     .regex(/^$|^#[0-9A-Fa-f]{6}$/)
     .default(''),
+  foregroundColor: z
+    .string()
+    .regex(/^$|^#[0-9A-Fa-f]{6}$/)
+    .default(''),
+  backgroundColor: z
+    .string()
+    .regex(/^$|^#[0-9A-Fa-f]{6}$/)
+    .default(''),
   corners: z.number().int().min(0).max(32).default(24),
   spacing: z.number().int().min(12).max(24).default(20),
   numberSize: z.number().int().min(24).max(40).default(30),

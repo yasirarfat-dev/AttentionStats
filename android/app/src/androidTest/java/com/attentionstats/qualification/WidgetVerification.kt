@@ -57,6 +57,9 @@ internal object WidgetVerification {
             expect(WidgetConfiguration.decode(flexible.encode()) == flexible)
             val old = JSONObject(flexible.encode()).put("version", 1).apply { listOf("opacity", "corners", "numberSize", "timestamp").forEach { remove(it) } }
             expect(WidgetConfiguration.decode(old.toString()).opacity == 100)
+            expect(WidgetConfiguration.defaults(WidgetStyle.APPS).names)
+            expect(WidgetConfiguration.decode(JSONObject(flexible.encode()).put("version", 2).put("names", false).toString()).names)
+            expect(!WidgetConfiguration.decode(flexible.copy(names = false).encode()).names)
             expect(runCatching { WidgetConfiguration.decode(JSONObject(flexible.encode()).put("opacity", -1).toString()) }.isFailure)
             expect(WidgetConfiguration().stats.take(2) == listOf(WidgetStat.SESSION, WidgetStat.VIDEOS))
             val first = WidgetConfiguration(WidgetStyle.RHYTHM, listOf(WidgetStat.PLAYBACK, WidgetStat.VIDEOS), "light", "teal")
@@ -109,6 +112,8 @@ internal object WidgetVerification {
                         val config = WidgetConfiguration(style = style, stats = listOf(WidgetStat.VIDEOS, WidgetStat.SESSION, WidgetStat.WATCHING, WidgetStat.REELS_APPS, WidgetStat.LAUNCHES, WidgetStat.BREAKS), theme = theme)
                         val host = attach(config, data, width, height)
                         ui {
+                            if (style == WidgetStyle.APPS && width >= 160 && height >= 140)
+                                expect(texts(host).any { it.id == R.id.w_label && it.text.toString() == "Instagram" })
                             check(texts(host).any { it.id == R.id.w_value && it.text.toString() == "7" } ||
                                 (style == WidgetStyle.SCREEN && host.findViewById<View>(R.id.w_screen_value) != null) ||
                                 (style == WidgetStyle.RHYTHM && width >= 160 && height >= 140 && host.findViewById<View>(R.id.w_chart) != null)) {

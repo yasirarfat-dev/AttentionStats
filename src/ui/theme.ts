@@ -1,5 +1,5 @@
 import tokens from './paletteTokens.json';
-import { customPalette } from './customPalette';
+import { scopedPalette } from './customPalette';
 import { useSyncExternalStore } from 'react';
 import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles';
 
@@ -8,6 +8,8 @@ export type Appearance = {
   accent: 'graphite' | 'blue' | 'teal' | 'violet';
   motion: boolean;
   customColor: string;
+  foregroundColor: string;
+  backgroundColor: string;
   corners: number;
   spacing: number;
   numberSize: number;
@@ -49,6 +51,8 @@ let appearance: Appearance = {
   accent: 'graphite',
   motion: true,
   customColor: '',
+  foregroundColor: '',
+  backgroundColor: '',
   corners: 24,
   spacing: 20,
   numberSize: 30,
@@ -56,8 +60,12 @@ let appearance: Appearance = {
 const listeners = new Set<() => void>();
 export function appearancePreview(next: Appearance, dark: boolean): AppTheme {
   return {
-    ...palette(dark ? 'dark' : 'light', next.accent),
-    ...customPalette(next.customColor, dark),
+    ...scopedPalette(
+      palette(dark ? 'dark' : 'light', next.accent),
+      next.foregroundColor,
+      next.backgroundColor,
+      next.customColor,
+    ),
     corners: next.corners,
     spacing: next.spacing,
     numberSize: next.numberSize,
@@ -65,15 +73,23 @@ export function appearancePreview(next: Appearance, dark: boolean): AppTheme {
 }
 export function applyAppearance(next: Appearance) {
   UnistylesRuntime.updateTheme('light', () => ({
-    ...palette('light', next.accent),
-    ...customPalette(next.customColor, false),
+    ...scopedPalette(
+      palette('light', next.accent),
+      next.foregroundColor,
+      next.backgroundColor,
+      next.customColor,
+    ),
     corners: next.corners,
     spacing: next.spacing,
     numberSize: next.numberSize,
   }));
   UnistylesRuntime.updateTheme('dark', () => ({
-    ...palette('dark', next.accent),
-    ...customPalette(next.customColor, true),
+    ...scopedPalette(
+      palette('dark', next.accent),
+      next.foregroundColor,
+      next.backgroundColor,
+      next.customColor,
+    ),
     corners: next.corners,
     spacing: next.spacing,
     numberSize: next.numberSize,

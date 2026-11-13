@@ -12,6 +12,7 @@ export function Screen({
   header = false,
   scrollRef,
   headerAction,
+  scrollEnabled = true,
 }: {
   children: ReactNode;
   title?: string;
@@ -20,6 +21,7 @@ export function Screen({
   header?: boolean;
   scrollRef?: Ref<ScrollViewInstance>;
   headerAction?: ReactNode;
+  scrollEnabled?: boolean;
 }) {
   const insets = useSafeAreaInsets();
   return (
@@ -31,6 +33,7 @@ export function Screen({
     >
       <ScrollView
         ref={scrollRef}
+        scrollEnabled={scrollEnabled}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         contentContainerStyle={[

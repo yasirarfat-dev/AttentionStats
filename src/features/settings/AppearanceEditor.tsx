@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import {
+  Pressable,
+  Text,
+  TextInput,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import {
   Body,
@@ -10,22 +16,29 @@ import {
   ToggleRow,
 } from '../../ui/Kit';
 import { appearancePreview, type Appearance } from '../../ui/theme';
+import { ColorCanvas } from './ColorCanvas';
 
 export function AppearanceEditor({
   value,
   onSave,
+  onDragChange,
 }: {
   value: Appearance;
   onSave: (value: Appearance) => Promise<unknown>;
+  onDragChange: (dragging: boolean) => void;
 }) {
   const { rt } = useUnistyles();
   const [draft, setDraft] = useState(value);
   const [hex, setHex] = useState(value.customColor || '#5676A6');
+  const [scope, setScope] = useState<
+    'foregroundColor' | 'backgroundColor' | 'customColor'
+  >('customColor');
   const [advanced, setAdvanced] = useState(false);
+  const [precision, setPrecision] = useState(false);
   const [busy, setBusy] = useState(false);
   useEffect(() => {
     setDraft(value);
-    setHex(value.customColor || '#5676A6');
+    setHex(value[scope] || '#5676A6');
   }, [value]);
   const valid = /^#[0-9a-f]{6}$/i.test(hex);
   const dark =
@@ -39,10 +52,11 @@ export function AppearanceEditor({
       next.toString(16).padStart(2, '0') +
       base.slice(3 + index * 2);
     setHex(color);
-    setDraft({ ...draft, customColor: color });
+    setDraft({ ...draft, [scope]: color });
   };
   return (
     <>
+      <SectionTitle>Theme</SectionTitle>
       <Segmented
         label="Theme"
         value={draft.mode}
@@ -53,90 +67,174 @@ export function AppearanceEditor({
         ]}
         onChange={mode => setDraft({ ...draft, mode })}
       />
-      <Segmented
-        label="Accent starting point"
-        value={draft.accent}
-        options={[
-          { value: 'graphite', label: 'Graphite' },
-          { value: 'blue', label: 'Blue' },
-          { value: 'teal', label: 'Teal' },
-          { value: 'violet', label: 'Violet' },
-        ]}
-        onChange={accent => setDraft({ ...draft, accent, customColor: '' })}
-      />
-      <ToggleRow
-        title="Mix a custom accent"
-        value={draft.customColor !== ''}
-        onChange={enabled =>
-          setDraft({
-            ...draft,
-            customColor: enabled ? (valid ? hex : '#5676A6') : '',
-          })
-        }
-      />
-      <View
-        style={[
-          styles.preview,
-          {
-            backgroundColor: preview.accentSoft,
-            borderRadius: draft.corners,
-            padding: draft.spacing,
-          },
-        ]}
-        accessible
-        accessibilityLabel="Appearance preview. Video encounters 965. Recorded surface time 6 hours 51 minutes."
-      >
-        <Text
-          style={{ color: preview.accent, fontWeight: '600', fontSize: 14 }}
-        >
-          Video encounters
-        </Text>
-        <Text
-          style={{
-            color: preview.accent,
-            fontWeight: '700',
-            fontSize: draft.numberSize,
-            fontVariant: ['tabular-nums'],
+      <View style={styles.colorGroup}>
+        <SectionTitle>Presets</SectionTitle>
+        <Body muted>
+          Ready-made palettes. Choosing one resets your custom colors.
+        </Body>
+        <AppearanceChoices
+          grid
+          label="Presets"
+          value={draft.accent}
+          options={[
+            { value: 'graphite', label: 'Graphite' },
+            { value: 'blue', label: 'Blue' },
+            { value: 'teal', label: 'Teal' },
+            { value: 'violet', label: 'Violet' },
+          ]}
+          onChange={accent => {
+            const next = {
+              ...draft,
+              accent,
+              customColor: '',
+              foregroundColor: '',
+              backgroundColor: '',
+            };
+            setDraft(next);
+            const colors = appearancePreview(next, dark);
+            setHex(
+              scope === 'backgroundColor'
+                ? colors.canvas
+                : scope === 'foregroundColor'
+                  ? colors.text
+                  : colors.accent,
+            );
           }}
-        >
-          965
-        </Text>
-        <Text style={{ color: preview.accent, fontSize: 14 }}>
-          Recorded surface time · 6h 51m
-        </Text>
+        />
       </View>
-      {draft.customColor !== '' && (
-        <>
-          <SectionTitle>Your accent color</SectionTitle>
-          <TextInput
-            accessibilityLabel="Custom accent hex color"
-            value={hex}
-            autoCorrect={false}
-            autoCapitalize="characters"
-            maxLength={7}
-            style={styles.input}
-            onChangeText={text => {
-              setHex(text);
-              if (/^#[0-9a-f]{6}$/i.test(text))
-                setDraft({ ...draft, customColor: text });
+      <View style={styles.colorGroup}>
+        <SectionTitle>Custom colors</SectionTitle>
+        <Body muted>
+          Choose Color, Background or Accent, then drag across the palette to
+          customize that part. Changes stay in your draft until Save appearance.
+        </Body>
+        <AppearanceChoices
+          label="Color scope"
+          value={scope}
+          options={[
+            { value: 'foregroundColor', label: 'Color' },
+            { value: 'backgroundColor', label: 'Background' },
+            { value: 'customColor', label: 'Accent' },
+          ]}
+          onChange={next => {
+            setScope(next);
+            setHex(
+              draft[next] ||
+                (next === 'backgroundColor'
+                  ? preview.canvas
+                  : next === 'foregroundColor'
+                    ? preview.text
+                    : preview.accent),
+            );
+          }}
+        />
+        <Body muted>
+          {scope === 'foregroundColor'
+            ? 'Text and numbers'
+            : scope === 'backgroundColor'
+              ? 'Page and card backgrounds'
+              : 'Buttons and highlights'}{' '}
+          · drag the hue strip, then the color canvas.
+        </Body>
+        <ColorCanvas
+          onDragChange={onDragChange}
+          key={scope}
+          color={valid ? hex : '#5676A6'}
+          onChange={color => {
+            setHex(color);
+            setDraft({ ...draft, [scope]: color });
+          }}
+        />
+        <Button
+          label="Use preset for this color"
+          variant="text"
+          onPress={() => {
+            setDraft({ ...draft, [scope]: '' });
+            setHex('#5676A6');
+          }}
+        />
+        <View
+          style={[
+            styles.preview,
+            {
+              backgroundColor: preview.surface,
+              borderWidth: 1,
+              borderColor: preview.border,
+              borderRadius: draft.corners,
+              padding: draft.spacing,
+            },
+          ]}
+          accessible
+          accessibilityLabel="Appearance preview. Video encounters 965. Recorded surface time 6 hours 51 minutes."
+        >
+          <Text
+            style={{ color: preview.text, fontWeight: '600', fontSize: 14 }}
+          >
+            Video encounters
+          </Text>
+          <Text
+            style={{
+              color: preview.text,
+              fontWeight: '700',
+              fontSize: draft.numberSize,
+              fontVariant: ['tabular-nums'],
             }}
-          />
-          {!valid && <Body>Enter a six-digit color, for example #5676A6.</Body>}
-          {['Red', 'Green', 'Blue'].map((label, i) => (
-            <ColorChannel
-              key={label}
-              label={label}
-              value={valid ? parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16) : 0}
-              color={['#B55D5D', '#44816A', '#5B78B3'][i]!}
-              onChange={next => updateChannel(i, next)}
+          >
+            965
+          </Text>
+          <Text style={{ color: preview.muted, fontSize: 14 }}>
+            Recorded surface time · 6h 51m
+          </Text>
+          <Text
+            style={{ color: preview.accent, fontSize: 16, fontWeight: '600' }}
+          >
+            Accent preview · View details
+          </Text>
+        </View>
+        {
+          <>
+            <SectionTitle>Selected color</SectionTitle>
+            <TextInput
+              accessibilityLabel="Selected hex color"
+              value={hex}
+              autoCorrect={false}
+              autoCapitalize="characters"
+              maxLength={7}
+              style={styles.input}
+              onChangeText={text => {
+                setHex(text);
+                if (/^#[0-9a-f]{6}$/i.test(text))
+                  setDraft({ ...draft, [scope]: text });
+              }}
             />
-          ))}
-          <Body muted>
-            Your chosen color adapts for readable text and buttons in each
-            theme. Status and deletion colors keep their meaning.
-          </Body>
-        </>
-      )}
+            {!valid && (
+              <Body>Enter a six-digit color, for example #5676A6.</Body>
+            )}
+            <Button
+              label={precision ? 'Hide RGB controls' : 'Fine-tune RGB'}
+              variant="text"
+              onPress={() => setPrecision(!precision)}
+            />
+            {precision &&
+              ['Red', 'Green', 'Blue'].map((label, i) => (
+                <ColorChannel
+                  key={label}
+                  label={label}
+                  value={
+                    valid ? parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16) : 0
+                  }
+                  color={['#B55D5D', '#44816A', '#5B78B3'][i]!}
+                  onChange={next => updateChannel(i, next)}
+                />
+              ))}
+            <Body muted>
+              Your background stays as selected. Text and accent tones adjust
+              when needed for readability. Status and deletion colors keep their
+              meaning.
+            </Body>
+          </>
+        }
+      </View>
       <Button
         label={advanced ? 'Hide layout controls' : 'Customize layout & numbers'}
         variant="text"
@@ -187,7 +285,7 @@ export function AppearanceEditor({
       />
       <Button
         label={busy ? 'Saving appearance…' : 'Save appearance'}
-        disabled={busy || (draft.customColor !== '' && !valid)}
+        disabled={busy || !valid}
         onPress={() => {
           setBusy(true);
           void onSave(draft).finally(() => setBusy(false));
@@ -203,6 +301,8 @@ export function AppearanceEditor({
             accent: 'graphite',
             motion: true,
             customColor: '',
+            foregroundColor: '',
+            backgroundColor: '',
             corners: 24,
             spacing: 20,
             numberSize: 30,
@@ -211,6 +311,58 @@ export function AppearanceEditor({
         }}
       />
     </>
+  );
+}
+
+function AppearanceChoices<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+  grid = false,
+}: {
+  label: string;
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (value: T) => void;
+  grid?: boolean;
+}) {
+  const { fontScale } = useWindowDimensions();
+  const large = fontScale > 1.3;
+  return (
+    <View
+      accessibilityRole="radiogroup"
+      accessibilityLabel={label}
+      style={styles.choices}
+    >
+      {options.map(option => (
+        <Pressable
+          key={option.value}
+          accessibilityRole="radio"
+          accessibilityLabel={option.label}
+          accessibilityState={{ selected: option.value === value }}
+          onPress={() => onChange(option.value)}
+          style={[
+            styles.choice,
+            large
+              ? { flexBasis: '100%' }
+              : grid
+                ? { flexBasis: '46%', flexGrow: 1 }
+                : { flex: option.value === 'backgroundColor' ? 1.6 : 1 },
+            option.value === value && styles.choiceSelected,
+          ]}
+        >
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit={!large}
+            minimumFontScale={0.9}
+            style={styles.choiceLabel}
+          >
+            {option.label}
+          </Text>
+        </Pressable>
+      ))}
+    </View>
   );
 }
 
@@ -257,6 +409,7 @@ function ColorChannel({
             ),
           )
         }
+        onResponderTerminationRequest={() => false}
         onResponderMove={event =>
           onChange(
             Math.round(
@@ -267,8 +420,12 @@ function ColorChannel({
         }
         style={styles.channelTouch}
       >
-        <View style={[styles.track, { backgroundColor: color }]} />
         <View
+          pointerEvents="none"
+          style={[styles.track, { backgroundColor: color }]}
+        />
+        <View
+          pointerEvents="none"
           style={[
             styles.thumb,
             { left: `${(value / 255) * 90}%`, borderColor: color },
@@ -279,6 +436,37 @@ function ColorChannel({
   );
 }
 const styles = StyleSheet.create(theme => ({
+  choices: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  choice: {
+    minWidth: 0,
+    minHeight: 48,
+    paddingHorizontal: 4,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: theme.border,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  choiceSelected: {
+    backgroundColor: theme.accentSoft,
+    borderColor: theme.accent,
+  },
+  choiceLabel: {
+    color: theme.text,
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+    flexShrink: 1,
+  },
+  colorGroup: {
+    gap: 12,
+    padding: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: theme.border,
+    backgroundColor: theme.surfaceAlt,
+  },
   preview: { gap: 6, minHeight: 125 },
   input: {
     color: theme.text,

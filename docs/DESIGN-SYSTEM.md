@@ -1,6 +1,6 @@
 # Design system
 
-**Status:** Accepted visual direction; experimental native shell, shared panels/icons and counter exist; full accessibility/performance qualification remains open. Updated 2026-11-13.
+**Status:** Accepted visual direction; experimental native shell, shared panels/icons and counter exist; full accessibility/performance qualification remains open. Updated 2026-11-14.
 **Responsibility:** Defines hierarchy, semantic tokens, primitives, charts, themes and purposeful motion.
 **Related specifications:** [Human factors](HUMAN-FACTORS.md), [UX](UX-SPEC.md), [Navigation](NAVIGATION.md), [Settings](SETTINGS-SPEC.md), [Preview](../design/prototype/README.md), [Conventions](CONVENTIONS.md).
 **Unresolved feasibility:** F-03 in [Decisions](DECISIONS.md); Android font metrics, frame pacing and TalkBack require native verification. Browser checks do not certify native accessibility.
@@ -125,3 +125,6 @@ ADR-089 uses card-level Settings help: one named info control at each section he
 
 
 ADR-091 adds aligned labelled metric lines for exact range/source data, DD/MM/YYYY date fields with heading/icon above values, checkbox app membership and semantic safe/destructive buttons. Green safe text/soft surface and red destructive text/soft surface retain accessible contrast. Custom RGB/hex accent shades adapt for readable text/buttons across light/dark surfaces; status colors remain independent. Cards expose saved corner/spacing controls and statistics expose saved number size without disabling system text scaling. Actual native visual review, large-type and TalkBack qualification remain distinct from contrast arithmetic.
+
+
+ADR-094 adds separate foreground/background/accent appearance scopes through a full HSV canvas and hue rail. Retain existing starting palettes, live illustrative preview and explicit Save/reset. Exact selected backgrounds remain; card/raised tones derive gently from them. Foreground/accent text adapts to meet 4.5:1 across the normal canvas/cards; status colors retain their own semantic backgrounds. Keep hex/RGB and adjustable controls as alternatives to dragging; color changes alone start no behavior.
