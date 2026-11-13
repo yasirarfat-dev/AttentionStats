@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Linking, Share, Text, View } from 'react-native';
+import { Alert, BackHandler, Linking, Share, Text, View } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { StyleSheet } from 'react-native-unistyles';
 import {
   NativeReels,
@@ -18,12 +19,14 @@ import {
   Pill,
   Row,
   SectionTitle,
-  Segmented,
   ToggleRow,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
+import { AppearanceEditor } from './AppearanceEditor';
 import { SettingsGroup } from './SettingsGroup';
 import { settingsHelp } from './settingsHelp';
+import { ProtectionToolScreen } from '../protection';
+import { clearHistoryCache } from '../diary';
 import { useAppIcons, useDiary } from '../diary';
 import { useDeleteHistory } from './DeleteHistory';
 import { useReels } from '../sources';
@@ -36,6 +39,16 @@ const EMAIL = 'consciousbiobot@gmail.com';
 const STORE = 'https://play.google.com/store/apps/details?id=attention.stats';
 
 export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
+  const [counter, setCounter] = useState(false);
+  const focused = useIsFocused();
+  useEffect(() => {
+    if (!focused || !counter) return;
+    const back = BackHandler.addEventListener('hardwareBackPress', () => {
+      setCounter(false);
+      return true;
+    });
+    return () => back.remove();
+  }, [focused, counter]);
   const reels = useReels();
   const diary = useDiary(1);
   const snapshot = reels.snapshot;
@@ -118,10 +131,20 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
 
   const deleter = useDeleteHistory({
     onPause: () => reels.setPaused(true),
-    onDelete: () => reels.deleteAll(),
+    onDelete: async () => {
+      if (await reels.deleteAll()) clearHistoryCache();
+    },
     storageBytes: Number(snapshot?.storageBytes ?? 0),
   });
 
+  if (counter)
+    return (
+      <ProtectionToolScreen
+        tool="Counter"
+        onBack={() => setCounter(false)}
+        onSchedules={() => setCounter(false)}
+      />
+    );
   return (
     <Screen title="Settings">
       <SettingsGroup title="Counting" entries={settingsHelp.counting}>
@@ -244,9 +267,16 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
       </SettingsGroup>
 
       <SettingsGroup
-        title="What to Measure & Extras"
+        title="Display & experience"
         entries={settingsHelp.measurement}
       >
+        <Row
+          icon="eye"
+          title="Live counter"
+          detail="Floating display, numbers and icons"
+          onPress={() => setCounter(true)}
+        />
+        <Divider />
         <ToggleRow
           icon="layers"
           title="Count photo encounters"
@@ -335,32 +365,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         entries={settingsHelp.appearance}
         padded
       >
-        <Segmented
-          label="Theme"
-          value={appearance.mode}
-          options={[
-            { value: 'light', label: 'Light' },
-            { value: 'dark', label: 'Dark' },
-            { value: 'system', label: 'System' },
-          ]}
-          onChange={mode => void chooseAppearance({ ...appearance, mode })}
-        />
-        <Segmented
-          label="Accent color"
-          value={appearance.accent}
-          options={[
-            { value: 'graphite', label: 'Graphite' },
-            { value: 'blue', label: 'Blue' },
-            { value: 'teal', label: 'Teal' },
-            { value: 'violet', label: 'Violet' },
-          ]}
-          onChange={accent => void chooseAppearance({ ...appearance, accent })}
-        />
-        <ToggleRow
-          title="Gentle animations"
-          value={appearance.motion}
-          onChange={motion => void chooseAppearance({ ...appearance, motion })}
-        />
+        <AppearanceEditor value={appearance} onSave={chooseAppearance} />
       </SettingsGroup>
 
       <SettingsGroup title="Help & Feedback" entries={settingsHelp.help}>

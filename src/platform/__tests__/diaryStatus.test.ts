@@ -64,6 +64,16 @@ const lifetime = () => ({
   newerEnd: null,
   snapshot: value,
 });
+
+test('zero-second continuation is a valid saved choice; negative delays are rejected', () => {
+  expect(
+    parseDiarySnapshot(JSON.stringify({ ...value, breakSeconds: 0 }))
+      .breakSeconds,
+  ).toBe(0);
+  expect(() =>
+    parseDiarySnapshot(JSON.stringify({ ...value, breakSeconds: -1 })),
+  ).toThrow();
+});
 test('lifetime contract preserves exact counts, nullable time and empty-history scope', () => {
   expect(
     parseDiaryHistoryPage(JSON.stringify(lifetime())).sources[0]?.videos,

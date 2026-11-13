@@ -11,6 +11,13 @@ import com.facebook.react.module.annotations.ReactModule
 @ReactModule(name = DiaryModule.NAME)
 class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpec(context) {
     override fun getName() = NAME
+    override fun configureAppearance(document: String, promise: Promise) {
+        try {
+            val result = com.attentionstats.appearance.AppearanceOwner.configure(context, document)
+            runCatching { com.attentionstats.widget.TodayWidget.render(context) }
+            promise.resolve(result)
+        } catch (_: Exception) { promise.reject("APPEARANCE_UNSAVED", "Could not save appearance") }
+    }
     override fun getAppearance(promise: Promise) {
         promise.resolve(com.attentionstats.appearance.AppearanceOwner.snapshot(context).toString())
     }
@@ -60,7 +67,7 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
     override fun configure(action: String, enabled: Boolean, count: Double, minutes: Double, expectedRevision: String, promise: Promise) {
         val revision = expectedRevision.toLongOrNull()
         if (action !in (setOf("usage", "reminder", "onboarding", "ads", "break", "playback", "photos") + org.attentionstats.reels.ReelApp.entries.map { "block.${it.key}" }) || revision == null || revision < 0 ||
-            !count.isFinite() || count % 1 != 0.0 || count !in 1.0..1000.0 ||
+            !count.isFinite() || count % 1 != 0.0 || count !in (if (action == "break") 0.0 else 1.0)..1000.0 ||
             !minutes.isFinite() || minutes % 1 != 0.0 || minutes !in 1.0..240.0) {
             failure(promise, "INVALID_ARGUMENT"); return
         }

@@ -27,9 +27,16 @@ export function useAppIcons(packages: string[]): Record<string, string> {
       publish();
       return;
     }
-    NativeDiary.getAppIcons(missing)
-      .then(raw => {
-        const parsed = JSON.parse(raw) as Record<string, unknown>;
+    Promise.all(
+      Array.from({ length: Math.ceil(missing.length / 80) }, (_, index) =>
+        NativeDiary!.getAppIcons(missing.slice(index * 80, (index + 1) * 80)),
+      ),
+    )
+      .then(payloads => {
+        const parsed = Object.assign(
+          {},
+          ...payloads.map(raw => JSON.parse(raw) as Record<string, unknown>),
+        ) as Record<string, unknown>;
         for (const [name, uri] of Object.entries(parsed))
           if (
             typeof uri === 'string' &&

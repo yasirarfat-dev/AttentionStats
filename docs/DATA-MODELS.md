@@ -120,3 +120,6 @@ ADR-082's experimental timed focus is nested in the existing encrypted `Protecti
 
 
 ADR-087/ADR-088 adds per-instance native widget display preferences (version 2, version-1 compatible) keyed by AppWidget ID: purpose/layout, ordered statistic keys, theme/accent, optional source names, opacity, corner shape, stat number size and update-time visibility. They contain no observed values or personal history and are separate from encrypted authoritative facts; example previews are in-memory only. Deleting a widget removes its display preferences without deleting observations. Detailed validation and behavior belong to [Contracts](NATIVE-CONTRACTS.md#widget-gallery-and-display-configuration-adr-087adr-088) and [Widgets](WIDGETS-SPEC.md).
+
+
+ADR-091 adds no Room schema or migration. Fresh DiaryConfiguration Kotlin defaults become reminderCount 30 and breakSeconds 3 (reminderMinutes stays 15); existing rows and historical SQL migration defaults remain unchanged. Native local appearance preferences add customColor/corners/spacing/numberSize with legacy read defaults. A focus-defaults local marker prevents repeated installed-group seeding after edits/deletion. Default groups persist as ordinary encrypted ProtectionConfiguration groups, never as active schedules. Focus durationMs is a snapshot projection of existing deadlineMs minus startedMs.

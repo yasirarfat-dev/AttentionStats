@@ -54,6 +54,33 @@ internal class ScheduleOwner(private val context: Context) {
         plan = next; revision = stored.revision
     }
 
+    /** Only the user-facing schedule read seeds defaults, never isolated owner loads or collection startup. */
+    suspend fun ensureDefaultGroups(history: HistoryStore) {
+        val defaults = context.getSharedPreferences("focus-defaults", Context.MODE_PRIVATE)
+        if (defaults.getBoolean("seeded-v1", false)) return
+        var stored = history.database.data().protection() ?: ProtectionConfiguration()
+        if (!defaults.getBoolean("seeded-v1", false)) {
+            val current = decode(stored.document)
+            val additions = DefaultGroups.create(context, excluded).filter { candidate -> current.groups.none { it.id == candidate.id || it.name.equals(candidate.name, true) } }
+                .take((30 - current.groups.size).coerceAtLeast(0))
+            var seeded = current
+            additions.forEach { candidate ->
+                val next = seeded.copy(groups = seeded.groups + candidate)
+                if (encode(next).toString().length <= 131_072) seeded = next
+            }
+            if (seeded != current) {
+                seeded.validate(excluded)
+                stored = stored.copy(revision = Math.addExact(stored.revision, 1), document = encode(seeded).toString())
+                history.database.withWriteTransaction {
+                    history.database.data().putProtection(stored)
+                    history.database.data().advanceConfigurationRevision()
+                }
+            }
+            check(defaults.edit().putBoolean("seeded-v1", true).commit())
+        }
+        load(history)
+    }
+
     suspend fun save(history: HistoryStore, document: String, expected: Long): Boolean {
         val next = decode(document).copy(focus = plan.focus)
         next.validate(excluded)
@@ -113,7 +140,7 @@ internal class ScheduleOwner(private val context: Context) {
             val focus = activeFocus()
             put("focus", if (focus == null) JSONObject.NULL else JSONObject()
                 .put("id", focus.id).put("packages", JSONArray(focus.packages.sorted())).put("allowOnly", focus.allowOnly)
-                .put("remainingMs", remaining(focus).toString()).put("deadlineMs", focus.deadlineMs.toString()))
+                .put("durationMs", (focus.deadlineMs - focus.startedMs).toString()).put("remainingMs", remaining(focus).toString()).put("deadlineMs", focus.deadlineMs.toString()))
         }.toString()
 
     companion object {

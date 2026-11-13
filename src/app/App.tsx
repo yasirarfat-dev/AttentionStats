@@ -6,7 +6,8 @@ import {
   type NavigatorScreenParams,
 } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AccessibilityInfo, StatusBar, View } from 'react-native';
+import { AccessibilityInfo, AppState, StatusBar, View } from 'react-native';
+import { clearHistoryCache, warmHistory } from '../features/diary';
 import { useEffect, useState } from 'react';
 import {
   SafeAreaProvider,
@@ -63,6 +64,16 @@ const icons: Record<keyof Tabs, NavSymbol> = {
 };
 
 function MainTabs({ onWelcome }: { onWelcome: () => void }) {
+  useEffect(() => {
+    void warmHistory();
+    const listener = AppState.addEventListener('change', state => {
+      if (state === 'active') {
+        clearHistoryCache();
+        void warmHistory();
+      }
+    });
+    return () => listener.remove();
+  }, []);
   const insets = useSafeAreaInsets();
   const { theme: colors } = useUnistyles();
   const appearance = useAppearance();
@@ -111,7 +122,13 @@ function MainTabs({ onWelcome }: { onWelcome: () => void }) {
                     params: { quickStart },
                     initial: false,
                   })
-                : navigation.navigate('Protect', { screen, initial: false })
+                : screen === 'Schedules'
+                  ? navigation.navigate('Protect', {
+                      screen,
+                      params: { view: 'groups' },
+                      initial: false,
+                    })
+                  : navigation.navigate('Protect', { screen, initial: false })
             }
           />
         )}

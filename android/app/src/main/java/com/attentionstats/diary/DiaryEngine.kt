@@ -39,7 +39,7 @@ internal class DiaryEngine(private val context: Context, private val installatio
     @Volatile var blockLimits: Map<ReelApp, Int> = emptyMap()
         private set
     val blockedApps: Set<ReelApp> get() = blockLimits.keys
-    @Volatile var breakSeconds = 10
+    @Volatile var breakSeconds = 3
         private set
     @Volatile var includeRecognizedAds = true
         private set
@@ -107,7 +107,7 @@ internal class DiaryEngine(private val context: Context, private val installatio
                         if (enabled) "allow" else "withdraw", now, Math.addExact(checkNotNull(dao.metadata()).configurationRevision, 1)))
                     if (action == "playback") config.copy(measurePlayback = enabled) else config.copy(countPhotos = enabled)
                 }
-                "break" -> config.copy(breakSeconds = count.coerceIn(3, 60))
+                "break" -> config.copy(breakSeconds = count.coerceIn(0, 60))
                 else -> {
                     require(action.startsWith("block."))
                     val app = checkNotNull(ReelApp.byKey(action.removePrefix("block.")))

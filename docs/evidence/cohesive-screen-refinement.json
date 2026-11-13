@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-13",
+  "decision": "ADR-091",
+  "status": "experimental; scoped physical presentation/flow verification complete",
+  "product": {
+    "sha256": "577943f18782b28cdf86633b266e4c7e8f22e6728258b773cb786f58cb4c97d9",
+    "installedHashMatched": true,
+    "platform": "physical Android API36",
+    "releaseVersionChanged": false,
+    "predecessorSha256": "fc3abc6badbb006f2d01d1bceda160f5eca883deea29f2104a5887b72d2fc642",
+    "nativePayloadMatchesTestedPredecessor": true
+  },
+  "verification": {
+    "unit": {
+      "suites": 15,
+      "checks": 127,
+      "scope": "range cache warmup/deduplication/retry/invalidation, RGB-grid semantic contrast, zero-delay parser, stable app ordering and group/individual exclusion; existing suites retained"
+    },
+    "protection": {
+      "checks": 68,
+      "instrumentationCode": -1,
+      "testSha256": "94df56c4c674cd6ba8bec50da43e657e4b509c4960f655bb97e87cd5e00e2988",
+      "scope": "synthetic attached native controls and four actual native visual forms, 36 unique curated invitations, zero-delay continuation, fresh defaults and isolated native appearance validation/contrast",
+      "productAtRunSha256": "fc3abc6badbb006f2d01d1bceda160f5eca883deea29f2104a5887b72d2fc642"
+    },
+    "widgets": {
+      "checks": 458,
+      "instrumentationCode": -1,
+      "testSha256": "0227719cce8e7b1257ff08555ca6f89043d6152117c23c2b836120a91057b690",
+      "scope": "same product; prior test artifact before pause-capture-only test edit; projections, responsive native hosts, progressive configuration, save/reopen/cancel; real launcher placement unchanged",
+      "productAtRunSha256": "fc3abc6badbb006f2d01d1bceda160f5eca883deea29f2104a5887b72d2fc642"
+    },
+    "static": [
+      "pnpm typecheck",
+      "pnpm lint including architecture/backup/palette",
+      "pnpm format:check",
+      "python tools/check_docs.py",
+      "python tools/check_mobile.py",
+      "git diff --check"
+    ],
+    "android": {
+      "previewAssembly": "pass",
+      "testAssembly": "pass",
+      "previewLint": "pass; zero errors, 167 warnings",
+      "finalProductBuild": "57s",
+      "latestTestCaptureBuild": "1m9s",
+      "compatibility": "No dependency added or changed. Existing AGP legacy DSL/Kotlin, SDK, CMake/path and native/localization lint warnings remain; new category constant warnings refer to API26 metadata guarded at runtime.",
+      "finalChoiceBuild": "57s",
+      "mainProductBuild": "1m47s"
+    }
+  },
+  "physicalUi": [
+    "Cold launch followed by Week/Month/All Time switches retains ready range dates without a loading card after warmup.",
+    "DD/MM/YYYY date fields, hero range and aligned per-source encounter/surface-time values inspected in the actual dark native app.",
+    "Protect defaults expanded; centered chooser has fixed Close, groups/type/duration/explicit Start; installed default groups are ordinary editable groups.",
+    "An Essentials-only Block Apps focus starts from the chooser, shows a decreasing native-authoritative time/ring and ends from the chooser. No target app is launched and no recurring rule is changed.",
+    "Full alphabetical default-group checkbox editor opens and exits without saving the test draft. Group/individual exclusion and stable order additionally have behavior tests.",
+    "Live Counter is reached from Settings with named and Android Back returning to Settings.",
+    "All three deletion dialogs inspected and cancelled with Keep My History; final destructive action never pressed.",
+    "Custom accent enabled through the actual UI, saved to the native preference and applied to Today/focus, then restored to original palette. Advanced card/number controls opened; native dimension validation/persistence checked in isolated preferences.",
+    "Four synthetic attached native pause renders and all five synthetic light/dark native widget renders inspected locally. No real personal-history screenshot published.",
+    "Final JS-only explicit-choice correction: selecting Block Apps before Essentials keeps Block Apps selected, starts no session and closes normally; native payload is byte-identical to the tested predecessor."
+  ],
+  "stoppedAttempts": [
+    "Initial pre-final launch displayed a history refresh failure; recovered on retry. Cause not established; final cold launch and warmed switches pass.",
+    "Floating call window initially obstructed a capture; it was left untouched, capture deleted, and maintainer subsequently closed the call.",
+    "UI runner initially matched offscreen controls and used ElementTree leaf truthiness; corrected to visible bounds and explicit None comparisons. Stopped attempts are not counted as passed saves or focus starts.",
+    "A calculator search/review traversal was stopped before Start. Completed focus trial instead explicitly selects the installed Essentials group with Block Apps.",
+    "A one-second Start assertion raced native completion; later actual active countdown and explicit End are independently observed.",
+    "Empty Accessibility service-list argument initially rejected by adb without a change; corrected quoting, own-service-only reconnection and original master restoration preserve other selections."
+  ],
+  "preservation": "Cleanup and final settings comparison are recorded in State/log; no history erase, synthetic diary facts, saved draft/schedule edit, launcher placement, new source grant, permission, collector or database schema. Authorized editable default groups are seeded without active rules. The temporary focus is ended and custom accent restored.",
+  "remaining": [
+    "Large text, TalkBack, RTL, landscape, all theme/custom-color UI combinations and other devices/API levels",
+    "Very large history/query latency and very large installed-app catalog rendering performance",
+    "Live source pause/trigger fidelity and broader protection lifecycle/reboot/expiry remain their existing separate gates",
+    "Full launcher placement/resize/restore breadth remains open; 458 native-host/config checks do not establish those cases",
+    "App-category metadata may be absent or incomplete; only nonempty installed suggestions seed, and existing groups remain authoritative/editable",
+    "36 invitations/four visual forms are the initial curated library; hundreds of templates and psychological benefit are not claimed"
+  ],
+  "cleanup": {
+    "originalAccessibilitySelectionsAndMasterMatch": true,
+    "originalAppearanceChoicesMatch": true,
+    "temporaryFocusEnded": true,
+    "ownedTestApkRemoved": true,
+    "ownedPhoneCapturesRemoved": true,
+    "returnedToToday": true,
+    "backupScope": "No backup controls or provider operations performed; original system-backup preferences were not independently captured for a byte comparison."
+  },
+  "finalChoiceCorrection": "Preserve an explicitly chosen focus type when selecting an allow-oriented suggested group; native payload unchanged. Two additional chooser behavior tests raise Jest total to 127."
+}

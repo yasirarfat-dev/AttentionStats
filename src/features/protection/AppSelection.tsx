@@ -1,14 +1,7 @@
 import { useState } from 'react';
 import { Pressable, Switch, Text, TextInput, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
-import {
-  Body,
-  Button,
-  Card,
-  Divider,
-  SectionTitle,
-  ToggleRow,
-} from '../../ui/Kit';
+import { Body, Card, Divider, SectionTitle, CheckRow } from '../../ui/Kit';
 import { Icon } from '../../ui/Icon';
 import type { AppGroup, ProtectableApp } from '../../platform/protectionStatus';
 import { scheduleStyles } from './schedulePresentation';
@@ -30,15 +23,13 @@ export function AppSelection({
   const { theme } = useUnistyles();
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<string[]>([]);
-  const [shown, setShown] = useState(12);
-  const grouped = new Set(groups.flatMap(group => group.packages));
   const matching = (name: string) =>
     name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase());
   const nameOf = (pkg: string) =>
     apps.find(app => app.packageName === pkg)?.name ?? pkg;
-  const others = apps.filter(
-    app => !grouped.has(app.packageName) && matching(app.name),
-  );
+  const others = apps
+    .filter(app => matching(app.name))
+    .sort((a, b) => a.name.localeCompare(b.name));
   const visibleGroups = groups.filter(
     group =>
       matching(group.name) || group.packages.some(pkg => matching(nameOf(pkg))),
@@ -58,12 +49,14 @@ export function AppSelection({
         value={query}
         onChangeText={value => {
           setQuery(value);
-          setShown(12);
         }}
         style={scheduleStyles.input}
         editable={!disabled}
       />
-      <Body muted>{selected.length} Selected · Up to 100 Apps</Body>
+      <Body muted>
+        {selected.length} selected · Group and individual choices stay in sync.
+        Apps stay alphabetical.
+      </Body>
       <Card padded={false}>
         {visibleGroups.map((group, index) => {
           const selectedCount = group.packages.filter(pkg =>
@@ -125,8 +118,9 @@ export function AppSelection({
                         matching(group.name) ||
                         matching(nameOf(pkg)),
                     )
+                    .sort((a, b) => nameOf(a).localeCompare(nameOf(b)))
                     .map(pkg => (
-                      <ToggleRow
+                      <CheckRow
                         key={pkg}
                         title={nameOf(pkg)}
                         value={selected.includes(pkg)}
@@ -142,10 +136,10 @@ export function AppSelection({
             </View>
           );
         })}
-        {others.slice(0, shown).map((app, index) => (
+        {others.map((app, index) => (
           <View key={app.packageName}>
             {(index > 0 || visibleGroups.length > 0) && <Divider />}
-            <ToggleRow
+            <CheckRow
               title={app.name}
               value={selected.includes(app.packageName)}
               disabled={
@@ -160,13 +154,6 @@ export function AppSelection({
           <View style={styles.empty}>
             <Body muted>No Matching Apps or Groups</Body>
           </View>
-        )}
-        {others.length > shown && (
-          <Button
-            label="Show More Apps"
-            variant="text"
-            onPress={() => setShown(shown + 30)}
-          />
         )}
       </Card>
     </>

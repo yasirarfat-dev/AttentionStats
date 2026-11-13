@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import {
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -35,50 +35,74 @@ export function useDeleteHistory({
   onDelete: () => unknown;
   storageBytes: number;
 }) {
-  const [typing, setTyping] = useState(false);
-
-  function start() {
-    Alert.alert(
-      'This is your private record',
-      `Your history is stored privately on this phone. Android backups or files you exported may also exist. Deleting here turns off future automatic backups and removes pending restores; it cannot delete copies held by your backup provider or elsewhere. No data is sent to us.
-
-It takes just ${size(storageBytes)}. Many people return months later to see how far they have come.
-
-Need a break from tracking? Pausing keeps everything safe.`,
-      [
-        { text: 'Pause counting instead', onPress: () => void onPause() },
-        { text: 'Keep my history', style: 'cancel' },
-        { text: 'Continue', style: 'destructive', onPress: second },
-      ],
+  const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
+  const dialog =
+    step === 3 ? (
+      <TypeToConfirm
+        visible
+        onCancel={() => setStep(0)}
+        onConfirm={() => {
+          setStep(0);
+          void onDelete();
+        }}
+      />
+    ) : (
+      <Modal
+        visible={step !== 0}
+        transparent
+        animationType="none"
+        onRequestClose={() => setStep(0)}
+      >
+        <View style={styles.backdrop}>
+          <ScrollView
+            style={styles.sheet}
+            contentContainerStyle={{ gap: 14, paddingBottom: 22 }}
+            accessibilityViewIsModal
+          >
+            <Text accessibilityRole="header" style={styles.title}>
+              {step === 1
+                ? 'Before erasing history'
+                : 'Review permanent deletion'}
+            </Text>
+            <Body>
+              {step === 1
+                ? `Your local record uses ${size(storageBytes)}. You can keep your history or pause counting without deleting it.`
+                : 'This erases history and choices from this phone. There is no local undo. The next step asks you to type DELETE and wait ten seconds.'}
+            </Body>
+            <Body muted>
+              Erasing turns off automatic backups and removes pending restores.
+              Copies already held by your backup provider or exported elsewhere
+              may remain.
+            </Body>
+            <Button
+              label="Keep my history"
+              variant="safe"
+              onPress={() => setStep(0)}
+            />
+            {step === 1 && (
+              <Button
+                label="Pause counting & keep history"
+                variant="safe"
+                onPress={() => {
+                  setStep(0);
+                  void onPause();
+                }}
+              />
+            )}
+            <Button
+              label={
+                step === 1
+                  ? 'Review history deletion'
+                  : 'Proceed to final erase confirmation'
+              }
+              variant="danger"
+              onPress={() => setStep(step === 1 ? 2 : 3)}
+            />
+          </ScrollView>
+        </View>
+      </Modal>
     );
-  }
-
-  function second() {
-    Alert.alert(
-      'Erase it forever?',
-      'This removes your history and choices from this phone. There is no local undo. Automatic backup will be turned off, but external backup copies may remain.\n\nContinue with deletion?',
-      [
-        { text: 'Keep my history', style: 'cancel' },
-        {
-          text: "I'm sure",
-          style: 'destructive',
-          onPress: () => setTyping(true),
-        },
-      ],
-    );
-  }
-
-  const dialog = (
-    <TypeToConfirm
-      visible={typing}
-      onCancel={() => setTyping(false)}
-      onConfirm={() => {
-        setTyping(false);
-        void onDelete();
-      }}
-    />
-  );
-  return { start, dialog };
+  return { start: () => setStep(1), dialog };
 }
 
 function TypeToConfirm({
@@ -108,7 +132,7 @@ function TypeToConfirm({
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="none"
       onRequestClose={onCancel}
     >
       <KeyboardAvoidingView behavior="padding" style={styles.backdrop}>
@@ -135,7 +159,7 @@ function TypeToConfirm({
             style={styles.input}
             returnKeyType="done"
           />
-          <Button label="Keep my history" onPress={onCancel} />
+          <Button label="Keep my history" variant="safe" onPress={onCancel} />
           <Button
             label={left > 0 ? `Erase everything · ${left}` : 'Erase everything'}
             variant="danger"
@@ -156,6 +180,8 @@ const styles = StyleSheet.create(theme => ({
     padding: 20,
   },
   sheet: {
+    maxHeight: '85%',
+    flexGrow: 0,
     backgroundColor: theme.surface,
     borderRadius: 24,
     padding: 22,

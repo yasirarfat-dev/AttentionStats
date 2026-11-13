@@ -12,6 +12,7 @@ import {
   Title,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
+import { FocusClock } from './FocusClock';
 import { AppSelection } from './AppSelection';
 import { focusChoices, type QuickFocusRequest } from './focusChoices';
 import { useSchedules } from './useSchedules';
@@ -109,9 +110,10 @@ export function FocusScreen({
       ) : active ? (
         <>
           <Card tone="soft">
-            <Title>
-              {Math.ceil(Number(active.remainingMs) / 60_000)} minutes remaining
-            </Title>
+            <FocusClock
+              remainingMs={active.remainingMs}
+              durationMs={active.durationMs}
+            />
             <Body>
               {active.allowOnly ? 'Allow Only' : 'Block Apps'} ·{' '}
               {names(active.packages)}

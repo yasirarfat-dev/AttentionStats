@@ -6,15 +6,22 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { reelsSources } from '../../platform';
 import NativeDiary from '../../platform/specs/NativeDiary';
 import { fixedRange } from './dateRange';
+import { Icon } from '../../ui/Icon';
 import { AppIcon, BarChart } from '../../ui/Charts';
-import { duration, exactCount, hourLabel, sumCounts } from '../../ui/format';
+import {
+  calendarDate,
+  duration,
+  exactCount,
+  hourLabel,
+  sumCounts,
+} from '../../ui/format';
 import {
   Body,
   Button,
   Card,
   Divider,
   Explanation,
-  Meter,
+  MetricLine,
   Row,
   SectionTitle,
   Segmented,
@@ -176,25 +183,32 @@ export function InsightsScreen() {
       />
       {history && (
         <Card>
-          <View style={styles.stats}>
-            <View style={styles.grow}>
-              <Row
-                icon="clock"
-                title="Start Date"
-                detail={dateLabel(history.rangeStart!)}
-                onPress={() => void pickDate('start')}
-              />
-            </View>
-            <View style={styles.grow}>
-              <Row
-                icon="clock"
-                title="End Date"
-                detail={dateLabel(history.rangeEnd!)}
-                onPress={
-                  range === 'all' ? () => void pickDate('end') : undefined
-                }
-              />
-            </View>
+          <View style={styles.rangeDates}>
+            {(['start', 'end'] as const).map(field => (
+              <Pressable
+                key={field}
+                accessibilityRole="button"
+                accessibilityLabel={`${field === 'start' ? 'Start' : 'End'} date, ${calendarDate(field === 'start' ? history.rangeStart! : history.rangeEnd!)}`}
+                accessibilityState={{
+                  disabled: field === 'end' && range !== 'all',
+                }}
+                disabled={field === 'end' && range !== 'all'}
+                onPress={() => void pickDate(field)}
+                style={styles.dateField}
+              >
+                <View style={styles.dateHeading}>
+                  <Icon name="clock" size={16} color={theme.muted} />
+                  <Text style={styles.dateFieldLabel}>
+                    {field === 'start' ? 'Start date' : 'End date'}
+                  </Text>
+                </View>
+                <Text style={styles.dateFieldValue}>
+                  {calendarDate(
+                    field === 'start' ? history.rangeStart! : history.rangeEnd!,
+                  )}
+                </Text>
+              </Pressable>
+            ))}
           </View>
           {range !== 'all' && (
             <Body muted>
@@ -249,7 +263,6 @@ export function InsightsScreen() {
       )}
       {diary.snapshot && (
         <>
-          {diary.busy && <Body muted>Refreshing retained observations…</Body>}
           <Card tone="hero">
             <Text style={styles.eyebrow}>
               VIDEO ENCOUNTERS ·{' '}
@@ -278,7 +291,7 @@ export function InsightsScreen() {
             {history && (
               <Text style={styles.heroNote}>
                 {history.firstDay
-                  ? `${history.rangeStart} – ${history.rangeEnd}`
+                  ? `${calendarDate(history.rangeStart!)} – ${calendarDate(history.rangeEnd!)}`
                   : 'No retained observations yet.'}
               </Text>
             )}
@@ -298,11 +311,17 @@ export function InsightsScreen() {
                 />
                 {showSources &&
                   history.sources.map(source => (
-                    <Row
-                      key={source.key}
-                      title={reelsSources[source.key].name}
-                      detail={`${exactCount(source.videos)} video encounters · ${time(source.reelsMs)} recorded surface time`}
-                    />
+                    <View key={source.key} style={styles.sourceSummary}>
+                      <Title>{reelsSources[source.key].name}</Title>
+                      <MetricLine
+                        label="Video encounters"
+                        value={exactCount(source.videos)}
+                      />
+                      <MetricLine
+                        label="Recorded surface time"
+                        value={time(source.reelsMs)}
+                      />
+                    </View>
                   ))}
                 <Explanation title="About This Range">
                   Totals cover the selected range. Missing time is unknown;
@@ -314,7 +333,8 @@ export function InsightsScreen() {
               <SectionTitle>Browse Dates</SectionTitle>
               <Card>
                 <Title>
-                  {history.pageStart} – {history.pageEnd}
+                  {calendarDate(history.pageStart!)} –{' '}
+                  {calendarDate(history.pageEnd!)}
                 </Title>
                 <Body muted>
                   Daily and app details below cover only these {days.length}{' '}
@@ -505,24 +525,17 @@ export function InsightsScreen() {
                           />
                         }
                         title={reelsSources[source.key].name}
-                        detail={`${time(source.reelsMs)} video surface time`}
-                        trailing={
-                          <View style={styles.share}>
-                            <Text style={styles.shareValue}>
-                              {exactCount(source.videos)}
-                            </Text>
-                            <Meter
-                              value={
-                                Number(detail.videos) > 0
-                                  ? Number(source.videos) /
-                                    Number(detail.videos)
-                                  : 0
-                              }
-                              color={reelsSources[source.key].color}
-                            />
-                          </View>
-                        }
                       />
+                      <View style={styles.sourceValues}>
+                        <MetricLine
+                          label="Video encounters"
+                          value={exactCount(source.videos)}
+                        />
+                        <MetricLine
+                          label="Recorded surface time"
+                          value={time(source.reelsMs)}
+                        />
+                      </View>
                     </View>
                   ))
                 )}
@@ -653,6 +666,37 @@ export function InsightsScreen() {
 }
 
 const styles = StyleSheet.create(theme => ({
+  rangeDates: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  dateField: {
+    flex: 1,
+    minWidth: 125,
+    minHeight: 76,
+    borderRadius: 16,
+    backgroundColor: theme.surfaceAlt,
+    padding: 12,
+    gap: 8,
+  },
+  dateHeading: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  dateFieldLabel: {
+    color: theme.muted,
+    fontSize: 13,
+    fontWeight: '600',
+    flexShrink: 1,
+  },
+  dateFieldValue: {
+    color: theme.text,
+    fontSize: 16,
+    fontWeight: '700',
+    fontVariant: ['tabular-nums'],
+  },
+  sourceValues: { paddingHorizontal: 12, paddingBottom: 12 },
+  sourceSummary: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.border,
+    gap: 2,
+  },
+
   stats: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   grow: { flex: 1, minWidth: 128 },
   eyebrow: {

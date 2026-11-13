@@ -49,9 +49,9 @@ export function ProtectionToolScreen({
   const icons = useAppIcons(
     reelsSourceKeys.map(key => reelsSources[key].packageName),
   );
-  const [count, setCount] = useState(20);
+  const [count, setCount] = useState(30);
   const [minutes, setMinutes] = useState(15);
-  const [seconds, setSeconds] = useState(10);
+  const [seconds, setSeconds] = useState(3);
   const [limits, setLimits] = useState<Partial<Record<ReelsSourceKey, number>>>(
     {},
   );
@@ -107,7 +107,11 @@ export function ProtectionToolScreen({
 
   return (
     <Screen title={titles[tool]}>
-      <Button label="Back to Protect" variant="text" onPress={onBack} />
+      <Button
+        label={tool === 'Counter' ? 'Back to Settings' : 'Back to Protect'}
+        variant="text"
+        onPress={onBack}
+      />
       {tool === 'Breaks' && (
         <>
           <SectionTitle>Mindful breaks</SectionTitle>
@@ -158,7 +162,7 @@ export function ProtectionToolScreen({
                 <Stepper
                   label="Pause length"
                   value={seconds}
-                  min={3}
+                  min={0}
                   max={30}
                   step={1}
                   suffix="seconds"

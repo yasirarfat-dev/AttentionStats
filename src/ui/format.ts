@@ -8,6 +8,11 @@ export function duration(value: number | null): string {
     ? `${Math.floor(hours / 24)}d ${hours % 24}h`
     : `${hours}h ${minutes % 60}m`;
 }
+/** Civil dates have no UTC/local conversion; keep the requested unambiguous order. */
+export function calendarDate(day: string): string {
+  const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(day);
+  return parts ? `${parts[3]}/${parts[2]}/${parts[1]}` : '—';
+}
 export function sumCounts(values: string[]): string {
   return values.reduce((sum, value) => sum + BigInt(value), 0n).toString();
 }

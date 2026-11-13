@@ -168,11 +168,7 @@ export function Row({
         <Text style={styles.rowTitle} numberOfLines={2}>
           {title}
         </Text>
-        {detail ? (
-          <Text style={styles.rowDetail} numberOfLines={3}>
-            {detail}
-          </Text>
-        ) : null}
+        {detail ? <Text style={styles.rowDetail}>{detail}</Text> : null}
       </View>
       {value ? (
         <Text style={styles.rowValue} numberOfLines={1}>
@@ -296,6 +292,70 @@ export function Divider() {
   return <View style={styles.divider} />;
 }
 
+/** Exact values aligned with their meaning; adapt to large type rather than clip digits. */
+export function MetricLine({ label, value }: { label: string; value: string }) {
+  const { fontScale, width } = useWindowDimensions();
+  return (
+    <View
+      accessible
+      accessibilityLabel={`${label}: ${value}`}
+      style={[
+        styles.metricLine,
+        (fontScale > 1.3 || width < 340) && {
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+        },
+      ]}
+    >
+      <Text style={styles.metricLabel}>{label}</Text>
+      <Text style={styles.metricValue}>{value}</Text>
+    </View>
+  );
+}
+
+export function CheckRow({
+  title,
+  value,
+  onChange,
+  disabled = false,
+  leading,
+}: {
+  title: string;
+  value: boolean;
+  onChange: (value: boolean) => void;
+  disabled?: boolean;
+  leading?: ReactNode;
+}) {
+  const { theme } = useUnistyles();
+  return (
+    <Pressable
+      accessibilityRole="checkbox"
+      accessibilityLabel={title}
+      accessibilityState={{ checked: value, disabled }}
+      disabled={disabled}
+      onPress={() => onChange(!value)}
+      style={[styles.row, disabled && styles.disabled]}
+    >
+      {leading}
+      <Text style={[styles.rowTitle, { flex: 1 }]}>{title}</Text>
+      <View
+        style={{
+          width: 24,
+          height: 24,
+          borderRadius: 6,
+          borderWidth: 2,
+          borderColor: value ? theme.accent : theme.muted,
+          backgroundColor: value ? theme.accentFill : 'transparent',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {value && <Icon name="check" size={18} color={theme.onAccent} />}
+      </View>
+    </Pressable>
+  );
+}
+
 /** Short visual separator; decorative and excluded from accessibility traversal. */
 export function StatDivider({ inverse = false }: { inverse?: boolean }) {
   const { theme } = useUnistyles();
@@ -384,7 +444,7 @@ export function Button({
 }: {
   label: string;
   onPress: () => void;
-  variant?: 'filled' | 'tonal' | 'text' | 'danger';
+  variant?: 'filled' | 'tonal' | 'text' | 'danger' | 'safe';
   disabled?: boolean;
   icon?: IconName;
 }) {
@@ -392,9 +452,11 @@ export function Button({
   const color =
     variant === 'filled'
       ? theme.onAccent
-      : variant === 'danger'
-        ? theme.danger
-        : theme.accent;
+      : variant === 'safe'
+        ? theme.safe
+        : variant === 'danger'
+          ? theme.danger
+          : theme.accent;
   return (
     <Pressable
       accessibilityRole="button"
@@ -406,6 +468,7 @@ export function Button({
         variant === 'tonal' && styles.tonal,
         variant === 'text' && styles.textButton,
         variant === 'danger' && styles.dangerButton,
+        variant === 'safe' && { backgroundColor: theme.safeSoft },
         pressed && styles.buttonPressed,
         disabled && styles.disabled,
       ]}
@@ -562,6 +625,25 @@ export function Meter({ value, color }: { value: number; color: string }) {
 }
 
 const styles = StyleSheet.create(theme => ({
+  metricLine: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    gap: 8,
+    paddingVertical: 5,
+  },
+  metricLabel: {
+    color: theme.muted,
+    fontSize: 14,
+    lineHeight: 21,
+    flexShrink: 1,
+  },
+  metricValue: {
+    color: theme.text,
+    fontSize: 19,
+    fontWeight: '700',
+    fontVariant: ['tabular-nums'],
+  },
   infoButton: {
     minWidth: 48,
     minHeight: 48,
@@ -570,8 +652,8 @@ const styles = StyleSheet.create(theme => ({
   },
   card: {
     backgroundColor: theme.surface,
-    borderRadius: 24,
-    padding: 20,
+    borderRadius: theme.corners,
+    padding: theme.spacing,
     gap: 14,
     borderWidth: 1,
     borderColor: theme.border,
@@ -642,7 +724,7 @@ const styles = StyleSheet.create(theme => ({
   stat: { flex: 1, gap: 2, minWidth: 0 },
   statValue: {
     color: theme.text,
-    fontSize: 30,
+    fontSize: theme.numberSize,
     fontWeight: '700',
     fontVariant: ['tabular-nums'],
   },

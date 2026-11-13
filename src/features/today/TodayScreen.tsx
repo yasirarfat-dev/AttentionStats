@@ -244,7 +244,14 @@ export function TodayScreen({
                     .filter(Boolean)
                     .join(' · ') || 'Nothing yet today'
                 }
-                value={exactCount(String(item.videos))}
+                trailing={
+                  <View style={{ alignItems: 'flex-end', gap: 2 }}>
+                    <Text style={styles.sourceCount}>
+                      {exactCount(String(item.videos))}
+                    </Text>
+                    <Text style={styles.sourceUnit}>videos</Text>
+                  </View>
+                }
                 accessibilityLabel={`${reelsSources[item.key].name}: ${item.videos} short videos`}
               />
             </View>
@@ -350,6 +357,13 @@ export function TodayScreen({
 }
 
 const styles = StyleSheet.create(theme => ({
+  sourceCount: {
+    color: theme.text,
+    fontSize: 22,
+    fontWeight: '700',
+    fontVariant: ['tabular-nums'],
+  },
+  sourceUnit: { color: theme.muted, fontSize: 12 },
   warnTitle: { color: theme.warn, fontSize: 17, fontWeight: '800' },
   heroHeading: {
     flexDirection: 'row',

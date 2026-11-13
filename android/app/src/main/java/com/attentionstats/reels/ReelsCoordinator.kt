@@ -205,7 +205,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
     }
 
     fun scheduleSnapshot(success: (String) -> Unit, failure: (String) -> Unit) = enqueue(failure) {
-        opened()
+        schedules.ensureDefaultGroups(opened())
         success(schedules.snapshot(grantEnabled() && serviceConnected))
     }
     fun exportArchive(cancelled: java.util.concurrent.atomic.AtomicBoolean,

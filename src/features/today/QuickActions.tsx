@@ -14,7 +14,7 @@ import { Icon } from '../../ui/Icon';
 import { Button, Row } from '../../ui/Kit';
 import { FocusQuickActions, type QuickFocusRequest } from '../protection';
 
-export type QuickDestination = 'Focus' | 'Breaks' | 'Blocks';
+export type QuickDestination = 'Focus' | 'Schedules' | 'Breaks' | 'Blocks';
 
 /** Centered shortcuts open existing review/edit flows; opening the card changes no settings. */
 export function QuickActions({
@@ -105,14 +105,8 @@ export function QuickActions({
                 Quick Actions
               </Text>
               {visible && (
-                <FocusQuickActions onSelect={choice => open('Focus', choice)} />
+                <FocusQuickActions onSelect={() => open('Schedules')} />
               )}
-              <Row
-                icon="clock"
-                title="Choose a Focus Session"
-                detail="Customize apps, groups and duration, then review."
-                onPress={() => open('Focus')}
-              />
               <Row
                 icon="heart"
                 title="Adjust mindful breaks"
@@ -125,12 +119,12 @@ export function QuickActions({
                 detail="Review short-video blocks for each app."
                 onPress={() => open('Blocks')}
               />
-              <Button
-                label="Close quick actions"
-                variant="text"
-                onPress={() => close()}
-              />
             </ScrollView>
+            <Button
+              label="Close quick actions"
+              variant="text"
+              onPress={() => close()}
+            />
           </View>
         </View>
       </Modal>

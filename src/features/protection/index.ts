@@ -6,3 +6,5 @@ export {
 
 export { FocusQuickActions } from './FocusQuickActions';
 export type { QuickFocusRequest } from './focusChoices';
+
+export { ProtectionToolScreen } from './ProtectionToolScreen';

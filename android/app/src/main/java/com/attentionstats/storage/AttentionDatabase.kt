@@ -121,13 +121,13 @@ data class DiaryConfiguration(
     val queryThroughMs: Long = 0,
     val grantLost: Boolean = false,
     val reminderEnabled: Boolean = false,
-    val reminderCount: Int = 15,
+    val reminderCount: Int = 30,
     val reminderMinutes: Int = 15,
     val onboardingSeen: Boolean = false,
     @ColumnInfo(defaultValue = "1") val includeRecognizedAds: Boolean = true,
     val revision: Long = 0,
     /** Seconds a mindful-break screen waits before its choices unlock. */
-    @ColumnInfo(defaultValue = "10") val breakSeconds: Int = 10,
+    @ColumnInfo(defaultValue = "10") val breakSeconds: Int = 3,
     @ColumnInfo(defaultValue = "0") val measurePlayback: Boolean = false,
     /** Existing disclosed photo collection survives migration; fresh installs opt in separately. */
     @ColumnInfo(defaultValue = "1") val countPhotos: Boolean = false,

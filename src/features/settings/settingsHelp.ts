@@ -37,6 +37,11 @@ export const settingsHelp = {
   ],
   measurement: [
     {
+      term: 'Live Counter',
+      detail:
+        'Choose whether the floating counter appears and which numbers and icons it shows. This is a display choice; source counting has separate controls.',
+    },
+    {
       term: 'Photo Encounters',
       detail:
         'Counts recognized photos and carousels separately in enabled sources. One carousel post is one encounter.',
@@ -97,7 +102,7 @@ export const settingsHelp = {
     {
       term: 'Accent Color',
       detail:
-        'Choose Graphite, Blue, Teal or Violet. This changes presentation without changing your data or rules.',
+        'Use a starting color or mix your own with RGB controls or a hex value. Preview before saving; accent shades adapt for readability. Expand layout controls for card corners, spacing and statistic size.',
     },
     {
       term: 'Gentle Animations',

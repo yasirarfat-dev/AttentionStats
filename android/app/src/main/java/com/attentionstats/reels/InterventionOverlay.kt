@@ -25,7 +25,7 @@ import android.widget.TextView
  * the system navigation bar stays uncovered.
  *
  * Human-factors choices: a slow breathing orb invites one calm breath (about 6 per minute),
- * numbers are factual and non-judgemental, the healthy choice is the primary button, and
+ * numbers are factual and non-judgemental, leaving is the primary button, and
  * "keep watching" unlocks after a short countdown instead of being hidden.
  */
 internal class InterventionOverlay(
@@ -47,24 +47,17 @@ internal class InterventionOverlay(
     private val density = resources.displayMetrics.density
     private fun dp(value: Int) = (value * density).toInt()
     private val handler = Handler(Looper.getMainLooper())
-    private val orb = BreathingOrb(context)
+    private val template = run {
+        val prefs = context.getSharedPreferences("break-presentations", Context.MODE_PRIVATE)
+        val next = prefs.getInt("next", 0).coerceAtLeast(0)
+        prefs.edit().putInt("next", (next + 1) % BreakTemplates.all.size).apply()
+        BreakTemplates.all[next % BreakTemplates.all.size]
+    }
+    private val orb = BreathingOrb(context, template.visual)
     private val secondary: TextView
     private val prompt: TextView
     private val session = org.attentionstats.protection.InterventionSession(if (compact) 0 else waitSeconds * 1000L)
     private var finished = false
-    private var lastPromptAtMs = 0L
-    private var promptIndex = 0
-
-    private val prompts = listOf(
-        "Breathe in slowly… and out.",
-        "Ten minutes is a short walk outside.",
-        "Ten minutes is a chapter of a book.",
-        "Ten minutes is a call to someone you miss.",
-        "Ten minutes is a glass of water and a stretch.",
-        "Your attention is yours to spend.",
-        "Notice how you feel right now.",
-    )
-
     init {
         isClickable = true // Touches stop here; they never reach the paused app.
         isFocusable = true
@@ -84,8 +77,8 @@ internal class InterventionOverlay(
             accessibilityLiveRegion = ACCESSIBILITY_LIVE_REGION_POLITE
         }, wrap(top = 14))
         column.addView(text(detail, 17f, palette.muted), wrap(top = 10))
-        prompt = text(prompts.first(), 15f, palette.muted).apply { alpha = 0.9f }
-        if (!compact) column.addView(prompt, wrap(top = 22))
+        prompt = text(template.prompt, 15f, palette.muted).apply { alpha = 0.9f }
+        column.addView(prompt, wrap(top = if (compact) 12 else 22))
         val primary = button(primaryLabel, primary = true) {
             if (session.choose(elapsedRealtime(), waitRequired = false)) { finish(); onPrimary() }
         }
@@ -110,7 +103,6 @@ internal class InterventionOverlay(
         super.onAttachedToWindow()
         handler.removeCallbacksAndMessages(null)
         session.start(elapsedRealtime())
-        lastPromptAtMs = elapsedRealtime()
         tick()
     }
 
@@ -155,13 +147,6 @@ internal class InterventionOverlay(
             secondary.alpha = 1f
             secondary.isEnabled = true
         }
-        if (!compact && now - lastPromptAtMs >= 5_000 && com.attentionstats.appearance.AppearanceOwner.motion(context)) {
-            lastPromptAtMs = now
-            promptIndex = (promptIndex + 1) % prompts.size
-            prompt.animate().alpha(0f).setDuration(250).withEndAction {
-                prompt.text = prompts[promptIndex]; prompt.animate().alpha(0.9f).setDuration(400).start()
-            }.start()
-        }
         handler.postDelayed({ tick() }, 250)
     }
 
@@ -174,7 +159,7 @@ internal class InterventionOverlay(
     override fun onDetachedFromWindow() { finish(); super.onDetachedFromWindow() }
 
     /** A soft glowing circle that grows over 5 s (breathe in) and shrinks over 5 s (breathe out). */
-    private class BreathingOrb(context: Context) : View(context) {
+    private class BreathingOrb(context: Context, private val visual: Int) : View(context) {
         private val palette = com.attentionstats.appearance.AppearanceOwner.palette(context)
         private fun alpha(color: Int, value: Int) = (color and 0x00FFFFFF) or (value shl 24)
         private val glow = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -186,11 +171,25 @@ internal class InterventionOverlay(
             interpolator = AccelerateDecelerateInterpolator()
             addUpdateListener { scale = it.animatedValue as Float; invalidate() }
         }
-        init { importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO; if (com.attentionstats.appearance.AppearanceOwner.motion(context)) animator.start() }
+        init { importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO; if (visual == 0 && com.attentionstats.appearance.AppearanceOwner.motion(context)) animator.start() }
         fun stop() = animator.cancel()
         override fun onDraw(canvas: Canvas) {
             val cx = width / 2f; val cy = height / 2f; val max = minOf(width, height) / 2f
             val radius = max * scale
+            if (visual != 0) {
+                ring.strokeWidth = 3f
+                if (visual == 1) {
+                    canvas.drawCircle(cx, cy, max * 0.45f, ring)
+                    canvas.drawCircle(cx, cy, max * 0.7f, ring)
+                } else if (visual == 2) {
+                    canvas.drawLine(cx - max * 0.65f, cy + max * 0.18f, cx + max * 0.65f, cy + max * 0.18f, ring)
+                    canvas.drawCircle(cx, cy - max * 0.2f, max * 0.18f, ring)
+                } else {
+                    canvas.drawRoundRect(cx - max * 0.24f, cy - max * 0.48f, cx + max * 0.24f, cy + max * 0.48f, 18f, 18f, ring)
+                    canvas.drawLine(cx - max * 0.08f, cy + max * 0.34f, cx + max * 0.08f, cy + max * 0.34f, ring)
+                }
+                return
+            }
             glow.shader = RadialGradient(cx, cy, radius, intArrayOf(alpha(palette.accent, 90), alpha(palette.accent, 0)),
                 null, Shader.TileMode.CLAMP)
             canvas.drawCircle(cx, cy, radius, glow)

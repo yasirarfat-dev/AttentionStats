@@ -26,7 +26,7 @@ export function focusChoices(
     }))
     .filter(group => group.packages.length > 0);
   return [
-    ...(reels.length
+    ...(reels.length && !groups.some(group => group.id === 'default-reels')
       ? [
           {
             kind: 'suggested' as const,

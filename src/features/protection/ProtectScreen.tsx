@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
-import { AppState } from 'react-native';
+import { AppState, Modal, ScrollView, View } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
+import { FocusQuickActions } from './FocusQuickActions';
+import { FocusClock } from './FocusClock';
+import { daysLabel, slotLabel } from './schedulePresentation';
 import { useIsFocused } from '@react-navigation/native';
 import { Body, Button, Card, Row, SectionTitle } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
@@ -12,7 +16,7 @@ export function ProtectScreen({
   onTool,
 }: {
   onFocus: () => void;
-  onSchedules: () => void;
+  onSchedules: (view?: 'groups' | 'slots') => void;
   onTool: (tool: ProtectionTool) => void;
 }) {
   const { snapshot, refresh, focus, busy, error } = useSchedules(false);
@@ -26,7 +30,8 @@ export function ProtectScreen({
     return () => clearInterval(timer);
   }, [focused, refresh]);
   const active = snapshot?.focus;
-  const [quick, setQuick] = useState(false);
+  const [quick, setQuick] = useState(true);
+  const [chooser, setChooser] = useState(false);
   return (
     <Screen title="Protect" subtitle="Gentle tools you choose">
       <Card tone="soft">
@@ -39,11 +44,11 @@ export function ProtectScreen({
         />
         {quick && (
           <>
-            <Button label="Focus Now" onPress={onFocus} />
+            <Button label="Focus Now" onPress={() => setChooser(true)} />
             <Button
               label="Scheduled Focus"
               variant="tonal"
-              onPress={onSchedules}
+              onPress={() => onSchedules('slots')}
             />
           </>
         )}
@@ -60,10 +65,10 @@ export function ProtectScreen({
       )}
       {active && (
         <Card tone="soft">
-          <Body>
-            Focus · {Math.ceil(Number(active.remainingMs) / 60_000)} minutes
-            remaining
-          </Body>
+          <FocusClock
+            remainingMs={active.remainingMs}
+            durationMs={active.durationMs}
+          />
           <Body muted>
             {snapshot.accessibility
               ? 'Accessibility is connected. Blocking is best effort.'
@@ -81,19 +86,34 @@ export function ProtectScreen({
           />
         </Card>
       )}
-      <SectionTitle>Focus & schedules</SectionTitle>
+      <SectionTitle>Your groups & time slots</SectionTitle>
       <Card padded={false}>
-        <Row
-          icon="clock"
-          title="Focus session"
-          detail="Choose an app group and a duration. End whenever you need."
-          onPress={onFocus}
-        />
+        {snapshot?.groups.map(group => (
+          <Row
+            key={group.id}
+            icon="layers"
+            title={group.name}
+            detail={`${group.packages.length} apps`}
+            onPress={() => onSchedules('groups')}
+          />
+        ))}
+        {snapshot?.windows.map(slot => (
+          <Row
+            key={slot.id}
+            icon="clock"
+            title={
+              snapshot.groups.find(group => group.id === slot.groupId)?.name ??
+              'Time slot'
+            }
+            detail={`${slotLabel(slot)} · ${daysLabel(slot.days)} · ${slot.enabled ? 'On' : 'Off'}`}
+            onPress={() => onSchedules('slots')}
+          />
+        ))}
         <Row
           icon="layers"
-          title="App groups & schedules"
-          detail="Choose apps together. Set recurring periods or all-day blocks."
-          onPress={onSchedules}
+          title="Customize focus lists & schedules"
+          detail="Edit groups or recurring time slots"
+          onPress={() => onSchedules('groups')}
         />
       </Card>
       <SectionTitle>Short-video boundaries</SectionTitle>
@@ -111,15 +131,54 @@ export function ProtectScreen({
           onPress={() => onTool('Blocks')}
         />
       </Card>
-      <SectionTitle>In the moment</SectionTitle>
-      <Card padded={false}>
-        <Row
-          icon="eye"
-          title="Live counter"
-          detail="Choose when the floating counter appears and what it shows."
-          onPress={() => onTool('Counter')}
-        />
-      </Card>
+      <Modal
+        visible={chooser}
+        transparent
+        animationType="none"
+        onRequestClose={() => setChooser(false)}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.sheet} accessibilityViewIsModal>
+            <ScrollView contentContainerStyle={styles.content}>
+              {chooser && (
+                <FocusQuickActions
+                  onSelect={() => {
+                    setChooser(false);
+                    onSchedules('groups');
+                  }}
+                />
+              )}
+            </ScrollView>
+            <Button
+              label="Close focus chooser"
+              variant="text"
+              onPress={() => {
+                setChooser(false);
+                void refresh(false);
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
     </Screen>
   );
 }
+
+const styles = StyleSheet.create(theme => ({
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: '#00000080',
+  },
+  sheet: {
+    maxHeight: '85%',
+    width: '100%',
+    maxWidth: 480,
+    alignSelf: 'center',
+    backgroundColor: theme.surface,
+    borderRadius: 28,
+    padding: 20,
+  },
+  content: { gap: 12 },
+}));

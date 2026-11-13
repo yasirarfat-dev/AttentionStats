@@ -119,3 +119,10 @@ ADR-089 uses card-level Settings help: one named info control at each section he
 
 
 ADR-090 keeps the native widget appearance page concise: preview/opacity/Theme/Accent first, with finer controls behind More Options and Tiles/List behind More Layouts. Current templates are curated rather than capped; changing presentation preserves chosen stats. Detailed options remain available without flooding the default view.
+
+
+### Display, deletion and custom appearance (ADR-091)
+
+Rename What to Measure & Extras to Display & Experience and include Live Counter configuration alongside measurement choices, auto-scroll and widgets. Native counter behavior and source consent remain independent. Erase History has three named confirmation steps with softly tinted green keep/pause-and-keep actions and red deletion-path actions; typed DELETE and the final ten-second delay stay mandatory. Colors supplement explicit action labels at every step.
+
+Appearance supports an editable draft, Light/Dark/System, starting palettes or an arbitrary RGB/hex accent, a live illustrative preview, card corners (0–32dp), card spacing (12–24dp), statistic size (24–40sp, still following system text scale), motion, explicit Save and Reset Appearance Draft. Advanced layout controls stay collapsed initially. Accent text/buttons derive readable tones, preserving warning/destructive meanings. Custom accents reach native palette consumers; layout dimensions apply to React Native cards/statistics, with separate native/widget layout controls. Old appearance preferences read with defaults; no observation or rule changes follow appearance editing.

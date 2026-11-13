@@ -91,3 +91,6 @@ X-04–X-07 in [Testing](TESTING.md) define design acceptance. AS-033 verifies a
 
 
 ADR-090 refines the maintainer's broad quality direction: consider useful needs the person may not have anticipated, while keeping the main experience modest. Curate defaults and reveal advanced choices on demand. There is no fixed widget-template quota or ceiling; a new template should serve a distinct useful purpose. More features and more visible controls do not automatically improve usability. Preserve current selections when changing presentation.
+
+
+ADR-091 explicitly permits comfortable optional breathing motion within person-chosen break/block interventions, with static alternatives, reduced-motion priority and practical phone-down invitations. This narrow exception supersedes the earlier blanket breathing-loop prohibition; it does not authorize motion on ordinary app screens or imply a therapeutic effect. Rotate a finite curated invitation between encounters, not an endless carousel during a break. Stable alphabetical checkbox lists preserve spatial memory; shared group/individual selection enables easy exclusions. Deletion labels name the next destructive step and the safe way to keep history, with color as a supplementary cue.

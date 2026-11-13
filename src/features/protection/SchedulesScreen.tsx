@@ -40,16 +40,21 @@ type Draft = { base: ProtectionSnapshot } & (
 
 export function SchedulesScreen({
   packageName,
+  initialView = 'slots',
   onBack,
 }: {
   packageName?: string;
+  initialView?: 'groups' | 'slots';
   onBack: () => void;
 }) {
   const schedules = useSchedules();
   const { snapshot, apps, busy, error } = schedules;
   const { theme } = useUnistyles();
   const screenFocused = useIsFocused();
-  const [view, setView] = useState<'slots' | 'groups'>('slots');
+  const [view, setView] = useState<'slots' | 'groups'>(initialView);
+  useEffect(() => {
+    if (screenFocused) setView(initialView);
+  }, [screenFocused, initialView]);
   const [draft, setDraft] = useState<Draft | null>(null);
   const icons = useAppIcons(
     packageName ? [packageName] : apps.slice(0, 80).map(app => app.packageName),

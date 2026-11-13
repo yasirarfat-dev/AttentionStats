@@ -51,7 +51,7 @@ const schema = z
     reminderMinutes: z.number().int().min(1).max(240),
     onboardingSeen: z.boolean(),
     includeRecognizedAds: z.boolean(),
-    breakSeconds: z.number().int().min(1).max(120),
+    breakSeconds: z.number().int().min(0).max(120),
     measurePlayback: z.boolean().default(false),
     countPhotos: z.boolean().default(true),
     blockers: z

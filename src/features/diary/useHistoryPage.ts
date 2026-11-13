@@ -1,11 +1,20 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { AppState } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import NativeDiary from '../../platform/specs/NativeDiary';
+import type { DiaryHistoryPage } from '../../platform/diaryStatus';
 import {
-  parseDiaryHistoryPage,
-  type DiaryHistoryPage,
-} from '../../platform/diaryStatus';
+  cachedHistory,
+  readHistory,
+  historyGeneration,
+  subscribeHistory,
+} from './historyCache';
 
 /** Lifetime aggregates are read only on entry, paging, explicit retry or foreground return. */
 export function useHistoryPage(
@@ -16,7 +25,8 @@ export function useHistoryPage(
   pageSize: 7 | 30 = 30,
   windowDays: 0 | 7 | 30 = 0,
 ) {
-  const key = `${startDay}|${throughDay}|${endDay}|${pageSize}|${windowDays}`;
+  const epoch = useSyncExternalStore(subscribeHistory, historyGeneration);
+  const key = `${epoch}|${startDay}|${throughDay}|${endDay}|${pageSize}|${windowDays}`;
   const focused = useIsFocused();
   const [loaded, setLoaded] = useState<{
     key: string;
@@ -35,15 +45,13 @@ export function useHistoryPage(
     const request = ++serial.current;
     setBusy(true);
     try {
-      const value = parseDiaryHistoryPage(
-        await NativeDiary.getHistoryRange(
-          startDay,
-          throughDay,
-          endDay,
-          pageSize,
-          windowDays,
-        ),
-      );
+      const value = await readHistory([
+        startDay,
+        throughDay,
+        endDay,
+        pageSize,
+        windowDays,
+      ]);
       if (
         serial.current === request &&
         current.current.enabled &&
@@ -78,7 +86,11 @@ export function useHistoryPage(
     };
   }, [enabled, focused, refresh]);
   return {
-    history: enabled && loaded?.key === key ? loaded.value : null,
+    history: enabled
+      ? loaded?.key === key
+        ? loaded.value
+        : cachedHistory([startDay, throughDay, endDay, pageSize, windowDays])
+      : null,
     error: enabled && failure?.key === key ? failure.message : null,
     busy,
     refresh,

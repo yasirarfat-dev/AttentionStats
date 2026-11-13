@@ -134,3 +134,6 @@ AS-027/ADR-086 widget continuation is underway at the maintainer's request: mult
 
 
 ADR-087/ADR-088 supersedes the six-generic-style interpretation of AS-027 with five launcher providers and seven optional layouts, meaningful synthetic previews, native gallery and per-instance background-only opacity/appearance controls. C-29 remains experimental; scopes and final artifact evidence are in State. Focus shortcuts reuse C-16/C-21/C-30 review/start contracts and grant no new observation capability.
+
+
+ADR-091 refines existing experimental presentation, focus, protection and appearance capabilities without changing capability admission or adding a collector/permission. Scoped native/phone results and remaining accessibility/device/lifecycle/performance limits are in [cohesive screen evidence](evidence/cohesive-screen-refinement.json); builds and attached-host checks do not promote the broader capabilities to implemented.

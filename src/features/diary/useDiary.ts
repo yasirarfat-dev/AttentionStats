@@ -79,7 +79,7 @@ export function useDiary(days: 1 | 7 | 30 | 31 = 1, enabled = true) {
       | 'photos'
       | `block.${ReelsSourceKey}`,
     enabled: boolean,
-    count = snapshot?.reminderCount ?? 15,
+    count = snapshot?.reminderCount ?? 30,
     minutes = snapshot?.reminderMinutes ?? 15,
   ) {
     if (!NativeDiary || !snapshot) return false;

@@ -47,6 +47,7 @@ export interface Spec extends TurboModule {
   stopFocus(sessionId: string, expectedRevision: string): Promise<string>;
   getProtectableApps(): Promise<string>;
   openBackup(): Promise<boolean>;
+  configureAppearance(document: string): Promise<string>;
   getAppearance(): Promise<string>;
   setAppearance(mode: string, accent: string, motion: boolean): Promise<string>;
 }

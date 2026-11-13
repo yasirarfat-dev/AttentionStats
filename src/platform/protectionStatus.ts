@@ -27,6 +27,10 @@ const schema = z
         id,
         allowOnly: z.boolean().optional(),
         packages: z.array(z.string().min(1).max(256)).min(1).max(100),
+        durationMs: z
+          .string()
+          .regex(/^(0|[1-9][0-9]*)$/)
+          .optional(),
         remainingMs: z.string().regex(/^(0|[1-9][0-9]*)$/),
         deadlineMs: z.string().regex(/^(0|[1-9][0-9]*)$/),
       })

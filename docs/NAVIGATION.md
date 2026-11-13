@@ -82,3 +82,6 @@ Final Quick Actions presentation (maintainer clarification, 2026-11-13): a light
 
 
 ADR-088 extends the centered Quick Actions card with bounded suggested/saved focus shortcuts alongside Choose a Focus Session, Breaks and Blocks. Focus navigation may carry a suggestion/saved-group key and a transient request marker; it carries no settings document or historical facts. Focus resolves the current native catalog/configuration and opens review, never automatic activation. A repeated request can reopen review without overwriting an active session. Custom groups/duration remain in the existing Focus/Schedules routes.
+
+
+ADR-091: Protect Focus Now and Today Quick Actions host the same centered app-group/type/duration chooser with explicit Start. Only Customize Focus List or Scheduled Focus navigate to schedule/group editors; the legacy Focus route remains available for custom individual-app review. Live Counter is accessed from Settings → Display & Experience with named/Android Back returning to Settings; retain the old Protect/Counter deep link for compatibility. Saved groups and time slots are summarized in Protect.

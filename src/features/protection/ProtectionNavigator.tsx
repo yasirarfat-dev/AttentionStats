@@ -11,7 +11,7 @@ export type ProtectionRoutes = {
   Breaks: undefined;
   Blocks: undefined;
   Counter: undefined;
-  Schedules: { packageName?: string } | undefined;
+  Schedules: { packageName?: string; view?: 'groups' | 'slots' } | undefined;
 };
 const Stack = createNativeStackNavigator<ProtectionRoutes>();
 export function ProtectionNavigator() {
@@ -22,7 +22,7 @@ export function ProtectionNavigator() {
           <ProtectScreen
             onFocus={() => navigation.navigate('Focus')}
             onTool={tool => navigation.navigate(tool)}
-            onSchedules={() => navigation.navigate('Schedules')}
+            onSchedules={view => navigation.navigate('Schedules', { view })}
           />
         )}
       </Stack.Screen>
@@ -56,6 +56,7 @@ export function ProtectionNavigator() {
         {({ navigation, route }) => (
           <SchedulesScreen
             packageName={route.params?.packageName}
+            initialView={route.params?.view}
             onBack={() =>
               navigation.reset({ index: 0, routes: [{ name: 'Overview' }] })
             }

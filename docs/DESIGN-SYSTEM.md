@@ -122,3 +122,6 @@ ADR-087 requires deliberate visual composition across screens and widgets: choos
 
 
 ADR-089 uses card-level Settings help: one named info control at each section heading, with a progressive definition list immediately below that heading, before controls. Each concept has its own bold term, concise description and separator; Hide Explanations offers an explicit exit. Routine per-row descriptions/info controls are removed, while actual health/status and deletion warnings remain visible. Switches are the final controls at the right edge. Help changes only presentation. Today, Viewing Details and paired Insights/app-history statistics gain subtle partial-height decorative separators, with no new spoken nodes or metric changes.
+
+
+ADR-091 adds aligned labelled metric lines for exact range/source data, DD/MM/YYYY date fields with heading/icon above values, checkbox app membership and semantic safe/destructive buttons. Green safe text/soft surface and red destructive text/soft surface retain accessible contrast. Custom RGB/hex accent shades adapt for readable text/buttons across light/dark surfaces; status colors remain independent. Cards expose saved corner/spacing controls and statistics expose saved number size without disabling system text scaling. Actual native visual review, large-type and TalkBack qualification remain distinct from contrast arithmetic.
