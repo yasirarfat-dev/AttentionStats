@@ -21,6 +21,15 @@ const schema = z
   .strictObject({
     revision: z.string().regex(/^(0|[1-9][0-9]*)$/),
     accessibility: z.boolean(),
+    focus: z
+      .strictObject({
+        id,
+        packages: z.array(z.string().min(1).max(256)).min(1).max(100),
+        remainingMs: z.string().regex(/^(0|[1-9][0-9]*)$/),
+        deadlineMs: z.string().regex(/^(0|[1-9][0-9]*)$/),
+      })
+      .nullable()
+      .optional(),
     groups: z.array(group).max(30),
     windows: z.array(window).max(100),
   })

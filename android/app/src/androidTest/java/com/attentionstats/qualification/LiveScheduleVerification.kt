@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 
 /** Task-owned whole-app rule trial on an installed calculator. Does not inspect its content. */
 internal object LiveScheduleVerification {
-    fun run(instrumentation: Instrumentation): String {
+    fun run(instrumentation: Instrumentation, focusOnly: Boolean = false): String {
         val context = instrumentation.targetContext
         val owner = ReelsCoordinator.get(context)
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
@@ -69,10 +69,16 @@ internal object LiveScheduleVerification {
         val before = state()
         check(before.getBoolean("accessibility")) { "accessibility unavailable" }
         val initial = plan(before)
+        if (focusOnly) {
+            val focus = before.optJSONObject("focus")
+            val packages = focus?.getJSONArray("packages")
+            check(packages != null && packages.length() == 1 && packages.getString(0) == pkg) { "expected explicit calculator-only focus" }
+            check(initial.matching(pkg, java.time.ZonedDateTime.now(), emptySet()).isEmpty()) { "other schedule would mask focus" }
+        }
         val group = AppGroup(UUID.randomUUID().toString(), "Schedule verification", setOf(pkg))
         val window = BlockWindow(UUID.randomUUID().toString(), group.id, 127, 0, 0, true, allDay = true)
         try {
-            save(initial.copy(groups = initial.groups + group, windows = initial.windows + window), before.getString("revision").toLong())
+            if (!focusOnly) save(initial.copy(groups = initial.groups + group, windows = initial.windows + window), before.getString("revision").toLong())
             context.startActivity(checkNotNull(context.packageManager.getLaunchIntentForPackage(pkg)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             val deadline = SystemClock.elapsedRealtime() + 10_000
             while (!allowedButton(false) && SystemClock.elapsedRealtime() < deadline) SystemClock.sleep(250)
@@ -82,11 +88,14 @@ internal object LiveScheduleVerification {
             val root = checkNotNull(automation.rootInActiveWindow)
             try { check(root.packageName?.toString() == pkg) { "allowance left selected app" } }
             finally { SnapshotReader.recycle(root) }
+            if (focusOnly) return "PASS: actual calculator-only focus cover and Allow 5 minutes; own overlay controls only, target content unread"
             return "PASS: installed non-social app covered by all-day group rule; immediate allowance removes cover and preserves app access; task-owned rule removed"
         } finally {
-            val latest = state(); val current = plan(latest)
-            save(current.copy(groups = current.groups.filter { it.id != group.id }, windows = current.windows.filter { it.id != window.id }),
-                latest.getString("revision").toLong())
+            if (!focusOnly) {
+                val latest = state(); val current = plan(latest)
+                save(current.copy(groups = current.groups.filter { it.id != group.id }, windows = current.windows.filter { it.id != window.id }),
+                    latest.getString("revision").toLong())
+            }
         }
     }
 }

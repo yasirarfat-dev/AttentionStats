@@ -11,6 +11,8 @@ import org.attentionstats.reels.main as verifyReels
  * the JVM with `:reels-core:verifyReels`). `adb shell am instrument -w <test package>/<this>`.
  */
 class AnalyticsInstrumentation : Instrumentation() {
+    private var focusLive = false
+    private var focus = false
     private var beta = false
     private var source: String? = null
     private var inspect: String? = null
@@ -89,12 +91,22 @@ class AnalyticsInstrumentation : Instrumentation() {
         feedSamples = arguments?.getString("feedSamples")?.toIntOrNull()?.takeIf { it in 10..90 } ?: 90
         source = arguments?.getString("source")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         inspect = arguments?.getString("inspect")?.takeIf { it in setOf("own", "settings") || org.attentionstats.reels.ReelApp.byKey(it) != null }
+        focusLive = arguments?.getString("focusLive") == "true"
+        focus = arguments?.getString("focus") == "true"
         start()
     }
 
     override fun onStart() {
         val result = Bundle()
         try {
+            if (focusLive) {
+                result.putString("stream", LiveScheduleVerification.run(this, focusOnly = true))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (focus) {
+                result.putString("stream", "PASS: ${FocusVerification.run(this)} isolated encrypted focus owner checks; real rules and history unchanged")
+                finish(Activity.RESULT_OK, result); return
+            }
             if (historyPage) {
                 result.putString("stream", "PASS: ${HistoryPageVerification.run(this)} isolated retained-history aggregate/page checks; synthetic facts, user history unchanged")
                 finish(Activity.RESULT_OK, result); return

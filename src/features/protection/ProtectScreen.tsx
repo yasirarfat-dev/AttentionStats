@@ -27,8 +27,10 @@ const ALWAYS = 1000;
 
 export function ProtectScreen({
   onSchedules,
+  onFocus,
 }: {
   onSchedules: (packageName?: string) => void;
+  onFocus: () => void;
 }) {
   const diary = useDiary(1);
   const reels = useReels();
@@ -89,6 +91,15 @@ export function ProtectScreen({
 
   return (
     <Screen title="Protect" subtitle="Gentle tools you choose">
+      <SectionTitle>Time to focus</SectionTitle>
+      <Card padded={false}>
+        <Row
+          icon="clock"
+          title="Focus session"
+          detail="Choose an app group and a duration. End whenever you need."
+          onPress={onFocus}
+        />
+      </Card>
       <SectionTitle>App schedules</SectionTitle>
       <Card padded={false}>
         <Row

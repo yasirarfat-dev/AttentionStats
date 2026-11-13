@@ -1,6 +1,6 @@
 # Feature tracker
 
-**Status:** MVP 1.0.0 implemented within its documented scope; maintainer reports closed beta. AS-052 establishes continuation on `develop`; export/restore, broader qualification and remaining full-product work are open. Updated 2026-11-03.
+**Status:** MVP 1.0.0 implemented within its documented scope; maintainer reports closed beta. AS-052 establishes continuation on `develop`; export/restore, broader qualification and remaining full-product work are open. Updated 2026-11-13.
 **Responsibility:** Owns stable task IDs, priorities, dependencies, capability mapping and completion evidence.
 **Related specifications:** [Roadmap](ROADMAP.md), [State](STATE.md), [Capabilities](CAPABILITY-MATRIX.md), [Tests](TESTING.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-10 gate relevant tasks; dependencies below are required, not optional recommendations.
@@ -39,9 +39,9 @@ The next AS-041 increment adds an optional diagnostic event/geometry bracket: bo
 | AS-012 Categories and social-app totals | P1 / MVP | planned | C-05, C-12 | AS-011; manual mapping/history scope, known coverage; T-05/T-12 |
 | AS-013 Qualified short-video detectors | P1 / MVP | experimental | C-06, C-07 | AS-005/AS-010; per-target/version/locale qualification, false-positive/negative evidence; T-06/T-07 |
 | AS-014 Aggregates, history and local insights | P1 / MVP | experimental | Narrow C-13 history; insights remain planned | ADR-056/AS-050 native daily/rolling-seven/31-day timer and encounter summaries, unknown coverage retained. AS-011/AS-012 broader provenance, timezone/clock correction, T-13/L-08 and insights remain |
-| AS-015 Native budget/schedule/focus engine | P1 / MVP | planned | C-16, C-17 | AS-007/AS-011; deterministic conflicts, time boundaries, native restart; P-01/P-02 |
+| AS-015 Native budget/schedule/focus engine | P1 / MVP | experimental | C-16, C-17 | ADR-082 adds voluntary timed whole-app focus with frozen group targets, encrypted native elapsed/boot deadlines and review/start/end; bounded evidence in State. Budgets, full deterministic conflicts, real reboot/expiry and broader acceptance remain; P-01/P-02 |
 | AS-016 Reminders/intervention renderer | P1 / MVP | experimental | C-20 | AS-007/AS-015; truthful unavailable states, duplicate prompt control; P-05/P-08 |
-| AS-017 Overrides, exceptions, emergency access | P1 / MVP | planned | C-21 | AS-015/AS-016; scoped tokens, invariant exclusions, immediate bypass; P-06 |
+| AS-017 Overrides, exceptions, emergency access | P1 / MVP | experimental | C-21 | ADR-082 reuses immediate package-scoped five-minute allowance and recovery exclusions for timed focus, with identity/revision-checked early end. Full scoped override/conflict/emergency matrix remains open; P-06 |
 | AS-018 Accessible app screens and settings | P1 / MVP | experimental | C-30 | AS-008/AS-010/AS-014; AS-033 visual reference, native consent/save/health flows, human-factors review; X-02/X-04–X-07 and actual Android accessibility/frame pacing |
 | AS-019 Retention, deletion and storage views | P1 / MVP | experimental | C-24 | AS-009/AS-014; preview/fences, derivative removal, no resurrection; D-01/S-05 |
 | AS-020 Portable export/restore | P1 / MVP | experimental | C-25, C-27 | AS-006/AS-009/AS-019; ADR-073/ADR-074 public-package profile, preserved origins, bounded staged replacement; current Google transport backup succeeds under AS-058; full recovery remains open; B-01–B-05/B-07 |
@@ -127,3 +127,6 @@ November 12 app-history delivery: AS-014/AS-018/AS-037 adds searchable package h
 Maintainer period feedback refines current Insights to seven/30-day windows; native 31-day support remains for older callers. All-time history now has an experimental AS-014/AS-037 native source aggregate/date-page API over retained history with real date bounds; whole-history app ranking and durable rollups remain open. It is distinct from a future custom last-X-day range.
 
 November 12 all-time delivery: AS-014/AS-018/AS-037 adds retained video/surface-time source totals, actual date bounds/calendar span and maximum-30-day older/newer browsing through existing daily/app explorers. App usage/search remain explicitly page-only; empty/missing values and partial coverage remain disclosed. No schema/dependency/consent change. Tasks remain experimental; large-history query latency/durable rollups, whole-history app ranking, chronology/provenance and broad accessibility remain open. Evidence and actual phone scope are recorded in State and the dated log.
+
+
+November 13 voluntary-focus delivery: ADR-082/AS-015/AS-017/AS-018 adds an explicit group/duration/review/Start flow, native remaining time and early End, reusing whole-app covers, package-scoped allowance and recovery exclusions. Same-boot elapsed/boot metadata is encrypted; ordinary schedule edits preserve frozen targets and archive replacement clears focus. Tasks remain experimental; budgets/full conflict/override, actual reboot/renderer expiry and broad accessibility/device qualification remain open. See State and the [dated log](IMPLEMENTATION_LOG/2026-11-13.md) for exact artifact/device outcomes.

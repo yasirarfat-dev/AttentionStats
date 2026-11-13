@@ -85,6 +85,22 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
         coordinator.saveSchedules(document, revision,
             { coordinator.scheduleSnapshot({ promise.resolve(it) }, { failure(promise, it) }) }, { failure(promise, it) })
     }
+    override fun startFocus(packages: com.facebook.react.bridge.ReadableArray, minutes: Double, expectedRevision: String, promise: Promise) {
+        val revision = expectedRevision.toLongOrNull()
+        if (revision == null || revision < 0 || !minutes.isFinite() || minutes != minutes.toInt().toDouble() ||
+            minutes !in 1.0..180.0 || packages.size() !in 1..100) { failure(promise, "INVALID_ARGUMENT"); return }
+        val targets = try { (0 until packages.size()).map { requireNotNull(packages.getString(it)) }.toSet() }
+            catch (_: Exception) { failure(promise, "INVALID_ARGUMENT"); return }
+        if (targets.size != packages.size()) { failure(promise, "INVALID_ARGUMENT"); return }
+        coordinator.changeFocus(targets, minutes.toInt(), revision, null,
+            { coordinator.scheduleSnapshot({ promise.resolve(it) }, { failure(promise, it) }) }, { failure(promise, it) })
+    }
+    override fun stopFocus(sessionId: String, expectedRevision: String, promise: Promise) {
+        val revision = expectedRevision.toLongOrNull()
+        if (revision == null || revision < 0) { failure(promise, "INVALID_ARGUMENT"); return }
+        coordinator.changeFocus(null, 0, revision, sessionId,
+            { coordinator.scheduleSnapshot({ promise.resolve(it) }, { failure(promise, it) }) }, { failure(promise, it) })
+    }
     override fun getProtectableApps(promise: Promise) {
         Thread {
             try {

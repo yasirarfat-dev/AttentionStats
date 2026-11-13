@@ -20,6 +20,12 @@ export interface Spec extends TurboModule {
   openAppSchedule(packageName: string): Promise<boolean>;
   getAppSchedules(): Promise<string>;
   saveAppSchedules(document: string, expectedRevision: string): Promise<string>;
+  startFocus(
+    packages: string[],
+    minutes: number,
+    expectedRevision: string,
+  ): Promise<string>;
+  stopFocus(sessionId: string, expectedRevision: string): Promise<string>;
   getProtectableApps(): Promise<string>;
   openBackup(): Promise<boolean>;
   getAppearance(): Promise<string>;

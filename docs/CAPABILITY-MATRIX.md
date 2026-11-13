@@ -116,3 +116,6 @@ The November 12 AS-014/AS-018/AS-037 continuation adds a bounded selected-day In
 The follow-on C-30/C-36 app explorer adds name/package search, exact time/open sorting, bounded app pages, per-package daily history and measurement explanation. This does not admit broader source coverage, session chronology, full provenance, forecasts or protection capability. Unknown package/day values stay unavailable; source-level media totals are excluded from package aggregation. Capability status remains experimental.
 
 November 12 AS-014/AS-037 All-time Insights extends the experimental C-30/C-36 explorer with fixed-size native source totals, actual retained date bounds and one maximum-30-day date page. App time/search remain page-only; unknown time and coverage remain unknown. No capability is promoted: whole-history package ranking, durable rollups, large-history latency, chronology/provenance and broad accessibility still need admission.
+
+
+ADR-082 adds an experimental C-17/C-21 timed-focus subset under AS-015/AS-017: frozen group targets, explicit review, encrypted native deadlines, immediate session end and existing package-scoped five-minute allowance. No whole-app minute budget, full conflict/override, reboot/expiry or broad accessibility capability is admitted; see State for actual build/phone scope.

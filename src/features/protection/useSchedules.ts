@@ -16,20 +16,21 @@ export function useSchedules() {
   const alive = useRef(true);
   const pending = useRef(false);
   const generation = useRef(0);
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (catalog = true) => {
     if (!NativeDiary || pending.current) return;
     const request = ++generation.current;
     setBusy(true);
     try {
       const [raw, installed] = await Promise.all([
         NativeDiary.getAppSchedules(),
-        NativeDiary.getProtectableApps(),
+        catalog ? NativeDiary.getProtectableApps() : Promise.resolve(null),
       ]);
       const value = parseProtection(raw);
-      const choices = parseProtectableApps(installed);
+      const choices =
+        installed === null ? null : parseProtectableApps(installed);
       if (alive.current && request === generation.current) {
         setSnapshot(value);
-        setApps(choices);
+        if (choices) setApps(choices);
         setError(null);
       }
     } catch {
@@ -83,5 +84,34 @@ export function useSchedules() {
       if (alive.current) setBusy(false);
     }
   }
-  return { snapshot, apps, busy, error, refresh, save };
+  async function focus(
+    packages: string[] | null,
+    minutes = 25,
+    expected = snapshot?.revision,
+  ) {
+    if (!NativeDiary || pending.current || !snapshot || !expected) return false;
+    pending.current = true;
+    generation.current++;
+    setBusy(true);
+    try {
+      const raw = packages
+        ? await NativeDiary.startFocus(packages, minutes, expected)
+        : await NativeDiary.stopFocus(snapshot.focus?.id ?? '', expected);
+      if (alive.current) {
+        setSnapshot(parseProtection(raw));
+        setError(null);
+      }
+      return true;
+    } catch {
+      if (alive.current)
+        setError(
+          'Could not change focus. Refresh to check the current session before trying again.',
+        );
+      return false;
+    } finally {
+      pending.current = false;
+      if (alive.current) setBusy(false);
+    }
+  }
+  return { snapshot, apps, busy, error, refresh, save, focus };
 }

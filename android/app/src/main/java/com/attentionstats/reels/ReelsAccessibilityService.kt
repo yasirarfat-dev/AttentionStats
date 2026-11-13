@@ -122,7 +122,7 @@ class ReelsAccessibilityService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null || destroyed) return
         val foreground = event.packageName?.toString() ?: return
-        if (foreground in coordinator.schedules.plan.targets()) schedule(60)
+        if (foreground in coordinator.schedules.targets()) schedule(60)
         val app = ReelApp.byPackage(foreground) ?: return
         if (!coordinator.allowed(app)) { if (coordinator.pausedSource(app)) schedule(300); return }
         when (event.eventType) {
@@ -140,7 +140,7 @@ class ReelsAccessibilityService : AccessibilityService() {
 
     private fun updateEventTargets() {
         val current = serviceInfo ?: return
-        val wanted = (ReelApp.allPackages + coordinator.schedules.plan.targets()).toSet()
+        val wanted = (ReelApp.allPackages + coordinator.schedules.targets()).toSet()
         val needed = android.accessibilityservice.AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
             android.accessibilityservice.AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS or
             android.accessibilityservice.AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
@@ -180,7 +180,7 @@ class ReelsAccessibilityService : AccessibilityService() {
             foregroundPackage = foreground
             coordinator.acquisitionStatus = "root_obtained"
             // Whole-app schedules read package ownership only. No labels/nodes of arbitrary apps.
-            val targeted = foreground != null && foreground in coordinator.schedules.plan.targets()
+            val targeted = foreground != null && foreground in coordinator.schedules.targets()
             scheduledPackage = foreground?.takeIf { coordinator.schedules.decision(it, now).isNotEmpty() }
             if (scheduledPackage != null) {
                 outside(true)
@@ -289,7 +289,7 @@ class ReelsAccessibilityService : AccessibilityService() {
         removeSchedule()
         if (target == null) return
         val view = InterventionOverlay(this, InterventionOverlay.Mode.BLOCK, "A little time away",
-            "This app is in a blocking period you chose. Change your schedule in Attention Stats or allow a short visit.",
+            "This app is covered by your focus session or a blocking period. End focus or change schedules in Attention Stats, or allow a short visit.",
             0, "Open Attention Stats", "Allow 5 minutes",
             { scheduledPackage = null; removeSchedule(); open("attentionstats://protect") },
             { coordinator.schedules.allow(target, SystemClock.elapsedRealtime()); scheduledPackage = null; removeSchedule(); schedule(0) })

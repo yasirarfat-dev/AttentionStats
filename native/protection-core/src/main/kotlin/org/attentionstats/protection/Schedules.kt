@@ -21,8 +21,10 @@ data class BlockWindow(val id: String, val groupId: String, val days: Int,
     }
 }
 
-data class SchedulePlan(val groups: List<AppGroup> = emptyList(), val windows: List<BlockWindow> = emptyList()) {
+data class SchedulePlan(val groups: List<AppGroup> = emptyList(), val windows: List<BlockWindow> = emptyList(),
+    val focus: FocusSession? = null) {
     fun validate(excluded: Set<String>) {
+        focus?.validate(excluded)
         require(groups.size <= 30 && windows.size <= 100)
         val id = Regex("[A-Za-z0-9-]{1,64}")
         val pkg = Regex("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z0-9_]+)+")

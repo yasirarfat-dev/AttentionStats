@@ -2,7 +2,7 @@
 
 > **Current behavior (1.0.0):** [ADR-066](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30) supersedes version-pinned detectors, per-app notices 3–5, structure-check diagnostics and the five-tab preview described below where they conflict. See [State](STATE.md) and the public [privacy policy](../policies/PRIVACY.md).
 
-**Status:** Rule engine planned; enforcement mechanisms require Android and policy validation. Updated 2026-10-26.
+**Status:** Experimental schedules, timed focus and interventions; full rule/enforcement qualification remains open. Updated 2026-11-13.
 **Responsibility:** Defines deterministic rules, conflict resolution, interventions, exceptions and safe failure.
 **Related specifications:** [Native contracts](NATIVE-CONTRACTS.md), [Permissions](PERMISSIONS.md), [Settings](SETTINGS-SPEC.md), [Testing](TESTING.md).
 **Unresolved feasibility:** F-01, F-02 and F-08 in [Decisions](DECISIONS.md); third-party apps cannot assume privileged system suspension.
@@ -75,3 +75,10 @@ ADR-077/AS-061 gates a full-screen breather on confirmed player pause **before**
 
 
 ADR-078 replaces the native editor with a coherent in-app Protect stack, preserving native evaluation/storage. Groups have searchable installed-app selection and membership review; supported groups offer whole-app/short-video scope. Time drafts use explicit 12-hour hour/minute fields and AM/PM, weekdays, all-day choice and a save-off summary. Existing selective slots and unsaved selective drafts may not silently become whole-app rules when an app is unavailable or the selected group changes. Preserve the selected scope; an unsupported new selective draft cannot save until the person chooses a supported group or explicitly selects Whole app. Activation lists resolved targets and an immediate five-minute escape; destructive changes have their own review. Draft base revisions are preserved through refresh, and stale saves retain the draft with an actionable error. Theme changes use the same shared components and tokens as other app screens.
+
+
+## Voluntary focus candidate (ADR-082)
+
+AS-015/AS-017 adds Protect → Focus session: select an existing group, choose five-to-180 minutes, review frozen whole-app targets and explicitly start. The native one-to-180-minute contract persists one session in encrypted protection configuration; UI closure and same-boot process restart do not reset its elapsed deadline. A later boot uses the original bounded UTC deadline; unknown/earlier boot and pre-start clock rollback fail open. Emergency/recovery exclusions, system navigation and package-scoped Allow 5 minutes remain available. Starting requires current Accessibility availability. A disconnected service makes blocking unavailable while the timer continues.
+
+End focus is immediate after durable native acknowledgement and affects only the identified session; existing schedules and count limits remain independent. Ordinary schedule/group edits preserve frozen targets. Archive replacement always clears focus. There is no automatic restart, notification, DND, intention text, completion score or audio-pause guarantee. Screen polling reads authoritative remaining time only while focused/foreground; native enforcement owns expiry. Full conflict, reboot, renderer-expiry, accessibility and broader lifecycle qualification remain open.

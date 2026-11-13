@@ -62,3 +62,6 @@ The follow-on app explorer stays inside Insights with a By day / By app switch. 
 All-time Insights retains only an end-date key and one maximum-30-day page in screen state. Native older/newer endpoints drive named page controls; Return to latest dates also works after a historical-page read fails. Page selection resets the selected day and scroll position; range selection returns to latest dates. By app filters and subtotals cover the labelled page, while the leading source summary covers all retained history. No history arrays enter route parameters.
 
 The all-time presentation refinement scrolls app detail/list returns and app-day drill-down to the explorer header, preserving the selected page context without repeatedly exposing the long lifetime summary. Date-page changes still return to the summary. This supersedes the earlier universal scroll-to-page-top description.
+
+
+ADR-082 adds native Protect → Focus (`attentionstats://protect/focus`) alongside the existing schedule editor. Focus contains duration/group selection, explicit target/exit review, active native remaining time and End focus now. Back leaves a running session active and starts nothing from a draft. Manage app groups opens the existing schedule route; active targets remain frozen after group edits. No extra primary tab is added.

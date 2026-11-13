@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-13",
+  "tasks": [
+    "AS-015",
+    "AS-017",
+    "AS-018"
+  ],
+  "status": "experimental",
+  "feature": "Voluntary timed whole-app focus with frozen group targets, review, native remaining time and early end",
+  "sourceBase": "05b33d97c77f60efb972fe32e189767c39593787",
+  "provenance": "Built from reviewed working-tree implementation on develop; no release/source mapping to the published beta is claimed.",
+  "previewSha256": "9804c0b6d73ad05190b83eaed958852d3645ebeefc595a9ac48a2db66bd3102f",
+  "testApkSha256": "2de550c71d64a3625d2ae2d550d5f642a2e160cbc936532c6b6e1149cd3cac8e",
+  "checks": {
+    "typecheck": true,
+    "lintArchitectureBackupPalette": true,
+    "jestSuites": 9,
+    "jestTests": 110,
+    "pythonTests": 88,
+    "sourceFormatting": true,
+    "previewAssemblyAndLint": true,
+    "debugTestAssembly": true,
+    "pureProtectionHostAssertions": 74,
+    "physicalApi": 36,
+    "isolatedEncryptedFocusOwnerAssertions": 23,
+    "ownerInstrumentationCode": -1,
+    "liveCoverInstrumentationCode": -1,
+    "actualOwnUiScope": [
+      "temporary calculator-only group creation through actual editor",
+      "group selection and explicit target review",
+      "duration stepper 25 to 30 to 25 minutes with explicit units",
+      "cancel returns inactive editor without starting",
+      "explicit Start",
+      "Back to Protect returns Overview",
+      "reentry preserves active native focus",
+      "active native remaining-time and service-health presentation",
+      "actual calculator focus cover and immediate Allow 5 minutes",
+      "early End returns inactive focus editor",
+      "saved group renamed to Focus Check with target unchanged"
+    ],
+    "ownActiveDarkGraphiteLayoutReviewedLocally": true,
+    "installedLocalPreviewHashesIndependentlyMatched": true,
+    "backupChoiceAndAccessibilitySelectionsMasterUnchangedAtCompletion": true,
+    "historyPreservedInPlace": true,
+    "ownedTestPrivateBaselineAndCaptureRemoved": true,
+    "remainingTaskFixture": "Calculator-only Focus Check group retained, no slots and no active focus."
+  },
+  "operatorNotes": [
+    "Initial TypeScript Stepper-property and Kotlin nullable-array mismatches were corrected before successful builds.",
+    "Initial runner package-absence assertion and raw-instrumentation-output selection were corrected; setup-only attempts are not acceptance.",
+    "Prior installed test APK was independently matched to the preceding all-time evidence before removal. Only the task-owned subsequent test was replaced/removed.",
+    "Installation/instrumentation left the accessibility master off despite its original enabled baseline. Restore only the own service selection while preserving all other selections; final full backup/accessibility comparison passes. Exact platform cause remains uninvestigated.",
+    "Physical navigation exposed ordinary goBack returning to Schedules under a button labelled Back to Protect; reset to Overview and verify the corrected final artifact.",
+    "Test typing used URL percent encoding instead of adb input text space syntax. The maintainer requests Focus Check; rename the saved group in the real editor and correct the ignored runner to map spaces to percent-s. Do not decode arbitrary stored names.",
+    "First live-only instrumentation variant hit Kotlin debug/preview internal-getter linkage before launching its target. Use the public native snapshot instead; final raw live result passes on the unchanged final product.",
+    "Owner checks use a unique encrypted store/key, removed in finally. Live cover trial traverses only own overlay controls and checks arbitrary target package ownership; it does not read calculator content."
+  ],
+  "limits": [
+    "Native deadline, clock and reboot branches have synthetic host coverage; actual reboot recovery and live renderer expiry remain unqualified.",
+    "Five-minute allowance removal is observed; its full expiry/conflict/override/emergency matrix remains open.",
+    "Whole-app minute budgets, category budgets, stricter commitment routines and DND are not implemented by focus.",
+    "Focus enforcement is best effort and does not guarantee target audio pause, system suspension or operation after force-stop/revocation.",
+    "TalkBack, large type, RTL, all themes, injected stale/error states, broader devices and lifecycle remain open.",
+    "Legacy groups/windows archives remain readable; older app readers can reject a new document containing nonnull focus. Restore always clears focus; no imported rule activation is accepted."
+  ],
+  "publicationScope": "Reviewed regular develop-only commit/push; no main merge, remote workflow, signing, Play upload or binary publication."
+}

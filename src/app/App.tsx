@@ -42,7 +42,7 @@ const linking: LinkingOptions<Tabs> = {
       Insights: 'insights',
       Protect: {
         path: 'protect',
-        screens: { Overview: '', Schedules: 'schedules' },
+        screens: { Overview: '', Focus: 'focus', Schedules: 'schedules' },
       },
       Settings: { path: 'settings', alias: ['convenience', 'reels'] },
     },

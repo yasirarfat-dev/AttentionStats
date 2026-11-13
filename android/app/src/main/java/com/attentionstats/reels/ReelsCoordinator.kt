@@ -260,7 +260,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
                     val protection = dao.protection()
                     if (protection != null) {
                         val plan = com.attentionstats.protection.ScheduleOwner.decode(protection.document)
-                        val disabled = plan.copy(windows = plan.windows.map { it.copy(enabled = false) })
+                        val disabled = plan.copy(windows = plan.windows.map { it.copy(enabled = false) }, focus = null)
                         disabled.validate(schedules.excluded)
                         dao.putProtection(protection.copy(revision = Math.addExact(protection.revision, 1),
                             document = com.attentionstats.protection.ScheduleOwner.encode(disabled).toString()))
@@ -284,6 +284,17 @@ internal class ReelsCoordinator private constructor(private val context: Context
             catch (_: Exception) { false }
         if (!valid) { failure("INVALID_ARGUMENT"); return@enqueue }
         if (!schedules.save(history, document, expected)) { failure("REVISION_CONFLICT"); return@enqueue }
+        acquisitionSettings.incrementAndGet()
+        publish(); success()
+    }
+
+    fun changeFocus(packages: Set<String>?, minutes: Int, expected: Long, stopId: String?,
+        success: () -> Unit, failure: (String) -> Unit) = enqueue(failure) {
+        val history = opened()
+        if (packages != null && !(grantEnabled() && serviceConnected)) { failure("ACCESS_UNAVAILABLE"); return@enqueue }
+        try {
+            if (!schedules.focus(history, packages, minutes, expected, stopId)) { failure("REVISION_CONFLICT"); return@enqueue }
+        } catch (_: IllegalArgumentException) { failure("INVALID_ARGUMENT"); return@enqueue }
         acquisitionSettings.incrementAndGet()
         publish(); success()
     }
