@@ -319,12 +319,14 @@ export function CheckRow({
   onChange,
   disabled = false,
   leading,
+  compact = false,
 }: {
   title: string;
   value: boolean;
   onChange: (value: boolean) => void;
   disabled?: boolean;
   leading?: ReactNode;
+  compact?: boolean;
 }) {
   const { theme } = useUnistyles();
   return (
@@ -334,7 +336,11 @@ export function CheckRow({
       accessibilityState={{ checked: value, disabled }}
       disabled={disabled}
       onPress={() => onChange(!value)}
-      style={[styles.row, disabled && styles.disabled]}
+      style={[
+        styles.row,
+        compact && { minHeight: 48, paddingVertical: 8 },
+        disabled && styles.disabled,
+      ]}
     >
       {leading}
       <Text style={[styles.rowTitle, { flex: 1 }]}>{title}</Text>

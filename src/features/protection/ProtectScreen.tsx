@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { AppState, Modal, ScrollView, View } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
-import { FocusQuickActions } from './FocusQuickActions';
+import { AppState } from 'react-native';
+import { FocusChooser } from './FocusChooser';
 import { FocusClock } from './FocusClock';
 import { daysLabel, slotLabel } from './schedulePresentation';
 import { useIsFocused } from '@react-navigation/native';
@@ -131,54 +130,17 @@ export function ProtectScreen({
           onPress={() => onTool('Blocks')}
         />
       </Card>
-      <Modal
+      <FocusChooser
         visible={chooser}
-        transparent
-        animationType="none"
-        onRequestClose={() => setChooser(false)}
-      >
-        <View style={styles.overlay}>
-          <View style={styles.sheet} accessibilityViewIsModal>
-            <ScrollView contentContainerStyle={styles.content}>
-              {chooser && (
-                <FocusQuickActions
-                  onSelect={() => {
-                    setChooser(false);
-                    onSchedules('groups');
-                  }}
-                />
-              )}
-            </ScrollView>
-            <Button
-              label="Close focus chooser"
-              variant="text"
-              onPress={() => {
-                setChooser(false);
-                void refresh(false);
-              }}
-            />
-          </View>
-        </View>
-      </Modal>
+        onClose={() => {
+          setChooser(false);
+          void refresh(false);
+        }}
+        onCustomize={() => {
+          setChooser(false);
+          onSchedules('groups');
+        }}
+      />
     </Screen>
   );
 }
-
-const styles = StyleSheet.create(theme => ({
-  overlay: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-    backgroundColor: '#00000080',
-  },
-  sheet: {
-    maxHeight: '85%',
-    width: '100%',
-    maxWidth: 480,
-    alignSelf: 'center',
-    backgroundColor: theme.surface,
-    borderRadius: 28,
-    padding: 20,
-  },
-  content: { gap: 12 },
-}));

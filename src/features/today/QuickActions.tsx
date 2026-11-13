@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Icon } from '../../ui/Icon';
 import { Button, Row } from '../../ui/Kit';
-import { FocusQuickActions, type QuickFocusRequest } from '../protection';
+import { FocusChooser, type QuickFocusRequest } from '../protection';
 
 export type QuickDestination = 'Focus' | 'Schedules' | 'Breaks' | 'Blocks';
 
@@ -27,6 +27,7 @@ export function QuickActions({
 }) {
   const { theme } = useUnistyles();
   const [visible, setVisible] = useState(false);
+  const [chooser, setChooser] = useState(false);
   const trigger = useRef<ComponentRef<typeof View>>(null);
   const heading = useRef<ComponentRef<typeof Text>>(null);
   const insets = useSafeAreaInsets();
@@ -104,9 +105,13 @@ export function QuickActions({
               >
                 Quick Actions
               </Text>
-              {visible && (
-                <FocusQuickActions onSelect={() => open('Schedules')} />
-              )}
+              <Button
+                label="Focus Now"
+                onPress={() => {
+                  close(false);
+                  setChooser(true);
+                }}
+              />
               <Row
                 icon="heart"
                 title="Adjust mindful breaks"
@@ -128,6 +133,17 @@ export function QuickActions({
           </View>
         </View>
       </Modal>
+      <FocusChooser
+        visible={chooser}
+        onClose={() => {
+          setChooser(false);
+          close();
+        }}
+        onCustomize={() => {
+          setChooser(false);
+          open('Schedules');
+        }}
+      />
     </>
   );
 }

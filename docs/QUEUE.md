@@ -57,3 +57,5 @@ Q-024 / 2026-11-07: Backup should initialize automatically so people do not forg
 
 
 Q-023 / 2026-11-13: Expand beyond Reels into comprehensive mobile-device statistics, investigating media playback and every other useful accessible usage type across apps, alongside convenient voluntary digital-wellbeing tools. Accepted planning direction ADR-085, planned AS-062 and the expanded Feature vision portfolio; existing metric/domain owners remain authoritative. Source-specific consent, permission, accuracy, sensitive-context and resource gates remain. No automatic broad capture or new grant.
+
+Q-025 / 2026-11-13: Maintainer requests optional offline protection PIN for quota exceptions, configurable behavior, uninstall resistance and one-to-three alternative recovery phrases. ADR-092/AS-063 records planned supervised protection and platform/security gates; the maintainer selects one-to-three complete recovery phrases, any one can reset, with at least one required and setup verification/retry limits. Generated recovery code remains an alternative recommendation only. No runtime PIN or uninstall restriction is implied.

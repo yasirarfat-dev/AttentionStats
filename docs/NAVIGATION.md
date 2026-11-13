@@ -85,3 +85,5 @@ ADR-088 extends the centered Quick Actions card with bounded suggested/saved foc
 
 
 ADR-091: Protect Focus Now and Today Quick Actions host the same centered app-group/type/duration chooser with explicit Start. Only Customize Focus List or Scheduled Focus navigate to schedule/group editors; the legacy Focus route remains available for custom individual-app review. Live Counter is accessed from Settings → Display & Experience with named/Android Back returning to Settings; retain the old Protect/Counter deep link for compatibility. Saved groups and time slots are summarized in Protect.
+
+ADR-092 preserves Today’s non-focus Quick Actions and replaces its inline focus list: Quick Actions → Focus Now opens the same shared modal as Protect → Focus Now, with fixed Close and Android Back. Customize closes it and opens groups. Close restores Today trigger focus; opening/dismissing starts no session. Adjust Mindful Breaks and Manage Video Limits remain in Quick Actions and Protect.

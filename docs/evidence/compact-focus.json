@@ -1,0 +1,65 @@
+{
+  "date": "2026-11-13",
+  "decision": "ADR-092",
+  "status": "experimental; final physical focus-menu presentation and navigation checks pass",
+  "product": {
+    "sha256": "006c5981b640d6c567f865df0a6962da908de6a6265ad0272b524659c22c6241",
+    "installedHashMatched": true,
+    "platform": "physical Android API36",
+    "databaseSchemaChanged": false,
+    "dependenciesChanged": false
+  },
+  "verification": {
+    "jest": {
+      "suites": 15,
+      "tests": 130
+    },
+    "typecheck": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "mobilePolicy": "pass",
+    "documentation": "pass",
+    "android": "preview/test assembly and preview lint pass; final JS-only preview reassembly passes; zero lint errors, 167 existing warnings",
+    "protection": {
+      "checks": 68,
+      "instrumentationCode": -1,
+      "testSha256": "94df56c4c674cd6ba8bec50da43e657e4b509c4960f655bb97e87cd5e00e2988",
+      "productSha256": "006c5981b640d6c567f865df0a6962da908de6a6265ad0272b524659c22c6241",
+      "scope": "synthetic native codec and attached protection controls; final product binding"
+    },
+    "phone": {
+      "passed": true,
+      "scope": [
+        "Existing Quick Actions remain, inline focus list replaced by Focus Now",
+        "Today and Protect use the same chooser",
+        "Initial Block Apps catalog has Social Apps, Games and Distracting Apps only",
+        "Initial Allow Only catalog has Productive Apps and Essentials only",
+        "Start is visible without page scrolling in both modes",
+        "All Groups expands/collapses the complete catalog; group scrolling stays separate from mode/duration/Start",
+        "Fixed Close and Android Back work; no session started"
+      ],
+      "visualReview": "final actual quick-action, Block Apps and Allow Only renders privately inspected; clipped third checkbox repaired before final review"
+    }
+  },
+  "limits": [
+    "PIN and recovery enforcement remain planned AS-063, not implemented",
+    "Uninstall protection remains a separately gated platform/policy proposal",
+    "One-to-three complete recovery phrases accepted by maintainer; any one can reset, at least one required",
+    "No broad TalkBack/large-text/RTL/landscape/minimum-API/device/lifecycle acceptance",
+    "No focus started, recurring rule/group edited or history erased by the scoped menu trial"
+  ],
+  "superseded": [
+    "Initial interpretation removed non-focus Quick Actions; maintainer correction restores them before final acceptance",
+    "Initial customization metadata approach removed; final code changes no native model or schema",
+    "Initial runner treated existing custom Games as a forbidden allow starter; corrected catalog assertion",
+    "Earlier outer-scroll chooser retained an offscreen mode row; final component scrolls only the group catalog",
+    "Final runner initially searched downward for the offscreen Today header; corrected upward search; stopped attempts are not passed flows"
+  ],
+  "cleanup": {
+    "ownedTestRemoved": true,
+    "originalAccessibilitySettingsComparedEqual": true,
+    "appReturnedToToday": true,
+    "backupControlsUntouched": true,
+    "privateCapturesRemoved": true
+  }
+}

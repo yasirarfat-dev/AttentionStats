@@ -39,3 +39,36 @@ export function focusChoices(
     ...saved,
   ];
 }
+
+/** Keep relevant starters and user choices visible; the complete catalog stays available. */
+export function visibleFocusChoices(
+  choices: FocusChoice[],
+  allowOnly: boolean,
+  showAll: boolean,
+  selected: string[],
+): FocusChoice[] {
+  const starterNames = allowOnly
+    ? [
+        ['default-essentials', 'essentials'],
+        ['default-productive', 'productive apps'],
+      ]
+    : [
+        ['default-social', 'social apps'],
+        ['default-games', 'games'],
+        ['default-distracting', 'distracting apps'],
+      ];
+  const starters = new Set(
+    starterNames.map(
+      ([id, name]) =>
+        choices.find(c => c.id === id)?.id ??
+        choices.find(c => c.name.toLowerCase() === name)?.id,
+    ),
+  );
+
+  return choices.filter(
+    choice =>
+      showAll ||
+      starters.has(choice.id) ||
+      selected.includes(choice.kind + choice.id),
+  );
+}

@@ -79,10 +79,17 @@ test('an explicit Block Apps choice survives selecting an allow-oriented group a
   let tree = render();
   tree.find(n => n.type === 'Segmented')!.props.onChange('block');
   tree = render();
+  tree
+    .find(n => n.type === 'Button' && n.props.label === 'All groups')!
+    .props.onPress();
+  tree = render();
   tree.find(n => n.type === 'CheckRow')!.props.onChange(true);
   tree = render();
   expect(tree.find(n => n.type === 'Segmented')!.props.value).toBe('block');
   expect(mockFocus).not.toHaveBeenCalled();
+  tree.find(n => n.type === 'Segmented')!.props.onChange('block');
+  tree = render();
+  expect(tree.find(n => n.type === 'CheckRow')!.props.value).toBe(true);
   tree
     .find(
       n => n.type === 'Button' && n.props.label === 'Start 25-minute focus',
@@ -93,10 +100,20 @@ test('an explicit Block Apps choice survives selecting an allow-oriented group a
 test('an untouched chooser suggests Allow Only for Essentials and still permits changing it', () => {
   const render = chooser();
   let tree = render();
+  tree
+    .find(n => n.type === 'Button' && n.props.label === 'All groups')!
+    .props.onPress();
+  tree = render();
   tree.find(n => n.type === 'CheckRow')!.props.onChange(true);
   tree = render();
   expect(tree.find(n => n.type === 'Segmented')!.props.value).toBe('allow');
   tree.find(n => n.type === 'Segmented')!.props.onChange('block');
-  expect(render().find(n => n.type === 'Segmented')!.props.value).toBe('block');
+  tree = render();
+  expect(tree.find(n => n.type === 'Segmented')!.props.value).toBe('block');
+  expect(
+    tree.find(
+      n => n.type === 'Button' && n.props.label === 'Start 25-minute focus',
+    )!.props.disabled,
+  ).toBe(true);
   expect(mockFocus).not.toHaveBeenCalled();
 });
