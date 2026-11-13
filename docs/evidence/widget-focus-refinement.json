@@ -84,7 +84,13 @@
     "Latest progressive configuration runtime and native configuration render-sheet review",
     "Fix cramped Start/End date layout observed in Insights; then verify on phone"
   ],
-  "publication": "Reviewed develop checkpoint awaiting normal commit/push at user-requested conclusion; no main merge, remote workflow or binary publication.",
+  "publication": {
+    "sourceCheckpoint": "1b1ed0865cc4ca8578e2562b8155acead187d0c8",
+    "remote": "origin/develop",
+    "remoteHashVerified": true,
+    "main": "1fc538221adfa3e66c1d94bdb9a0258509dc188c",
+    "scope": "Normal reviewed source push only; no main merge, workflow or binary publication."
+  },
   "checkpoint": "User requested concluding because the session limit is approaching. Latest progressive widget menus are compiled, not device-accepted.",
   "latestBuiltCandidate": {
     "productSha256": "11e3471691897eb8b4cd7ead4925bf6d9ea26d44b5c170a61b74dd4d986c24e5",
