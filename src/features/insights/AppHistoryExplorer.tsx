@@ -75,11 +75,7 @@ export function AppHistoryExplorer({
     );
     return () => subscription.remove();
   }, [focused, packageName, onNavigate]);
-  const end = Math.min(
-    limit,
-    Math.max(10, Math.ceil(matches.length / 10) * 10),
-  );
-  const visible = matches.slice(end - 10, end);
+  const visible = matches.slice(0, limit);
   const icons = useAppIcons(
     app ? [app.packageName] : visible.map(item => item.packageName),
   );
@@ -272,24 +268,18 @@ export function AppHistoryExplorer({
             </Body>
           </View>
         )}
-        {end > 10 && (
+        {matches.length > limit && (
           <Button
-            label="Previous apps"
+            label={`Show All ${matches.length} Apps`}
             variant="text"
-            onPress={() => {
-              setLimit(end - 10);
-              onNavigate();
-            }}
+            onPress={() => setLimit(matches.length)}
           />
         )}
-        {matches.length > end && (
+        {limit > 10 && matches.length > 10 && (
           <Button
-            label="Next apps"
+            label="Show Fewer Apps"
             variant="text"
-            onPress={() => {
-              setLimit(end + 10);
-              onNavigate();
-            }}
+            onPress={() => setLimit(10)}
           />
         )}
       </Card>

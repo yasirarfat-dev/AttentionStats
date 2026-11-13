@@ -164,3 +164,66 @@ test.each([
     'Diary unavailable',
   );
 });
+
+test('ranged history validates bounded pages independently of retained-history bounds', () => {
+  const payload = {
+    ...lifetime(),
+    contractVersion: 2,
+    windowDays: 0,
+    rangeStart: '2026-10-01',
+    rangeEnd: '2026-10-29',
+    earliestDay: '2026-09-29',
+    installDay: '2026-09-29',
+    pageSize: 7,
+    pageStart: '2026-10-23',
+    olderEnd: '2026-10-22',
+    snapshot: {
+      ...value,
+      days: Array.from({ length: 7 }, (_, i) => ({
+        ...value.days[0],
+        day: `2026-10-${23 + i}`,
+      })),
+    },
+  };
+  expect(
+    parseDiaryHistoryPage(JSON.stringify(payload)).snapshot.days,
+  ).toHaveLength(7);
+  for (const changes of [
+    { pageSize: 31 },
+    { rangeStart: '2026-10-30' },
+    { rangeEnd: '2026-10-30' },
+    { olderEnd: null },
+    { pageStart: '2026-10-22' },
+    { earliestDay: '2026-10-15' },
+  ]) {
+    expect(() =>
+      parseDiaryHistoryPage(JSON.stringify({ ...payload, ...changes })),
+    ).toThrow('History page unavailable');
+  }
+});
+
+test('fixed periods can end after today while detail pages stop at observed dates', () => {
+  const payload = {
+    ...lifetime(),
+    contractVersion: 2,
+    windowDays: 7,
+    rangeStart: '2026-10-29',
+    rangeEnd: '2026-11-04',
+    earliestDay: '2026-10-29',
+    installDay: '2026-10-29',
+    pageSize: 7,
+  };
+  expect(
+    parseDiaryHistoryPage(JSON.stringify(payload)).snapshot.days,
+  ).toHaveLength(1);
+  expect(() =>
+    parseDiaryHistoryPage(
+      JSON.stringify({ ...payload, rangeEnd: '2026-11-03' }),
+    ),
+  ).toThrow('History page unavailable');
+  expect(() =>
+    parseDiaryHistoryPage(
+      JSON.stringify({ ...payload, installDay: '2026-10-30' }),
+    ),
+  ).toThrow('History page unavailable');
+});

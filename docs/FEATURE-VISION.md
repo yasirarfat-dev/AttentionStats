@@ -1,6 +1,6 @@
 # Attention Stats: the complete product vision
 
-**Status:** Accepted direction and staged feature portfolio; runtime acceptance remains in the tracker. Updated 2026-10-28.
+**Status:** Accepted direction and staged feature portfolio; runtime acceptance remains in the tracker. Updated 2026-11-13.
 **Responsibility:** Connects the long-term experience, enriched feature list and delivery priorities without promising unsupported tracking.
 **Related specifications:** [Vision](VISION.md), [Product](PRODUCT.md), [Capabilities](CAPABILITY-MATRIX.md), [Metrics](METRIC-CATALOG.md), [Roadmap](ROADMAP.md), [Tracker](FEATURE-TRACKER.md).
 **Unresolved feasibility:** F-01–F-10 remain applicable; a portfolio entry does not enable a source or clear a gate.
@@ -11,7 +11,7 @@ An open-source, ad-free, account-optional personal attention diary: understand a
 
 The same product should serve four intentions without forcing a personality test or a permanent mode. **Keep count** offers quiet in-context counters. **Understand** offers a rich diary with explanations. **Change a routine** offers a chosen goal and measured reflection. **Protect time** offers predictable boundaries and immediate safe escape. A person can mix these intentions, change them or use observation alone.
 
-The installed preview is an early slice: five tabs, saved viewer-page estimates and an optional counter. Whole-app time, complete history, protection, recovery and the features below are not all implemented. [State](STATE.md) records the actual build. This document is the product map; domain specifications own semantics, the capability matrix owns admission, and the tracker owns execution status.
+The current development app has four primary tabs (Today, Insights, Protect, Settings), saved Reels encounters/surface time, app-usage estimates, bounded history explorers and experimental protection/data-ownership flows. [State](STATE.md) records exact implemented subsets and artifact evidence. This document is the product map; domain specifications own semantics, the capability matrix owns admission, and the tracker owns execution status.
 
 ## The experience
 
@@ -77,3 +77,26 @@ Q-019 in [Queue](QUEUE.md) holds three deliberately uncommitted extensions: priv
 ## Latest lifetime and route priorities
 
 User steering on 2026-10-29 reinforces lifetime per-encounter facts and origin-aware future portability, efficient native calendar summaries, all four apps’ viewer entry routes including Home, and independently verified video/photo/carousel/text/ad counters in expanded interactions. [Lifetime architecture](STORAGE-AND-RETENTION.md#lifetime-event-history-and-future-multi-origin-merging) and [route matrix](evidence/counter-route-matrix.json) make those obligations concrete. Counter MVP readiness still requires real source/route fidelity and release gates; a rich vision or Console app record is not a passing implementation.
+
+## Device-wide statistics ambition (ADR-085)
+
+Maintainer direction on 2026-11-13: aspire to a comprehensive mobile-device statistics and digital-wellbeing app, rather than a Reels-only product. Evaluate every useful, technically accessible usage type across apps, and incorporate features that make everyday understanding and chosen boundaries more convenient. “Best” is a product ambition, not a comparative or measurement claim. Reels remains a useful supported slice; it does not define the eventual ceiling.
+
+For every installed app, aim first for the supported general app-usage layer, then add independently qualified activity-specific statistics. An unsupported activity remains unknown inside known app time. Do not assume identical observability, screen access, permissions or feature parity across every app/OS; application sandboxing and source exposure remain real limits. “All possible statistics” means a maintained discovery portfolio, not indiscriminate collection.
+
+| Usage family | Statistics and convenience to evaluate | Ownership / first gate |
+|---|---|---|
+| Device use and app switching | Screen/lock/unlock episodes, foreground sessions, entries/returns, time distribution, switching/reopening, categories and coverage | AS-003/AS-011/AS-012/AS-014; qualify OS events and distinguish app time from device-interactive union |
+| Video beyond Reels | Long-form/local-player/browser/live/PiP/background playback where distinguishable; starts, pauses, playing duration, seeking, loops, completion and visible-versus-playing context | AS-062 with AS-013/AS-041/AS-055; begin a per-player/signal feasibility matrix, including local-player candidates, before implementing collection |
+| Audio and listening | Music, podcasts and audiobooks; playing/paused/known duration, background versus foreground, separate from video | AS-062; verify published media-session signals; never label generic media playback as video or infer listening/attention |
+| Reading, browsing and learning | App/site/category time, qualified reading/browser/course/document contexts, session lengths and selected progress only when safely exposed | AS-024/AS-031/AS-037/AS-062; generic app use first, separately consented supported domain/context detail later; no page, query, document or typed-content capture by default |
+| Work, creation, utilities and games | App/category sessions and time; safe editing/creation/game/navigation context where observable; optional user-defined categories and routines | AS-012/AS-024/AS-062; no productivity grade or inference of task completion, game success or physical location from foreground time |
+| Communication and notifications | Metadata-only notification counts and response associations; coarse qualified communication context when possible | AS-023/AS-062; separate opt-in/source qualification; no private messages, participants, credentials, call audio or input recording; sensitive/restricted signals remain unavailable unless a separately approved safe design exists |
+| Interaction and mixed feeds | Qualified video/photo/post/story/ad encounters, safe UI outcomes versus attempts, selected interaction totals and dwell distributions | AS-041/AS-055; safe app/route adapters and existing M-015–M-044 definitions; no universal tap/scroll/keystroke logger |
+| Network and resource context | Coarse app traffic, battery/resource effects where public sources permit trustworthy attribution; source freshness and missing intervals | AS-036/AS-062; research availability explicitly; no packets/content interception or invented third-party CPU/energy totals |
+| Wellbeing conveniences | Flexible budgets, group/manual targets, allow-only/block schedules, on-the-fly focus, gentle breaks, quiet routines, widgets/quick actions, optional personal comparisons and accessible custom dashboards | Existing protection/widget/UX tasks plus AS-062 discovery; explicit user choice, conflict review, safe escape, ownership-aware restoration and no guilt/engagement pressure |
+| Ownership and long-term understanding | Calendar queries, years of history, comparable trends, summaries, export/restore, selective deletion, source health and inspectable definitions | AS-009/AS-019/AS-020/AS-037–AS-040/AS-058; provenance, bounded resource use, exact loss disclosure and no resurrection |
+
+Cross-app media research starts with [Android MediaSessionManager](https://developer.android.com/reference/android/media/session/MediaSessionManager): apps publish sessions; ordinary cross-app access generally requires an enabled notification listener. That is a research option, not a request for the grant or an implementation. General [usage statistics](https://developer.android.com/reference/android/app/usage/UsageStatsManager) describe device/app use and do not establish playback. Our engineering inference is that there is no justified universal video total from these sources alone: classify each signal as app presence, visible media context, reported playback or independently confirmed progress, and retain unknown audio/video type when necessary.
+
+AS-062 owns the additive feasibility matrix and delivery proposals. Each candidate records the user question/value, existing metric IDs or proposed definition, source and permission, app/OS/route coverage, consent and exclusions, local storage/retention, known gaps, overlap/dedup rules, UI presentation, resource cost and physical acceptance evidence. Promote only reviewable slices through the existing domain specs, tracker and capability registry. Evaluate precision and useful supported coverage, rather than filling dashboards with speculative metrics. Current presentation delivery continues; this ambition does not silently start collectors, change grants or delay the current concrete work.

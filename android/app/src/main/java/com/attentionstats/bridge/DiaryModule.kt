@@ -15,7 +15,11 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
         promise.resolve(com.attentionstats.appearance.AppearanceOwner.snapshot(context).toString())
     }
     override fun setAppearance(mode: String, accent: String, motion: Boolean, promise: Promise) {
-        try { promise.resolve(com.attentionstats.appearance.AppearanceOwner.save(context, mode, accent, motion)) }
+        try {
+            val result = com.attentionstats.appearance.AppearanceOwner.save(context, mode, accent, motion)
+            runCatching { com.attentionstats.widget.TodayWidget.render(context) }
+            promise.resolve(result)
+        }
         catch (_: Exception) { promise.reject("APPEARANCE_UNSAVED", "Could not save appearance") }
     }
     private val coordinator get() = ReelsCoordinator.get(context)
@@ -30,6 +34,28 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
             failure(promise, "INVALID_ARGUMENT"); return
         }
         coordinator.diaryHistoryPage(endDay, { promise.resolve(it) }, { failure(promise, it) })
+    }
+    override fun getHistoryRange(startDay: String, throughDay: String, pageEnd: String, pageSize: Double, windowDays: Double, promise: Promise) {
+        if (windowDays !in listOf(0.0, 7.0, 30.0) || pageSize !in listOf(7.0, 30.0) || listOf(startDay, throughDay, pageEnd).any {
+            it.isNotEmpty() && (!it.matches(Regex("\\d{4}-\\d{2}-\\d{2}")) || runCatching { java.time.LocalDate.parse(it) }.isFailure)
+        }) { failure(promise, "INVALID_ARGUMENT"); return }
+        coordinator.diaryHistoryRange(startDay, throughDay, pageEnd, pageSize.toInt(), windowDays.toInt(), { promise.resolve(it) }, { failure(promise, it) })
+    }
+    override fun pickDate(label: String, value: String, minimum: String, maximum: String, promise: Promise) {
+        val activity = context.currentActivity ?: run { promise.resolve(""); return }
+        try {
+            val date = java.time.LocalDate.parse(value)
+            val first = java.time.LocalDate.parse(minimum); val last = java.time.LocalDate.parse(maximum)
+            require(!first.isAfter(last) && !date.isBefore(first) && !date.isAfter(last) && label.length <= 60)
+            activity.runOnUiThread {
+                val dialog = android.app.DatePickerDialog(activity, { _, year, month, day ->
+                    promise.resolve(java.time.LocalDate.of(year, month + 1, day).toString())
+                }, date.year, date.monthValue - 1, date.dayOfMonth)
+                fun millis(day: java.time.LocalDate) = day.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+                dialog.setTitle(label); dialog.datePicker.minDate = millis(first); dialog.datePicker.maxDate = millis(last)
+                dialog.setOnCancelListener { promise.resolve("") }; dialog.show()
+            }
+        } catch (_: Exception) { failure(promise, "INVALID_ARGUMENT") }
     }
     override fun configure(action: String, enabled: Boolean, count: Double, minutes: Double, expectedRevision: String, promise: Promise) {
         val revision = expectedRevision.toLongOrNull()
@@ -85,7 +111,13 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
         coordinator.saveSchedules(document, revision,
             { coordinator.scheduleSnapshot({ promise.resolve(it) }, { failure(promise, it) }) }, { failure(promise, it) })
     }
+    override fun startFocusMode(packages: com.facebook.react.bridge.ReadableArray, minutes: Double, expectedRevision: String, allowOnly: Boolean, promise: Promise) {
+        startFocusInternal(packages, minutes, expectedRevision, allowOnly, promise)
+    }
     override fun startFocus(packages: com.facebook.react.bridge.ReadableArray, minutes: Double, expectedRevision: String, promise: Promise) {
+        startFocusInternal(packages, minutes, expectedRevision, false, promise)
+    }
+    private fun startFocusInternal(packages: com.facebook.react.bridge.ReadableArray, minutes: Double, expectedRevision: String, allowOnly: Boolean, promise: Promise) {
         val revision = expectedRevision.toLongOrNull()
         if (revision == null || revision < 0 || !minutes.isFinite() || minutes != minutes.toInt().toDouble() ||
             minutes !in 1.0..180.0 || packages.size() !in 1..100) { failure(promise, "INVALID_ARGUMENT"); return }
@@ -93,7 +125,7 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
             catch (_: Exception) { failure(promise, "INVALID_ARGUMENT"); return }
         if (targets.size != packages.size()) { failure(promise, "INVALID_ARGUMENT"); return }
         coordinator.changeFocus(targets, minutes.toInt(), revision, null,
-            { coordinator.scheduleSnapshot({ promise.resolve(it) }, { failure(promise, it) }) }, { failure(promise, it) })
+            { coordinator.scheduleSnapshot({ promise.resolve(it) }, { failure(promise, it) }) }, { failure(promise, it) }, allowOnly)
     }
     override fun stopFocus(sessionId: String, expectedRevision: String, promise: Promise) {
         val revision = expectedRevision.toLongOrNull()
@@ -104,6 +136,7 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
     override fun getProtectableApps(promise: Promise) {
         Thread {
             try {
+                coordinator.schedules.refreshLaunchable()
                 val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
                 val choices = context.packageManager.queryIntentActivities(intent, 0)
                     .filter { it.activityInfo.packageName !in coordinator.schedules.excluded }

@@ -15,6 +15,7 @@ import {
   Button,
   Card,
   Divider,
+  InfoButton,
   Meter,
   Row,
   SectionTitle,
@@ -63,6 +64,7 @@ export function TodayScreen({
   const { theme } = useUnistyles();
   const diary = useDiary(1);
   const reels = useReels();
+  const [explainHero, setExplainHero] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const day = diary.snapshot?.days[0];
   const sources = sourceDay(day);
@@ -81,6 +83,15 @@ export function TodayScreen({
         .sort((a, b) => Number(b.appMs) - Number(a.appMs)),
     [day],
   );
+  const videoApps = (day?.apps ?? []).filter(
+    app => app.social !== null && app.appMs !== null,
+  );
+  const videoAppMs =
+    diary.snapshot?.usageEnabled &&
+    diary.snapshot.usageGranted &&
+    videoApps.length
+      ? videoApps.reduce((sum, app) => sum + Number(app.appMs), 0)
+      : null;
   const totalApp = apps.reduce((sum, app) => sum + Number(app.appMs ?? 0), 0);
   const visibleApps = showAll ? apps : apps.slice(0, 6);
   const icons = useAppIcons([
@@ -98,8 +109,11 @@ export function TodayScreen({
   });
 
   return (
-    <Screen title="Today" subtitle={date}>
-      <QuickActions onNavigate={onQuickAction} />
+    <Screen
+      title="Today"
+      subtitle={date}
+      headerAction={<QuickActions onNavigate={onQuickAction} />}
+    >
       {reels.snapshot && !ready && (
         <Card tone="warn">
           <Text style={styles.warnTitle}>Counting is not on yet</Text>
@@ -112,7 +126,15 @@ export function TodayScreen({
       )}
 
       <Card tone="hero">
-        <Text style={styles.heroLabel}>Video encounters today</Text>
+        <View style={styles.heroHeading}>
+          <Text style={styles.heroLabel}>Short Videos Today</Text>
+          <InfoButton
+            inverse
+            label="Today Stats"
+            expanded={explainHero}
+            onPress={() => setExplainHero(!explainHero)}
+          />
+        </View>
         <Text
           style={styles.heroValue}
           accessibilityLabel={`${videos} video encounters today`}
@@ -139,10 +161,49 @@ export function TodayScreen({
             label={breaks === 1 ? 'Break' : 'Breaks'}
           />
         </View>
+        <View style={styles.deviceSection}>
+          <View style={styles.heroStats}>
+            <Stat inverse value={duration(videoAppMs)} label="Reels Apps" />
+            <Stat
+              inverse
+              value={duration(
+                diary.snapshot?.usageEnabled && diary.snapshot.usageGranted
+                  ? totalApp
+                  : null,
+              )}
+              label="Screen Time"
+            />
+            <Stat
+              inverse
+              value={
+                day?.apps.some(app => app.appOpens !== null)
+                  ? String(
+                      day.apps.reduce(
+                        (sum, app) => sum + Number(app.appOpens ?? 0),
+                        0,
+                      ),
+                    )
+                  : '—'
+              }
+              label="App Launches"
+            />
+          </View>
+        </View>
+        {explainHero && (
+          <Text style={styles.heroNote}>
+            This Session counts short-video encounters since the current
+            observed unlock session. On Screen is today's recorded short-video
+            screen time. Reels Apps totals recorded whole-app time for supported
+            video apps, including their non-video screens. Screen Time covers
+            all recorded apps. App Launches counts observed entries and returns,
+            not just cold starts. Missing time is unknown; these are known
+            subtotals, not proof of watched playback.
+          </Text>
+        )}
       </Card>
 
       <ViewingDetail days={diary.snapshot?.days ?? []} />
-      <SectionTitle>By app</SectionTitle>
+      <SectionTitle>Reels by Apps</SectionTitle>
       <Card padded={false}>
         {sources
           .filter(item => installed.has(item.key) || item.videos > 0)
@@ -281,6 +342,13 @@ export function TodayScreen({
 
 const styles = StyleSheet.create(theme => ({
   warnTitle: { color: theme.warn, fontSize: 17, fontWeight: '800' },
+  heroHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  heroNote: { color: theme.heroMuted, fontSize: 13, lineHeight: 19 },
   heroLabel: { color: theme.heroMuted, fontSize: 15, fontWeight: '600' },
   heroValue: {
     color: theme.onHero,
@@ -289,6 +357,13 @@ const styles = StyleSheet.create(theme => ({
     fontWeight: '800',
     letterSpacing: -1.5,
     fontVariant: ['tabular-nums'],
+  },
+  deviceSection: {
+    borderTopWidth: 1,
+    borderTopColor: theme.heroMuted,
+    paddingTop: 16,
+    marginTop: 4,
+    gap: 10,
   },
   heroStats: { flexDirection: 'row', gap: 12, marginTop: 4 },
   padded: { padding: 12, gap: 10 },

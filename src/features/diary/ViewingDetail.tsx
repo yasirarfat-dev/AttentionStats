@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import type { DiarySnapshot } from '../../platform/diaryStatus';
-import { Body, Card, SectionTitle, Stat } from '../../ui/Kit';
+import { Card, Explanation, Stat } from '../../ui/Kit';
 import { duration, exactCount } from '../../ui/format';
 
 /** Media type, advertising and playback are separate facets; totals must not be added together. */
@@ -20,7 +20,13 @@ export function ViewingDetail({ days }: { days: DiarySnapshot['days'] }) {
   const measured = apps.some(app => app.measuredVideoCount !== null);
   return (
     <>
-      <SectionTitle>Viewing detail</SectionTitle>
+      <Explanation title="Viewing Details">
+        Encounters mean on screen, not watched. Photos and videos describe
+        media; ads can overlap either. Playback is opt-in where numeric player
+        times are available. A watch needs 3 seconds in one visit; completions
+        need an observed run from the start. Missing signals stay unknown;
+        pauses and gaps add no time.
+      </Explanation>
       <Card>
         <View style={styles.row}>
           <Stat
@@ -49,14 +55,6 @@ export function ViewingDetail({ days }: { days: DiarySnapshot['days'] }) {
             label="Measured visits"
           />
         </View>
-        <Body muted>
-          Encountered means on screen, not watched. Photo and video counts
-          describe media; ads are a separate facet and can overlap them.
-          Playback is opt-in and only measured where numeric player times are
-          exposed. Missing signals stay unknown. A watch needs 3 seconds of
-          observed playback in one visit. Pauses and gaps add no watch time;
-          completions require an observed run from the start.
-        </Body>
       </Card>
     </>
   );

@@ -73,3 +73,9 @@ The all-time presentation refinement scrolls app detail/list returns and app-day
 
 
 ADR-082 adds native Protect → Focus (`attentionstats://protect/focus`) alongside the existing schedule editor. Focus contains duration/group selection, explicit target/exit review, active native remaining time and End focus now. Back leaves a running session active and starts nothing from a draft. Manage app groups opens the existing schedule route; active targets remain frozen after group edits. No extra primary tab is added.
+
+ADR-084 puts Today Quick Actions in a top-right hamburger-style icon, opening the same bounded sheet. Protect adds an expandable top Focus Sessions widget; Focus Now opens reviewable immediate selection, Scheduled Focus opens the existing schedule route. Schedules presents By Time Slots / By App Groups, and per-app Blocks places ⏱ Slot in the same bar as Off/Daily Limit/Always. It navigates without changing those independent rules. Native date pickers cancel back to unchanged Insights. No new global drawer or tab.
+
+Maintainer inline-bar refinement (2026-11-13): the block bar uses Off / sun + Limit / Always / clock + Slot, with full Daily Limit and Time Slots accessibility names. Labels stay on one line; larger system text uses two columns instead of forcing four cramped controls. This supersedes the earlier literal Daily Limit/⏱ Slot display wording, with unchanged rule values and navigation.
+
+Final Quick Actions presentation (maintainer clarification, 2026-11-13): a lightning icon is centered vertically beside the combined date/Today header block. It opens a centered floating card of action rows over a dimmed screen, rather than a bottom sheet or literal hamburger menu. Close, outside tap, Android Back and return focus remain. No shortcut starts focus or changes settings without its existing review flow. This supersedes earlier ADR-084 bottom/header-menu presentation wording.

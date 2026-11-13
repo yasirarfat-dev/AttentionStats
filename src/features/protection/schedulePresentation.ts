@@ -17,7 +17,11 @@ export const slotLabel = (slot: TimeSlot) =>
     ? 'All day'
     : `${timeLabel(slot.startMinute)} – ${timeLabel(slot.endMinute)}${slot.startMinute > slot.endMinute ? ' · next day' : ''}`;
 export const scopeLabel = (slot: TimeSlot) =>
-  slot.scope === 'app' ? 'Whole app' : 'Short videos only';
+  slot.allowOnly
+    ? 'Allow Only · Other Apps Blocked'
+    : slot.scope === 'app'
+      ? 'Whole App'
+      : 'Short Videos Only';
 
 export const scheduleStyles = StyleSheet.create(theme => ({
   row: {

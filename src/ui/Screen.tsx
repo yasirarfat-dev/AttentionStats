@@ -11,6 +11,7 @@ export function Screen({
   subtitle,
   header = false,
   scrollRef,
+  headerAction,
 }: {
   children: ReactNode;
   title?: string;
@@ -18,6 +19,7 @@ export function Screen({
   /** True when a navigation header already covers the status bar. */
   header?: boolean;
   scrollRef?: Ref<ScrollViewInstance>;
+  headerAction?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
   return (
@@ -38,10 +40,15 @@ export function Screen({
       >
         {title ? (
           <View style={styles.titleBlock}>
-            {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
-            <Text accessibilityRole="header" style={styles.title}>
-              {title}
-            </Text>
+            <View style={styles.titleCopy}>
+              {subtitle ? (
+                <Text style={styles.subtitle}>{subtitle}</Text>
+              ) : null}
+              <Text accessibilityRole="header" style={styles.title}>
+                {title}
+              </Text>
+            </View>
+            {headerAction}
           </View>
         ) : null}
         {children}
@@ -62,8 +69,16 @@ const styles = StyleSheet.create(theme => ({
     backgroundColor: theme.canvas,
   },
   content: { paddingHorizontal: 18, gap: 14, flexGrow: 1 },
-  titleBlock: { paddingHorizontal: 4, paddingBottom: 6, gap: 2 },
+  titleBlock: {
+    paddingHorizontal: 4,
+    paddingBottom: 6,
+    gap: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  titleCopy: { flex: 1, gap: 2 },
   title: {
+    textTransform: 'capitalize',
     color: theme.text,
     fontSize: 32,
     lineHeight: 38,

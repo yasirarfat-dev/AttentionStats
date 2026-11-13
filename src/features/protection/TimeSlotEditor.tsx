@@ -24,6 +24,7 @@ import {
   slotLabel,
 } from './schedulePresentation';
 
+import { AppSelection } from './AppSelection';
 import { clockDraft, toMinute, type ClockDraft } from './scheduleTime';
 function ClockInput({
   label,
@@ -95,15 +96,33 @@ export function TimeSlotEditor({
   initialGroup?: string;
   busy: boolean;
   error: string | null;
-  onSave: (slot: TimeSlot) => void;
+  onSave: (slot: TimeSlot, group?: AppGroup) => void;
   onBack: () => void;
 }) {
-  const [groupId, setGroupId] = useState(
-    initial?.groupId ?? initialGroup ?? groups[0]?.id ?? '',
+  const initialSelected = groups.find(
+    group => group.id === (initial?.groupId ?? initialGroup),
   );
+  const [packages, setPackages] = useState<string[]>(
+    initialSelected?.packages ?? [],
+  );
+  const [customId] = useState(newProtectionId);
+  const [customName, setCustomName] = useState('Selected Apps');
+  const existingGroup = [...groups]
+    .sort(
+      (a, b) =>
+        Number(b.id === initialSelected?.id) -
+        Number(a.id === initialSelected?.id),
+    )
+    .find(
+      group =>
+        group.packages.length === packages.length &&
+        group.packages.every(pkg => packages.includes(pkg)),
+    );
+  const groupId = existingGroup?.id ?? customId;
   const [scope, setScope] = useState<TimeSlot['scope']>(
     initial?.scope ?? 'app',
   );
+  const [allowOnly, setAllowOnly] = useState(initial?.allowOnly ?? false);
   const [allDay, setAllDay] = useState(initial?.allDay ?? false);
   const [days, setDays] = useState(initial?.days ?? 127);
   const [start, setStart] = useState(
@@ -112,7 +131,11 @@ export function TimeSlotEditor({
   const [end, setEnd] = useState(
     clockDraft(initial?.allDay ? 660 : (initial?.endMinute ?? 660)),
   );
-  const selected = groups.find(group => group.id === groupId);
+  const selected =
+    existingGroup ??
+    (packages.length > 0
+      ? { id: customId, name: customName.trim(), packages }
+      : undefined);
   const supported =
     selected?.packages.every(pkg =>
       apps.some(app => app.packageName === pkg && app.shortVideos),
@@ -123,7 +146,10 @@ export function TimeSlotEditor({
   const from = allDay ? 0 : toMinute(start),
     to = allDay ? 0 : toMinute(end);
   const valid =
+    (!allowOnly || scope === 'app') &&
     !!selected &&
+    selected.name.length > 0 &&
+    (existingGroup !== undefined || groups.length < 30) &&
     (scope === 'app' || canSelectShortVideos) &&
     days > 0 &&
     from !== null &&
@@ -132,6 +158,7 @@ export function TimeSlotEditor({
   const slot: TimeSlot = {
     id: initial?.id ?? newProtectionId(),
     groupId,
+    allowOnly,
     scope,
     allDay,
     days,
@@ -150,29 +177,51 @@ export function TimeSlotEditor({
         onPress={onBack}
         disabled={busy}
       />
-      <SectionTitle>Apps to pause</SectionTitle>
-      <Card padded={false}>
-        {groups.map(group => (
-          <Pressable
-            key={group.id}
-            accessibilityRole="radio"
-            accessibilityState={{ selected: groupId === group.id }}
-            disabled={busy}
-            onPress={() => setGroupId(group.id)}
-          >
-            <View style={[styles.row, { padding: 16 }]}>
-              <View style={styles.grow}>
-                <Text style={styles.heading}>{group.name}</Text>
-                <Body muted>
-                  {group.packages.length}{' '}
-                  {group.packages.length === 1 ? 'app' : 'apps'}
-                </Body>
-              </View>
-              <Body>{group.id === groupId ? 'Selected' : 'Choose'}</Body>
-            </View>
-          </Pressable>
-        ))}
-      </Card>
+      <Segmented
+        label="Time Slot App Rule"
+        value={allowOnly ? 'allow' : 'block'}
+        disabled={busy}
+        options={[
+          { value: 'block', label: 'Block Apps' },
+          { value: 'allow', label: 'Allow Only' },
+        ]}
+        onChange={value => {
+          setAllowOnly(value === 'allow');
+          if (value === 'allow') setScope('app');
+        }}
+      />
+      {allowOnly && (
+        <Body muted>
+          Only the selected apps and essential recovery controls stay available
+          under this rule. Other installed launchable apps are blocked during
+          the slot. Other rules still apply.
+        </Body>
+      )}
+      <AppSelection
+        groups={groups}
+        apps={apps}
+        selected={packages}
+        onChange={setPackages}
+        disabled={busy}
+      />
+      {!existingGroup && packages.length > 0 && (
+        <>
+          <SectionTitle>Save Selection As</SectionTitle>
+          <TextInput
+            accessibilityLabel="Selection Group Name"
+            value={customName}
+            onChangeText={setCustomName}
+            maxLength={60}
+            style={styles.input}
+            editable={!busy}
+          />
+          {groups.length >= 30 && (
+            <Body>
+              Group limit reached. Choose an existing group or remove one first.
+            </Body>
+          )}
+        </>
+      )}
       <SectionTitle>What to block</SectionTitle>
       <Card>
         <Segmented
@@ -180,7 +229,7 @@ export function TimeSlotEditor({
           disabled={busy}
           value={slot.scope}
           options={
-            canSelectShortVideos || scope === 'short_videos'
+            !allowOnly && (canSelectShortVideos || scope === 'short_videos')
               ? [
                   { value: 'app', label: 'Whole app' },
                   { value: 'short_videos', label: 'Short videos' },
@@ -190,9 +239,11 @@ export function TimeSlotEditor({
           onChange={setScope}
         />
         <Body muted>
-          {slot.scope === 'app'
-            ? 'Every screen in the selected apps. Their content is never read for this rule.'
-            : 'Only recognized short-video viewers. Messages and other screens stay available. Source tracking must be enabled.'}
+          {slot.allowOnly
+            ? 'Other installed launchable apps are blocked. Your selection and essential recovery controls stay available under this rule.'
+            : slot.scope === 'app'
+              ? 'Every screen in the selected apps. Their content is never read for this rule.'
+              : 'Only recognized short-video viewers. Messages and other screens stay available. Source tracking must be enabled.'}
         </Body>
         {scope === 'short_videos' && !canSelectShortVideos && (
           <Body muted>
@@ -273,7 +324,7 @@ export function TimeSlotEditor({
       <Button
         label={busy ? 'Saving…' : 'Save time slot · off'}
         disabled={!valid || busy}
-        onPress={() => onSave(slot)}
+        onPress={() => onSave(slot, existingGroup ? undefined : selected)}
       />
     </Screen>
   );

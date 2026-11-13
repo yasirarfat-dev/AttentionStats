@@ -4,6 +4,8 @@ import type { ScrollViewInstance } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { reelsSources } from '../../platform';
+import NativeDiary from '../../platform/specs/NativeDiary';
+import { fixedRange } from './dateRange';
 import { AppIcon, BarChart } from '../../ui/Charts';
 import { duration, exactCount, hourLabel, sumCounts } from '../../ui/format';
 import {
@@ -11,6 +13,7 @@ import {
   Button,
   Card,
   Divider,
+  Explanation,
   Meter,
   Row,
   SectionTitle,
@@ -19,7 +22,7 @@ import {
   Title,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
-import { useAppIcons, useDiary, useHistoryPage, ViewingDetail } from '../diary';
+import { useAppIcons, useHistoryPage, ViewingDetail } from '../diary';
 import { AppHistoryExplorer } from './AppHistoryExplorer';
 import {
   historySummary,
@@ -53,18 +56,65 @@ export function InsightsScreen() {
   const { theme } = useUnistyles();
   const [range, setRange] = useState<'7' | '30' | 'all'>('7');
   const [endDay, setEndDay] = useState('');
+  const [dates, setDates] = useState({ start: '', end: '' });
+  const [dateError, setDateError] = useState('');
   const [view, setView] = useState<'day' | 'app'>('day');
   const [selected, setSelected] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
   const [showHours, setShowHours] = useState(false);
   const [showSources, setShowSources] = useState(false);
-  const recent = useDiary(range === '7' ? 7 : 30, range !== 'all');
-  const lifetime = useHistoryPage(range === 'all', endDay);
+  const lifetime = useHistoryPage(
+    true,
+    endDay,
+    dates.start,
+    dates.end,
+    range === '7' ? 7 : 30,
+    range === 'all' ? 0 : range === '7' ? 7 : 30,
+  );
   const history = lifetime.history;
-  const diary =
-    range === 'all'
-      ? { ...lifetime, snapshot: history?.snapshot ?? null }
-      : recent;
+  const diary = { ...lifetime, snapshot: history?.snapshot ?? null };
+  const changeRange = (value: '7' | '30' | 'all') => {
+    setRange(value);
+    setEndDay('');
+    setSelected(null);
+    setShowAll(false);
+    setDateError('');
+    setDates({ start: '', end: '' });
+  };
+  const pickDate = async (field: 'start' | 'end') => {
+    if (!history) return;
+    const today = history.throughDay;
+    const size = range === '7' ? 7 : 30;
+    const start = history.rangeStart!;
+    const end = history.rangeEnd!;
+    try {
+      const chosen = await NativeDiary?.pickDate(
+        field === 'start' ? 'Start Date' : 'End Date',
+        field === 'start' ? start : end,
+        field === 'start' ? history.earliestDay! : start,
+        field === 'end' ? today : range === 'all' ? end : today,
+      );
+      if (!chosen) return;
+      if (chosen < history.installDay!) {
+        setDateError('Choose the installation date or a later date.');
+        return;
+      }
+      setDates(
+        range === 'all'
+          ? {
+              start: field === 'start' ? chosen : start,
+              end: field === 'end' ? chosen : end,
+            }
+          : fixedRange(chosen, size),
+      );
+      setEndDay('');
+      setSelected(null);
+      setShowAll(false);
+      setDateError('');
+    } catch {
+      setDateError('Could not open the date picker. Try again.');
+    }
+  };
   const days = orderedDays(diary.snapshot?.days ?? []);
   const day = resolveDay(days, selected);
   const summary = historySummary(days);
@@ -116,18 +166,53 @@ export function InsightsScreen() {
       <Segmented
         label="Time range"
         value={range}
-        onChange={value => {
-          setRange(value);
-          setEndDay('');
-          setShowAll(false);
-        }}
+        onChange={changeRange}
         options={[
-          { value: '7', label: 'Last 7 days' },
-          { value: '30', label: 'Last 30 days' },
-          { value: 'all', label: 'All time' },
+          { value: '7', label: 'Week' },
+          { value: '30', label: 'Month' },
+          { value: 'all', label: 'All Time' },
         ]}
       />
-      {range === 'all' && endDay !== '' && (
+      {history && (
+        <Card>
+          <View style={styles.stats}>
+            <View style={styles.grow}>
+              <Row
+                icon="clock"
+                title="Start Date"
+                detail={dateLabel(history.rangeStart!)}
+                onPress={() => void pickDate('start')}
+              />
+            </View>
+            <View style={styles.grow}>
+              <Row
+                icon="clock"
+                title="End Date"
+                detail={dateLabel(history.rangeEnd!)}
+                onPress={
+                  range === 'all' ? () => void pickDate('end') : undefined
+                }
+              />
+            </View>
+          </View>
+          {range !== 'all' && (
+            <Body muted>
+              {range === '7' ? '7' : '30'} days · End date follows the start
+              date.
+            </Body>
+          )}
+        </Card>
+      )}
+      {history && (
+        <Body muted>
+          Available From {dateLabel(history.installDay!, true)}
+          {history.rangeEnd! > history.throughDay
+            ? ' · Observations Through Today'
+            : ''}
+        </Body>
+      )}
+      {dateError !== '' && <Body>{dateError}</Body>}
+      {endDay !== '' && (
         <Button
           label="Return to latest dates"
           variant="text"
@@ -167,7 +252,7 @@ export function InsightsScreen() {
           <Card tone="hero">
             <Text style={styles.eyebrow}>
               VIDEO ENCOUNTERS ·{' '}
-              {range === 'all' ? 'ALL TIME' : `${range} DAYS`}
+              {range === 'all' ? 'SELECTED RANGE' : `${range} DAYS`}
             </Text>
             <Text style={styles.heroValue}>
               {exactCount(allTimeVideos ?? summary.videos)}
@@ -178,7 +263,7 @@ export function InsightsScreen() {
                 value={time(history ? allTimeMs : summary.reelsMs)}
                 label="Recorded video surface time"
               />
-              {range !== 'all' && (
+              {!history && (
                 <Stat
                   inverse
                   value={time(summary.appMs)}
@@ -189,7 +274,7 @@ export function InsightsScreen() {
             {history && (
               <Text style={styles.heroNote}>
                 {history.firstDay
-                  ? `Since ${history.firstDay} · ${history.dayCount} calendar days through ${history.throughDay}`
+                  ? `${history.rangeStart} – ${history.rangeEnd}`
                   : 'No retained observations yet.'}
               </Text>
             )}
@@ -202,9 +287,7 @@ export function InsightsScreen() {
               <Card>
                 <Button
                   label={
-                    showSources
-                      ? 'Hide all-time sources'
-                      : 'Show all-time sources'
+                    showSources ? 'Hide Range Sources' : 'Show Range Sources'
                   }
                   variant="tonal"
                   onPress={() => setShowSources(value => !value)}
@@ -217,20 +300,14 @@ export function InsightsScreen() {
                       detail={`${exactCount(source.videos)} video encounters · ${time(source.reelsMs)} recorded surface time`}
                     />
                   ))}
-                <Body muted>
-                  Saved observations across retained history, including gaps.
-                  Calendar days are not days of complete coverage. Time is a
-                  known subtotal; missing intervals are not zero. App time is
-                  available in the date pages below.
-                </Body>
-                {history.lastRecordedDay && (
-                  <Body muted>
-                    Last retained observation: {history.lastRecordedDay}.
-                    Grouped in {history.zone}.
-                  </Body>
-                )}
+                <Explanation title="About This Range">
+                  Totals cover the selected range. Missing time is unknown;
+                  calendar dates do not prove complete coverage. App time and
+                  app rankings cover only the date page below. Dates use{' '}
+                  {history.zone}.
+                </Explanation>
               </Card>
-              <SectionTitle>Browse retained history</SectionTitle>
+              <SectionTitle>Browse Dates</SectionTitle>
               <Card>
                 <Title>
                   {history.pageStart} – {history.pageEnd}

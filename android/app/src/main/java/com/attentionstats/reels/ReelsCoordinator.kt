@@ -270,6 +270,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
                 }
                 // Commit is durable here; cancellation after this point must not report a rollback.
                 committed = true
+                com.attentionstats.widget.TodayWidget.clear(context)
                 main.post { com.attentionstats.autoscroll.AutoScrollSession.clear() }
                 trackers.clear(); visits.clear(); routes.clear(); openExposures.clear(); unlockSession.clear(); allowances.clear()
                 diary.resetLive(); refreshConfiguration(history); refreshTodayCounts(history); publish()
@@ -289,11 +290,11 @@ internal class ReelsCoordinator private constructor(private val context: Context
     }
 
     fun changeFocus(packages: Set<String>?, minutes: Int, expected: Long, stopId: String?,
-        success: () -> Unit, failure: (String) -> Unit) = enqueue(failure) {
+        success: () -> Unit, failure: (String) -> Unit, allowOnly: Boolean = false) = enqueue(failure) {
         val history = opened()
         if (packages != null && !(grantEnabled() && serviceConnected)) { failure("ACCESS_UNAVAILABLE"); return@enqueue }
         try {
-            if (!schedules.focus(history, packages, minutes, expected, stopId)) { failure("REVISION_CONFLICT"); return@enqueue }
+            if (!schedules.focus(history, packages, minutes, expected, stopId, allowOnly)) { failure("REVISION_CONFLICT"); return@enqueue }
         } catch (_: IllegalArgumentException) { failure("INVALID_ARGUMENT"); return@enqueue }
         acquisitionSettings.incrementAndGet()
         publish(); success()
@@ -306,6 +307,10 @@ internal class ReelsCoordinator private constructor(private val context: Context
     fun diaryHistoryPage(endDay: String, success: (String) -> Unit, failure: (String) -> Unit) {
         val capturedFence = diary.fence.get()
         enqueue(failure) { success(diary.historyPage(opened(), endDay, capturedFence, ::blockingAvailable)) }
+    }
+    fun diaryHistoryRange(start: String, through: String, end: String, size: Int, windowDays: Int, success: (String) -> Unit, failure: (String) -> Unit) {
+        val capturedFence = diary.fence.get()
+        enqueue(failure) { success(diary.historyRange(opened(), end, capturedFence, ::blockingAvailable, start, through, size, true, windowDays)) }
     }
     fun configureDiary(action: String, enabled: Boolean, count: Int, minutes: Int, expected: Long,
         success: (String) -> Unit, failure: (String) -> Unit) {
@@ -503,7 +508,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
         }
 
     fun deleteHistory(expected: String, success: (String) -> Unit, failure: (String) -> Unit) =
-        mutate(expected, success, failure) { history ->
+        mutate(expected, { value -> com.attentionstats.widget.TodayWidget.clear(context); success(value) }, failure) { history ->
             val dao = history.database.data()
             for (app in ReelApp.entries) dao.configure(app.sourceId, false,
                 Math.addExact(checkNotNull(dao.metadata()).configurationRevision, 1), System.currentTimeMillis())
@@ -677,22 +682,11 @@ internal class ReelsCoordinator private constructor(private val context: Context
     }
 
     private suspend fun renderWidget(history: HistoryStore) {
-        val day = JSONObject(diary.snapshot(history, 1, blockingAvailable = ::blockingAvailable))
-            .getJSONArray("days").getJSONObject(0)
-        val apps = day.getJSONArray("apps")
-        var watching = 0L; var screen = 0L; var top: Pair<String, Long>? = null
-        for (index in 0 until apps.length()) {
-            val app = apps.getJSONObject(index)
-            watching += app.optString("reelsMs").toLongOrNull() ?: 0
-            val ms = app.optString("appMs").toLongOrNull() ?: 0
-            screen += ms
-            if (ms > (top?.second ?: 0) && app.optString("packageName") != context.packageName) top = app.getString("name") to ms
-        }
-        val interventions = day.getJSONObject("interventions")
-        val breaks = interventions.keys().asSequence().filter { it.startsWith("break.") }.sumOf { interventions.getLong(it) }
-        val videoApps = ReelApp.entries.map { it.displayName to (todayCounts[it] ?: 0L) }.sortedByDescending { it.second }
-        com.attentionstats.widget.TodayWidget.render(context, com.attentionstats.widget.WidgetData(
-            todayCounts.values.sum(), headline(unlockSession.counts()), watching, screen, breaks, videoApps, top))
+        val snapshot = JSONObject(diary.snapshot(history, 1, blockingAvailable = ::blockingAvailable))
+        val data = com.attentionstats.widget.WidgetData.fromSnapshot(snapshot, headline(unlockSession.counts()),
+            schedules.activeFocus()?.remaining(System.currentTimeMillis(), SystemClock.elapsedRealtime(),
+                android.provider.Settings.Global.getInt(context.contentResolver, android.provider.Settings.Global.BOOT_COUNT, -1)), System.currentTimeMillis())
+        com.attentionstats.widget.TodayWidget.render(context, data)
     }
 
     private fun headline(values: Map<String, Long>): Long = values.filterKeys { key ->

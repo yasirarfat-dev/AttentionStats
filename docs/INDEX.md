@@ -51,6 +51,7 @@ The earlier [interactive design study](../design/prototype/README.md), scaffold 
 | Human experience | [HUMAN-FACTORS.md](HUMAN-FACTORS.md) | Supportive engagement, psychological rationale, language, trust and review |
 | Routes | [NAVIGATION.md](NAVIGATION.md) | Hierarchy, typed routes, native flows and back behavior |
 | Visuals | [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md) | Proposed tokens/components, themes, charts and motion |
+| Widgets | [WIDGETS-SPEC.md](WIDGETS-SPEC.md) | Responsive per-instance home-screen layouts, stats and configuration |
 | Controls | [SETTINGS-SPEC.md](SETTINGS-SPEC.md) | Complete settings catalog, defaults and persistence |
 | System | [ARCHITECTURE.md](ARCHITECTURE.md) | Native/JS boundaries, data flow, lifecycle and adapters |
 | Placement | [FILE-STRUCTURE.md](FILE-STRUCTURE.md) | Existing docs tree versus proposed implementation tree |

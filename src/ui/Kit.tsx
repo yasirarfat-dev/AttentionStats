@@ -1,5 +1,11 @@
-import type { ReactNode } from 'react';
-import { Pressable, Switch, Text, View } from 'react-native';
+import { useState, type ReactNode } from 'react';
+import {
+  Pressable,
+  Switch,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Icon, type IconName } from './Icon';
 
@@ -71,6 +77,62 @@ export function Body({
 
 export function Caption({ children }: { children: ReactNode }) {
   return <Text style={styles.caption}>{children}</Text>;
+}
+
+/** Optional explanations stay discoverable without occupying the default view. */
+export function InfoButton({
+  label,
+  expanded,
+  onPress,
+  inverse = false,
+}: {
+  label: string;
+  expanded: boolean;
+  onPress: () => void;
+  inverse?: boolean;
+}) {
+  const { theme } = useUnistyles();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`About ${label}`}
+      accessibilityState={{ expanded }}
+      onPress={onPress}
+      style={styles.infoButton}
+    >
+      <Icon
+        name="info"
+        size={22}
+        color={inverse ? theme.onHero : theme.accent}
+      />
+    </Pressable>
+  );
+}
+
+export function Explanation({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <>
+      <SectionTitle
+        action={
+          <InfoButton
+            label={title}
+            expanded={expanded}
+            onPress={() => setExpanded(!expanded)}
+          />
+        }
+      >
+        {title}
+      </SectionTitle>
+      {expanded && <Body muted>{children}</Body>}
+    </>
+  );
 }
 
 /** List row: optional leading visual, title/detail, trailing value or control. */
@@ -158,6 +220,7 @@ export function ToggleRow({
   value,
   onChange,
   disabled = false,
+  discloseDetail = false,
 }: {
   icon?: IconName;
   leading?: ReactNode;
@@ -166,14 +229,16 @@ export function ToggleRow({
   value: boolean;
   onChange: (next: boolean) => void;
   disabled?: boolean;
+  discloseDetail?: boolean;
 }) {
   const { theme } = useUnistyles();
-  return (
+  const [expanded, setExpanded] = useState(false);
+  const row = (
     <Row
       icon={icon}
       leading={leading}
       title={title}
-      detail={detail}
+      detail={discloseDetail ? undefined : detail}
       onPress={disabled ? undefined : () => onChange(!value)}
       accessibilityLabel={`${title}, ${value ? 'on' : 'off'}`}
       trailing={
@@ -187,6 +252,24 @@ export function ToggleRow({
         />
       }
     />
+  );
+  if (!discloseDetail || !detail) return row;
+  return (
+    <View>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flex: 1 }}>{row}</View>
+        <InfoButton
+          label={title}
+          expanded={expanded}
+          onPress={() => setExpanded(!expanded)}
+        />
+      </View>
+      {expanded && (
+        <View style={{ paddingHorizontal: 12, paddingBottom: 12 }}>
+          <Body muted>{detail}</Body>
+        </View>
+      )}
+    </View>
   );
 }
 
@@ -360,16 +443,26 @@ export function Segmented<T extends string>({
   onChange,
   label,
   disabled = false,
+  singleLine = false,
 }: {
-  options: { value: T; label: string }[];
+  options: {
+    value: T;
+    label: string;
+    icon?: IconName;
+    accessibilityLabel?: string;
+  }[];
   value: T;
   onChange: (next: T) => void;
   label: string;
   disabled?: boolean;
+  singleLine?: boolean;
 }) {
+  const { theme } = useUnistyles();
+  const { fontScale } = useWindowDimensions();
+  const wrap = singleLine && fontScale > 1.3;
   return (
     <View
-      style={styles.segmented}
+      style={[styles.segmented, wrap && styles.segmentedWrap]}
       accessibilityRole="radiogroup"
       accessibilityLabel={label}
     >
@@ -379,16 +472,33 @@ export function Segmented<T extends string>({
           <Pressable
             key={option.value}
             accessibilityRole="radio"
+            accessibilityLabel={option.accessibilityLabel ?? option.label}
             accessibilityState={{ selected, disabled }}
             disabled={disabled}
             onPress={() => onChange(option.value)}
-            style={[styles.segment, selected && styles.segmentOn]}
+            style={[
+              styles.segment,
+              wrap && styles.segmentWrapped,
+              selected && styles.segmentOn,
+            ]}
           >
-            <Text
-              style={[styles.segmentText, selected && styles.segmentTextOn]}
-            >
-              {option.label}
-            </Text>
+            <View style={styles.segmentContent}>
+              {option.icon && (
+                <Icon
+                  name={option.icon}
+                  size={16}
+                  color={selected ? theme.text : theme.muted}
+                />
+              )}
+              <Text
+                numberOfLines={singleLine ? 1 : undefined}
+                adjustsFontSizeToFit={singleLine}
+                minimumFontScale={0.9}
+                style={[styles.segmentText, selected && styles.segmentTextOn]}
+              >
+                {option.label}
+              </Text>
+            </View>
           </Pressable>
         );
       })}
@@ -414,6 +524,12 @@ export function Meter({ value, color }: { value: number; color: string }) {
 }
 
 const styles = StyleSheet.create(theme => ({
+  infoButton: {
+    minWidth: 48,
+    minHeight: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   card: {
     backgroundColor: theme.surface,
     borderRadius: 24,
@@ -434,13 +550,20 @@ const styles = StyleSheet.create(theme => ({
     paddingHorizontal: 4,
   },
   section: {
+    flexShrink: 1,
+    textTransform: 'capitalize',
     color: theme.muted,
     fontSize: 13,
     fontWeight: '700',
     letterSpacing: 0.8,
-    textTransform: 'uppercase',
   },
-  title: { color: theme.text, fontSize: 22, lineHeight: 28, fontWeight: '700' },
+  title: {
+    textTransform: 'capitalize',
+    color: theme.text,
+    fontSize: 22,
+    lineHeight: 28,
+    fontWeight: '700',
+  },
   body: { color: theme.text, fontSize: 15, lineHeight: 22 },
   muted: { color: theme.muted },
   center: { textAlign: 'center' },
@@ -464,7 +587,12 @@ const styles = StyleSheet.create(theme => ({
     justifyContent: 'center',
   },
   rowText: { flex: 1, gap: 2 },
-  rowTitle: { color: theme.text, fontSize: 16, fontWeight: '600' },
+  rowTitle: {
+    textTransform: 'capitalize',
+    color: theme.text,
+    fontSize: 16,
+    fontWeight: '600',
+  },
   rowDetail: { color: theme.muted, fontSize: 13, lineHeight: 18 },
   rowValue: {
     color: theme.text,
@@ -480,7 +608,12 @@ const styles = StyleSheet.create(theme => ({
     fontWeight: '700',
     fontVariant: ['tabular-nums'],
   },
-  statLabel: { color: theme.muted, fontSize: 13, fontWeight: '500' },
+  statLabel: {
+    textTransform: 'capitalize',
+    color: theme.muted,
+    fontSize: 13,
+    fontWeight: '500',
+  },
   inverse: { color: theme.onHero },
   inverseMuted: { color: theme.heroMuted },
   pill: {
@@ -510,7 +643,7 @@ const styles = StyleSheet.create(theme => ({
   dangerButton: { backgroundColor: theme.dangerSoft },
   buttonPressed: { opacity: 0.8 },
   disabled: { opacity: 0.45 },
-  buttonLabel: { fontSize: 16, fontWeight: '700' },
+  buttonLabel: { textTransform: 'capitalize', fontSize: 16, fontWeight: '700' },
   stepper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -534,6 +667,15 @@ const styles = StyleSheet.create(theme => ({
     fontVariant: ['tabular-nums'],
   },
   stepSuffix: { color: theme.muted, fontSize: 12 },
+  segmentContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    flexShrink: 1,
+  },
+  segmentedWrap: { flexWrap: 'wrap' },
+  segmentWrapped: { flexBasis: '45%', flexGrow: 1, flexShrink: 0 },
   segmented: {
     flexDirection: 'row',
     backgroundColor: theme.surfaceAlt,
@@ -552,7 +694,12 @@ const styles = StyleSheet.create(theme => ({
     borderColor: 'transparent',
   },
   segmentOn: { backgroundColor: theme.accentSoft, borderColor: theme.accent },
-  segmentText: { color: theme.muted, fontSize: 14, fontWeight: '600' },
+  segmentText: {
+    textTransform: 'capitalize',
+    color: theme.muted,
+    fontSize: 14,
+    fontWeight: '600',
+  },
   segmentTextOn: { color: theme.text },
   meterTrack: {
     alignSelf: 'stretch',

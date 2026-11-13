@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import { Body, Button, Card, Row, SectionTitle } from '../../ui/Kit';
@@ -26,8 +26,28 @@ export function ProtectScreen({
     return () => clearInterval(timer);
   }, [focused, refresh]);
   const active = snapshot?.focus;
+  const [quick, setQuick] = useState(false);
   return (
     <Screen title="Protect" subtitle="Gentle tools you choose">
+      <Card tone="soft">
+        <Row
+          icon="clock"
+          title="Focus Sessions"
+          detail={active ? 'Session Active' : 'On the Fly or On a Schedule'}
+          value={quick ? '−' : '+'}
+          onPress={() => setQuick(!quick)}
+        />
+        {quick && (
+          <>
+            <Button label="Focus Now" onPress={onFocus} />
+            <Button
+              label="Scheduled Focus"
+              variant="tonal"
+              onPress={onSchedules}
+            />
+          </>
+        )}
+      </Card>
       {error && (
         <Card tone="warn">
           <Body>{error}</Body>

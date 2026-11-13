@@ -8,7 +8,15 @@ import {
 } from '../../platform/diaryStatus';
 
 /** Lifetime aggregates are read only on entry, paging, explicit retry or foreground return. */
-export function useHistoryPage(enabled: boolean, endDay: string) {
+export function useHistoryPage(
+  enabled: boolean,
+  endDay: string,
+  startDay = '',
+  throughDay = '',
+  pageSize: 7 | 30 = 30,
+  windowDays: 0 | 7 | 30 = 0,
+) {
+  const key = `${startDay}|${throughDay}|${endDay}|${pageSize}|${windowDays}`;
   const focused = useIsFocused();
   const [loaded, setLoaded] = useState<{
     key: string;
@@ -20,38 +28,44 @@ export function useHistoryPage(enabled: boolean, endDay: string) {
   } | null>(null);
   const [busy, setBusy] = useState(false);
   const serial = useRef(0);
-  const current = useRef({ enabled, endDay });
-  current.current = { enabled, endDay };
+  const current = useRef({ enabled, key });
+  current.current = { enabled, key };
   const refresh = useCallback(async () => {
     if (!enabled || !NativeDiary || AppState.currentState !== 'active') return;
     const request = ++serial.current;
     setBusy(true);
     try {
       const value = parseDiaryHistoryPage(
-        await NativeDiary.getHistoryPage(endDay),
+        await NativeDiary.getHistoryRange(
+          startDay,
+          throughDay,
+          endDay,
+          pageSize,
+          windowDays,
+        ),
       );
       if (
         serial.current === request &&
         current.current.enabled &&
-        current.current.endDay === endDay
+        current.current.key === key
       ) {
-        setLoaded({ key: endDay, value });
+        setLoaded({ key, value });
         setFailure(null);
       }
     } catch {
       if (
         serial.current === request &&
         current.current.enabled &&
-        current.current.endDay === endDay
+        current.current.key === key
       )
         setFailure({
-          key: endDay,
-          message: 'All-time history is unavailable. Saved data is preserved.',
+          key,
+          message: 'History is unavailable. Saved data is preserved.',
         });
     } finally {
       if (serial.current === request) setBusy(false);
     }
-  }, [enabled, endDay]);
+  }, [enabled, endDay, startDay, throughDay, pageSize, windowDays, key]);
   useEffect(() => {
     if (!focused || !enabled) return;
     void refresh();
@@ -64,8 +78,8 @@ export function useHistoryPage(enabled: boolean, endDay: string) {
     };
   }, [enabled, focused, refresh]);
   return {
-    history: enabled && loaded?.key === endDay ? loaded.value : null,
-    error: enabled && failure?.key === endDay ? failure.message : null,
+    history: enabled && loaded?.key === key ? loaded.value : null,
+    error: enabled && failure?.key === key ? failure.message : null,
     busy,
     refresh,
   };

@@ -16,6 +16,7 @@ import {
   Caption,
   Card,
   Divider,
+  Explanation,
   Pill,
   Row,
   SectionTitle,
@@ -248,9 +249,111 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         />
       </Card>
 
+      <Explanation title="What to Measure & Extras">
+        Choose which observations to save and which optional tools to show. Text
+        posts, likes, reactions and submitted comments are not measured.
+      </Explanation>
+      <Card padded={false}>
+        <ToggleRow
+          discloseDetail
+          icon="layers"
+          title="Count photo encounters"
+          detail="Count recognized photos and carousels separately from videos in your enabled sources. One carousel post is one encounter."
+          value={diary.snapshot?.countPhotos ?? true}
+          disabled={!diary.snapshot}
+          onChange={value => diary.configure('photos', value)}
+        />
+        <ToggleRow
+          discloseDetail
+          icon="play"
+          title="Measure confirmed playback (experimental)"
+          detail="Use exposed numeric player times for 3-second watches, playback time and observed completions. Pauses and missing signals add no time; availability varies by app and layout."
+          value={diary.snapshot?.measurePlayback ?? false}
+          disabled={!diary.snapshot}
+          onChange={value => diary.configure('playback', value)}
+        />
+        <View style={styles.subgroup}>
+          <SectionTitle>Extras</SectionTitle>
+          <ToggleRow
+            discloseDetail
+            icon="play"
+            title="Auto-scroll (experimental)"
+            detail="Adds a button to the floating counter that moves to the next video when one ends, where the player exposes progress. Without readable progress, automatic swipes pause. Tap the same button to stop."
+            value={autoScroll}
+            onChange={async value => {
+              try {
+                setAutoScroll(
+                  parseAutoScrollStatus(
+                    await NativeReels!.configureAutoScroll(value, 1),
+                  ).enabled,
+                );
+              } catch {
+                /* unchanged */
+              }
+            }}
+          />
+        </View>
+        <Divider />
+        <Row
+          icon="layers"
+          title="Add a home-screen widget"
+          detail="Six styles, 12 stats and automatic layouts. Long-press a placed widget to customize."
+          onPress={async () => {
+            const ok = await NativeDiary?.pinWidget();
+            if (!ok)
+              Alert.alert(
+                'Add it from your home screen',
+                'Long-press an empty spot on your home screen, choose Widgets, then find Attention Stats.',
+              );
+          }}
+        />
+      </Card>
+
+      <SectionTitle>Data & Privacy</SectionTitle>
+      <Card padded={false}>
+        <Row
+          icon="lock"
+          title="Backup & restore"
+          detail="Automatic Android backup starts enabled. Manage backup, recovery and manual files."
+          onPress={async () => {
+            if (!(await NativeDiary?.openBackup()))
+              Alert.alert(
+                'Backup unavailable',
+                'Could not open backup. Please try again.',
+              );
+          }}
+        />
+        <Divider />
+        <Row
+          icon="lock"
+          title="Privacy policy"
+          detail="Local history, automatic Android backup and your controls."
+          onPress={() => Linking.openURL(PRIVACY)}
+        />
+        <Divider />
+        <Row
+          icon="code"
+          title="Source code"
+          detail="Apache-2.0 on GitHub"
+          onPress={() => Linking.openURL(REPO)}
+        />
+        <Divider />
+        <Row
+          icon="info"
+          title="Encrypted local history"
+          detail="No data sent to us. Android can back up history to your device backup account. Manual files use a public app key. Local erase turns backup off; external copies may remain."
+        />
+        <Divider />
+        <Row
+          icon="trash"
+          title="Erase history"
+          detail="Permanent. Three confirmations."
+          onPress={deleter.start}
+        />
+      </Card>
+      {deleter.dialog}
       <SectionTitle>Appearance</SectionTitle>
       <Card>
-        <Body>Make it comfortable for you</Body>
         <Segmented
           label="Theme"
           value={appearance.mode}
@@ -273,73 +376,11 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
           onChange={accent => void chooseAppearance({ ...appearance, accent })}
         />
         <ToggleRow
+          discloseDetail
           title="Gentle animations"
           detail="Soft transitions between tabs. Your phone’s reduced-motion setting takes priority."
           value={appearance.motion}
           onChange={motion => void chooseAppearance({ ...appearance, motion })}
-        />
-        <Body muted>
-          System follows your phone’s light or dark setting. Your choices are
-          saved on this device.
-        </Body>
-      </Card>
-      <SectionTitle>What to measure</SectionTitle>
-      <Card padded={false}>
-        <ToggleRow
-          icon="layers"
-          title="Count photo encounters"
-          detail="Count recognized photos and carousels separately from videos in your enabled sources. One carousel post is one encounter."
-          value={diary.snapshot?.countPhotos ?? true}
-          disabled={!diary.snapshot}
-          onChange={value => diary.configure('photos', value)}
-        />
-        <ToggleRow
-          icon="play"
-          title="Measure confirmed playback (experimental)"
-          detail="Use exposed numeric player times for 3-second watches, playback time and observed completions. Pauses and missing signals add no time; availability varies by app and layout."
-          value={diary.snapshot?.measurePlayback ?? false}
-          disabled={!diary.snapshot}
-          onChange={value => diary.configure('playback', value)}
-        />
-      </Card>
-      <Body muted>
-        Text posts, likes, reactions and submitted comments are not measured in
-        this build. They need separate source qualification and opt-in controls.
-      </Body>
-      <SectionTitle>Extras</SectionTitle>
-      <Card padded={false}>
-        <ToggleRow
-          icon="play"
-          title="Auto-scroll (experimental)"
-          detail="Adds a button to the floating counter that moves to the next video when one ends, where the player exposes progress. Without readable progress, automatic swipes pause. Tap the same button to stop."
-          value={autoScroll}
-          onChange={async value => {
-            try {
-              setAutoScroll(
-                parseAutoScrollStatus(
-                  await NativeReels!.configureAutoScroll(value, 1),
-                ).enabled,
-              );
-            } catch {
-              /* unchanged */
-            }
-          }}
-        />
-      </Card>
-
-      <Card padded={false}>
-        <Row
-          icon="layers"
-          title="Add a home-screen widget"
-          detail="Pick what it shows: short videos, session, watching time, screen time or breaks."
-          onPress={async () => {
-            const ok = await NativeDiary?.pinWidget();
-            if (!ok)
-              Alert.alert(
-                'Add it from your home screen',
-                'Long-press an empty spot on your home screen, choose Widgets, then find Attention Stats.',
-              );
-          }}
         />
       </Card>
 
@@ -371,60 +412,14 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <Row icon="info" title="Show the welcome tour" onPress={onWelcome} />
       </Card>
 
-      <SectionTitle>Privacy</SectionTitle>
-      <Card padded={false}>
-        <Row
-          icon="lock"
-          title="Backup & restore"
-          detail="Automatic Android backup starts enabled. Manage backup, recovery and manual files."
-          onPress={async () => {
-            if (!(await NativeDiary?.openBackup()))
-              Alert.alert(
-                'Backup unavailable',
-                'Could not open backup. Please try again.',
-              );
-          }}
-        />
-        <Divider />
-        <Row
-          icon="lock"
-          title="Privacy policy"
-          detail="Local history, automatic Android backup and your controls."
-          onPress={() => Linking.openURL(PRIVACY)}
-        />
-        <Divider />
-        <Row
-          icon="code"
-          title="Source code"
-          detail="Apache-2.0 on GitHub"
-          onPress={() => Linking.openURL(REPO)}
-        />
-      </Card>
-
-      <SectionTitle>Your data</SectionTitle>
-      <Card padded={false}>
-        <Row
-          icon="info"
-          title="Encrypted local history"
-          detail="No data sent to us. Android can back up history to your device backup account. Manual files use a public app key. Local erase turns backup off; external copies may remain."
-        />
-        <Divider />
-        <Row
-          icon="trash"
-          title="Erase history"
-          detail="Permanent. Three confirmations."
-          onPress={deleter.start}
-        />
-      </Card>
-      {deleter.dialog}
-
       <View style={styles.footer}>
         <Text style={styles.brand}>
-          Attention Stats {snapshot?.device.appVersion ?? ''}
+          Digital Wellbeing:Attention Stats{' '}
+          {snapshot?.device.appVersion.replace(/-.*/, '') ?? '1.0.0'}
         </Text>
-        <Caption>No developer telemetry · No ads · Open source</Caption>
+        <Caption>No Developer Telemetry, No Ads Ever, Open Source</Caption>
         <Text style={styles.maker}>
-          Made with care by{' '}
+          Made with Care by{' '}
           <Text
             accessibilityRole="link"
             onPress={() => Linking.openURL('https://yasirarfat.com')}
@@ -434,7 +429,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
           </Text>
         </Text>
         <Text style={styles.publisher}>
-          Published by{' '}
+          Published By{' '}
           <Text
             accessibilityRole="link"
             onPress={() =>
@@ -460,6 +455,12 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
 }
 
 const styles = StyleSheet.create(theme => ({
+  subgroup: {
+    backgroundColor: theme.surfaceAlt,
+    borderRadius: 16,
+    padding: 8,
+    marginTop: 8,
+  },
   footer: { alignItems: 'center', gap: 4, paddingVertical: 16 },
   brand: { color: theme.muted, fontSize: 14, fontWeight: '700' },
   maker: { color: theme.muted, fontSize: 13, fontWeight: '600', marginTop: 8 },

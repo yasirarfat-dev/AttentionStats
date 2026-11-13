@@ -22,6 +22,7 @@ jest.mock('../../ui/Kit', () => ({
   Segmented: 'Segmented',
   Title: 'Title',
 }));
+jest.mock('./AppSelection', () => ({ AppSelection: 'AppSelection' }));
 jest.mock('../../ui/Screen', () => ({ Screen: 'Screen' }));
 
 const social: AppGroup = {
@@ -41,12 +42,13 @@ const apps: ProtectableApp[] = [
 
 // Exercise editor choices without a native renderer. State persists between
 // renders, including the same draft receiving a refreshed installed-app list.
-function editor(initial?: TimeSlot, initialGroup?: string) {
+function editor(initial?: TimeSlot, initialGroup: string = social.id) {
   const states: unknown[] = [];
   let cursor = 0;
   (useState as jest.Mock).mockImplementation((value: unknown) => {
     const index = cursor++;
-    if (!(index in states)) states[index] = value;
+    if (!(index in states))
+      states[index] = typeof value === 'function' ? value() : value;
     return [states[index], (next: unknown) => (states[index] = next)];
   });
   const onSave = jest.fn();
@@ -94,10 +96,10 @@ test('catalog loss preserves a short-video draft and prevents whole-app fallback
 test('changing to an unsupported group requires an explicit whole-app choice', () => {
   const draft = editor();
   draft.render().control('Blocking scope').onChange('short_videos');
-  const groupChoices = draft
+  draft
     .render()
-    .props.filter(item => item.accessibilityRole === 'radio');
-  groupChoices[1]!.onPress();
+    .props.find(item => Array.isArray(item.selected))!
+    .onChange(other.packages);
   const unsupported = draft.render();
   expect(unsupported.control('Blocking scope').value).toBe('short_videos');
   expect(unsupported.control('Save time slot · off').disabled).toBe(true);
@@ -111,6 +113,7 @@ test('changing to an unsupported group requires an explicit whole-app choice', (
       scope: 'app',
       enabled: false,
     }),
+    undefined,
   );
 });
 
@@ -119,13 +122,13 @@ test('returning to a supported group retains the chosen short-video scope', () =
   draft.render().control('Blocking scope').onChange('short_videos');
   draft
     .render()
-    .props.filter(item => item.accessibilityRole === 'radio')[1]!
-    .onPress();
+    .props.find(item => Array.isArray(item.selected))!
+    .onChange(other.packages);
   expect(draft.render().control('Save time slot · off').disabled).toBe(true);
   draft
     .render()
-    .props.filter(item => item.accessibilityRole === 'radio')[0]!
-    .onPress();
+    .props.find(item => Array.isArray(item.selected))!
+    .onChange(social.packages);
   const supported = draft.render();
   expect(supported.control('Blocking scope').value).toBe('short_videos');
   expect(supported.control('Save time slot · off').disabled).toBe(false);
@@ -136,6 +139,7 @@ test('returning to a supported group retains the chosen short-video scope', () =
       scope: 'short_videos',
       enabled: false,
     }),
+    undefined,
   );
 });
 
@@ -153,6 +157,7 @@ test('a per-app shortcut saves the requested group instead of the first group', 
       scope: 'app',
       enabled: false,
     }),
+    undefined,
   );
 });
 
@@ -176,6 +181,7 @@ test('an existing selective slot stays selective when its app is unavailable', (
       scope: 'short_videos',
       enabled: false,
     }),
+    undefined,
   );
 });
 
@@ -211,6 +217,7 @@ test('equal custom times cannot save, while an explicit all-day choice uses cano
       allDay: true,
       enabled: false,
     }),
+    undefined,
   );
 });
 
@@ -236,5 +243,6 @@ test('editing an overnight slot preserves start-day boundaries and requires reac
       endMinute: 60,
       enabled: false,
     }),
+    undefined,
   );
 });

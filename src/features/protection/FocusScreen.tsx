@@ -5,12 +5,14 @@ import {
   Body,
   Button,
   Card,
-  Row,
+  Segmented,
+  Explanation,
   SectionTitle,
   Stepper,
   Title,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
+import { AppSelection } from './AppSelection';
 import { useSchedules } from './useSchedules';
 
 export function FocusScreen({
@@ -23,14 +25,16 @@ export function FocusScreen({
   const schedules = useSchedules();
   const { snapshot, apps, busy, error, refresh } = schedules;
   const focused = useIsFocused();
-  const [groupId, setGroupId] = useState('');
+  const [packages, setPackages] = useState<string[]>([]);
+  const [allowOnly, setAllowOnly] = useState(false);
   const [minutes, setMinutes] = useState(25);
   const [review, setReview] = useState<{
     packages: string[];
     revision: string;
     minutes: number;
+    allowOnly: boolean;
   } | null>(null);
-  const group = snapshot?.groups.find(item => item.id === groupId);
+
   const active = snapshot?.focus;
   useEffect(() => {
     if (!focused) return;
@@ -70,10 +74,13 @@ export function FocusScreen({
             <Title>
               {Math.ceil(Number(active.remainingMs) / 60_000)} minutes remaining
             </Title>
-            <Body>{names(active.packages)}</Body>
             <Body>
-              Whole-app blocking until this session ends. You can end early or
-              allow a five-minute visit from the cover.
+              {active.allowOnly ? 'Allow Only' : 'Block Apps'} ·{' '}
+              {names(active.packages)}
+            </Body>
+            <Body>
+              The chosen app rule lasts until this session ends. You can end
+              early or allow a five-minute visit from the cover.
             </Body>
             <Body muted>
               {snapshot.accessibility
@@ -94,9 +101,14 @@ export function FocusScreen({
         <>
           <Card tone="soft">
             <Title>{review.minutes} minutes for yourself</Title>
-            <Body>{names(review.packages)}</Body>
             <Body>
-              These whole apps will be blocked while the session is active.
+              {review.allowOnly ? 'Allow Only' : 'Block Apps'} ·{' '}
+              {names(review.packages)}
+            </Body>
+            <Body>
+              {review.allowOnly
+                ? 'Other installed launchable apps will be blocked; the selected apps stay available under this focus rule.'
+                : 'These whole apps will be blocked while the session is active.'}
               Existing schedules and limits still apply. Settings, emergency
               access and system navigation stay available.
             </Body>
@@ -116,7 +128,12 @@ export function FocusScreen({
             disabled={busy || !snapshot.accessibility}
             onPress={() =>
               void schedules
-                .focus(review.packages, review.minutes, review.revision)
+                .focus(
+                  review.packages,
+                  review.minutes,
+                  review.revision,
+                  review.allowOnly,
+                )
                 .then(ok => {
                   if (ok) setReview(null);
                 })
@@ -131,13 +148,22 @@ export function FocusScreen({
         </>
       ) : (
         <>
-          <Card tone="soft">
-            <Title>Make room for a moment</Title>
-            <Body>
-              Choose an app group and a duration, then review before starting.
-              There is no penalty for ending early.
-            </Body>
-          </Card>
+          <Segmented
+            label="Focus Timing"
+            value="now"
+            options={[
+              { value: 'now', label: 'Focus Now' },
+              { value: 'slots', label: 'By Time Slots' },
+            ]}
+            onChange={value => {
+              if (value === 'slots') onSchedules();
+            }}
+          />
+          <Explanation title="Focus Session">
+            Choose app groups or individual apps, then review before starting.
+            Selected apps are frozen for this session; later group edits do not
+            change it. End whenever you need.
+          </Explanation>
           <SectionTitle>Duration</SectionTitle>
           <Stepper
             label="Focus minutes"
@@ -148,33 +174,39 @@ export function FocusScreen({
             step={5}
             onChange={setMinutes}
           />
-          <SectionTitle>App group</SectionTitle>
-          {snapshot.groups.length === 0 ? (
-            <Body>
-              Create an app group in schedules, then return here to choose it.
+          <Segmented
+            label="Focus App Rule"
+            value={allowOnly ? 'allow' : 'block'}
+            onChange={value => setAllowOnly(value === 'allow')}
+            options={[
+              { value: 'block', label: 'Block Apps' },
+              { value: 'allow', label: 'Allow Only' },
+            ]}
+          />
+          {allowOnly && (
+            <Body muted>
+              Other installed launchable apps will be blocked. Phone, emergency,
+              keyboard, launcher, Settings and Attention Stats stay available.
+              Other schedules and limits still apply.
             </Body>
-          ) : (
-            <Card padded={false}>
-              {snapshot.groups.map(item => (
-                <Row
-                  key={item.id}
-                  title={item.name}
-                  detail={names(item.packages)}
-                  value={groupId === item.id ? 'Selected' : undefined}
-                  onPress={() => setGroupId(item.id)}
-                />
-              ))}
-            </Card>
           )}
+          <AppSelection
+            groups={snapshot.groups}
+            apps={apps}
+            selected={packages}
+            onChange={setPackages}
+            disabled={busy}
+          />
           <Button
             label="Review focus"
-            disabled={busy || !group}
+            disabled={busy || packages.length === 0}
             onPress={() => {
-              if (group)
+              if (packages.length)
                 setReview({
-                  packages: [...group.packages],
+                  packages: [...packages],
                   revision: snapshot.revision,
                   minutes,
+                  allowOnly,
                 });
             }}
           />

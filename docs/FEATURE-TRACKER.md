@@ -51,7 +51,7 @@ The next AS-041 increment adds an optional diagnostic event/geometry bracket: bo
 | AS-024 Safe browsing/content adapters | P2 / expansion | experimental | C-10, C-11 | AS-013/AS-019; private/sensitive exclusion evidence and separate consent; T-10/T-11 |
 | AS-025 Selective surface protection | P2 / expansion | experimental | C-19 | AS-013/AS-017; release unknown surfaces, preserve unrelated app use; P-04 |
 | AS-026 Bedtime and richer commitment routines | P2 / expansion | planned | C-18, C-22, C-20 | AS-017; optional DND ownership, bounded friction/emergency; P-03/P-07 |
-| AS-027 Widgets and Quick Settings | P2 / expansion | planned | C-29 | AS-018/AS-021; lock-screen redaction, stale/native pause state; X-01 |
+| AS-027 Widgets and Quick Settings | P0 / user-prioritized widgets; Quick Settings later | experimental | C-29 widget subset | Existing overview/single-stat widget; ADR-086 adds flexible per-instance styles/stats/resize/preview under the [widget specification](WIDGETS-SPEC.md). Native data/availability, bounded updates and actual host/launcher evidence required; Quick Settings and broader lifecycle/accessibility remain planned; X-01 |
 | AS-028 Automatic personal Google backup | P2 / desired expansion | blocked | C-26 | F-05 authoritative policy clarification; AS-020; no OAuth/upload before gate; B-06 |
 | AS-029 Scheduled picker-destination evaluation | P2 / expansion | experimental | C-27 future scheduling | AS-020; provider URI/durability/policy/background evidence; not a substitute for AS-028 |
 | AS-030 Local forecasts/recommendations | P3 / evolution | experimental | C-14 | AS-014/AS-021; opt-in, local calibration, sufficient data, no autonomous rules; T-14 |
@@ -86,6 +86,12 @@ The next AS-041 increment adds an optional diagnostic event/geometry bracket: bo
 | Task | Priority / stage | Status | Capability coverage | Prerequisites / concrete completion evidence |
 |---|---|---|---|---|
 | AS-052 Beta-preserving development branch and current handoff | P0 / user-prioritized continuation | implemented | Repository workflow only; no new runtime capability | ADR-067; clean fetched `main` baseline `1fc5382`, `develop` created, current entrypoint/release/roadmap handoff corrected; types, lint/boundaries, 66 Jest tests and docs check pass. [Dated evidence](IMPLEMENTATION_LOG/2026-11-03.md); no new binary or phone acceptance |
+
+## Comprehensive statistics expansion (ADR-085)
+
+| Task | Priority / stage | Status | Capability coverage | Prerequisites / concrete completion evidence |
+|---|---|---|---|---|
+| AS-062 Device-wide usage statistics and cross-app media feasibility | P1 / expansion | planned | Discovery across existing C-01–C-15/C-30/C-33–C-38; no new runtime admission | ADR-085/Q-023; [portfolio](FEATURE-VISION.md#device-wide-statistics-ambition-adr-085). Maintain per-usage/app/OS/source feasibility and usefulness matrix, distinguish app presence/context/reported playback/confirmed progress, research audio/video/local/browser/PiP/background behavior, consent/permission/privacy/resource limits and map proposals into existing owners. Each delivered subset needs domain contracts, metric definitions, physical evidence and bounded accessible UI. No listener grant, universal playback promise or new collection from this planning entry |
 
 ## Completion protocol
 
@@ -132,3 +138,9 @@ November 12 all-time delivery: AS-014/AS-018/AS-037 adds retained video/surface-
 November 13 voluntary-focus delivery: ADR-082/AS-015/AS-017/AS-018 adds an explicit group/duration/review/Start flow, native remaining time and early End, reusing whole-app covers, package-scoped allowance and recovery exclusions. Same-boot elapsed/boot metadata is encrypted; ordinary schedule edits preserve frozen targets and archive replacement clears focus. Tasks remain experimental; budgets/full conflict/override, actual reboot/renderer expiry and broad accessibility/device qualification remain open. See State and the [dated log](IMPLEMENTATION_LOG/2026-11-13.md) for exact artifact/device outcomes.
 
 November 13 navigation continuation: ADR-083/AS-018/AS-045 retains four primary tabs and adds a grouped Protect hub with dedicated breaks/blocks/counter screens, visible active-focus ending and a Today Quick actions bottom sheet. Existing native settings and review flows remain authoritative; no drawer, dependency, schema or permission expansion. Final preview assembly/lint, 110 Jest tests and bounded physical API-36 navigation/active-End/draft-cancel checks pass; [artifact-scoped evidence](evidence/navigation-hubs.json) retains earlier-candidate traversal and the repaired nested Back failure. The stepper departure trial remains unrun with reminders off; broader accessibility/performance qualification stays open and tasks remain experimental.
+
+
+November 13 maintainer screen refinement underway (ADR-084; AS-014/AS-015/AS-017/AS-018/AS-037/AS-045/AS-053/AS-061): Today’s exact two stat rows (This Session / On Screen / Breaks, Reels Apps / Screen Time / App Launches) and top-right Quick Actions icon, collapsible explanations, calendar range selection with bounded detail pages, expanding app lists, time-slot/group focus organization and explicit Allow Only, centered fallback breather, inline Slot action and reordered Settings/credits. Existing tasks remain experimental. No new dependency/permission/schema or history reset. Types/lint and 113 Jest checks pass before Android/physical verification; final evidence and limitations follow after actual trials.
+
+
+User-requested November 13 checkpoint: final screen refinements and flexible widgets remain experimental/WIP. AS-027 runtime is not accepted: medium Reels By Apps attached-host assertion 96 crashes; configuration/remaining cases and final screen/launcher checks are pending. AS-062 remains planned. See State and [bounded checkpoint evidence](evidence/screen-refinement.json).

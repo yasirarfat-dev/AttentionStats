@@ -3,6 +3,7 @@ import {
   duration,
   exactCount,
   fullDuration,
+  hourLabel,
   sumCounts,
   countedEncounters,
 } from '../format';
@@ -45,4 +46,14 @@ test('excludes only recognized ads and preserves exact large totals', () => {
     '9223372036854775806',
   );
   expect(countedEncounters('0', '1', false)).toBe('0');
+});
+
+test('hour labels use explicit uppercase AM/PM at midnight and noon', () => {
+  expect([0, 6, 12, 18, 23].map(hourLabel)).toEqual([
+    '12AM',
+    '6AM',
+    '12PM',
+    '6PM',
+    '11PM',
+  ]);
 });

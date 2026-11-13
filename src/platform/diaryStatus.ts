@@ -118,7 +118,13 @@ const shiftDay = (value: string, offset: number) =>
     .slice(0, 10);
 const historyPageSchema = z
   .strictObject({
-    contractVersion: z.literal(1),
+    contractVersion: z.union([z.literal(1), z.literal(2)]),
+    rangeStart: civilDay.optional(),
+    rangeEnd: civilDay.optional(),
+    earliestDay: civilDay.optional(),
+    installDay: civilDay.optional(),
+    windowDays: z.union([z.literal(0), z.literal(7), z.literal(30)]).optional(),
+    pageSize: z.union([z.literal(7), z.literal(30)]).optional(),
     firstDay: civilDay.nullable(),
     lastRecordedDay: civilDay.nullable(),
     throughDay: civilDay,
@@ -140,37 +146,80 @@ const historyPageSchema = z
     snapshot: schema,
   })
   .refine(value => {
-    const first = value.firstDay ?? value.throughDay;
+    const ranged = value.contractVersion === 2;
+    if (
+      ranged &&
+      (!value.rangeStart ||
+        !value.rangeEnd ||
+        !value.earliestDay ||
+        !value.installDay ||
+        value.windowDays === undefined ||
+        !value.pageSize)
+    )
+      return false;
+    if (
+      !ranged &&
+      [
+        value.rangeStart,
+        value.rangeEnd,
+        value.earliestDay,
+        value.installDay,
+        value.pageSize,
+        value.windowDays,
+      ].some(item => item !== undefined)
+    )
+      return false;
+    const first = ranged
+      ? value.rangeStart!
+      : (value.firstDay ?? value.throughDay);
+    const last =
+      ranged && value.rangeEnd! < value.throughDay
+        ? value.rangeEnd!
+        : value.throughDay;
+    const selectedEnd = ranged ? value.rangeEnd! : value.throughDay;
+    const size = ranged ? value.pageSize! : 30;
     const days = value.snapshot.days;
     return (
       new Set(value.sources.map(source => source.key)).size === 5 &&
       value.zone === value.snapshot.zone &&
-      days.length <= 30 &&
+      days.length <= size &&
+      first <= last &&
+      last <= value.throughDay &&
+      first <= value.throughDay &&
+      (!ranged ||
+        (value.earliestDay === value.installDay &&
+          (value.windowDays === 0
+            ? selectedEnd <= value.throughDay
+            : selectedEnd === shiftDay(first, value.windowDays! - 1)))) &&
+      (!ranged ||
+        (value.earliestDay! <= first &&
+          value.installDay! >= value.earliestDay!)) &&
       first <= value.pageStart &&
       value.pageStart <= value.pageEnd &&
-      value.pageEnd <= value.throughDay &&
+      value.pageEnd <= last &&
       value.dayCount ===
         (value.firstDay === null
           ? 0
           : Math.round(
-              (Date.parse(value.throughDay) - Date.parse(first)) / 86_400_000,
+              (Date.parse(value.throughDay) - Date.parse(value.firstDay!)) /
+                86_400_000,
             ) + 1) &&
       (value.firstDay === null
         ? value.lastRecordedDay === null
         : value.lastRecordedDay !== null &&
-          first <= value.lastRecordedDay &&
+          value.firstDay! <= value.lastRecordedDay &&
           value.lastRecordedDay <= value.throughDay) &&
       value.pageStart ===
-        (shiftDay(value.pageEnd, -29) < first
+        (shiftDay(value.pageEnd, 1 - size) < first
           ? first
-          : shiftDay(value.pageEnd, -29)) &&
+          : shiftDay(value.pageEnd, 1 - size)) &&
       value.olderEnd ===
         (value.pageStart > first ? shiftDay(value.pageStart, -1) : null) &&
       value.newerEnd ===
-        (value.pageEnd < value.throughDay
-          ? shiftDay(value.pageEnd, 30) > value.throughDay
-            ? value.throughDay
-            : shiftDay(value.pageEnd, 30)
+        (value.pageEnd < last
+          ? shiftDay(value.pageEnd, size) > last
+            ? last
+            : shiftDay(value.pageEnd, size)
           : null) &&
       days[0]?.day === value.pageStart &&
       days[days.length - 1]?.day === value.pageEnd &&

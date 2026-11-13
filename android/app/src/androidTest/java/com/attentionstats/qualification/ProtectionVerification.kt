@@ -34,6 +34,13 @@ internal object ProtectionVerification {
         val unknown = ScheduleOwner.encode(plan).apply { getJSONArray("windows").getJSONObject(0).put("scope", "unsupported") }
         expect(runCatching { ScheduleOwner.decode(unknown.toString()) }.isFailure)
 
+        val allowPlan = decoded.copy(windows = decoded.windows.map { it.copy(allowOnly = true) })
+        expect(ScheduleOwner.decode(ScheduleOwner.encode(allowPlan).toString()) == allowPlan)
+        expect(!decoded.windows.single().allowOnly)
+        val badAllow = ScheduleOwner.encode(allowPlan).apply { getJSONArray("windows").getJSONObject(0).put("allowOnly", "true") }
+        expect(runCatching { ScheduleOwner.decode(badAllow.toString()) }.isFailure)
+        val wrongScope = plan.copy(windows = plan.windows.map { it.copy(allowOnly = true) })
+        expect(runCatching { wrongScope.validate(emptySet()) }.isFailure)
         val activity = instrumentation.startActivitySync(Intent(instrumentation.targetContext, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         fun texts(view: View): List<TextView> = if (view is TextView) listOf(view) else if (view is ViewGroup)
             (0 until view.childCount).flatMap { texts(view.getChildAt(it)) } else emptyList()

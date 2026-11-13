@@ -16,6 +16,7 @@ const window = z.strictObject({
   enabled: z.boolean(),
   scope: z.enum(['app', 'short_videos']),
   allDay: z.boolean(),
+  allowOnly: z.boolean().optional(),
 });
 const schema = z
   .strictObject({
@@ -24,6 +25,7 @@ const schema = z
     focus: z
       .strictObject({
         id,
+        allowOnly: z.boolean().optional(),
         packages: z.array(z.string().min(1).max(256)).min(1).max(100),
         remainingMs: z.string().regex(/^(0|[1-9][0-9]*)$/),
         deadlineMs: z.string().regex(/^(0|[1-9][0-9]*)$/),
@@ -45,6 +47,7 @@ const schema = z
         context.addIssue({ code: 'custom', message: 'Duplicate group member' });
     for (const item of value.windows)
       if (
+        (item.allowOnly === true && item.scope !== 'app') ||
         !groupIds.has(item.groupId) ||
         (item.allDay
           ? item.startMinute !== 0 || item.endMinute !== 0

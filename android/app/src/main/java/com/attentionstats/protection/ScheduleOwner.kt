@@ -40,7 +40,13 @@ internal class ScheduleOwner(private val context: Context) {
         }
     }
 
+    @Volatile private var launchable: Set<String> = emptySet()
+    fun refreshLaunchable() {
+        launchable = context.packageManager.queryIntentActivities(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0)
+            .map { it.activityInfo.packageName }.filter { it !in excluded }.toSet()
+    }
     suspend fun load(history: HistoryStore) {
+        refreshLaunchable()
         val stored = history.database.data().protection() ?: ProtectionConfiguration()
         val next = decode(stored.document)
         next.validate(excluded)
@@ -66,9 +72,9 @@ internal class ScheduleOwner(private val context: Context) {
     fun decision(packageName: String, elapsed: Long, scope: BlockScope = BlockScope.APP): List<BlockWindow> {
         if ((allowances[packageName] ?: 0) > elapsed) return emptyList()
         val timed = if (scope == BlockScope.APP && packageName !in excluded &&
-            packageName in (activeFocus()?.packages ?: emptySet()))
+            packageName in focusTargets())
             listOf(BlockWindow("focus", "focus", 127, 0, 0, true, allDay = true)) else emptyList()
-        return timed + plan.matching(packageName, ZonedDateTime.now(), excluded, scope)
+        return timed + plan.matching(packageName, ZonedDateTime.now(), excluded, scope, launchable)
     }
     fun allow(packageName: String, elapsed: Long) { allowances[packageName] = elapsed + 5 * 60_000 }
     fun reset() { plan = SchedulePlan(); revision = 0; allowances.clear() }
@@ -76,9 +82,10 @@ internal class ScheduleOwner(private val context: Context) {
     private fun boot() = bootEpoch
     private fun remaining(focus: FocusSession) = focus.remaining(System.currentTimeMillis(), SystemClock.elapsedRealtime(), boot())
     fun activeFocus() = plan.focus?.takeIf { remaining(it) > 0 }
-    fun targets() = plan.targets() + (activeFocus()?.packages ?: emptySet())
+    private fun focusTargets(): Set<String> = activeFocus()?.let { if (it.allowOnly) launchable - it.packages else it.packages } ?: emptySet()
+    fun targets() = plan.targets(launchable) + focusTargets()
 
-    suspend fun focus(history: HistoryStore, packages: Set<String>?, minutes: Int, expected: Long, stopId: String?): Boolean {
+    suspend fun focus(history: HistoryStore, packages: Set<String>?, minutes: Int, expected: Long, stopId: String?, allowOnly: Boolean = false): Boolean {
         val current = history.database.data().protection() ?: ProtectionConfiguration()
         if (current.revision != expected) return false
         val nextFocus = if (packages == null) {
@@ -88,7 +95,7 @@ internal class ScheduleOwner(private val context: Context) {
             require(activeFocus() == null && minutes in 1..180 && boot() >= 0)
             val wall = System.currentTimeMillis(); val elapsed = SystemClock.elapsedRealtime()
             FocusSession(java.util.UUID.randomUUID().toString(), packages, wall,
-                Math.addExact(wall, minutes * 60_000L), elapsed, Math.addExact(elapsed, minutes * 60_000L), boot())
+                Math.addExact(wall, minutes * 60_000L), elapsed, Math.addExact(elapsed, minutes * 60_000L), boot(), allowOnly)
         }
         val next = plan.copy(focus = nextFocus)
         next.validate(excluded)
@@ -105,7 +112,7 @@ internal class ScheduleOwner(private val context: Context) {
         .put("accessibility", accessibility).apply {
             val focus = activeFocus()
             put("focus", if (focus == null) JSONObject.NULL else JSONObject()
-                .put("id", focus.id).put("packages", JSONArray(focus.packages.sorted()))
+                .put("id", focus.id).put("packages", JSONArray(focus.packages.sorted())).put("allowOnly", focus.allowOnly)
                 .put("remainingMs", remaining(focus).toString()).put("deadlineMs", focus.deadlineMs.toString()))
         }.toString()
 
@@ -116,7 +123,10 @@ internal class ScheduleOwner(private val context: Context) {
             val keys = json.keys().asSequence().toSet()
             require(keys == setOf("groups", "windows") || keys == setOf("groups", "windows", "focus"))
             val focus = if (!json.has("focus") || json.isNull("focus")) null else json.getJSONObject("focus").let { row ->
-                require(row.keys().asSequence().toSet() == setOf("id", "packages", "startedMs", "deadlineMs", "elapsedStart", "elapsedDeadline", "boot"))
+                val keys = row.keys().asSequence().toSet()
+                val legacy = setOf("id", "packages", "startedMs", "deadlineMs", "elapsedStart", "elapsedDeadline", "boot")
+                require(keys == legacy || keys == legacy + "allowOnly")
+                if ("allowOnly" in keys) require(row.get("allowOnly") is Boolean)
                 val members = row.getJSONArray("packages")
                 require(members.length() in 1..100)
                 val targets = (0 until members.length()).map { members.getString(it) }
@@ -124,7 +134,7 @@ internal class ScheduleOwner(private val context: Context) {
                 fun long(key: String): Long = row.getString(key).let { require(it.matches(Regex("0|[1-9][0-9]*"))); it.toLong() }
                 require(row.get("boot") is Int)
                 FocusSession(row.getString("id"), targets.toSet(), long("startedMs"), long("deadlineMs"),
-                    long("elapsedStart"), long("elapsedDeadline"), row.getInt("boot"))
+                    long("elapsedStart"), long("elapsedDeadline"), row.getInt("boot"), row.optBoolean("allowOnly", false))
             }
             val groups = json.getJSONArray("groups")
             val windows = json.getJSONArray("windows")
@@ -146,7 +156,8 @@ internal class ScheduleOwner(private val context: Context) {
                 val row = windows.getJSONObject(i)
                 val keys = row.keys().asSequence().toSet()
                 val legacy = setOf("id", "groupId", "days", "startMinute", "endMinute", "enabled")
-                require(keys == legacy || keys == legacy + setOf("scope", "allDay"))
+                require(keys == legacy || keys == legacy + setOf("scope", "allDay") || keys == legacy + setOf("scope", "allDay", "allowOnly"))
+                if ("allowOnly" in keys) require(row.get("allowOnly") is Boolean)
                 require(row.get("enabled") is Boolean)
                 val scope = if ("scope" in keys) BlockScope.entries.first { it.key == row.getString("scope") } else BlockScope.APP
                 val allDay = if ("allDay" in keys) { require(row.get("allDay") is Boolean); row.getBoolean("allDay") } else false
@@ -156,7 +167,7 @@ internal class ScheduleOwner(private val context: Context) {
                     require((0 until members.length()).all { members.getString(it) in org.attentionstats.reels.ReelApp.allPackages })
                 }
                 BlockWindow(row.getString("id"), row.getString("groupId"), integer(row, "days"),
-                    integer(row, "startMinute"), integer(row, "endMinute"), row.getBoolean("enabled"), scope, allDay)
+                    integer(row, "startMinute"), integer(row, "endMinute"), row.getBoolean("enabled"), scope, allDay, row.optBoolean("allowOnly", false))
             }, focus)
         }
         fun encode(plan: SchedulePlan): JSONObject = JSONObject().put("groups", JSONArray().apply {
@@ -164,10 +175,10 @@ internal class ScheduleOwner(private val context: Context) {
         }).put("windows", JSONArray().apply {
             plan.windows.forEach { put(JSONObject().put("id", it.id).put("groupId", it.groupId).put("days", it.days)
                 .put("startMinute", it.startMinute).put("endMinute", it.endMinute).put("enabled", it.enabled)
-                .put("scope", it.scope.key).put("allDay", it.allDay)) }
+                .put("scope", it.scope.key).put("allDay", it.allDay).put("allowOnly", it.allowOnly)) }
         }).apply { plan.focus?.let { focus -> put("focus", JSONObject().put("id", focus.id)
             .put("packages", JSONArray(focus.packages.sorted())).put("startedMs", focus.startedMs.toString())
             .put("deadlineMs", focus.deadlineMs.toString()).put("elapsedStart", focus.elapsedStart.toString())
-            .put("elapsedDeadline", focus.elapsedDeadline.toString()).put("boot", focus.boot)) } }
+            .put("elapsedDeadline", focus.elapsedDeadline.toString()).put("boot", focus.boot).put("allowOnly", focus.allowOnly)) } }
     }
 }

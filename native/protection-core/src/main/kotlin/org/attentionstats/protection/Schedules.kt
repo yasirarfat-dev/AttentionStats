@@ -9,7 +9,7 @@ enum class BlockScope(val key: String) { APP("app"), SHORT_VIDEOS("short_videos"
 /** Days belong to the start of a window; Monday is bit 0, Sunday bit 6. */
 data class BlockWindow(val id: String, val groupId: String, val days: Int,
     val startMinute: Int, val endMinute: Int, val enabled: Boolean = false,
-    val scope: BlockScope = BlockScope.APP, val allDay: Boolean = false) {
+    val scope: BlockScope = BlockScope.APP, val allDay: Boolean = false, val allowOnly: Boolean = false) {
     fun active(at: ZonedDateTime): Boolean {
         if (!enabled) return false
         val minute = at.hour * 60 + at.minute
@@ -35,19 +35,20 @@ data class SchedulePlan(val groups: List<AppGroup> = emptyList(), val windows: L
             require(group.packages.all { it.length <= 256 && pkg.matches(it) && it !in excluded })
         }
         windows.forEach { window ->
+            require(!window.allowOnly || window.scope == BlockScope.APP)
             require(id.matches(window.id) && groups.any { it.id == window.groupId })
             require(window.days in 1..127 && window.startMinute in 0..1439 && window.endMinute in 0..1439)
             require(if (window.allDay) window.startMinute == 0 && window.endMinute == 0 else window.startMinute != window.endMinute)
         }
     }
 
-    fun matching(packageName: String, at: ZonedDateTime, excluded: Set<String>, scope: BlockScope = BlockScope.APP): List<BlockWindow> {
+    fun matching(packageName: String, at: ZonedDateTime, excluded: Set<String>, scope: BlockScope = BlockScope.APP, launchable: Set<String> = emptySet()): List<BlockWindow> {
         if (packageName in excluded) return emptyList()
         val memberships = groups.filter { packageName in it.packages }.map { it.id }.toSet()
-        return windows.filter { it.groupId in memberships && it.scope == scope && it.active(at) }.sortedBy { it.id }
+        return windows.filter { (if (it.allowOnly) packageName in launchable && it.groupId !in memberships else it.groupId in memberships) && it.scope == scope && it.active(at) }.sortedBy { it.id }
     }
-    fun targets(): Set<String> {
+    fun targets(launchable: Set<String> = emptySet()): Set<String> {
         val activeGroups = windows.filter { it.enabled }.map { it.groupId }.toSet()
-        return groups.filter { it.id in activeGroups }.flatMap { it.packages }.toSet()
+        return groups.filter { it.id in activeGroups }.flatMap { it.packages }.toSet() + if (windows.any { it.enabled && it.allowOnly }) launchable else emptySet()
     }
 }

@@ -122,3 +122,12 @@ ADR-082 adds an experimental C-17/C-21 timed-focus subset under AS-015/AS-017: f
 
 
 ADR-083/AS-018/AS-045 refines the experimental C-30 navigation subset: four primary tabs, grouped Protect hub, dedicated breaks/blocks/counter routes, active focus ending and Today Quick actions sheet. Existing C-17/C-19/C-20/C-32 owners and consent semantics stay unchanged. Bounded navigation evidence does not qualify full accessibility/performance or expand collection/enforcement admission. See [State](STATE.md#navigation-growth-continuation-2026-11-13).
+
+
+November 13 maintainer screen refinement underway (ADR-084; AS-014/AS-015/AS-017/AS-018/AS-037/AS-045/AS-053/AS-061): Today’s exact two stat rows (This Session / On Screen / Breaks, Reels Apps / Screen Time / App Launches) and top-right Quick Actions icon, collapsible explanations, calendar range selection with bounded detail pages, expanding app lists, time-slot/group focus organization and explicit Allow Only, centered fallback breather, inline Slot action and reordered Settings/credits. Existing tasks remain experimental. No new dependency/permission/schema or history reset. Types/lint and 113 Jest checks pass before Android/physical verification; final evidence and limitations follow after actual trials.
+
+
+November 13 broader direction: maintainer requests ambitious device-wide statistics for media playback and all other useful observable usage types across apps, plus voluntary digital-wellbeing conveniences. ADR-085/Q-023, expanded Feature vision and planned AS-062 record scope, existing owners and a per-app/source/evidence admission process. Planning only: no new collection/listener grant, universal playback claim or capability status promotion. Reels Apps remains the current Today tile scope.
+
+
+AS-027/ADR-086 widget continuation is underway at the maintainer's request: multiple adaptive styles, ordered stat choices, per-instance appearance and native preview, preserving bounded updates and source/consent ownership. See [Widget specification](WIDGETS-SPEC.md). Experimental; actual artifact/host/launcher results follow separately.

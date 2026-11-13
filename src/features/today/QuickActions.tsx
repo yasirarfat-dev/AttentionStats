@@ -9,17 +9,19 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { StyleSheet } from 'react-native-unistyles';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { Icon } from '../../ui/Icon';
 import { Button, Row } from '../../ui/Kit';
 
 export type QuickDestination = 'Focus' | 'Breaks' | 'Blocks';
 
-/** Shortcuts open existing review/edit flows; opening the sheet changes no settings. */
+/** Centered shortcuts open existing review/edit flows; opening the card changes no settings. */
 export function QuickActions({
   onNavigate,
 }: {
   onNavigate: (destination: QuickDestination) => void;
 }) {
+  const { theme } = useUnistyles();
   const [visible, setVisible] = useState(false);
   const trigger = useRef<ComponentRef<typeof View>>(null);
   const heading = useRef<ComponentRef<typeof Text>>(null);
@@ -38,20 +40,17 @@ export function QuickActions({
   };
   return (
     <>
-      <View
+      <Pressable
         ref={trigger}
-        accessible
         accessibilityRole="button"
-        accessibilityLabel="Quick actions"
-        onAccessibilityTap={() => setVisible(true)}
+        accessibilityLabel="Quick Actions"
+        accessibilityHint="Open Focus, Breaks and Video Limits"
+        accessibilityState={{ expanded: visible }}
+        style={styles.trigger}
+        onPress={() => setVisible(true)}
       >
-        <Button
-          label="Quick actions"
-          icon="spark"
-          variant="tonal"
-          onPress={() => setVisible(true)}
-        />
-      </View>
+        <Icon name="bolt" size={24} color={theme.accent} />
+      </Pressable>
       <Modal
         visible={visible}
         transparent
@@ -62,7 +61,17 @@ export function QuickActions({
           if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
         }}
       >
-        <View style={styles.overlay}>
+        <View
+          style={[
+            styles.overlay,
+            {
+              paddingTop: insets.top + 16,
+              paddingBottom: insets.bottom + 16,
+              paddingLeft: insets.left + 16,
+              paddingRight: insets.right + 16,
+            },
+          ]}
+        >
           <Pressable
             style={styles.backdrop}
             accessibilityRole="button"
@@ -74,9 +83,9 @@ export function QuickActions({
             style={[
               styles.sheet,
               {
-                paddingBottom: Math.max(18, insets.bottom),
-                paddingLeft: 18 + insets.left,
-                paddingRight: 18 + insets.right,
+                paddingBottom: 18,
+                paddingLeft: 18,
+                paddingRight: 18,
               },
             ]}
           >
@@ -86,7 +95,7 @@ export function QuickActions({
                 accessibilityRole="header"
                 style={styles.title}
               >
-                Quick actions
+                Quick Actions
               </Text>
               <Row
                 icon="clock"
@@ -120,13 +129,23 @@ export function QuickActions({
 }
 
 const styles = StyleSheet.create(theme => ({
-  overlay: { flex: 1, justifyContent: 'flex-end' },
+  trigger: {
+    minWidth: 48,
+    minHeight: 48,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.accentSoft,
+  },
+  overlay: { flex: 1, justifyContent: 'center' },
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: '#00000080' },
   sheet: {
     maxHeight: '85%',
     backgroundColor: theme.surface,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    borderRadius: 28,
+    width: '100%',
+    maxWidth: 480,
+    alignSelf: 'center',
     paddingTop: 24,
   },
   content: { gap: 12 },

@@ -55,11 +55,12 @@ internal class NativePage(private val activity: Activity) {
             group = this
         }
     }
+    private fun titleCase(value: String) = value.split(" ").joinToString(" ") { word -> word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } }
     fun text(value: String, size: Float = 15f): TextView {
         if (size >= 24) {
             group = null
             return TextView(activity).apply {
-                text = value; textSize = 32f; typeface = Typeface.create("sans-serif", Typeface.BOLD)
+                text = titleCase(value); textSize = 32f; typeface = Typeface.create("sans-serif", Typeface.BOLD)
                 if (Build.VERSION.SDK_INT >= 28) isAccessibilityHeading = true
                 add(this, content, 22); bind { setTextColor(it.text) }
             }
@@ -67,7 +68,7 @@ internal class NativePage(private val activity: Activity) {
         if (size >= 20) {
             group = null
             val heading = TextView(activity).apply {
-                text = value.uppercase(); textSize = 13f; letterSpacing = .06f
+                text = titleCase(value); textSize = 13f; letterSpacing = .06f
                 typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL); setPadding(dp(4), dp(10), 0, dp(2))
                 if (Build.VERSION.SDK_INT >= 28) isAccessibilityHeading = true
             }
@@ -81,7 +82,7 @@ internal class NativePage(private val activity: Activity) {
     }
     fun button(label: String, filled: Boolean = false, action: () -> Unit) {
         val button = TextView(activity).apply {
-            text = label; textSize = 16f; gravity = Gravity.CENTER; minHeight = dp(52)
+            text = titleCase(label); textSize = 16f; gravity = Gravity.CENTER; minHeight = dp(52)
             setPadding(dp(18), dp(12), dp(18), dp(12)); typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
             isClickable = true; isFocusable = true; setOnClickListener { action() }
             accessibilityDelegate = object : View.AccessibilityDelegate() {
@@ -94,7 +95,7 @@ internal class NativePage(private val activity: Activity) {
         bind { button.background = shape(if (filled) it.accentFill else it.accentSoft, it.border, 26); button.setTextColor(if (filled) it.onAccent else it.accent) }
     }
     fun toggle(view: Switch) {
-        view.textSize = 16f; view.minHeight = dp(56); view.setPadding(0, dp(8), 0, dp(8))
+        view.text = titleCase(view.text.toString()); view.textSize = 16f; view.minHeight = dp(56); view.setPadding(0, dp(8), 0, dp(8))
         add(view, ensureGroup())
         bind {
             view.setTextColor(it.text)
@@ -114,6 +115,10 @@ internal class NativePage(private val activity: Activity) {
         val body = TextView(activity).apply { text = detail; textSize = 13f; setPadding(0, dp(6), 0, 0); setLineSpacing(dp(2).toFloat(), 1f) }
         card.addView(heading); card.addView(body); add(card, content, 10)
         bind { card.background = shape(if (selected) it.accentSoft else it.surface, if (selected) it.accent else it.border); heading.setTextColor(it.text); body.setTextColor(it.muted) }
+    }
+    fun custom(view: View, heightDp: Int) {
+        group = null
+        content.addView(view, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(heightDp)).apply { bottomMargin = dp(14) })
     }
     fun refresh() {
         val palette = AppearanceOwner.palette(activity)

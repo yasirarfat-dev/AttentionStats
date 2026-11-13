@@ -13,8 +13,8 @@ import {
   Button,
   Card,
   Divider,
+  Explanation,
   SectionTitle,
-  Row,
   Segmented,
   Stepper,
   ToggleRow,
@@ -183,15 +183,14 @@ export function ProtectionToolScreen({
           <SectionTitle>Short-video blocks</SectionTitle>
           <Card>
             <Body muted>
-              Choose per app. A block leaves the short-video player and shows a
-              pause screen. Everything else in the app keeps working, and you
-              can allow 5 minutes when you really need it.
+              Saved Time Slots Apply Separately From These Video Limits.
             </Body>
-            <Body muted>
-              Daily limits count videos. Time slots can block the whole app or
-              short videos during periods such as 5–11 AM and 6–11 PM. Saved
-              slots apply separately, even when the control below is Off.
-            </Body>
+            <Explanation title="About Video Blocks">
+              Daily limits count videos. Blocking leaves the player; other app
+              screens stay available. You can allow a five-minute visit. Time
+              Slots can target whole apps or short videos independently of Off /
+              Daily Limit / Always.
+            </Explanation>
             {reelsSourceKeys
               .filter(key => installed.has(key) || modeOf(key) !== 'off')
               .map((key, index) => {
@@ -211,20 +210,30 @@ export function ProtectionToolScreen({
                       </Text>
                     </View>
                     <Segmented
+                      singleLine
                       label={`${reelsSources[key].observation} block`}
                       value={mode}
-                      onChange={next => setBlock(key, next)}
+                      onChange={next =>
+                        next === 'slot'
+                          ? onSchedules(reelsSources[key].packageName)
+                          : setBlock(key, next)
+                      }
                       options={[
                         { value: 'off', label: 'Off' },
-                        { value: 'limit', label: 'Daily limit' },
+                        {
+                          value: 'limit',
+                          label: 'Limit',
+                          icon: 'sun',
+                          accessibilityLabel: 'Daily Limit',
+                        },
                         { value: 'always', label: 'Always' },
+                        {
+                          value: 'slot',
+                          label: 'Slot',
+                          icon: 'clock',
+                          accessibilityLabel: 'Time Slots',
+                        },
                       ]}
-                    />
-                    <Row
-                      icon="clock"
-                      title="+ Time slots"
-                      detail="Multiple periods · whole app or short videos"
-                      onPress={() => onSchedules(reelsSources[key].packageName)}
                     />
                     {mode === 'limit' && (
                       <Stepper

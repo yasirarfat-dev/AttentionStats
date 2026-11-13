@@ -26,7 +26,7 @@ internal object HistoryPageVerification {
         try {
             val history = HistoryStore.open(context, alias).also { store = it }
             val dao = history.database.data()
-            val diary = DiaryEngine(context)
+            val diary = DiaryEngine(context) { LocalDate.now().minusDays(70).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }
             suspend fun page(end: String = "") = JSONObject(diary.historyPage(history, end, diary.fence.get()) { false })
             fun source(page: JSONObject) = page.getJSONArray("sources").let { rows ->
                 (0 until rows.length()).map { rows.getJSONObject(it) }.first { it.getString("key") == "instagram" }
@@ -86,6 +86,32 @@ internal object HistoryPageVerification {
                 .getJSONArray("days").getJSONObject(5).getJSONArray("apps")
             expect((0 until pairedTail.length()).map { pairedTail.getJSONObject(it) }
                 .first { it.getString("packageName") == "com.example.tail" }.getString("appMs") == "120000")
+            suspend fun range(start: String, end: String, pageEnd: String = "", size: Int = 30) = JSONObject(diary.historyRange(history, pageEnd, diary.fence.get(), { false }, start, end, size, true))
+            val week = range(today.minusDays(6).toString(), today.toString(), size = 7)
+            expect(week.getInt("contractVersion") == 2 && week.getInt("pageSize") == 7)
+            expect(week.getJSONObject("snapshot").getJSONArray("days").length() == 7)
+            expect(source(week).getString("videos") == "2")
+            expect(week.isNull("olderEnd") && week.isNull("newerEnd"))
+            val selected = range(today.minusDays(65).toString(), today.minusDays(40).toString(), size = 7)
+            expect(selected.getJSONObject("snapshot").getJSONArray("days").length() == 7)
+            expect(source(selected).getString("videos") == "1")
+            expect(selected.getString("rangeStart") == today.minusDays(65).toString() && selected.getString("rangeEnd") == today.minusDays(40).toString())
+            expect(selected.getString("olderEnd") == today.minusDays(47).toString())
+            val selectedOlder = range(today.minusDays(65).toString(), today.minusDays(40).toString(), selected.getString("olderEnd"), 7)
+            expect(selectedOlder.getString("newerEnd") == today.minusDays(40).toString())
+            expect(source(selectedOlder).getString("videos") == "1")
+            expect(runCatching { range(today.toString(), today.plusDays(1).toString()) }.isFailure)
+            expect(runCatching { range(today.toString(), today.minusDays(1).toString()) }.isFailure)
+            expect(runCatching { range(today.minusDays(65).toString(), today.toString(), size = 31) }.isFailure)
+            expect(runCatching { range(today.minusDays(71).toString(), today.toString()) }.isFailure)
+            val fixed = JSONObject(diary.historyRange(history, "", diary.fence.get(), { false }, today.toString(), "", 7, true, 7))
+            expect(fixed.getString("rangeEnd") == today.plusDays(6).toString())
+            expect(fixed.getString("pageEnd") == today.toString() && fixed.getJSONObject("snapshot").getJSONArray("days").length() == 1)
+            expect(runCatching { diary.historyRange(history, "", diary.fence.get(), { false }, today.toString(), today.plusDays(5).toString(), 7, true, 7) }.isFailure)
+            dao.putTimer(ReelsTimer("cross-bound", "instagram", "viewer", at(60) - 30_000, at(60) + 30_000, 60_000))
+            val oneDay = range(today.minusDays(60).toString(), today.minusDays(60).toString())
+            expect(source(oneDay).getString("reelsMs") == "90000")
+            expect(oneDay.getJSONObject("snapshot").getJSONArray("days").length() == 1)
             // Usage-event-only history must establish bounds even without media or interventions.
             dao.deleteEpisodes(); dao.deleteTimers(); dao.deleteInterventions()
             val usageOnly = page()

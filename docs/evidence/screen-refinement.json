@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-13",
+  "branch": "develop",
+  "sourceBaseline": "ffbebcb",
+  "status": "experimental",
+  "checkpoint": "User explicitly requested concluding the large session; widget work remains incomplete.",
+  "decisions": [
+    "ADR-084",
+    "ADR-085",
+    "ADR-086"
+  ],
+  "tasks": [
+    "AS-014",
+    "AS-015",
+    "AS-017",
+    "AS-018",
+    "AS-027",
+    "AS-037",
+    "AS-045",
+    "AS-053",
+    "AS-061",
+    "AS-062"
+  ],
+  "installedCheckpointSha256": "ca6dd37931bf3cf7fb5ac5bd6265d0b9000de6d735857f249b9b7329e0521ed1",
+  "binaryLimit": "Built before the final small app-picker accessibility/Settings wording and test-choice edits. Rebuild before final acceptance.",
+  "checks": {
+    "typecheck": "pass",
+    "lintArchitectureBackupPalette": "pass",
+    "jest": "114 tests / 10 suites pass",
+    "hostProtection": "80 checks pass",
+    "android": "Preview assembly/lint and test APK assembly pass; latest completed combined build 57 seconds"
+  },
+  "earlierPhoneCandidate": {
+    "sha256": "de87c43d761fffab259c0221dd66fce393a3ca9c773e07c7cbfd49bcce3a47a0",
+    "checks": [
+      "43 isolated history-range checks",
+      "18 protection codec/attached-view checks",
+      "34 isolated focus-owner checks",
+      "Today exact two stat rows and collapsible Viewing Details, Reels by Apps and AM/PM axes",
+      "Week/Month date fields and All Time calendar cancellation",
+      "App expansion preserves all previously seen app rows",
+      "Focus widget/review and schedule-view draft cancellation",
+      "Inline Slot navigation and Android Back",
+      "Settings merged groups/order, info controls and credits"
+    ],
+    "limits": "Today action placement was the earlier header/menu and bottom-sheet version; final lightning/mid-header/centered-card clarification has not been phone-accepted. Unified inline All Apps groups and the new sun/clock labels also need final phone checks."
+  },
+  "widgets": {
+    "state": "incomplete; not runtime accepted",
+    "implementation": "Six responsive layouts, 12 selectable stats, per-instance ordered choices/theme/accent, native live preview, save/cancel, legacy mapping, deduplicated source projections and in-memory values only.",
+    "stopped": [
+      "Initial native compile rejected deprecated Back delegation; migrated to existing AndroidX ComponentActivity/OnBackPressedDispatcher.",
+      "First widget test hit debug-versus-preview Kotlin internal-method mangling; test now reads its isolated preferences directly.",
+      "Latest widget test crashes on main-thread assertion widget check 96: Reels By Apps / light / 260x150 attached host does not expose the expected first value. Configuration/cancel stage and remaining matrix cases have not run."
+    ],
+    "next": "Inspect RemoteViews inflation/layout errors for the medium Reels By Apps host, make test assertion failures return safely, rerun widget matrix and real configuration, then verify launcher resizing without changing existing widgets."
+  },
+  "preservation": "Owned test APK, isolated widget-qualification preferences, private captures and crash capture removed. No real schedule save/focus start/history reset or synthetic history insertion. Own Accessibility service reconnected while preserving unrelated selections; baseline verification recorded in the session log.",
+  "remaining": [
+    "Final centered Quick Actions card/lightning header geometry and dismissal",
+    "Unified expandable All Apps list, shared-member selection and compact block bar",
+    "Widget matrix/configuration/native lifecycle and actual launcher resize/reconfigure",
+    "Final artifact build and bounded phone verification",
+    "Broad accessibility, minimum API, other launchers/devices, reboot/restore and performance remain open"
+  ],
+  "futurePlan": "ADR-085/Q-023 and planned AS-062 record comprehensive device/app/media/other usage statistics; no additional collector or permission enabled."
+}

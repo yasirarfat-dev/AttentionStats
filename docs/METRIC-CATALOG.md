@@ -1,13 +1,13 @@
 # Metric catalog and platform research
 
-**Status:** Authoritative expanded inventory; all collection/display rows planned or experimental, no device-qualified support. Updated 2026-10-27.
+**Status:** Authoritative expanded inventory; narrow Android subsets exist, with broader collection/display admission planned or experimental. Updated 2026-11-13.
 **Responsibility:** Enumerates measurable data points, source/permission/control/accuracy/phase/scenario and per-platform admission.
 **Related specifications:** [Analytics](ANALYTICS-SPEC.md), [Capabilities](CAPABILITY-MATRIX.md), [Social](SOCIAL-MEDIA-SPEC.md), [Privacy](PRIVACY.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-01/F-02/F-08/F-09/F-10; source existence does not establish that a particular target exposes it. This is a research inventory, not advertised live support.
 
 ## How to read this catalog
 
-Stable M identifiers name individual metrics, while C identifiers in [Capabilities](CAPABILITY-MATRIX.md) name product capability families. Every row below has **device verification: none**. AS-035 verifies only calculation subsets of T-17/T-18/T-19/T-20/T-23, not collectors or complete acceptance scenarios. “planned” means specified; “experimental” means admission evidence required. No current Android or iOS collector is implemented.
+Stable M identifiers name individual metrics, while C identifiers in [Capabilities](CAPABILITY-MATRIX.md) name capability families. The foundational row labels and platform study below describe broad definitions, not a complete inventory of the current build. [State](STATE.md) and artifact evidence record the actual Android app-usage/Reels/playback subsets and remaining gates; iOS is unqualified. AS-035 verifies calculation subsets of T-17/T-18/T-19/T-20/T-23, not collectors or complete scenarios. “planned” means specified; “experimental” means scope-specific admission evidence remains required. No broad or cross-app playback support is implied by a narrow Android result.
 
 Source/access codes: U = UsageEvents and native interactive/keyguard state with user-granted Usage Access; A = narrowly allowlisted accessibility structural metadata with separate disclosure, consent and user-enabled service; N = metadata-only Notification Listener grant; W = NetworkStatsManager with user-granted Usage Access plus separate network-statistics consent; L = local derived calculation, requiring the underlying sources; H = separately consented supported title/domain/URL fields through A; I = a future user-selected supported archive via system picker URI grant. No input recording or packet capture source exists. Source grants never enable another metric family.
 
@@ -141,3 +141,8 @@ No general third-party API grants complete activity across every social platform
 For every admitted metric record: target/package/profile/version/locale/OS range; definition/unit; inspected/retained fields; necessary access; consent/exclusion/detail controls; source freshness; false-positive/negative evidence where relevant; dedup identity; coverage/null behavior; phase; fixture/device evidence and remaining restrictions. Interaction precision and coverage are assessed per action, not inherited from surface detection. Out-of-range support is unavailable by default.
 
 T-17–T-23 and D-04–D-06 extend the [test inventory](TESTING.md). Documentation/calculation checks do not qualify the named social platforms or establish network accounting accuracy. No row becomes implemented merely because a synthetic number can be displayed.
+
+
+## Cross-app expansion research (ADR-085 / AS-062)
+
+Retain M-001–M-064 identities and definitions. The [device-wide portfolio](FEATURE-VISION.md#device-wide-statistics-ambition-adr-085) adds a planning process for useful usage types across apps, including media outside Reels. Research app presence, visible context, published play/pause state, observed numeric progress, playing duration, seek/loop and completion as separate evidence kinds; audio/video type can remain unknown. Do not relabel M-001 app duration or M-025 context time as playback. New metric IDs require explicit definitions/source/controls/overlap/coverage/retention and acceptance before promotion. General app sessions, sensitive activity contexts, notifications, interactions and network/resource perspectives retain their own source/consent gates. No new collector or permission is admitted by the portfolio.

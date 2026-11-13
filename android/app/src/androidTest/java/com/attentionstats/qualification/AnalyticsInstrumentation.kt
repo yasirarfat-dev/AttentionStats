@@ -49,10 +49,12 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var autoScrollRestart: String? = null
     private var autoScrollLock = false
     private var breakTiming = false
+    private var widgets = false
     private var historyPage = false
     private var numericAudit: String? = null
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
+        widgets = arguments?.getString("widgets") == "true"
         historyPage = arguments?.getString("historyPage") == "true"
         autoScrollLock = arguments?.getString("autoScrollLock") == "true"
         breakTiming = arguments?.getString("breakTiming") == "true"
@@ -99,6 +101,10 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            if (widgets) {
+                result.putString("stream", "PASS: ${WidgetVerification.run(this)} widget projection/configuration/attached-host checks; synthetic host only, real widgets unchanged")
+                finish(Activity.RESULT_OK, result); return
+            }
             if (focusLive) {
                 result.putString("stream", LiveScheduleVerification.run(this, focusOnly = true))
                 finish(Activity.RESULT_OK, result); return

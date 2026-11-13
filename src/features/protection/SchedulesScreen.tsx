@@ -8,6 +8,7 @@ import {
   Card,
   Row,
   SectionTitle,
+  Segmented,
   Title,
   ToggleRow,
 } from '../../ui/Kit';
@@ -48,6 +49,7 @@ export function SchedulesScreen({
   const { snapshot, apps, busy, error } = schedules;
   const { theme } = useUnistyles();
   const screenFocused = useIsFocused();
+  const [view, setView] = useState<'slots' | 'groups'>('slots');
   const [draft, setDraft] = useState<Draft | null>(null);
   const icons = useAppIcons(
     packageName ? [packageName] : apps.slice(0, 80).map(app => app.packageName),
@@ -98,16 +100,20 @@ export function SchedulesScreen({
     return (
       <TimeSlotEditor
         groups={packageName && draft.group ? [draft.group] : groups}
-        apps={apps}
+        apps={
+          packageName
+            ? apps.filter(app => app.packageName === packageName)
+            : apps
+        }
         initial={draft.slot}
         initialGroup={draft.group?.id}
         busy={busy}
         error={error}
         onBack={() => setDraft(null)}
-        onSave={slot =>
+        onSave={(slot, selection) =>
           void commit({
             ...draft.base,
-            groups,
+            groups: selection ? [...groups, selection] : groups,
             windows: draft.base.windows
               .filter(item => item.id !== slot.id)
               .concat(slot),
@@ -158,7 +164,9 @@ export function SchedulesScreen({
           )}
           <Body muted>
             {draft.kind === 'enable'
-              ? 'This slot will block the selected apps during these times. You can always allow 5 minutes, use system navigation or change this rule.'
+              ? slot?.allowOnly
+                ? 'During this slot, other installed launchable apps will be blocked. Selected apps and essential recovery controls stay available under this rule. Other rules still apply; you can allow 5 minutes or change the rule.'
+                : 'This slot will block the selected apps during these times. You can always allow 5 minutes, use system navigation or change this rule.'
               : draft.kind === 'delete-group'
                 ? 'This also removes all time slots for the group. Your recorded history is preserved.'
                 : 'This removes the time slot. Your recorded history is preserved.'}
@@ -216,7 +224,7 @@ export function SchedulesScreen({
       focused?.some(group => group.id === slot.groupId),
     ) ?? [];
   const app = apps.find(item => item.packageName === packageName);
-  function addSlot() {
+  function addSlot(selectedGroup?: AppGroup) {
     if (!snapshot) return;
     const group = packageName
       ? (focused?.[0] ?? {
@@ -224,7 +232,7 @@ export function SchedulesScreen({
           name: app?.name || 'App',
           packages: [packageName],
         })
-      : undefined;
+      : selectedGroup;
     setDraft({ kind: 'slot', base: snapshot, group });
   }
   return (
@@ -233,21 +241,25 @@ export function SchedulesScreen({
       subtitle="App schedules"
     >
       <Button label="Back to Protect" variant="text" onPress={onBack} />
-      <Card tone="hero">
-        <Text style={styles.heroHeading}>Less distraction. More room.</Text>
-        <Text style={styles.heroBody}>
-          Set aside time for what you want to do. Choose one app or a group,
-          then make a schedule that fits your day.
-        </Text>
-        <Button
-          label="+ Add time slot"
-          variant="tonal"
-          disabled={
-            !snapshot || busy || (!packageName && !snapshot.groups.length)
-          }
-          onPress={addSlot}
+      {!packageName && (
+        <Segmented
+          label="Organize Focus"
+          value={view}
+          onChange={setView}
+          options={[
+            { value: 'slots', label: 'By Time Slots' },
+            { value: 'groups', label: 'By App Groups' },
+          ]}
         />
-      </Card>
+      )}
+      {(view === 'slots' || packageName) && (
+        <Button
+          label="+ Add Time Slot"
+          variant="tonal"
+          disabled={!snapshot || busy}
+          onPress={() => addSlot()}
+        />
+      )}
       {snapshot && !snapshot.accessibility && (
         <Card tone="warn">
           <Body>
@@ -268,75 +280,84 @@ export function SchedulesScreen({
         </Card>
       )}
       {!snapshot && !error && <Body muted>Loading your schedules…</Body>}
-      <SectionTitle>Your time slots</SectionTitle>
-      {windows.length === 0 && snapshot && (
-        <Card>
-          <View style={styles.empty}>
-            <Title>A quieter routine starts here</Title>
-            <Body muted>
-              {packageName
-                ? 'Try 5–11 AM for mornings, then add another slot for your evenings. New slots stay off until you enable them.'
-                : 'Make an app group below, then add morning, evening or overnight slots. New slots stay off until you enable them.'}
-            </Body>
-          </View>
-        </Card>
+      {(view === 'slots' || packageName) && (
+        <>
+          <SectionTitle>Your time slots</SectionTitle>
+          {windows.length === 0 && snapshot && (
+            <Card>
+              <View style={styles.empty}>
+                <Title>A quieter routine starts here</Title>
+                <Body muted>
+                  {packageName
+                    ? 'Try 5–11 AM for mornings, then add another slot for your evenings. New slots stay off until you enable them.'
+                    : 'Choose apps or groups, then add a morning, evening or overnight slot. New slots stay off until enabled.'}
+                </Body>
+              </View>
+            </Card>
+          )}
+          {windows.map(slot => {
+            const group = snapshot?.groups.find(
+              item => item.id === slot.groupId,
+            );
+            return (
+              <Card key={slot.id}>
+                <ToggleRow
+                  icon="clock"
+                  title={group?.name ?? 'App group'}
+                  detail={`${daysLabel(slot.days)} · ${scopeLabel(slot)}`}
+                  value={slot.enabled}
+                  disabled={busy}
+                  onChange={enabled => {
+                    if (!snapshot) return;
+                    if (enabled)
+                      setDraft({ kind: 'enable', base: snapshot, slot });
+                    else
+                      void schedules.save({
+                        ...snapshot,
+                        windows: snapshot.windows.map(item =>
+                          item.id === slot.id
+                            ? { ...item, enabled: false }
+                            : item,
+                        ),
+                      });
+                  }}
+                />
+                <Text style={styles.time}>{slotLabel(slot)}</Text>
+                <View style={styles.row}>
+                  <View style={styles.grow}>
+                    <Button
+                      label="Edit slot"
+                      variant="tonal"
+                      disabled={busy}
+                      onPress={() =>
+                        snapshot &&
+                        setDraft({
+                          kind: 'slot',
+                          base: snapshot,
+                          slot,
+                          group: packageName ? group : undefined,
+                        })
+                      }
+                    />
+                  </View>
+                  <View style={styles.grow}>
+                    <Button
+                      label="Remove"
+                      variant="text"
+                      disabled={busy}
+                      onPress={() =>
+                        snapshot &&
+                        setDraft({ kind: 'delete-slot', base: snapshot, slot })
+                      }
+                    />
+                  </View>
+                </View>
+              </Card>
+            );
+          })}
+        </>
       )}
-      {windows.map(slot => {
-        const group = snapshot?.groups.find(item => item.id === slot.groupId);
-        return (
-          <Card key={slot.id}>
-            <ToggleRow
-              icon="clock"
-              title={group?.name ?? 'App group'}
-              detail={`${daysLabel(slot.days)} · ${scopeLabel(slot)}`}
-              value={slot.enabled}
-              disabled={busy}
-              onChange={enabled => {
-                if (!snapshot) return;
-                if (enabled) setDraft({ kind: 'enable', base: snapshot, slot });
-                else
-                  void schedules.save({
-                    ...snapshot,
-                    windows: snapshot.windows.map(item =>
-                      item.id === slot.id ? { ...item, enabled: false } : item,
-                    ),
-                  });
-              }}
-            />
-            <Text style={styles.time}>{slotLabel(slot)}</Text>
-            <View style={styles.row}>
-              <View style={styles.grow}>
-                <Button
-                  label="Edit slot"
-                  variant="tonal"
-                  disabled={busy}
-                  onPress={() =>
-                    snapshot &&
-                    setDraft({
-                      kind: 'slot',
-                      base: snapshot,
-                      slot,
-                      group: packageName ? group : undefined,
-                    })
-                  }
-                />
-              </View>
-              <View style={styles.grow}>
-                <Button
-                  label="Remove"
-                  variant="text"
-                  disabled={busy}
-                  onPress={() =>
-                    snapshot &&
-                    setDraft({ kind: 'delete-slot', base: snapshot, slot })
-                  }
-                />
-              </View>
-            </View>
-          </Card>
-        );
-      })}
-      {!packageName && (
+      {!packageName && view === 'groups' && (
         <>
           <SectionTitle>App groups</SectionTitle>
           {snapshot?.groups.map(group => (
@@ -356,6 +377,24 @@ export function SchedulesScreen({
                   setDraft({ kind: 'group', base: snapshot, group })
                 }
               />
+              <Button
+                label="+ Add Time Slot"
+                variant="tonal"
+                disabled={busy}
+                onPress={() => addSlot(group)}
+              />
+              {snapshot.windows
+                .filter(slot => slot.groupId === group.id)
+                .map(slot => (
+                  <Row
+                    key={slot.id}
+                    title={slotLabel(slot)}
+                    detail={`${daysLabel(slot.days)} · ${slot.enabled ? 'On' : 'Off'}`}
+                    onPress={() =>
+                      setDraft({ kind: 'slot', base: snapshot, slot })
+                    }
+                  />
+                ))}
               <Button
                 label={`Remove ${group.name}`}
                 variant="text"

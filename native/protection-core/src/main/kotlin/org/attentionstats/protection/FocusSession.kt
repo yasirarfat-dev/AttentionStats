@@ -2,7 +2,7 @@ package org.attentionstats.protection
 
 /** Frozen targets; elapsed time owns expiry within a boot, UTC is a bounded reboot fallback. */
 data class FocusSession(val id: String, val packages: Set<String>, val startedMs: Long,
-    val deadlineMs: Long, val elapsedStart: Long, val elapsedDeadline: Long, val boot: Int) {
+    val deadlineMs: Long, val elapsedStart: Long, val elapsedDeadline: Long, val boot: Int, val allowOnly: Boolean = false) {
     fun validate(excluded: Set<String>) {
         SchedulePlan(groups = listOf(AppGroup(id, "Focus", packages))).validate(excluded)
         require(startedMs > 0 && elapsedStart >= 0 && boot >= 0)

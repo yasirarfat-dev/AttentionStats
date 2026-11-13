@@ -58,9 +58,9 @@ export function ago(atMs: number, now = Date.now()): string {
   return `${Math.floor(hours / 24)} d ago`;
 }
 
-/** 0..23 -> "12a", "6a", "12p", "6p" style axis labels. */
+/** 0..23 -> "12AM", "6AM", "12PM", "6PM" style axis labels. */
 export function hourLabel(hour: number): string {
-  const suffix = hour < 12 ? 'a' : 'p';
+  const suffix = hour < 12 ? 'AM' : 'PM';
   const value = hour % 12 === 0 ? 12 : hour % 12;
   return `${value}${suffix}`;
 }

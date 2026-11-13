@@ -31,7 +31,10 @@ import java.util.concurrent.atomic.AtomicLong
 internal class DiaryInterrupted : RuntimeException()
 
 /** Invoked only on the history coordinator's serialized IO queue; no parallel writer. */
-internal class DiaryEngine(private val context: Context) {
+internal class DiaryEngine(private val context: Context, private val installationTime: () -> Long = {
+    @Suppress("DEPRECATION")
+    context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime
+}) {
     /** Apps whose short-video viewer is blocked, with their daily limit (0 = always blocked). */
     @Volatile var blockLimits: Map<ReelApp, Int> = emptyMap()
         private set
@@ -345,7 +348,12 @@ internal class DiaryEngine(private val context: Context) {
 
     /** Fixed-size SQL aggregates plus one bounded date page; never materialize lifetime events. */
     suspend fun historyPage(history: HistoryStore, endDay: String, capturedFence: Long,
-        blockingAvailable: (ReelApp) -> Boolean): String {
+        blockingAvailable: (ReelApp) -> Boolean): String = historyRange(history, endDay, capturedFence, blockingAvailable)
+
+    suspend fun historyRange(history: HistoryStore, endDay: String, capturedFence: Long,
+        blockingAvailable: (ReelApp) -> Boolean, startDay: String = "", throughDay: String = "",
+        pageSize: Int = 30, ranged: Boolean = false, windowDays: Int = 0): String {
+        require(pageSize in listOf(7, 30) && windowDays in listOf(0, 7, 30))
         collect(history, capturedFence)
         val dao = history.database.data()
         val now = System.currentTimeMillis()
@@ -354,26 +362,41 @@ internal class DiaryEngine(private val context: Context) {
         val bounds = dao.historyBounds(now)
         val first = bounds.firstMs?.let { Instant.ofEpochMilli(it).atZone(zone).toLocalDate() }
         val lastRecorded = bounds.lastMs?.let { Instant.ofEpochMilli(it).atZone(zone).toLocalDate() }
-        val end = if (endDay.isEmpty()) today else java.time.LocalDate.parse(endDay)
-        require(!end.isAfter(today) && !end.isBefore(first ?: today))
-        val pageStart = maxOf(first ?: today, end.minusDays(29))
+        val installed = minOf(today, Instant.ofEpochMilli(installationTime()).atZone(zone).toLocalDate())
+        val earliest = installed
+        val selectedStart = if (!ranged) first ?: today else if (startDay.isEmpty())
+            if (windowDays > 0) maxOf(installed, today.minusDays(windowDays - 1L)) else installed
+            else java.time.LocalDate.parse(startDay)
+        val selectedEnd = if (ranged && windowDays > 0) selectedStart.plusDays(windowDays - 1L)
+            else if (throughDay.isEmpty()) today else java.time.LocalDate.parse(throughDay)
+        require(!selectedStart.isBefore(if (ranged) earliest else first ?: today) && !selectedStart.isAfter(today) && !selectedStart.isAfter(selectedEnd))
+        if (!ranged || windowDays == 0) require(!selectedEnd.isAfter(today))
+        if (ranged && windowDays > 0 && throughDay.isNotEmpty()) require(java.time.LocalDate.parse(throughDay) == selectedEnd)
+        val observedEnd = minOf(selectedEnd, today)
+        val end = if (endDay.isEmpty()) observedEnd else java.time.LocalDate.parse(endDay)
+        require(!end.isAfter(observedEnd) && !end.isBefore(selectedStart))
+        val pageStart = maxOf(selectedStart, end.minusDays(pageSize - 1L))
         val pageDays = java.time.temporal.ChronoUnit.DAYS.between(pageStart, end).toInt() + 1
-        val from = (first ?: today).atStartOfDay(zone).toInstant().toEpochMilli()
-        val videos = dao.videoTotals(from, now).associate { it.appId to it.count }
-        val times = dao.retainedTimerTotals(from, now).associate { it.appId to it.count }
+        val from = selectedStart.atStartOfDay(zone).toInstant().toEpochMilli()
+        val until = minOf(now, selectedEnd.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli())
+        val videos = dao.videoTotals(from, until).associate { it.appId to it.count }
+        val times = dao.retainedTimerTotals(from, until).associate { it.appId to it.count }
         val sources = JSONArray(ReelApp.entries.map { app -> JSONObject()
             .put("key", app.key).put("videos", (videos[app.key] ?: 0L).toString())
             .put("reelsMs", times[app.key]?.toString() ?: JSONObject.NULL) })
         val page = JSONObject(snapshot(history, pageDays, capturedFence, blockingAvailable, end, collectFirst = false))
-        val result = JSONObject().put("contractVersion", 1)
+        val result = JSONObject().put("contractVersion", if (ranged) 2 else 1)
             .put("firstDay", first?.toString() ?: JSONObject.NULL)
             .put("lastRecordedDay", lastRecorded?.toString() ?: JSONObject.NULL)
             .put("throughDay", today.toString()).put("zone", zone.id)
             .put("dayCount", if (first == null) 0 else java.time.temporal.ChronoUnit.DAYS.between(first, today) + 1)
             .put("sources", sources).put("pageStart", pageStart.toString()).put("pageEnd", end.toString())
-            .put("olderEnd", if (pageStart.isAfter(first ?: today)) pageStart.minusDays(1).toString() else JSONObject.NULL)
-            .put("newerEnd", if (end.isBefore(today)) minOf(today, end.plusDays(30)).toString() else JSONObject.NULL)
-            .put("snapshot", page).toString()
+            .put("olderEnd", if (pageStart.isAfter(selectedStart)) pageStart.minusDays(1).toString() else JSONObject.NULL)
+            .put("newerEnd", if (end.isBefore(observedEnd)) minOf(observedEnd, end.plusDays(pageSize.toLong())).toString() else JSONObject.NULL)
+            .put("snapshot", page).apply { if (ranged) {
+                put("windowDays", windowDays); put("rangeStart", selectedStart.toString()); put("rangeEnd", selectedEnd.toString())
+                put("earliestDay", earliest.toString()); put("installDay", installed.toString()); put("pageSize", pageSize)
+            } }.toString()
         check(result.length <= 2_000_000)
         return result
     }

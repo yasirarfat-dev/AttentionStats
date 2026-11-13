@@ -88,6 +88,7 @@ export function useSchedules(loadCatalog = true) {
     packages: string[] | null,
     minutes = 25,
     expected = snapshot?.revision,
+    allowOnly = false,
   ) {
     if (!NativeDiary || pending.current || !snapshot || !expected) return false;
     pending.current = true;
@@ -95,7 +96,12 @@ export function useSchedules(loadCatalog = true) {
     setBusy(true);
     try {
       const raw = packages
-        ? await NativeDiary.startFocus(packages, minutes, expected)
+        ? await NativeDiary.startFocusMode(
+            packages,
+            minutes,
+            expected,
+            allowOnly,
+          )
         : await NativeDiary.stopFocus(snapshot.focus?.id ?? '', expected);
       if (alive.current) {
         setSnapshot(parseProtection(raw));

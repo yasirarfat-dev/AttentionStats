@@ -95,6 +95,18 @@ class ReelsAccessibilityService : AccessibilityService() {
             }
         }
     }
+    private val packageReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (destroyed) return
+            worker.execute {
+                if (!destroyed) {
+                    coordinator.schedules.refreshLaunchable()
+                    main.post { if (!destroyed) { updateEventTargets(); schedule(0) } }
+                }
+            }
+        }
+    }
+    private var packageReceiverRegistered = false
     private var receiverRegistered = false
 
     private val sampling = SurfaceSamplingLoop(worker, ::sample) {
@@ -113,6 +125,10 @@ class ReelsAccessibilityService : AccessibilityService() {
         if (Build.VERSION.SDK_INT >= 33) registerReceiver(screenReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
         else @Suppress("DEPRECATION") registerReceiver(screenReceiver, filter)
         receiverRegistered = true
+        val packages = IntentFilter().apply { addAction(Intent.ACTION_PACKAGE_ADDED); addAction(Intent.ACTION_PACKAGE_REMOVED); addAction(Intent.ACTION_PACKAGE_REPLACED); addDataScheme("package") }
+        if (Build.VERSION.SDK_INT >= 33) registerReceiver(packageReceiver, packages, Context.RECEIVER_NOT_EXPORTED)
+        else @Suppress("DEPRECATION") registerReceiver(packageReceiver, packages)
+        packageReceiverRegistered = true
         // Events arrive only from the supported short-video apps; departure is noticed by polling
         // the foreground window's package while one of them is in front.
         updateEventTargets()
@@ -367,9 +383,10 @@ class ReelsAccessibilityService : AccessibilityService() {
         // Stop above the navigation bar so its buttons/gesture area stay visible and usable.
         val navigation = navigationBarHeight()
         if (compactBreak) {
-            params.height = WindowManager.LayoutParams.WRAP_CONTENT
-            params.gravity = Gravity.BOTTOM
-            params.y = navigation
+            params.height = ((if (Build.VERSION.SDK_INT >= 30) getSystemService(WindowManager::class.java).currentWindowMetrics.bounds.height()
+                else resources.displayMetrics.heightPixels) - navigation).let { (it * 0.65f).toInt() }
+            params.gravity = Gravity.CENTER
+            params.y = -navigation / 2
             params.flags = params.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
         } else if (navigation > 0) {
             params.height = resources.displayMetrics.heightPixels.let { visible ->
@@ -381,7 +398,9 @@ class ReelsAccessibilityService : AccessibilityService() {
         try {
             getSystemService(WindowManager::class.java).addView(view, params)
             intervention = view; interventionKind = wanted; interventionApp = current
-            breakCoversPlayer = wanted == "break" && !compactBreak
+            // Both full and centered reminders obscure the player. Exclude covered
+            // samples even when audio/playback pause could not be confirmed.
+            breakCoversPlayer = wanted == "break"
             val receipt = org.attentionstats.protection.InterventionOutcome { id, choice -> coordinator.decideIntervention(id, choice) }
             interventionReceipt = receipt
             view.alpha = 0f; view.animate().alpha(1f).setDuration(220).start()
@@ -703,6 +722,7 @@ class ReelsAccessibilityService : AccessibilityService() {
         coordinator.stopDiaryLive()
         coordinator.resetUnlockSession()
         if (receiverRegistered) { unregisterReceiver(screenReceiver); receiverRegistered = false }
+        if (packageReceiverRegistered) { unregisterReceiver(packageReceiver); packageReceiverRegistered = false }
         AutoScrollSession.onChanged = {}
         AutoScrollSession.clear()
         sampling.close()

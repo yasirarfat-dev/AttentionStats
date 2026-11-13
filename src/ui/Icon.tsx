@@ -1,6 +1,8 @@
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 export type IconName =
+  | 'sun'
+  | 'bolt'
   | 'shield'
   | 'lock'
   | 'code'
@@ -43,6 +45,16 @@ export function Icon({
   };
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" accessible={false}>
+      {name === 'sun' && (
+        <>
+          <Circle cx={12} cy={12} r={4} {...stroke} />
+          <Path
+            d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"
+            {...stroke}
+          />
+        </>
+      )}
+      {name === 'bolt' && <Path d="M13 2L4 14h7l-1 8L20 9h-7V2z" {...stroke} />}
       {name === 'shield' && (
         <Path
           d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6l7-3z"

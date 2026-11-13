@@ -101,7 +101,7 @@ internal class InterventionOverlay(
             column.addView(primary, wrap(top = 32))
             column.addView(secondary, wrap(top = 12))
         }
-        addView(column, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, if (compact) Gravity.TOP else Gravity.BOTTOM))
+        addView(column, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, if (compact) Gravity.CENTER else Gravity.BOTTOM))
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
         contentDescription = "$headline. $detail"
     }
