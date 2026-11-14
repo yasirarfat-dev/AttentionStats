@@ -162,9 +162,8 @@ internal object InformationUiVerification {
                     click("Got it")
                     help("Data & Privacy", "Android-managed backup starts")
                     help("Appearance", "Choose Light, Dark")
-                    help("Theme", "Choose Light, Dark")
-                    help("Presets", "Ready-made palettes")
-                    help("Custom Colors", "Color changes text")
+                    help("Templates", "Choose Light, Dark or System")
+                    help("Customization", "Text changes text")
                     click("Customize Layout & Numbers"); help("Layout & Numbers", "Adjust app-card corners")
                     click("Hide Layout Controls"); help("Help & Feedback", "Choose Email or a GitHub issue")
                 }

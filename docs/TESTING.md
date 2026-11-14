@@ -1,6 +1,6 @@
 # Verification and acceptance
 
-**Status:** Documentation/browser checks and pure Kotlin calculation tests available; full native application scenarios not run. Updated 2026-11-13.
+**Status:** Host and scoped physical Android checks available; full native/lifecycle/accessibility/release matrix remains incomplete. Updated 2026-11-15.
 **Responsibility:** Owns acceptance scenarios, evidence quality and release gates.
 **Related specifications:** [Capabilities](CAPABILITY-MATRIX.md), [Tracking](TRACKING-SPEC.md), [Protection](PROTECTION-SPEC.md), [Backup](BACKUP-RESTORE.md), [Security](SECURITY.md).
 **Unresolved feasibility:** F-01–F-10 in [Decisions](DECISIONS.md); source/API/OEM support is not verified by calculation tests alone.
@@ -266,3 +266,7 @@ Use X-02/X-07/X-10 to inspect actual full tab names at 100%/200%, selected state
 ### Publishing history failure-stage qualification
 
 Use the internal debug-only history failure fixture through `historyFailure=true` instrumentation; request raw `am instrument -w -r` output and require both the named PASS and result -1. Verify seven fixed native/parser stages, help initially collapsed, fixed code after expansion, no synthetic private sentinel, collapse, explicit retry and an actual read after clearing the fixture. Match rendered heading/button text case-insensitively under shared capitalization. Keep acquisition to own-app windows and preserve preferences/grants/history; clear fixture in finally, remove owned captures/test installation after ownership checks and inspect actual error rendering. A synthetic STORAGE_UNAVAILABLE response is not a real corruption/recovery test; this does not close D-03, paging, cold-history, accessibility or source/lifecycle gates. [Dated results](evidence/publishing-history-diagnostics.json).
+
+### Publishing Appearance draft qualification
+
+Use `informationUi=appearance-draft` with raw instrumentation output on the owned debug phone. The runner temporarily configures synthetic visual preferences, exercises actual React Native controls and restores the exact original appearance preference map in finally. Require the named PASS and -1, then independently compare original appearance/backup and font state. Verify scope-preserving accent selection, edits remaining drafts, actual native Save, per-scope reset, discard versus default reset and help/RGB/layout reachability at 100%/200%. Review the captured native rendering separately; assertions alone do not qualify presentation or TalkBack. Do not change source consent, rules, history or shared accessibility selections. A finished instrumentation record in Android's activity dump is historical, not an active run; inspect its finished flag before deciding whether phone ownership is blocked.

@@ -1,12 +1,12 @@
 # Feature tracker
 
-**Publishing baseline (14/11/26; AS-014/AS-018/AS-037/AS-046):** installed preview identified, implemented-surface inventory recorded, 37 focused host checks and bounded cold/warm Insights loads pass. Earlier cold-history cause and full page/error/retry acceptance remain open; no feature status promotion. [Evidence](evidence/publishing-baseline.json), [next work](PUBLISHING-PHASE.md#latest-handoff--141126-history-diagnostics-batch).
+**Publishing progress (15/11/26; AS-014/AS-018/AS-037/AS-045/AS-046/AS-057):** baseline/history diagnostics and Appearance/Today integration are recorded. Final Appearance passes 51 physical checks at each of 100%/200%, plus eight default-reset/tab-draft/discard checks; original settings preserved. Earlier cold-history cause and remaining gates stay open; no feature status promotion. [Latest evidence](evidence/publishing-appearance-today.json), [next work](PUBLISHING-PHASE.md#latest-handoff--151126-appearance-and-today-integration).
 
 **Active delivery priority (14/11/26):** [Publishing-phase plan](PUBLISHING-PHASE.md) batches verification, defect repair and polish of implemented behavior toward AS-022/AS-046. New features follow the next Play publication. Existing task states, dependencies and release gates remain unchanged; planning is not runtime verification.
 
 For separate implementation/verification boxes, dates, versions and known failures, read the [feature verification checklist](FEATURE-VERIFICATION.md). Historical passes do not clear a later regression or qualify a different artifact.
 
-**Status:** MVP 1.0.0 implemented within its documented scope; maintainer reports closed beta. AS-052 establishes continuation on `develop`; export/restore, broader qualification and remaining full-product work are open. Updated 2026-11-14.
+**Status:** MVP 1.0.0 implemented within its documented scope; maintainer reports closed beta. AS-052 establishes continuation on `develop`; export/restore, broader qualification and remaining full-product work are open. Updated 2026-11-15.
 **Responsibility:** Owns stable task IDs, priorities, dependencies, capability mapping and completion evidence.
 **Related specifications:** [Roadmap](ROADMAP.md), [State](STATE.md), [Capabilities](CAPABILITY-MATRIX.md), [Tests](TESTING.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-10 gate relevant tasks; dependencies below are required, not optional recommendations.
@@ -205,6 +205,12 @@ November 14 ADR-098 extends AS-018/AS-027/AS-045 presentation: consistent left-s
 ADR-097/ADR-098/ADR-099 concluding checkpoint: P8 has scoped 27/15 actual UI and 93/477 native checks; later cold Insights history-unavailable invalidates current read acceptance. Final focus-review/placeholder-ink source refinements await build/phone review. Emulator/other-device work is stopped and explicitly deferred until product completion, with no size/performance acceptance. Tasks remain experimental; [evidence](evidence/day-insights-continuation.json) and State carry exact artifacts, cleanup and next actions. Publication remains HOLD.
 
 
+November 14 compact Appearance/Today continuation: AS-018/AS-045/AS-057 repairs extra inset-heading spacing and per-source sentence wrapping, with compact large counts and responsive source/hero groups. Debug-only display fixtures exercise zero, ordinary, six-digit and trillion-scale counts on the actual phone UI without changing saved history. Tasks remain experimental; final artifact, visual results and cleanup are recorded in State and the dated log. At the maintainer's explicit request, the manually created Social group is removed through the existing phone UI; installed-only default Social Apps remains and default seeding is unchanged.
+
+
+ADR-100 concludes this follow-up with Templates versus Customization grouping and scope-preserving accent choices. [Bounded evidence](evidence/compact-appearance-today.json) separates final grouping, count-render artifacts, cleanup and remaining large-text/publication gates.
+
+
 November 14 ADR-101 continuation: AS-044/AS-059 retains an independent scrolling backend and adds conditional Facebook/Instagram built-in Reels guidance. A bounded operator-only fixed-token probe supports installed-menu investigation without provider setting changes. Direct state control, comparative reliability and YouTube/Snapchat end/action acceptance remain open; no timer fallback or task promotion. [Exact evidence](evidence/builtin-autoscroll-investigation.json).
 
 
@@ -212,3 +218,5 @@ November 14 publishing presentation batch: AS-018/AS-045 repairs large-text prim
 
 
 November 14 publishing history diagnostics: AS-014/AS-018/AS-037 adds fixed local native/parser failure codes behind the error-card information control, retaining validation/cache/privacy fences. 148 host tests and 71 injected physical error/help/retry/recovery assertions pass with explicit instrumentation -1; actual dark 100% error states and one fresh normal Insights entry reviewed. [Exact artifact and limits](evidence/publishing-history-diagnostics.json). Earlier history cause, paging/stale/lifecycle and release gates stay open; no task promotion.
+
+November 15 publishing Appearance/Today integration: AS-018/AS-045/AS-057 independently integrates the earlier compact layout/fixture work, adds explicit discard and scope-correct hex resets, and repairs System splitting at 200% by stacking theme choices. Final API36 preview passes 102 actual instrumentation checks across 100%/200% plus eight default-reset/tab-draft/discard checks; actual controls/help/preview/RGB/layout/actions visually reviewed. 148 host tests and builds pass; [artifact-scoped evidence](evidence/publishing-appearance-today.json). Original preferences/font restored. Historical Today stress counts retain their own artifacts; count-only empty-copy, broad accessibility and release gates remain open. Tasks stay experimental.

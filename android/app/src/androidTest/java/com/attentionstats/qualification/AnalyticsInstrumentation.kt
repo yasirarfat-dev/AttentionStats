@@ -72,7 +72,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         breakTiming = arguments?.getString("breakTiming") == "true"
         numericAudit = arguments?.getString("numericAudit")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         numericAuditRefresh = arguments?.getString("numericAuditRefresh") == "true"
-        informationUi = arguments?.getString("informationUi")?.takeIf { it in setOf("today", "insights", "settings", "protect", "native", "editors", "tour") }
+        informationUi = arguments?.getString("informationUi")?.takeIf { it in setOf("today", "insights", "settings", "protect", "native", "editors", "tour", "today-layout", "appearance-draft") }
         numericMediaProbe = arguments?.getString("numericMediaProbe")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollContinuous = arguments?.getString("autoScrollContinuous")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         standaloneAdLive = arguments?.getString("standaloneAdLive") == "true"
@@ -128,7 +128,11 @@ class AnalyticsInstrumentation : Instrumentation() {
                 finish(Activity.RESULT_OK, result); return
             }
             informationUi?.let { mode ->
-                result.putString("stream", InformationUiVerification.run(this, mode))
+                result.putString("stream", when (mode) {
+                    "today-layout" -> TodayLayoutVerification.run(this)
+                    "appearance-draft" -> AppearanceDraftVerification.run(this)
+                    else -> InformationUiVerification.run(this, mode)
+                })
                 finish(Activity.RESULT_OK, result); return
             }
             autoScrollContinuous?.let { source ->

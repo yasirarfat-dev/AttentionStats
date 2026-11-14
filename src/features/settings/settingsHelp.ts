@@ -106,13 +106,14 @@ export const settingsHelp = {
   ],
   appearance: [
     {
-      term: 'Theme',
-      detail: 'Choose Light, Dark or follow the phone’s System appearance.',
+      term: 'Templates',
+      detail:
+        'Choose Light, Dark or System, then Graphite, Blue, Teal or Violet accent presets. Custom text and background colors are preserved when choosing an accent preset.',
     },
     {
-      term: 'Color, Background & Accent',
+      term: 'Customization',
       detail:
-        'Keep a preset or drag across the full color canvas and hue strip. Color changes text, Background changes pages and cards, and Accent changes buttons and highlights. Hex and RGB controls provide precision. Preview before saving; text tones adapt for readability. Layout controls adjust card corners, spacing and statistic size.',
+        'Drag across the full color canvas and hue strip. Text changes text and numbers, Background changes pages and cards, and Accent changes buttons and highlights. Hex and RGB controls provide precision. Preview before saving; text tones adapt for readability. Layout controls adjust card corners, spacing and statistic size.',
     },
     {
       term: 'Gentle Animations',

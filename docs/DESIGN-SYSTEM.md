@@ -1,6 +1,6 @@
 # Design system
 
-**Status:** Accepted visual direction; experimental native shell, shared panels/icons and counter exist; full accessibility/performance qualification remains open. Updated 2026-11-14.
+**Status:** Accepted visual direction; experimental native shell, shared panels/icons and counter exist; full accessibility/performance qualification remains open. Updated 2026-11-15.
 **Responsibility:** Defines hierarchy, semantic tokens, primitives, charts, themes and purposeful motion.
 **Related specifications:** [Human factors](HUMAN-FACTORS.md), [UX](UX-SPEC.md), [Navigation](NAVIGATION.md), [Settings](SETTINGS-SPEC.md), [Preview](../design/prototype/README.md), [Conventions](CONVENTIONS.md).
 **Unresolved feasibility:** F-03 in [Decisions](DECISIONS.md); Android font metrics, frame pacing and TalkBack require native verification. Browser checks do not certify native accessibility.
@@ -135,6 +135,18 @@ ADR-094 adds separate foreground/background/accent appearance scopes through a f
 Default cards prioritize values and actions. Use a clear internal heading with a right-aligned, at least 48-unit information target for routine explanations. Explanations start collapsed, open immediately below that heading and close from the same control; accessible labels name the card and expose expanded state. Shared React Native Card and native sections/choice cards own independent presentation state. Help never changes a setting or draft selection. Quiet vertical separators distinguish parallel statistics; short horizontal lines separate groups without boxing every number.
 
 Keep units, selected dates/ranges, missing values, active health/errors and concrete review/irreversible-action effects visible. Move definitions, source limitations, measurement method and optional instructions into help. Settings has grouped definitions; Appearance has separate Theme, Presets, Custom Colors and Layout & Numbers disclosures. Introductory tour points out the information controls. Native backup/widget help follows the same principle while preserving secure-window and explicit Save/confirmation behavior.
+
+
+### Today count and source-detail resilience (2026-11-14)
+
+Short Videos Today keeps its primary total on one line with bounded fit; counts at one million and above use the shared compact notation. Full count announcements accompany abbreviated hero/session/break/app-launch/source values. Existing summary rows stack at narrow effective width or larger system text.
+
+Reels by Apps gives the app identity and video total their own heading row. Surface time, ads and photos use separate whole-metric wrapping items below it; whole-app time occupies a dedicated line labelled in app time. Large text moves the count beneath the identity. Grouped numbers retain their units; no fixed card height or sentence competing with the trailing count. Existing observation scopes, empty states and card help remain. This is a presentation change, not a new tracking capability or proof of support for every possible device/statistic.
+
+
+ADR-100 combines Appearance's theme mode and accent presets into one compact Templates panel, separate from Customization. Text is the user-facing name for the foreground override. Template accent selection preserves custom foreground/background, and large-text qualification remains bounded to the recorded cards.
+
+Publishing follow-up (15/11/26): theme modes use the same named choice controls as the color scopes. At large system text they stack at full width so System remains an intact word. Save, Discard Appearance Changes (saved choices) and Reset Appearance Draft (defaults awaiting Save) have distinct labels and effects; none of these actions changes collection or history.
 
 
 ### Large-text navigation and viewing facets (publishing polish)

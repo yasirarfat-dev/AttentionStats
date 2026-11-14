@@ -13,7 +13,6 @@ import {
   SectionTitle,
   Explanation,
   Divider,
-  Segmented,
   Stepper,
   ToggleRow,
 } from '../../ui/Kit';
@@ -31,7 +30,7 @@ export function AppearanceEditor({
 }) {
   const { rt } = useUnistyles();
   const [draft, setDraft] = useState(value);
-  const [hex, setHex] = useState(value.customColor || '#5676A6');
+  const [hex, setHex] = useState(() => selectedColor(value, 'customColor'));
   const [scope, setScope] = useState<
     'foregroundColor' | 'backgroundColor' | 'customColor'
   >('customColor');
@@ -40,13 +39,28 @@ export function AppearanceEditor({
   const [busy, setBusy] = useState(false);
   useEffect(() => {
     setDraft(value);
-    setHex(value[scope] || '#5676A6');
+    setHex(selectedColor(value, scope));
   }, [value]);
   const valid = /^#[0-9a-f]{6}$/i.test(hex);
   const dark =
     draft.mode === 'dark' ||
     (draft.mode === 'system' && rt.themeName === 'dark');
   const preview = appearancePreview(draft, dark);
+  function selectedColor(next: Appearance, selected: typeof scope): string {
+    const colors = appearancePreview(
+      next,
+      next.mode === 'dark' ||
+        (next.mode === 'system' && rt.themeName === 'dark'),
+    );
+    return (
+      next[selected] ||
+      (selected === 'backgroundColor'
+        ? colors.canvas
+        : selected === 'foregroundColor'
+          ? colors.text
+          : colors.accent)
+    );
+  }
   const updateChannel = (index: number, next: number) => {
     const base = valid ? hex : '#5676A6';
     const color =
@@ -57,29 +71,32 @@ export function AppearanceEditor({
     setDraft({ ...draft, [scope]: color });
   };
   return (
-    <>
-      <Explanation title="Theme">
-        Choose Light, Dark or follow the system. Appearance changes stay in this
-        draft until Save Appearance.
-      </Explanation>
-      <Segmented
-        label="Theme"
-        value={draft.mode}
-        options={[
-          { value: 'light', label: 'Light' },
-          { value: 'dark', label: 'Dark' },
-          { value: 'system', label: 'System' },
-        ]}
-        onChange={mode => setDraft({ ...draft, mode })}
-      />
+    <View style={styles.editor}>
       <View style={styles.colorGroup}>
-        <Explanation title="Presets">
-          Ready-made palettes. Choosing one resets the custom colors in this
-          draft. Save Appearance applies your changes.
+        <Explanation compact title="Templates">
+          Choose Light, Dark or System, then an accent preset. Custom text and
+          background colors override the template. Choosing an accent preset
+          replaces only the custom accent. Save Appearance applies this draft.
         </Explanation>
+        <SectionTitle compact>Theme mode</SectionTitle>
+        <AppearanceChoices
+          label="Theme"
+          value={draft.mode}
+          options={[
+            { value: 'light', label: 'Light' },
+            { value: 'dark', label: 'Dark' },
+            { value: 'system', label: 'System' },
+          ]}
+          onChange={mode => {
+            const next = { ...draft, mode };
+            setDraft(next);
+            setHex(selectedColor(next, scope));
+          }}
+        />
+        <SectionTitle compact>Accent presets</SectionTitle>
         <AppearanceChoices
           grid
-          label="Presets"
+          label="Accent presets"
           value={draft.accent}
           options={[
             { value: 'graphite', label: 'Graphite' },
@@ -92,24 +109,15 @@ export function AppearanceEditor({
               ...draft,
               accent,
               customColor: '',
-              foregroundColor: '',
-              backgroundColor: '',
             };
             setDraft(next);
-            const colors = appearancePreview(next, dark);
-            setHex(
-              scope === 'backgroundColor'
-                ? colors.canvas
-                : scope === 'foregroundColor'
-                  ? colors.text
-                  : colors.accent,
-            );
+            setHex(selectedColor(next, scope));
           }}
         />
       </View>
       <View style={styles.colorGroup}>
-        <Explanation title="Custom Colors">
-          Color changes text and numbers; Background changes page and card
+        <Explanation compact title="Customization">
+          Text changes text and numbers; Background changes page and card
           backgrounds; Accent changes buttons and highlights. Choose a scope,
           drag the hue strip and color canvas, or enter hex/RGB. Your selected
           background is preserved; text and accent tones adjust for readability.
@@ -120,20 +128,13 @@ export function AppearanceEditor({
           label="Color scope"
           value={scope}
           options={[
-            { value: 'foregroundColor', label: 'Color' },
+            { value: 'foregroundColor', label: 'Text' },
             { value: 'backgroundColor', label: 'Background' },
             { value: 'customColor', label: 'Accent' },
           ]}
           onChange={next => {
             setScope(next);
-            setHex(
-              draft[next] ||
-                (next === 'backgroundColor'
-                  ? preview.canvas
-                  : next === 'foregroundColor'
-                    ? preview.text
-                    : preview.accent),
-            );
+            setHex(selectedColor(draft, next));
           }}
         />
         <ColorCanvas
@@ -149,8 +150,9 @@ export function AppearanceEditor({
           label="Use preset for this color"
           variant="text"
           onPress={() => {
-            setDraft({ ...draft, [scope]: '' });
-            setHex('#5676A6');
+            const next = { ...draft, [scope]: '' };
+            setDraft(next);
+            setHex(selectedColor(next, scope));
           }}
         />
         <View
@@ -193,7 +195,7 @@ export function AppearanceEditor({
         </View>
         {
           <>
-            <SectionTitle>Selected color</SectionTitle>
+            <SectionTitle compact>Selected color</SectionTitle>
             <TextInput
               accessibilityLabel="Selected hex color"
               value={hex}
@@ -238,12 +240,12 @@ export function AppearanceEditor({
       {advanced && (
         <>
           <Divider />
-          <Explanation title="Layout & Numbers">
+          <Explanation compact title="Layout & Numbers">
             Adjust app-card corners, spacing and statistic size. System text
             scaling still applies. Native tools and launcher widgets retain
             their own layout controls.
           </Explanation>
-          <SectionTitle>Card corners</SectionTitle>
+          <SectionTitle compact>Card corners</SectionTitle>
           <Stepper
             label="Card corners"
             value={draft.corners}
@@ -253,7 +255,7 @@ export function AppearanceEditor({
             suffix="dp"
             onChange={corners => setDraft({ ...draft, corners })}
           />
-          <SectionTitle>Card spacing</SectionTitle>
+          <SectionTitle compact>Card spacing</SectionTitle>
           <Stepper
             label="Card spacing"
             value={draft.spacing}
@@ -263,7 +265,7 @@ export function AppearanceEditor({
             suffix="dp"
             onChange={spacing => setDraft({ ...draft, spacing })}
           />
-          <SectionTitle>Statistic size</SectionTitle>
+          <SectionTitle compact>Statistic size</SectionTitle>
           <Stepper
             label="Statistic size"
             value={draft.numberSize}
@@ -289,11 +291,20 @@ export function AppearanceEditor({
         }}
       />
       <Button
+        label="Discard appearance changes"
+        variant="text"
+        disabled={busy}
+        onPress={() => {
+          setDraft(value);
+          setHex(selectedColor(value, scope));
+        }}
+      />
+      <Button
         label="Reset appearance draft"
         variant="text"
         disabled={busy}
         onPress={() => {
-          setDraft({
+          const next: Appearance = {
             mode: 'system',
             accent: 'graphite',
             motion: true,
@@ -303,11 +314,12 @@ export function AppearanceEditor({
             corners: 24,
             spacing: 20,
             numberSize: 30,
-          });
-          setHex('#5676A6');
+          };
+          setDraft(next);
+          setHex(selectedColor(next, scope));
         }}
       />
-    </>
+    </View>
   );
 }
 
@@ -433,6 +445,8 @@ function ColorChannel({
   );
 }
 const styles = StyleSheet.create(theme => ({
+  // Keep the owning card compact vertically, independent of its horizontal inset.
+  editor: { gap: 8, marginVertical: 8 - theme.spacing },
   choices: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   choice: {
     minWidth: 0,
@@ -457,8 +471,9 @@ const styles = StyleSheet.create(theme => ({
     flexShrink: 1,
   },
   colorGroup: {
-    gap: 12,
-    padding: 12,
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: theme.border,

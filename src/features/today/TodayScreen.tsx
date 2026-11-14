@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, useWindowDimensions } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import {
   reelsSources,
@@ -9,7 +9,7 @@ import {
 import type { DiarySnapshot } from '../../platform/diaryStatus';
 import NativeDiary from '../../platform/specs/NativeDiary';
 import { AppIcon, BarChart, StackedBar } from '../../ui/Charts';
-import { duration, exactCount, hourLabel } from '../../ui/format';
+import { compactCount, duration, exactCount, hourLabel } from '../../ui/format';
 import {
   Body,
   Button,
@@ -66,6 +66,8 @@ export function TodayScreen({
   ) => void;
 }) {
   const { theme } = useUnistyles();
+  const { width, fontScale } = useWindowDimensions();
+  const stackedStats = width / fontScale < 330;
   const diary = useDiary(1);
   const reels = useReels();
   const [explainHero, setExplainHero] = useState(false);
@@ -141,9 +143,12 @@ export function TodayScreen({
         </View>
         <Text
           style={styles.heroValue}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.6}
           accessibilityLabel={`${videos} video encounters today`}
         >
-          {exactCount(String(videos))}
+          {compactCount(String(videos))}
         </Text>
         <StackedBar
           parts={sources.map(item => ({
@@ -152,25 +157,27 @@ export function TodayScreen({
             color: reelsSources[item.key].color,
           }))}
         />
-        <View style={styles.heroStats}>
+        <View style={[styles.heroStats, stackedStats && styles.stackedStats]}>
           <Stat
             inverse
-            value={exactCount(String(session))}
+            value={compactCount(String(session))}
+            accessibilityLabel={`This session: ${exactCount(String(session))}`}
             label="This session"
           />
-          <StatDivider inverse />
+          {!stackedStats && <StatDivider inverse />}
           <Stat inverse value={duration(reelsMs)} label="On screen" />
-          <StatDivider inverse />
+          {!stackedStats && <StatDivider inverse />}
           <Stat
             inverse
-            value={String(breaks)}
+            value={compactCount(String(breaks))}
+            accessibilityLabel={`Breaks: ${exactCount(String(breaks))}`}
             label={breaks === 1 ? 'Break' : 'Breaks'}
           />
         </View>
         <View style={styles.deviceSection}>
-          <View style={styles.heroStats}>
+          <View style={[styles.heroStats, stackedStats && styles.stackedStats]}>
             <Stat inverse value={duration(videoAppMs)} label="Reels Apps" />
-            <StatDivider inverse />
+            {!stackedStats && <StatDivider inverse />}
             <Stat
               inverse
               value={duration(
@@ -180,19 +187,22 @@ export function TodayScreen({
               )}
               label="Screen Time"
             />
-            <StatDivider inverse />
+            {!stackedStats && <StatDivider inverse />}
             <Stat
               inverse
               value={
                 day?.apps.some(app => app.appOpens !== null)
-                  ? String(
-                      day.apps.reduce(
-                        (sum, app) => sum + Number(app.appOpens ?? 0),
-                        0,
+                  ? compactCount(
+                      String(
+                        day.apps.reduce(
+                          (sum, app) => sum + Number(app.appOpens ?? 0),
+                          0,
+                        ),
                       ),
                     )
                   : '—'
               }
+              accessibilityLabel={`App Launches: ${day?.apps.some(app => app.appOpens !== null) ? exactCount(String(day.apps.reduce((sum, app) => sum + Number(app.appOpens ?? 0), 0))) : 'unavailable'}`}
               label="App Launches"
             />
           </View>
@@ -221,41 +231,77 @@ export function TodayScreen({
           .map((item, index) => (
             <View key={item.key}>
               {index > 0 && <Divider />}
-              <Row
-                leading={
+              <View
+                style={styles.sourceRow}
+                accessible
+                accessibilityLabel={`${reelsSources[item.key].name}: ${exactCount(String(item.videos))} short videos, ${duration(item.reelsMs)} in videos, ${duration(item.appMs)} in app, ${exactCount(String(item.ads))} ads, ${exactCount(String(item.photos))} photos`}
+              >
+                <View
+                  style={[
+                    styles.sourceHeading,
+                    stackedStats && styles.sourceHeadingStacked,
+                  ]}
+                >
                   <AppIcon
                     uri={sourceIcon(icons, item.key)}
                     mark={reelsSources[item.key].mark}
                     color={reelsSources[item.key].color}
                   />
-                }
-                title={reelsSources[item.key].name}
-                detail={
-                  [
-                    item.reelsMs > 0
-                      ? `${duration(item.reelsMs)} in ${reelsSources[item.key].observation.split(' ').slice(1).join(' ') || 'videos'}`
-                      : null,
-                    item.appMs > 0 ? `${duration(item.appMs)} in app` : null,
-                    item.ads > 0
-                      ? `${item.ads} ${item.ads === 1 ? 'ad' : 'ads'}`
-                      : null,
-                    item.photos > 0
-                      ? `${item.photos} ${item.photos === 1 ? 'photo' : 'photos'}`
-                      : null,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ') || 'Nothing yet today'
-                }
-                trailing={
-                  <View style={{ alignItems: 'flex-end', gap: 2 }}>
-                    <Text style={styles.sourceCount}>
-                      {exactCount(String(item.videos))}
+                  <Text
+                    style={[
+                      styles.sourceName,
+                      stackedStats && styles.sourceNameStacked,
+                    ]}
+                  >
+                    {reelsSources[item.key].name}
+                  </Text>
+                  <View
+                    style={[
+                      styles.sourceTotal,
+                      stackedStats && styles.sourceTotalStacked,
+                    ]}
+                  >
+                    <Text
+                      style={styles.sourceCount}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                    >
+                      {compactCount(String(item.videos))}
                     </Text>
                     <Text style={styles.sourceUnit}>videos</Text>
                   </View>
-                }
-                accessibilityLabel={`${reelsSources[item.key].name}: ${item.videos} short videos`}
-              />
+                </View>
+                <View style={styles.sourceDetails}>
+                  {[
+                    item.reelsMs > 0
+                      ? `${duration(item.reelsMs)} in ${reelsSources[item.key].observation.split(' ').slice(1).join(' ') || 'videos'} .`
+                      : null,
+                    item.ads > 0
+                      ? `${compactCount(String(item.ads))} ${item.ads === 1 ? 'ad' : 'ads'} .`
+                      : null,
+                    item.photos > 0
+                      ? `${compactCount(String(item.photos))} ${item.photos === 1 ? 'photo' : 'photos'} .`
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .map(detail => (
+                      <Text key={detail} style={styles.sourceDetail}>
+                        {detail!.replace(/ /g, '\u00a0')}
+                      </Text>
+                    ))}
+                </View>
+                {item.appMs > 0 && (
+                  <Text style={styles.sourceAppTime}>
+                    {duration(item.appMs).replace(/ /g, '\u00a0')} in app time
+                  </Text>
+                )}
+                {item.reelsMs === 0 &&
+                  item.appMs === 0 &&
+                  item.ads === 0 &&
+                  item.photos === 0 && (
+                    <Text style={styles.sourceAppTime}>Nothing yet today</Text>
+                  )}
+              </View>
             </View>
           ))}
       </Card>
@@ -359,7 +405,43 @@ export function TodayScreen({
 }
 
 const styles = StyleSheet.create(theme => ({
+  sourceRow: { paddingHorizontal: 12, paddingVertical: 12, gap: 6 },
+  sourceHeading: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  sourceHeadingStacked: { flexWrap: 'wrap' },
+  sourceNameStacked: { flexBasis: '70%' },
+  sourceTotalStacked: {
+    flexBasis: '100%',
+    maxWidth: '100%',
+    paddingLeft: 52,
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 6,
+  },
+  sourceName: {
+    flex: 1,
+    minWidth: 0,
+    color: theme.text,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  sourceTotal: { alignItems: 'flex-end', maxWidth: '45%', gap: 2 },
+  sourceDetails: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: 12,
+    rowGap: 4,
+  },
+  sourceDetail: {
+    color: theme.muted,
+    fontSize: 13,
+    lineHeight: 20,
+    flexShrink: 1,
+  },
+  sourceAppTime: { color: theme.muted, fontSize: 13, lineHeight: 20 },
+  stackedStats: { flexDirection: 'column', gap: 12 },
   sourceCount: {
+    maxWidth: '100%',
     color: theme.text,
     fontSize: 22,
     fontWeight: '700',
@@ -374,7 +456,12 @@ const styles = StyleSheet.create(theme => ({
     gap: 12,
   },
   heroNote: { color: theme.heroMuted, fontSize: 13, lineHeight: 19 },
-  heroLabel: { color: theme.heroMuted, fontSize: 15, fontWeight: '600' },
+  heroLabel: {
+    flex: 1,
+    color: theme.heroMuted,
+    fontSize: 15,
+    fontWeight: '600',
+  },
   heroValue: {
     color: theme.onHero,
     fontSize: 64,

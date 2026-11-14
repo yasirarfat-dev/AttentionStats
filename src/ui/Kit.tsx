@@ -85,12 +85,25 @@ export function Card({
 export function SectionTitle({
   children,
   action,
+  compact = false,
 }: {
   children: string;
   action?: ReactNode;
+  compact?: boolean;
 }) {
   return (
-    <View style={styles.sectionRow}>
+    <View
+      style={[
+        styles.sectionRow,
+        // Let the 48dp target use the adjacent 8dp gaps without adding a tall heading row.
+        compact && {
+          marginTop: action ? -8 : 0,
+          marginBottom: action ? -8 : 0,
+          minHeight: action ? 48 : undefined,
+          paddingHorizontal: 0,
+        },
+      ]}
+    >
       <Text accessibilityRole="header" style={styles.section}>
         {children}
       </Text>
@@ -160,14 +173,17 @@ export function InfoButton({
 export function Explanation({
   title,
   children,
+  compact = false,
 }: {
   title: string;
   children: ReactNode;
+  compact?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   return (
     <>
       <SectionTitle
+        compact={compact}
         action={
           <InfoButton
             label={title}

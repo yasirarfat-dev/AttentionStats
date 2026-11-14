@@ -13,7 +13,7 @@ class ReelsModule(private val context: ReactApplicationContext) : NativeReelsSpe
     private val coordinator get() = ReelsCoordinator.get(context)
     override fun getName() = NAME
     private fun fail(promise: Promise, code: String) { promise.reject(code, "Counter operation unavailable; saved data preserved") }
-    override fun getSnapshot(promise: Promise) = coordinator.snapshot({ promise.resolve(it) }, { fail(promise, it) })
+    override fun getSnapshot(promise: Promise) = coordinator.snapshot({ promise.resolve(com.attentionstats.diary.DiaryPresentationFixture.applyReels(it)) }, { fail(promise, it) })
     override fun configure(app: String, enabled: Boolean, noticeRevision: Double, expectedRevision: String, promise: Promise) {
         val selected = ReelApp.byKey(app)
         if (selected == null || noticeRevision != ReelsCoordinator.NOTICE_REVISION.toDouble() || expectedRevision.length !in 38..60) { fail(promise, "INVALID_ARGUMENT"); return }

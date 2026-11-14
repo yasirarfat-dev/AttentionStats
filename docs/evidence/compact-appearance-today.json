@@ -1,0 +1,114 @@
+{
+  "date": "2026-11-14",
+  "tasks": [
+    "AS-018",
+    "AS-045",
+    "AS-057"
+  ],
+  "status": "historical scoped count-layout evidence; final Templates/Customization qualification is recorded separately; publication HOLD",
+  "followupEvidence": "publishing-appearance-today.json",
+  "product": {
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "sha256": "2beac2aa48a38313c223b06371a6d72a93748d33a789e083bc7aa0c889cde819",
+    "physicalApi": 36,
+    "installedInPlace": true
+  },
+  "testSha256": "be16b4a2b80777f89974f49d9d4852360e6661794e0090be2ce7344c76926107",
+  "implementation": [
+    "Appearance outer vertical inset 8dp; 8dp local rhythm; compact titles use adjacent gaps while retaining 48dp information targets",
+    "Presets/Custom Colors vertical inset 8dp; selected-color and advanced headings also compact",
+    "Source identity/count row with full-width wrapping surface/ad/photo metrics and a separate whole-app screen-time line",
+    "Million-and-larger compact count labels with full count accessibility announcements",
+    "Narrow effective width/large text stacks hero statistics and source count identity; wrapping source units"
+  ],
+  "host": {
+    "jest": 139,
+    "typesLintArchitectureBackupPaletteFormat": "pass",
+    "mobilePolicy": "pass; no dependency changes",
+    "documentation": "pass before final evidence update",
+    "finalPreviewBuild": "pass; 1m38s",
+    "testAndNativeLint": "pass; unchanged Kotlin payload after 1m40s reviewed build",
+    "bundledUiSourcesMatch": [
+      "src/ui/Kit.tsx",
+      "src/features/settings/AppearanceEditor.tsx",
+      "src/features/today/TodayScreen.tsx"
+    ]
+  },
+  "physical": {
+    "normalPredecessor": {
+      "sha256": "1840695ef4040063d629e418b50e7bbd0dab5ea6fc3a72e2776200b06b90fdac",
+      "cases": [
+        "zero",
+        "typical",
+        "large",
+        "extreme"
+      ],
+      "actualTotalsAsserted": true,
+      "visualReview": "Primary hero and source detail layouts reviewed; six-digit and trillion counts fit; grouped photo metrics wrap as whole items"
+    },
+    "finalNormal": {
+      "result": "PASS; instrumentation -1; four actual totals and source headings asserted",
+      "cases": [
+        "0",
+        "965",
+        "999999",
+        "9999999999999"
+      ],
+      "visual": "Hero plus five app rows inspected; Facebook 999999 and grouped photo wrapping inspected",
+      "artifactSha256": "2beac2aa48a38313c223b06371a6d72a93748d33a789e083bc7aa0c889cde819"
+    },
+    "largeText": {
+      "fontScale": 2.0,
+      "result": "PASS; instrumentation -1; same four counts",
+      "visual": "Targeted hero statistics stack; app names/counts and whole metrics render without digit/unit splitting",
+      "remainingOutsideChangedCards": [
+        "Bottom navigation labels ellipsize at 200%",
+        "Existing Viewing Details Observed Completions label can split mid-word at 200%"
+      ]
+    },
+    "appearance": "Compact vertical insets visually reviewed; final two-group refinement pending",
+    "appearanceBeforeFinalRegrouping": {
+      "checks": 11,
+      "informationTargetsDp": {
+        "Theme": [
+          48.0,
+          48.0
+        ],
+        "Presets": [
+          48.0,
+          48.0
+        ],
+        "Custom Colors": [
+          48.0,
+          48.0
+        ]
+      },
+      "savedAppearanceBackupUnchanged": true
+    }
+  },
+  "groupRemoval": {
+    "removed": "Social",
+    "kind": "maintainer-created group, removed through existing UI at explicit request",
+    "retained": "Social Apps",
+    "defaultSeedingChanged": false
+  },
+  "initialHarnessFailure": "First 1.2-second startup wait could not reach Today tab; no UI acceptance. Repaired bounded startup wait passes four predecessor cases.",
+  "cleanup": {
+    "installedProductHashIndependentlyMatched": true,
+    "ownedTestHashMatchedAndRemoved": true,
+    "phoneDiagnosticImagesRemoved": 20,
+    "fontScaleRestored": true,
+    "accessibilitySelectionsMasterRestored": true,
+    "appearanceBackupByteIdentical": true,
+    "returnedToToday": true,
+    "realHistoryReset": false,
+    "unrelatedGroupsChanged": false,
+    "localPrivateCaptures": "pending final review/removal"
+  },
+  "limits": [
+    "Scoped physical API36 UI render checks, not all stats/devices/RTL/TalkBack/performance",
+    "Cold Insights history and auto-scroll/publication gates remain open",
+    "No emulator resumed; no main merge, workflow run or binary publication"
+  ]
+}

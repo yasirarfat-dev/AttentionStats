@@ -1,0 +1,81 @@
+{
+  "date": "2026-11-15",
+  "tasks": ["AS-018", "AS-045", "AS-057"],
+  "status": "experimental; scoped Appearance behavior/render checks pass; publication HOLD",
+  "sourceBase": "0f2c61bfd20a0c6d01ce5df2bef1dbc84984f642",
+  "implementation": [
+    "Independently reviewed and integrated the earlier compact Appearance/Today implementation, debug-only process-memory display fixtures and historical evidence",
+    "Templates combines theme mode/accent presets; Customization contains Text/Background/Accent overrides; accent presets preserve text/background",
+    "Discard Appearance Changes restores the saved draft without writing preferences; Reset Appearance Draft prepares defaults awaiting Save",
+    "Selected hex follows the selected scope's effective color after theme/preset changes, reset, discard and confirmed save",
+    "Theme choices use full-width stacked rows at large text, correcting visually reproduced System mid-word splitting at 200%"
+  ],
+  "product": {
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "sha256": "50faafc761f4d0088ce356c264b3f35cd9117a2778267fcf1858845407d29c46",
+    "physicalApi": 36,
+    "installedInPlace": true,
+    "mappedAppSourcesMatching": 60,
+    "generatedBundleMatches": true,
+    "provenance": "Working-tree debug preview containing this reviewed integration; not a signed production candidate built from a clean committed checkout"
+  },
+  "testSha256": "dc25ab54b1abdf79b66cc3d45d0aff934c43d7c8de928e9e7ebbf24ad2141b1b",
+  "host": {
+    "jestTests": 148,
+    "jestSuites": 17,
+    "typesLintArchitectureBackupPaletteFormatMobile": "pass",
+    "finalPreviewTestLintBuild": "pass; 2m26s; 536 tasks, 36 executed, 500 up-to-date",
+    "finalTestOnlyBuild": "pass; 1m52s; 315 tasks, 31 executed, 284 up-to-date",
+    "lintErrors": 0,
+    "lintWarnings": 170,
+    "toolingLimits": "Existing AGP DSL/variant/Kotlin deprecations, Gradle-10 incompatibility, CMake ordering/minimum-version/object-path and missing local platform-tools warnings remain; no machine-global changes"
+  },
+  "physical": {
+    "normal": {"fontScale": 1.0, "checks": 51, "instrumentationCode": -1, "result": "PASS"},
+    "large": {"fontScale": 2.0, "checks": 51, "instrumentationCode": -1, "result": "PASS"},
+    "behavior": [
+      "System selection and return to Dark remain drafts",
+      "Accent preset and custom text edit do not persist before Save",
+      "Actual native Save confirms blue accent/custom-accent clearing while preserving background and selected custom text",
+      "Per-scope background reset resolves a valid effective hex instead of the fixed example; discard returns saved background",
+      "Default reset remains unsaved; discard returns saved scope",
+      "Templates/Customization/Layout help, RGB and advanced layout controls are reachable"
+    ],
+    "visualReview": "Actual dark native RN theme choices, preset/customization groups, help, preview/hex, RGB sliders, layout values/units and Save/Discard/Reset inspected at 100%/200%; System remains intact after repair",
+    "todayCounts": "Historical four synthetic zero/ordinary/six-digit/trillion cases remain scoped to compact-appearance-today.json artifacts; no repeated stress matrix or transferred final-artifact claim",
+    "additionalResetNavigation": {
+      "checks": 8,
+      "result": "PASS at original text size via actual own-app touchscreen UI",
+      "tabDraftRetained": true,
+      "resetSelectsSystemAndGraphiteWithoutSaving": true,
+      "discardRestoresSavedAccent": true,
+      "savedAppearanceBackupUnchanged": true
+    }
+  },
+  "retainedFailures": [
+    "First normal runner used an outer-edge swipe and could not reach Templates (code0); switching to the independently working one-eighth-width path passes",
+    "Predecessor c02515031730d089c02400968991144cea983ef81a04049b8e7d802a82ae8613 passes 40 controls at each scale but actual 200% review exposes System splitting; no presentation acceptance for that defect",
+    "Enhanced final-product trial reaches native Save/discard then overshoots Reset (control32/code0); bidirectional control search repairs the runner; final 51-check runs pass with raw -1"
+  ],
+  "cleanup": {
+    "status": "complete",
+    "originalFontRestored": true,
+    "savedAppearanceBackupHashesMatch": true,
+    "installedProductIndependentlyMatches": true,
+    "ownedPhoneCapturePathsRemovedAndAbsent": 12,
+    "ownedTestRemovedAndAbsent": true,
+    "freshTodayReadySelectedAndVisuallyReviewed": true,
+    "currentBatchPrivateHostFilesRemoved": 34,
+    "earlierOtherBatchIgnoredFiles": "untouched",
+    "historyResetRestore": false
+  },
+  "limits": [
+    "Scoped one-phone/API36 dark 100%/200% qualification; light/System-theme rendering, TalkBack, RTL, keyboard/insets, broader palette gestures and other devices remain separate",
+    "Native runner temporarily changes synthetic visual preferences only and restores the exact original map in finally; no history database reset/restore or source/rule/provider/grant mutation",
+    "No logical history equality claim; ordinary consented collection may append facts",
+    "Source-review follow-up: reproduce a source row with nonzero videos but no duration/ad/photo metrics; its existing Nothing yet today condition omits videos",
+    "Earlier cold-history cause, paging/stale/lifecycle, auto-scroll and remaining release gates stay open",
+    "No emulator, main merge, remote workflow, version reservation, signing or Play action"
+  ]
+}

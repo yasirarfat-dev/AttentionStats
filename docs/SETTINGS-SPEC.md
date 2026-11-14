@@ -1,6 +1,6 @@
 # Settings specification
 
-**Status:** Planned catalog with working narrow Reels controls and experimental settings routes; broader preferences remain unimplemented. Updated 2026-11-14.
+**Status:** Planned catalog with working narrow Reels controls and experimental settings routes; broader preferences remain unimplemented. Updated 2026-11-15.
 **Responsibility:** Defines user controls, defaults, persistence owner and change effects.
 **Related specifications:** [UX](UX-SPEC.md), [Privacy](PRIVACY.md), [Protection](PROTECTION-SPEC.md), [Backup](BACKUP-RESTORE.md), [Models](DATA-MODELS.md).
 **Unresolved feasibility:** F-01–F-08 in [Decisions](DECISIONS.md); unavailable settings must state the gate rather than appear functional.
@@ -143,6 +143,16 @@ During a palette touch, Settings suspends its parent scrolling so vertical/diago
 ## Compact grouped explanations (ADR-096)
 
 Settings retains its section-level information controls and explicit source/convenience consent prompts. Appearance's Theme, Presets, Custom Colors and Layout & Numbers each expose routine instructions through their own collapsed information heading, rather than permanent paragraphs. Preview, scope selection, hex validation errors, saved choices and explicit Save remain visible. Live counter and protection tools use card-owned help; backup native pages provide the same pattern. Routine descriptions are not duplicated beneath rows already covered by the owning help panel. Source readiness/disconnection, invalid inputs, destructive deletion and transfer confirmations remain explicit. Opening help changes no settings; actual preference preservation requires scoped phone evidence.
+
+
+### Appearance heading density (2026-11-14)
+
+Appearance uses 8dp outer vertical insets and a local 8dp control rhythm. Compact headings let their 48dp information targets occupy the adjacent gaps instead of reserving an additional tall row. Presets/Custom Colors inset panels use 8dp vertical padding while retaining 48dp information targets, clear group boundaries, collapsed help, draft editing and explicit Save. These density changes do not change saved appearance values.
+
+
+ADR-100 supersedes the earlier three-part Appearance grouping: one Templates panel contains Theme Mode and Accent Presets; one Customization panel contains Text/Background/Accent color controls. Accent presets clear only the custom accent, preserving custom text and background. Theme modes select the base light/dark palette; explicit overrides continue to take precedence. Per-scope reset and Reset Appearance Draft remain available; nothing applies before Save.
+
+Publishing polish (15/11/26): **Discard Appearance Changes** restores the latest saved appearance in the editor without writing preferences. **Reset Appearance Draft** prepares defaults and still requires Save. The selected hex field follows the selected scope's effective color after theme/preset changes, scope reset, discard, default reset and a confirmed save; it must not substitute a fixed example color for the displayed palette. Help remains a draft-preserving action. Inline drafts can survive tab changes; they are not automatically saved when leaving Settings.
 
 
 ADR-101 (14/11/26): Display & Experience → Extras adds **Built-in Reels auto-scroll**, an optional guidance dialog for Facebook/Instagram playback/options menus. Show availability as conditional. Explain stopping our session before using provider scrolling and that our Stop cannot stop a provider mode. Opening/dismissing the dialog changes no source, permission, session or provider preference. Auto-scroll help discloses independent behavior and unqualified YouTube/Snapchat video-end support. No provider-control switch is represented as implemented.

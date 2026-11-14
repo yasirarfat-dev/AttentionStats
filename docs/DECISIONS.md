@@ -461,6 +461,11 @@ Record actual API/image/ABI/artifact, dimensions/font scale, failures and visual
 ADR-099 concluding maintainer instruction (14/11/26): stop/defer emulator and other-device support until product completion. Retain the isolated tooling/configuration without treating any failed render or automation stage as a pass; prioritize product work in the next session.
 
 
+## Compact Templates and Customization — ADR-100 — 2026-11-14
+
+The maintainer requests two compact Appearance groups: Templates contains Theme Mode (Light/Dark/System) and Accent Presets (Graphite/Blue/Teal/Violet); Customization contains Text/Background/Accent overrides and precision controls. These are composable base choices and overrides, not duplicate palette groups. Selecting an accent preset replaces only the custom accent and preserves custom text/background; this supersedes ADR-094's all-override reset on preset selection. Per-scope reset and Reset Appearance Draft retain their distinct scopes; explicit Save remains mandatory. Use 8dp vertical insets/gaps and maintain 48dp information targets. Today source details wrap whole metrics with whole-app screen time on a separate line; large totals use compact display and full count announcements. No new permission, dependency, schema or collection scope.
+
+
 ## Independent scrolling and provider-owned controls — ADR-101 — 2026-11-14
 
 The maintainer requests investigating invocation/control of built-in Facebook and Instagram Reels auto-scroll, while retaining Attention Stats' independent accessibility scrolling. A provider feature must never become a dependency of our completion gate, counting, consent or source adapters. Prioritize independent YouTube/Snapchat signal qualification as well; an unavailable end signal remains unavailable, without a video timer substitute.
