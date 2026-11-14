@@ -1,0 +1,157 @@
+{
+  "date": "2026-11-14",
+  "tasks": [
+    "AS-044",
+    "AS-059"
+  ],
+  "decision": "ADR-101",
+  "status": "experimental; direct provider control unavailable; end scrolling on YouTube/Snapchat remains unqualified; publication HOLD",
+  "product": {
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "physicalApi": 36,
+    "sha256": "f9da99d1703dd96ecf3f9766998bfb18d23e1c117612c4db5b1d828d4ae3b60a",
+    "installedInPlace": true,
+    "provenance": "Build includes preserved pre-existing Appearance/Today working-tree changes; those unrelated changes are excluded from this task commit."
+  },
+  "testSha256": "f49689acc35ec0ceb8f5d07df5fd0226d71078e5a36dd12e2f47f53ca891d58f",
+  "intermediateResearchTestSha256": "929bc4ff6d70cd1fe7f34ed9aee1e7da50bea338862df6b5fb070e285c8adf7c",
+  "initialNumericAuditTestSha256": null,
+  "implementation": [
+    "Conditional Settings built-in Reels guidance; explicit independent backend and Stop ownership",
+    "No production provider state read/write, automatic handoff, new dependency, grant or schema",
+    "Operator-only no-action Python fixed-token probe with eight privacy/context checks",
+    "Operator-only native fixed-control/menu probe; guarded explicit menu action, zero provider toggles"
+  ],
+  "research": {
+    "publicControlApi": "No documented public Reels auto-scroll setting API identified in reviewed Meta platform scope. Absence of a documented endpoint is not proof about private APIs.",
+    "references": [
+      "https://developers.facebook.com/documentation/instagram-platform",
+      "https://developer.android.com/reference/android/view/accessibility/AccessibilityNodeInfo"
+    ],
+    "comparativeReliability": "Unverified; no claim that built-in mode is always available or more reliable"
+  },
+  "phone": {
+    "instagram": {
+      "version": "455.0.0.51.72",
+      "pythonProbe": "No exact/phrase auto-scroll control found in inspected screens; fixed Reels/More Options operator navigation did not establish a qualified dedicated viewer. This does not prove feature absence.",
+      "nativeReadOnly": {
+        "nodes": 112,
+        "surface": "REELS",
+        "route": "HOME",
+        "controls": []
+      },
+      "nativeMenuAttempt": "Rejected: dedicated-viewer precondition. A preceding launch-race root failure is also unqualified. No provider state action.",
+      "finalNativeReadOnly": {
+        "nodes": 129,
+        "surface": "REELS",
+        "route": "HOME",
+        "controls": []
+      }
+    },
+    "facebook": {
+      "version": "586.0.0.52.53",
+      "pythonProbe": "Fixed More menu operator navigation; no auto-scroll control found in inspected screen. Does not prove feature absence.",
+      "nativeReadOnly": {
+        "nodes": 125,
+        "surface": "OUTSIDE",
+        "route": "HOME",
+        "controls": [
+          "more"
+        ]
+      },
+      "nativeMenuAttempt": "Rejected: dedicated-viewer precondition. No provider state action.",
+      "finalNativeReadOnly": {
+        "nodes": 108,
+        "surface": "REELS",
+        "route": "HOME",
+        "controls": []
+      }
+    },
+    "youtube": {
+      "version": "21.40.165",
+      "numericAudit": {
+        "samples": 50,
+        "viewerSamples": 50,
+        "progressSamples": 0,
+        "numericOrFixedPlayerMatches": 0,
+        "sourceGestures": 0
+      },
+      "mediaProbe": {
+        "samples": 30,
+        "matchingSessionSamples": 30,
+        "positiveDurationSamples": 0,
+        "playingStateSamples": 0,
+        "usableNumericSamples": 0,
+        "sourceGestures": 0
+      },
+      "qualification": "No usable end signal in these trials; no automatic gesture trial admitted."
+    },
+    "snapchat": {
+      "version": "14.31.0.56",
+      "initialDeepLinkAudit": {
+        "samples": 50,
+        "viewerSamples": 0,
+        "progressSamples": 0,
+        "classification": "OUTSIDE/VIEWER/REEL/video"
+      },
+      "navigation": "One uniquely bounded fixed bottom Spotlight tab tap; top Spotlight heading was excluded.",
+      "numericAudit": {
+        "samples": 50,
+        "viewerSamples": 50,
+        "progressSamples": 0,
+        "numericOrFixedPlayerMatches": 0,
+        "sourceGestures": 0
+      },
+      "mediaProbe": {
+        "samples": 30,
+        "matchingSessionSamples": 0,
+        "usableNumericSamples": 0,
+        "sourceGestures": 0
+      },
+      "qualification": "Dedicated viewer established after fixed navigation; no usable end signal; no automatic gesture trial admitted."
+    }
+  },
+  "host": {
+    "jest": 139,
+    "probeBoundaryTests": 8,
+    "completionGateChecks": 31,
+    "typesLintArchitectureBackupPaletteFormat": "pass",
+    "previewAndInitialTestBuild": "pass; 3m49s",
+    "nativeProbeBuild": "pass after scoped deprecation compatibility suppression; initial Werror failure retained",
+    "finalTestBuild": "pass; 24s; tighter epoch/item/control fences compiled; final negative source checks recorded separately",
+    "dependenciesChanged": false
+  },
+  "guidanceUi": {
+    "checks": 20,
+    "result": "PASS; instrumentation code -1; actual Settings guidance opens, Stop ownership text is present and Got it dismisses; saved appearance/backup unchanged",
+    "testSha256": "cb98ecd8c2af79c6363d6bbd3e9d5ccf5e555287ddf0c66d44818615780322fb",
+    "visualReview": "Actual physical-phone dialog inspected: readable text, complete paragraphs and visible Got it; no clipping at current phone dimensions/text size. Private captures removed after review. Not large-text/TalkBack/RTL acceptance."
+  },
+  "cleanup": {
+    "providerToggleActions": 0,
+    "sourceAutomaticSwipes": 0,
+    "realHistoryReset": false,
+    "grantsChanged": false,
+    "emulatorStarted": false,
+    "testRemoval": "owned hash-checked test uninstalled successfully",
+    "installedProductHashIndependentlyMatched": true,
+    "ownedTestHashMatched": true,
+    "accessibilitySelectionsUnchanged": true,
+    "providerPreferencesChanged": false,
+    "trialYouTubePiPClosed": true,
+    "returnedToToday": false,
+    "privateCapturesRemoved": true,
+    "returnNavigation": "Own Today deep link launched successfully; subsequent exact-tab lookup did not verify final visible tab. Earlier Settings harness returned through its own Today navigation. No additional device setting changes."
+  },
+  "limitations": [
+    "No provider switch state read/write/read-back, persistence or direct integration accepted",
+    "No universal availability or comparative reliability claim",
+    "YouTube/Snapchat signals still unavailable; no timer fallback",
+    "Full source end/negative matrix and existing publication gates remain open"
+  ],
+  "uiTestSha256": "cb98ecd8c2af79c6363d6bbd3e9d5ccf5e555287ddf0c66d44818615780322fb",
+  "initialNumericAuditProvenance": "Initial rebuilt instrumentation installed before native-probe changes; hash was not captured at invocation. These initial research observations are not exact-artifact acceptance; final provenance-qualified rerun follows.",
+  "finalSourceProbeTestSha256": "f49689acc35ec0ceb8f5d07df5fd0226d71078e5a36dd12e2f47f53ca891d58f",
+  "finalSourceProbeRerun": "Final test hash: YouTube/Snapchat each 50 qualified viewer samples, zero progress/matches; 30 media samples each with zero usable values. Instagram HOME/129 nodes and Facebook HOME/108 nodes; both reject menu actions. Launch-race missing-root failures retained as unqualified. No automatic source gestures or provider toggles."
+}

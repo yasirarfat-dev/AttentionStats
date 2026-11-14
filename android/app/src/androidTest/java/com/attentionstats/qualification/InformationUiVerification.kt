@@ -157,6 +157,9 @@ internal object InformationUiVerification {
                     help("Counting", "Choose the apps whose")
                     help("Permissions", "Recognizes supported")
                     help("Display & experience", "Choose whether the floating")
+                    click("Built-in Reels auto-scroll")
+                    find("Our Stop control only stops our own swipes", contains = true) { true }; checks++
+                    click("Got it")
                     help("Data & Privacy", "Android-managed backup starts")
                     help("Appearance", "Choose Light, Dark")
                     help("Theme", "Choose Light, Dark")

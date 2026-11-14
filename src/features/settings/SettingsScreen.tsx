@@ -360,6 +360,17 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
               );
             }}
           />
+          <Row
+            icon="play"
+            title="Built-in Reels auto-scroll"
+            onPress={() =>
+              Alert.alert(
+                'Facebook & Instagram',
+                'Open a Reel and check its playback or options menu for Auto-scroll. Availability varies by app version and account. If the option is present, you can turn it on there.\n\nStop Attention Stats auto-scroll first to avoid two scrolling systems running together. Our Stop control only stops our own swipes; turn off built-in auto-scroll inside the source app.\n\nAttention Stats auto-scroll works independently and does not change either app’s built-in setting. Missing playback progress still waits.',
+                [{ text: 'Got it' }],
+              )
+            }
+          />
         </View>
         <Divider />
         <Row

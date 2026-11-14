@@ -58,8 +58,12 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var autoScrollContinuous: String? = null
     private var standaloneAdLive = false
     private var mixedAdsLive = false
+    private var builtinScrollProbe: String? = null
+    private var builtinScrollMenu = false
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
+        builtinScrollProbe = arguments?.getString("builtinScrollProbe")?.takeIf { it in setOf("facebook", "instagram") }
+        builtinScrollMenu = arguments?.getString("builtinScrollMenu") == "true"
         widgets = arguments?.getString("widgets") == "true"
         historyPage = arguments?.getString("historyPage") == "true"
         autoScrollLock = arguments?.getString("autoScrollLock") == "true"
@@ -113,6 +117,10 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            builtinScrollProbe?.let { source ->
+                result.putString("stream", BuiltInReelsProbe.run(this, source, builtinScrollMenu))
+                finish(Activity.RESULT_OK, result); return
+            }
             informationUi?.let { mode ->
                 result.putString("stream", InformationUiVerification.run(this, mode))
                 finish(Activity.RESULT_OK, result); return

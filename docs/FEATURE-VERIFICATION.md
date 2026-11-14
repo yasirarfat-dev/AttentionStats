@@ -163,3 +163,12 @@ Completion here mirrors tracker task acceptance. Experimental tasks can contain 
 | AS-062 Device-wide usage statistics and cross-app media feasibility | planned | [ ] | [Scope and evidence](FEATURE-TRACKER.md) |
 | AS-063 Offline protection PIN and supervised exceptions | planned | [ ] | [Scope and evidence](FEATURE-TRACKER.md) |
 | AS-064 Immediate standalone-ad scrolling and genuine Skip Ad feasibility | experimental | [ ] | [Scope and evidence](FEATURE-TRACKER.md) |
+
+
+## Built-in scrolling investigation — ADR-101 (14/11/26)
+
+- [x] Code: independent existing completion/gesture backend retained; conditional built-in Reels guidance row/help added.
+- [x] Code: bounded operator-only fixed-token/menu probe; eight host privacy/context tests pass. This is not a production provider-control adapter.
+- [x] Verified: guidance opens/dismisses on physical API36; 20 actual Settings information checks pass with appearance/backup unchanged. Actual guidance dialog visually reviewed at current phone size/text. Exact product/test hashes and separate source failures are in [evidence](evidence/builtin-autoscroll-investigation.json); broader accessibility/layout scope remains open.
+- [ ] Provider auto-scroll state read/write/read-back, persistence/Stop semantics and comparative reliability. No toggle is claimed implemented.
+- [ ] Independent YouTube/Snapchat completion, automatic next-item arrival and negative-case qualification. Existing no-signal findings are not passes.

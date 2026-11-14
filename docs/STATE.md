@@ -530,3 +530,10 @@ Reviewed source checkpoint `ab598db2901c59de0f5f5118bc01854bec96c9aa` is committ
 
 
 Reviewed source checkpoint `6ef3627c96c9c001cebc1064b5f35f6779b12001` is normally pushed to origin/develop and independently matched remotely before this metadata follow-up. Intended no-reply author/committer, remote and authenticated account were verified separately. Main remains `1fc538221adfa3e66c1d94bdb9a0258509dc188c`. Installed P8, unaccepted final JS refinements, cold-history/source gates and explicit emulator deferral remain as recorded above. No main merge, workflow or binary publication.
+
+
+## Independent scrolling and provider-control investigation (2026-11-14; ADR-101)
+
+AS-044/AS-059 continues at the maintainer's request: keep our accessibility scrolling independent while researching built-in Facebook/Instagram controls and prioritizing YouTube/Snapchat signal qualification. Settings adds conditional built-in Reels guidance with explicit ownership of Stop. An operator-only fixed-token/menu probe is isolated from production and changes no provider preference. No documented public setting-control API identified; direct toggle/read-back and superior reliability remain unqualified. [Exact artifacts, installed-version findings and checks](evidence/builtin-autoscroll-investigation.json). Existing publication HOLD and source-specific gates remain.
+
+ADR-101 bounded outcome: final preview builds; 139 Jest, eight fixed-token privacy/context tests, 31 host completion-gate checks and types/lint/format/docs/mobile checks pass. Physical Settings traversal passes 20 checks with saved appearance/backup unchanged; the native guidance dialog is visually reviewed at current phone dimensions/text. Facebook/Instagram menu-action attempts reject unqualified Home contexts; this is not feature-absence or direct-control proof. YouTube/Snapchat each expose 50 qualified viewer samples without progress and no usable media-session end signal. No video timer, provider toggle or automatic source swipe is added. Full exact-artifact/cleanup scope remains in the linked evidence.

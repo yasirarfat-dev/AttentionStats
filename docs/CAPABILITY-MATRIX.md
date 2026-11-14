@@ -148,3 +148,6 @@ November 14 AS-021 begins a current-candidate static C-28 inspection subset: ind
 
 
 ADR-097/AS-014/AS-018/AS-037 refines the existing experimental Insights presentation: visibly grouped selected-day facts, repeated date scopes and existing app-duration/open/reminder projections. No collector, session metric, native contract or capability admission is added. See [day evidence](evidence/day-insights-continuation.json) for artifact and device scope.
+
+
+ADR-101 (14/11/26), C-32/AS-044/AS-059: independent accessibility autoscroll remains experimental. Built-in Facebook/Instagram manual guidance is a separate Settings aid, not a provider API/adapter capability or an automatic fallback. Direct provider control and YouTube/Snapchat completion/action remain unqualified. [Investigation evidence](evidence/builtin-autoscroll-investigation.json).

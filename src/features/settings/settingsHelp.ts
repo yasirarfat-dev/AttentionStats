@@ -54,7 +54,12 @@ export const settingsHelp = {
     {
       term: 'Auto-scroll',
       detail:
-        'Experimental and optional for this session. Start on the floating counter to move past finished videos with readable progress. Missing video progress waits. Use the same control to stop.',
+        'Experimental and optional for this session. Start on the floating counter to move past finished videos with readable progress. Missing video progress waits. Use the same control to stop. This works independently of built-in scrolling. YouTube and Snapchat video-end scrolling are not yet qualified.',
+    },
+    {
+      term: 'Built-in Reels Auto-scroll',
+      detail:
+        'Facebook or Instagram may offer Auto-scroll in a Reel’s playback or options menu. Availability varies. The guidance row explains how to check. Stop our scrolling before enabling theirs; our Stop control cannot stop scrolling enabled inside another app.',
     },
     {
       term: 'Skip Standalone Ads',

@@ -199,3 +199,6 @@ November 14 ADR-098 extends AS-018/AS-027/AS-045 presentation: consistent left-s
 
 
 ADR-097/ADR-098/ADR-099 concluding checkpoint: P8 has scoped 27/15 actual UI and 93/477 native checks; later cold Insights history-unavailable invalidates current read acceptance. Final focus-review/placeholder-ink source refinements await build/phone review. Emulator/other-device work is stopped and explicitly deferred until product completion, with no size/performance acceptance. Tasks remain experimental; [evidence](evidence/day-insights-continuation.json) and State carry exact artifacts, cleanup and next actions. Publication remains HOLD.
+
+
+November 14 ADR-101 continuation: AS-044/AS-059 retains an independent scrolling backend and adds conditional Facebook/Instagram built-in Reels guidance. A bounded operator-only fixed-token probe supports installed-menu investigation without provider setting changes. Direct state control, comparative reliability and YouTube/Snapchat end/action acceptance remain open; no timer fallback or task promotion. [Exact evidence](evidence/builtin-autoscroll-investigation.json).

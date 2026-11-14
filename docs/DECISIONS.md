@@ -459,3 +459,14 @@ Record actual API/image/ABI/artifact, dimensions/font scale, failures and visual
 
 
 ADR-099 concluding maintainer instruction (14/11/26): stop/defer emulator and other-device support until product completion. Retain the isolated tooling/configuration without treating any failed render or automation stage as a pass; prioritize product work in the next session.
+
+
+## Independent scrolling and provider-owned controls — ADR-101 — 2026-11-14
+
+The maintainer requests investigating invocation/control of built-in Facebook and Instagram Reels auto-scroll, while retaining Attention Stats' independent accessibility scrolling. A provider feature must never become a dependency of our completion gate, counting, consent or source adapters. Prioritize independent YouTube/Snapchat signal qualification as well; an unavailable end signal remains unavailable, without a video timer substitute.
+
+Offer a compact Settings guidance row for checking a Reel's playback/options menu. Availability is account/version-specific and must be described conditionally. Do not describe built-in scrolling as universally present or more reliable without comparative evidence. Our Start/Stop controls own only our swipes. Explain that users must stop our session before enabling provider scrolling and stop the provider mode inside its app. No automatic handoff or resumption.
+
+A future direct toggle requires an identified source-owned Reels control, explicit requested state rather than blind toggle, known current state, fresh window/context/consent checks, bounded single action and independently read-back state. The separate request must explain that provider scrolling may outlive our service, HUD, Stop or permission. Unknown state, ambiguous/absent controls or changed layout must offer manual guidance. No private API, arbitrary deep-link setting write, hidden setting or silent provider change. The current guidance/probe does not implement that production action.
+
+Reviewed official [Meta Instagram platform scope](https://developers.facebook.com/documentation/instagram-platform) and [Android node/action/state API](https://developer.android.com/reference/android/view/accessibility/AccessibilityNodeInfo) on 14/11/26. No documented public Reels autoscroll-setting API was identified; this is a research result, not proof that every private interface is absent. Android click/checkable APIs alone establish no target-app control identity. Exact installed-version findings, artifacts and remaining qualification are in [evidence](evidence/builtin-autoscroll-investigation.json). AS-044/AS-059 remain experimental.
