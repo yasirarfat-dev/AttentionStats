@@ -93,5 +93,13 @@
     "Continue Facebook numeric-unavailability/repeated-end qualification with auto-scroll retained.",
     "Concrete release recovery/security/resources/Console/signature/merge/publication gates remain open."
   ],
-  "privacy": "No real counters, app-history names, raw source content, screenshots, phone identifiers or private baseline published. Normal consented observations can add their usual facts."
+  "privacy": "No real counters, app-history names, raw source content, screenshots, phone identifiers or private baseline published. Normal consented observations can add their usual facts.",
+  "sourcePublication": {
+    "reviewedSourceCommit": "ab598db2901c59de0f5f5118bc01854bec96c9aa",
+    "branch": "develop",
+    "sourceCheckpointIndependentlyMatchedRemotely": true,
+    "mainUnchanged": true,
+    "binaryPublished": false,
+    "remoteWorkflowDispatched": false
+  }
 }

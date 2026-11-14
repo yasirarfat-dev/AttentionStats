@@ -190,5 +190,13 @@
     "scope": "Paired no-action feasibility audit only; no progress recovered. UiAutomation cache only; no production cache change.",
     "cleanup": "Owned test removed; exact accessibility/backup and installed product hash matched."
   },
-  "maintainerScopeDecision": "Retain auto-scroll in publication scope and keep publication blocked while continuing qualification."
+  "maintainerScopeDecision": "Retain auto-scroll in publication scope and keep publication blocked while continuing qualification.",
+  "sourcePublication": {
+    "reviewedSourceCommit": "ab598db2901c59de0f5f5118bc01854bec96c9aa",
+    "branch": "develop",
+    "sourceCheckpointIndependentlyMatchedRemotely": true,
+    "mainUnchanged": true,
+    "binaryPublished": false,
+    "remoteWorkflowDispatched": false
+  }
 }
