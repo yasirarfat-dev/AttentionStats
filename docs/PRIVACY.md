@@ -101,3 +101,6 @@ ADR-062 derives observed app opens from already consented numeric usage events, 
 
 
 The experimental voluntary focus feature (ADR-082/AS-015) stores selected package targets, session identity, start/deadline/elapsed times and boot epoch in existing encrypted local protection configuration. This is user-selected rule configuration, not a record of attention or target content. It adds no permission, provider connection, diagnostic upload or free-text intention. It can accompany protection configuration in an explicitly selected archive/Android-managed snapshot, but replacement clears active focus before any rule evaluation. No imported focus is silently activated.
+
+
+History troubleshooting exposes only a fixed local failure-stage code through the error card’s information button. Native rejection messages/codes outside the allowlist, JSON, parser issues and history fields are discarded from errors. There is no diagnostic history, automatic logging, upload or new acquisition. The person may independently include the displayed code in a problem report.

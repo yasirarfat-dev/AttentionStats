@@ -10,6 +10,10 @@ import { useIsFocused } from '@react-navigation/native';
 import NativeDiary from '../../platform/specs/NativeDiary';
 import type { DiaryHistoryPage } from '../../platform/diaryStatus';
 import {
+  historyFailureCode,
+  type HistoryFailureCode,
+} from '../../platform/historyFailure';
+import {
   cachedHistory,
   readHistory,
   historyGeneration,
@@ -35,6 +39,7 @@ export function useHistoryPage(
   const [failure, setFailure] = useState<{
     key: string;
     message: string;
+    code: HistoryFailureCode;
   } | null>(null);
   const [busy, setBusy] = useState(false);
   const serial = useRef(0);
@@ -60,7 +65,7 @@ export function useHistoryPage(
         setLoaded({ key, value });
         setFailure(null);
       }
-    } catch {
+    } catch (error) {
       if (
         serial.current === request &&
         current.current.enabled &&
@@ -69,6 +74,7 @@ export function useHistoryPage(
         setFailure({
           key,
           message: 'History is unavailable. Saved data is preserved.',
+          code: historyFailureCode(error),
         });
     } finally {
       if (serial.current === request) setBusy(false);
@@ -92,6 +98,7 @@ export function useHistoryPage(
         : cachedHistory([startDay, throughDay, endDay, pageSize, windowDays])
       : null,
     error: enabled && failure?.key === key ? failure.message : null,
+    errorCode: enabled && failure?.key === key ? failure.code : null,
     busy,
     refresh,
   };

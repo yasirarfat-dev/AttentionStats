@@ -51,6 +51,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var breakTiming = false
     private var widgets = false
     private var historyPage = false
+    private var historyFailure = false
     private var numericAudit: String? = null
     private var numericAuditRefresh = false
     private var informationUi: String? = null
@@ -66,6 +67,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         builtinScrollMenu = arguments?.getString("builtinScrollMenu") == "true"
         widgets = arguments?.getString("widgets") == "true"
         historyPage = arguments?.getString("historyPage") == "true"
+        historyFailure = arguments?.getString("historyFailure") == "true"
         autoScrollLock = arguments?.getString("autoScrollLock") == "true"
         breakTiming = arguments?.getString("breakTiming") == "true"
         numericAudit = arguments?.getString("numericAudit")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
@@ -117,6 +119,10 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            if (historyFailure) {
+                result.putString("stream", HistoryFailureVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
             builtinScrollProbe?.let { source ->
                 result.putString("stream", BuiltInReelsProbe.run(this, source, builtinScrollMenu))
                 finish(Activity.RESULT_OK, result); return

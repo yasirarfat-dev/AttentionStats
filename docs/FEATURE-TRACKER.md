@@ -1,6 +1,6 @@
 # Feature tracker
 
-**Publishing baseline (14/11/26; AS-014/AS-018/AS-037/AS-046):** installed preview identified, implemented-surface inventory recorded, 37 focused host checks and bounded cold/warm Insights loads pass. Earlier cold-history cause and full page/error/retry acceptance remain open; no feature status promotion. [Evidence](evidence/publishing-baseline.json), [next work](PUBLISHING-PHASE.md#latest-handoff--141126-large-text-presentation-batch).
+**Publishing baseline (14/11/26; AS-014/AS-018/AS-037/AS-046):** installed preview identified, implemented-surface inventory recorded, 37 focused host checks and bounded cold/warm Insights loads pass. Earlier cold-history cause and full page/error/retry acceptance remain open; no feature status promotion. [Evidence](evidence/publishing-baseline.json), [next work](PUBLISHING-PHASE.md#latest-handoff--141126-history-diagnostics-batch).
 
 **Active delivery priority (14/11/26):** [Publishing-phase plan](PUBLISHING-PHASE.md) batches verification, defect repair and polish of implemented behavior toward AS-022/AS-046. New features follow the next Play publication. Existing task states, dependencies and release gates remain unchanged; planning is not runtime verification.
 
@@ -209,3 +209,6 @@ November 14 ADR-101 continuation: AS-044/AS-059 retains an independent scrolling
 
 
 November 14 publishing presentation batch: AS-018/AS-045 repairs large-text primary navigation and AS-018 Viewing Details metric wrapping. Physical API36 100%/200% tab/detail, 200% nested/Back/repeated-tab navigation and 100% final pending Appearance grouping/help checks pass on the exact working-tree preview in [evidence](evidence/publishing-large-text.json). Saved appearance/backup and original font scale are preserved. AS-057 grouping source stays separate pending work; all tasks retain experimental status. History, broader accessibility and release gates remain open.
+
+
+November 14 publishing history diagnostics: AS-014/AS-018/AS-037 adds fixed local native/parser failure codes behind the error-card information control, retaining validation/cache/privacy fences. 148 host tests and 71 injected physical error/help/retry/recovery assertions pass with explicit instrumentation -1; actual dark 100% error states and one fresh normal Insights entry reviewed. [Exact artifact and limits](evidence/publishing-history-diagnostics.json). Earlier history cause, paging/stale/lifecycle and release gates stay open; no task promotion.

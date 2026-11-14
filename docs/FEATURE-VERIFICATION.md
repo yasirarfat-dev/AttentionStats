@@ -21,6 +21,10 @@ The product rows cover delivered and proposed user-facing behavior. The complete
 
 [Large-text evidence](evidence/publishing-large-text.json) binds preview `5754370c325eb939e56fb01175af017d29c4cc49f74c003e0098f6c30b07b90b`, code10/API36, to 59 matching bundled app sources including pending work. Tab labels and Viewing Details render at 100%/200%; 200% nested/Android/repeated-tab Back passes. Pending Templates/Customization grouping/help is visually reviewed at 100%, with saved appearance/backup unchanged. 139 Jest and preview assembly/lint pass (zero errors, 170 warnings). This accepts only those presentation checks; history, source, broad accessibility and publication gates remain open.
 
+## Publishing history diagnostics — 14/11/26
+
+**[x] Code; [x] Verified for injected scope only.** [Evidence](evidence/publishing-history-diagnostics.json) binds preview `4cf0f60fd1806c47331c6bc650c26b2577ca21e59763314f959d5df232792b2b` / test `d81786b56f3e72cb04df0ab2b463b16d2d28b932faadff712f98ee2bd6021c10`, code10/API36. Seven injected native/parser stages pass 71 error/help/redaction/retry/recovery assertions with explicit -1. Native busy/validation error presentation is visually reviewed in dark theme at 100%; fresh direct Insights entry loads after test removal. 148 host tests/build/lint pass; saved appearance/backup/font preserved. Original regression cause, real failure recovery, page boundaries/stale-screen behavior and broader accessibility remain unchecked. No full history acceptance or release clearance.
+
 ## Artifact key
 
 | Key | Attention Stats version / artifact | Evidence scope |

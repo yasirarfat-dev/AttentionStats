@@ -46,6 +46,7 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
         if (windowDays !in listOf(0.0, 7.0, 30.0) || pageSize !in listOf(7.0, 30.0) || listOf(startDay, throughDay, pageEnd).any {
             it.isNotEmpty() && (!it.matches(Regex("\\d{4}-\\d{2}-\\d{2}")) || runCatching { java.time.LocalDate.parse(it) }.isFailure)
         }) { failure(promise, "INVALID_ARGUMENT"); return }
+        if (HistoryFailureFixture.respond(promise)) return
         coordinator.diaryHistoryRange(startDay, throughDay, pageEnd, pageSize.toInt(), windowDays.toInt(), { promise.resolve(it) }, { failure(promise, it) })
     }
     override fun pickDate(label: String, value: String, minimum: String, maximum: String, promise: Promise) {

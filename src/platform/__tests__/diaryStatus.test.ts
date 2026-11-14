@@ -1,4 +1,5 @@
 import { parseDiaryHistoryPage, parseDiarySnapshot } from '../diaryStatus';
+import { HistoryReadError } from '../historyFailure';
 
 const value = {
   contractVersion: 2,
@@ -63,6 +64,33 @@ const lifetime = () => ({
   olderEnd: null,
   newerEnd: null,
   snapshot: value,
+});
+
+test('history errors identify the bounded failure stage without payload or parser issues', () => {
+  for (const [payload, code] of [
+    [null, 'payload'],
+    [' '.repeat(2_000_001), 'payload'],
+    ['{"synthetic-private-history":', 'json'],
+    [JSON.stringify({ private: 'synthetic-private-history' }), 'validation'],
+    [JSON.stringify({ ...lifetime(), olderEnd: '2026-10-01' }), 'validation'],
+  ] as const) {
+    let failure: unknown;
+    try {
+      parseDiaryHistoryPage(payload);
+    } catch (error) {
+      failure = error;
+    }
+    expect(failure).toBeInstanceOf(HistoryReadError);
+    expect(failure).toMatchObject({
+      code,
+      message: 'History page unavailable',
+    });
+    expect(JSON.stringify(failure)).not.toMatch(/private|issues|cause/);
+    expect(Object.keys(failure as HistoryReadError).sort()).toEqual([
+      'code',
+      'name',
+    ]);
+  }
 });
 
 test('zero-second continuation is a valid saved choice; negative delays are rejected', () => {

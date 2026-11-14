@@ -1,5 +1,9 @@
 import NativeDiary from '../../platform/specs/NativeDiary';
 import {
+  HistoryReadError,
+  nativeHistoryFailure,
+} from '../../platform/historyFailure';
+import {
   parseDiaryHistoryPage,
   type DiaryHistoryPage,
 } from '../../platform/diaryStatus';
@@ -26,16 +30,25 @@ export function clearHistoryCache() {
   pending.clear();
   listeners.forEach(listener => listener());
 }
+async function loadHistory(args: Request): Promise<DiaryHistoryPage> {
+  if (!NativeDiary) throw new HistoryReadError('native_unavailable');
+  let raw: string;
+  try {
+    raw = await NativeDiary.getHistoryRange(...args);
+  } catch (error) {
+    throw nativeHistoryFailure(error);
+  }
+  return parseDiaryHistoryPage(raw);
+}
+
 export function readHistory(args: Request): Promise<DiaryHistoryPage> {
   const key = historyKey(args);
   const existing = pending.get(key);
   if (existing) return existing;
-  if (!NativeDiary) return Promise.reject(new Error('History unavailable'));
   const epoch = generation;
-  const request = NativeDiary.getHistoryRange(...args)
-    .then(raw => {
-      const value = parseDiaryHistoryPage(raw);
-      if (epoch !== generation) throw new Error('History invalidated');
+  const request = loadHistory(args)
+    .then(value => {
+      if (epoch !== generation) throw new HistoryReadError('invalidated');
       if (epoch === generation) {
         if (cache.size >= 8) cache.delete(cache.keys().next().value!);
         cache.set(key, value);

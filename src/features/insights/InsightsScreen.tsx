@@ -295,8 +295,11 @@ export function InsightsScreen() {
         />
       )}
       {diary.error && (
-        <Card tone="warn">
-          <Title>History couldn’t refresh</Title>
+        <Card
+          tone="warn"
+          title="History couldn’t refresh"
+          info={`Troubleshooting code: ${diary.errorCode}. You can include this code when reporting a problem; it contains no history. Nothing is sent automatically.`}
+        >
           <Body>{diary.error}</Body>
           {diary.snapshot && (
             <Body muted>Showing the last loaded observations.</Body>

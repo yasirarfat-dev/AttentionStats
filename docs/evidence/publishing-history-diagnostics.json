@@ -1,0 +1,113 @@
+{
+  "date": "2026-11-14",
+  "verificationDate": "14/11/26",
+  "tasks": [
+    "AS-014",
+    "AS-018",
+    "AS-037",
+    "AS-046"
+  ],
+  "status": "Failure-stage diagnostics and scoped injected error/help/retry checks pass; earlier history regression unresolved; publication HOLD",
+  "source": {
+    "branch": "develop",
+    "startingCommit": "c729a10e6ad450bccb59ebb36283edc637434ba0",
+    "workingTree": "Preserved pending Appearance/Today/native source and test edits included in build; not committed-only release provenance",
+    "mappedAppSourcesCompared": 60,
+    "mappedAppSourceDifferences": 0,
+    "apkBundleMatchesGeneratedBundle": true,
+    "comparison": "Generated final Hermes map sourcesContent compared with src TS/TSX/JS; normalized line endings, binary assets excluded; native/test compilation recorded separately"
+  },
+  "product": {
+    "sha256": "4cf0f60fd1806c47331c6bc650c26b2577ca21e59763314f959d5df232792b2b",
+    "testSha256": "d81786b56f3e72cb04df0ab2b463b16d2d28b932faadff712f98ee2bd6021c10",
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "physicalApi": 36,
+    "installation": "In-place update of existing debug package; no uninstall/reset of product",
+    "testInstallation": "Owned debug test APK; independently hashed after install and removed after verification"
+  },
+  "implementation": {
+    "codes": [
+      "native_busy",
+      "native_interrupted",
+      "native_storage_unavailable",
+      "native_invalid_argument",
+      "native_unavailable",
+      "native_unknown",
+      "payload",
+      "json",
+      "validation",
+      "invalidated",
+      "unexpected"
+    ],
+    "bounds": "Existing 2,000,000-character limit, strict schema/calendar/cursor validation, cache capacity and invalidation/request fences retained",
+    "privacy": "Fixed tokens only; original rejection message/code outside allowlist/cause, payload and parser issues are not retained in errors or logged; optional local help, no automatic report",
+    "fixture": "Debug-gated process memory; no JS/intent setter, no store mutation; cleared in finally and inert for release"
+  },
+  "checks": {
+    "focusedHostTests": 36,
+    "jestTests": 148,
+    "jestSuites": 17,
+    "typecheck": "PASS",
+    "lintArchitectureBackupPalette": "PASS",
+    "format": "PASS",
+    "mobilePolicy": "PASS; dated locked tooling check, not live registry research",
+    "previewTestAssemblyAndPreviewLint": "PASS; 4m14s; 536 tasks, 56 executed, 480 up-to-date",
+    "finalTestOnlyAssembly": "PASS; 1m7s; 315 tasks, 31 executed, 284 up-to-date",
+    "nativeLint": {
+      "errors": 0,
+      "warnings": 170
+    },
+    "toolingLimitations": [
+      "Existing AGP legacy DSL/variant and Kotlin plugin deprecations; Gradle 10 compatibility open",
+      "Existing CMake ordering/minimum-version/object-path warnings",
+      "Repository SDK lacks platform-tools; existing external adb used without shared configuration changes"
+    ]
+  },
+  "phone": {
+    "assertions": 71,
+    "instrumentationCode": -1,
+    "mode": "historyFailure=true; own-app touchscreen taps with bounded accessibility-tree matching and explicit target; no external source interaction",
+    "injectedCodes": [
+      "native_busy",
+      "native_interrupted",
+      "native_storage_unavailable",
+      "native_unknown",
+      "payload",
+      "json",
+      "validation"
+    ],
+    "cases": "Error card, collapsed information, expanded fixed code, preserved-history message, raw synthetic sentinel absent, help collapse and explicit retry; after clearing fixture, successful actual native history read removes error and renders Video Encounters",
+    "visualReview": "Actual dark-theme 100% native_busy and validation error/help captures reviewed: complete heading, wrapped fixed code/explanation, preserved-history message and Try Again visible; no clipping",
+    "finalNormalRead": "After owned test removal and fresh process, direct Insights deep link loads Video Encounters within bounded 25-second readiness wait; no performance benchmark or full cold/warm matrix claim",
+    "harnessCorrections": [
+      "Early phone trials were interrupted by reported other-agent use; subsequent resume independently matched last owned artifacts/preferences and no active instrumentation",
+      "Case-sensitive locators failed to recognize shared title/button capitalization; native lifecycle RESUMED, Insights selected and loading false retained as diagnosis; case-insensitive matching fixes test; no product repair inferred",
+      "Touchscreen taps establish the same entry as successful owned adb navigation; no claim that accessibility ACTION_CLICK itself is defective",
+      "Pretty am instrument -w output supplies PASS stream without machine result code; final -w -r run returns 71 PASS checks and explicit -1; previous repeated streams are not counted as additional coverage"
+    ]
+  },
+  "preservation": {
+    "appearanceAndBackupPreferencesMatchFreshBaselineAfterUpgradeAndFinalCleanup": true,
+    "originalFontScaleUnchanged": true,
+    "historyReset": false,
+    "databaseEqualityClaim": false,
+    "sourceProviderGrantRuleChanges": false,
+    "fixtureCleared": true,
+    "ownedPhoneCapturesRemoved": true,
+    "ownedTestPackageAbsent": true,
+    "finalProductHashMatched": true,
+    "finalTab": "Today",
+    "emulatorMergeWorkflowSigningPlayActions": false,
+    "ownedPrivateCacheFilesRemoved": 6
+  },
+  "limits": [
+    "Earlier P8 cold-history regression cause is still unestablished; these injected failures do not repair it",
+    "No real storage corruption, queue saturation, interruption, deletion or permission withdrawal was induced",
+    "Native invalid-argument mapping is host-tested; missing-module/unexpected paths are not phone-qualified",
+    "Same-page stale cache and invalidation/replacement requests are host-tested; no broad mounted-hook concurrency/erase or stale-screen qualification",
+    "No paging-boundary, million-row, latency/soak, TalkBack, RTL, light-theme or 200% error-card qualification",
+    "Source auto-scroll remains in release scope and unqualified; remaining release gates and pending-work integration stay open"
+  ],
+  "next": "Review/integrate pending Appearance/Today work as a separate batch; complete draft/save/cancel and 200% editor checks. On a real history recurrence use the fixed code to select the next cause-specific investigation; finish paging/error/stale/lifecycle gates without repeating unchanged negative matrices."
+}

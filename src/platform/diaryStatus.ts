@@ -1,4 +1,5 @@
 import type * as Zod from 'zod';
+import { HistoryReadError } from './historyFailure';
 const { z }: typeof Zod = require('zod');
 const socialKeys = [
   'instagram',
@@ -228,13 +229,19 @@ const historyPageSchema = z
   });
 export type DiaryHistoryPage = Zod.infer<typeof historyPageSchema>;
 export function parseDiaryHistoryPage(payload: unknown): DiaryHistoryPage {
+  if (typeof payload !== 'string' || payload.length > 2_000_000)
+    throw new HistoryReadError('payload');
+  let decoded: unknown;
   try {
-    if (typeof payload === 'string' && payload.length <= 2_000_000) {
-      const result = historyPageSchema.safeParse(JSON.parse(payload));
-      if (result.success) return result.data;
-    }
+    decoded = JSON.parse(payload);
   } catch {
-    /* Never include native history in errors. */
+    throw new HistoryReadError('json');
   }
-  throw new Error('History page unavailable');
+  try {
+    const result = historyPageSchema.safeParse(decoded);
+    if (result.success) return result.data;
+  } catch {
+    /* Refinement exceptions are also sanitized; never retain parser issues. */
+  }
+  throw new HistoryReadError('validation');
 }
