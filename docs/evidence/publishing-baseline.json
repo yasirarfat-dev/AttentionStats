@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-14",
+  "verificationDate": "14/11/26",
+  "tasks": ["AS-014", "AS-018", "AS-037", "AS-046"],
+  "status": "Initial baseline and bounded history investigation; publication HOLD; earlier cold-history regression unresolved",
+  "source": {
+    "branch": "develop",
+    "startingCommit": "45c93ada34d375ae6656a9203e5bf783f6c8080b",
+    "workingTree": "Existing uncommitted Appearance/Today implementation, tests and documentation preserved separately; not a committed-only binary",
+    "installedMatchesLocalPreview": true,
+    "apkBundleMatchesGeneratedBundle": true,
+    "mappedAppSourceFilesCompared": 58,
+    "mappedAppSourceDifferences": 0,
+    "comparison": "Generated preview source-map sourcesContent compared with existing src TS/TSX/JS files, normalizing line endings; PNG/binary assets excluded",
+    "limits": "JS comparison does not establish native source provenance, reproduce the build, or qualify all pending renders"
+  },
+  "product": {
+    "sha256": "f9da99d1703dd96ecf3f9766998bfb18d23e1c117612c4db5b1d828d4ae3b60a",
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "physicalApi": 36,
+    "installedDuringThisBatch": false,
+    "testArtifact": null,
+    "method": "Explicitly targeted adb own-app navigation and in-memory UIAutomator trees; no instrumentation installed or executed"
+  },
+  "phone": {
+    "initialColdWeek": "PASS: own-app force-stop/launch, Insights; Date Range/Video Encounters rendered without the known history error",
+    "repeatedMatrix": {
+      "coldWeekLaunches": 3,
+      "coldWeekLoaded": 3,
+      "subsequentWarmMonthSwitches": 3,
+      "warmMonthLoaded": 3,
+      "subsequentWarmAllTimeSwitches": 3,
+      "warmAllTimeLoaded": 3,
+      "knownHistoryErrorObserved": false,
+      "predicate": "Own-package Start date accessibility control plus Video Encounters title; bounded polling for error/loading. Range data/metric accuracy and every transient frame are not asserted"
+    },
+    "directColdRanges": [
+      {"period": "Month", "loaded": true, "rangeDateControlsPresent": true, "inclusiveWindowLength": 30},
+      {"period": "All Time", "loaded": true, "rangeDateControlsPresent": true}
+    ],
+    "navigation": {
+      "rangeCalendarCancelPreservesStartSelection": true,
+      "rangeCalendarAndroidBackPreservesStartSelection": true,
+      "chooseDayCalendarOpensAndBackReturns": true,
+      "previousAndNextDayControlsActionable": true,
+      "byAppRowOpensAndReturnsToList": true,
+      "limits": "No new assertion of historical-date caption coherence, app subtotal accuracy, page-boundary replacement, error/retry behavior or visual/accessibility acceptance"
+    },
+    "timing": "Polling observations include adb/UIAutomator overhead; no native query-latency or smoothness benchmark is claimed"
+  },
+  "host": {
+    "focusedJest": {"suites": 3, "tests": 37, "result": "PASS"},
+    "testFiles": [
+      "src/platform/__tests__/diaryStatus.test.ts",
+      "src/features/diary/historyCache.test.ts",
+      "src/features/insights/historySummary.test.ts"
+    ],
+    "scope": "Strict history/date/cursor contracts, exact/unknown counts, cache deduplication/invalidation/retry and day/app summary semantics; no injected phone error scenario",
+    "documentationAndWhitespace": "PASS"
+  },
+  "investigation": {
+    "pathsReviewed": [
+      "src/features/diary/useHistoryPage.ts",
+      "src/features/diary/historyCache.ts",
+      "src/platform/diaryStatus.ts",
+      "android/app/src/main/java/com/attentionstats/bridge/DiaryModule.kt",
+      "android/app/src/main/java/com/attentionstats/reels/ReelsCoordinator.kt",
+      "android/app/src/main/java/com/attentionstats/diary/DiaryEngine.kt"
+    ],
+    "finding": "Native rejection and strict JS payload validation converge on the same user-visible history error. Current bounded trials do not reproduce the earlier P8 failure; root cause is not established",
+    "repairMade": false,
+    "next": "Separate native error code from parser-stage failure with bounded content-free evidence when reproduced; do not log history payloads or alter the store. Cover retry/error and page replacement before clearing acceptance"
+  },
+  "cleanup": {
+    "installedProductHashIndependentlyMatchedAfterChecks": true,
+    "returnedToTodaySelected": true,
+    "testPackageAbsentAtEnd": true,
+    "historyResetReplacedExportedOrRestored": false,
+    "settingsPermissionSourceOrRuleCommandsIssued": false,
+    "screenshotsOrPrivateHistoryFilesCreated": false,
+    "limits": "No direct logical database before/after comparison; normal previously consented collection may append facts. Only existing installation was used"
+  },
+  "release": {
+    "baselineSurfaceInventory": "docs/PUBLISHING-PHASE.md scope and defect ledger",
+    "readiness": "HOLD",
+    "remaining": ["Earlier cold-history failure/root cause", "Page-boundary/error/retry acceptance", "Known 200% tab/detail-label issues and pending Appearance render review", "Source auto-scroll, safety, lifecycle, recovery, accessibility, resource and compatibility gates", "Console state, candidate provenance and current policy review"],
+    "mainMergeWorkflowSigningOrPlayAction": false,
+    "resourceSoakStarted": false
+  }
+}

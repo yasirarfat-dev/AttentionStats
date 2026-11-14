@@ -1,6 +1,6 @@
 # Next Google Play publishing phase
 
-**Status:** Active maintainer-directed release preparation, started 14/11/26. Planning batch complete; qualification pending. Publication readiness: HOLD.
+**Status:** Active maintainer-directed release preparation, started 14/11/26. Plan and initial artifact/surface inventory complete; bounded history checks recorded, regression investigation pending. Publication readiness: HOLD.
 **Responsibility:** Persists scope, ordered task batches, acceptance gates and handoffs for polishing and publishing the existing Android product before newer features.
 **Related specifications:** [Rules](AGENT-RULES.md), [State](STATE.md), [Tracker](FEATURE-TRACKER.md), [Verification](FEATURE-VERIFICATION.md), [Release](RELEASE.md), [Testing](TESTING.md), [Console preparation](../release/PLAY-CONSOLE.md).
 **Unresolved feasibility:** History reads, source playback/auto-scroll, recovery, lifecycle, accessibility, resources, compatibility and Console/candidate provenance remain open. This plan clears none of those gates.
@@ -44,14 +44,25 @@ The nine gates in [Release](RELEASE.md#readiness-assessment-2026-11-07) remain t
 
 ## Scope and defect ledger
 
-Batch 1 expands this to cover every implemented release surface and links to existing Verification rows instead of duplicating historical results. Each failed/uncovered scope needs an owner and next action. These are work dispositions, not AS status promotions.
+Initial inventory covers the existing release surfaces below. [Feature verification](FEATURE-VERIFICATION.md#product-behavior) retains historical artifact-specific results; this table records disposition and ownership, not fresh acceptance or AS status promotions. [Baseline evidence](evidence/publishing-baseline.json) identifies the actually installed preview and the narrow new checks. Planned features outside the implemented subsets stay deferred.
 
 | Surface / issue | Current disposition | Next action |
 |---|---|---|
-| Cold Insights history | Release blocker; reported regression | Reproduce cold reads and inspect native error/query path; AS-014/AS-037. |
-| Appearance/Today/focus/icons | Existing source; artifact-specific partial acceptance | Review pending diff/evidence and identify installed binary; AS-018/AS-045/AS-057. |
-| Auto-scroll reliability | Release blocker; historical partial passes | New correlated-signal hypothesis and supported negative/arrival matrix; AS-044/AS-059/AS-064. |
-| Recovery/security/lifecycle/resources/accessibility | Open gates with substantial scoped historical evidence | Map remaining applicable scenarios before reruns; owners in batches 2–6. |
+| Onboarding, disclosures, source choices and permission health | Implemented subset; earlier scoped evidence | Batch 2 entry/Back/help review and batch 4 revoke/restore fences; AS-010/AS-018. |
+| App usage, opens and retained counting store | Implemented subset; broader accuracy/lifecycle open | Independent time/entry comparison, upgrade and clock/epoch boundaries; AS-009/AS-011/AS-050, batches 3–5. |
+| Five-source viewers, supported inline feeds, media/ad/revisit classification | Implemented adapters; route/version-specific historical acceptance | Current source/version/locale and negative matrix; AS-013/AS-041/AS-048/AS-054, batch 3. No blanket source support claim. |
+| Today, source/app identities and details | Pending source refinements; installed JS now matched | Review pending diff and actual render; repair 200% detail-label wrapping; AS-018/AS-045/AS-057, batch 2. |
+| Insights Week/Month/All Time and bounded day/app explorers | Cold-history regression remains open; initial checks do not reproduce it | Three cold Week launches and six warm switches plus direct cold Month/All Time load on current preview. Isolate failure code/payload-validation stage before a repair; full paging, retry/error and coverage remain; AS-014/AS-037, batch 1. |
+| HUD count/detail, drag, pause, hide and source return | Historical scoped control evidence | Current-artifact source/control/lifecycle negatives; AS-034/AS-059, batches 3–4. |
+| Independent auto-scroll and standalone-ad skipping | Release blocker; partial source-specific arrivals | New correlated-signal hypothesis and supported negative/arrival matrix; AS-044/AS-059/AS-064, batch 3. Provider-control guidance is conditional help, not provider-setting control. |
+| Mindful-break count/time, dismissal and pause fallback | Earlier bounded count/time/dismissal evidence | Current trigger/reset/dismiss/late-action and source pause/unavailable matrix; AS-016/AS-060/AS-061, batches 3–4. |
+| Blocks, limits, groups and recurring full/selective schedules | Implemented subset; conflict/expiry matrix open | Safe exits, allowances, overlapping rules, expiry and recovery exclusions; AS-015/AS-017/AS-051/AS-053, batch 4. |
+| Voluntary focus, review, Block Apps / Allow Only, early End | Implemented subset; actual expiry/reboot open | Verify final review render; real expiry/reboot/conflict matrix; AS-015/AS-017, batches 2/4. |
+| Settings, appearance, compact help and native pages | Pending Appearance grouping; partial actual render evidence | Review saved/cancel/help unchanged-state and final grouping; AS-018/AS-045/AS-057, batch 2. |
+| Launcher widgets, gallery and per-instance configuration | Implemented widget subset; launcher/lifecycle gaps | Current-artifact placement/resize/reconfigure/stale/unknown values and resource checks; AS-027, batches 2/6. Quick Settings stays deferred. |
+| Local erase, portable backup/restore and Android-managed backup | Existing paths; destructive/recovery acceptance incomplete | Preserve live store; isolated synthetic failure/recovery/no-resurrection matrix; AS-019/AS-020/AS-058, batch 5. Direct Drive API backup stays blocked AS-028. |
+| Report-a-problem/privacy and published support materials | Existing UI/materials; candidate consistency unverified | Inspect outbound destinations, disclosures and candidate claims; AS-018/AS-021/AS-046, batches 2/5/7. |
+| Security, lifecycle, accessibility and resources across surfaces | Open gates with scoped historical evidence | Apply D/B/S/L/X scenarios; 200% tab-label ellipsis remains; batches 2–6. No seven-day soak or new performance benchmark started in this baseline batch. |
 | Compatibility beyond current phone | Deferred work; acceptance gap | Preserve deferral; resolve explicitly before readiness; AS-002/AS-022. |
 | Play state/signed provenance | Externally unverified | Inspect authorized Console access or obtain exact maintainer records when needed; AS-046. |
 
@@ -64,11 +75,13 @@ Batch 1 expands this to cover every implemented release surface and links to exi
 5. Review diffs/public artifacts, run applicable checks, and commit/push only reviewed owned changes on `develop` after identity/remote/authentication checks. Workflows remain manual and undispatched unless explicitly requested. Distinguish source push, installed binary and Play status.
 6. Save a handoff after each small batch. Follow the 100k–150k context checkpoint/compact rule when readings are available; never invent readings or claim unavailable compaction controls. Use available controls or leave a saved checkpoint for user/app compaction. Resume the next action without repeating trials unless changes or coverage gaps warrant it.
 
-## Latest handoff — 14/11/26, planning batch
+## Latest handoff — 14/11/26, initial baseline/history batch
 
-- **Completed:** phase scope, ordered batches, gates, defects and continuity procedure documented and linked from entrypoints. Product behavior and feature acceptance unchanged.
-- **Checks/publication:** actual results belong in the [dated planning record](IMPLEMENTATION_LOG/2026-11-14.md#next-google-play-publishing-phase-plan).
-- **Preserved work:** existing Appearance/Today source/tests/evidence and associated documentation are separate from this batch.
+- **Completed:** installed-artifact identification, implemented-surface inventory, bounded cold/warm history checks and focused host regressions. [Exact results and limits](evidence/publishing-baseline.json). This is an investigation checkpoint, not completion of all batch 1 acceptance.
+- **Artifact:** installed/local preview `f9da99d1703dd96ecf3f9766998bfb18d23e1c117612c4db5b1d828d4ae3b60a`, code10, physical API36. All 58 mapped app TS/TSX/JS files match current working files; native build/source provenance is not independently reconstructed. Source checkpoint starts at `45c93ad` plus preserved uncommitted work. Neither P8 nor a committed-only tree identifies this preview.
+- **History outcome:** current bounded cold/warm loads pass; P8 failure is not reproduced and its cause is unknown. No runtime fix, data reset, version bump, install, migration or new release acceptance. No need to repeat this unchanged matrix without a new hypothesis.
+- **Checks/publication:** 37 focused Jest tests pass; remaining documentation/commit/push results in the [dated baseline record](IMPLEMENTATION_LOG/2026-11-14.md#publishing-baseline-and-history-investigation). No Play publication.
+- **Preserved work:** existing Appearance/Today source/tests/evidence and associated documentation remain separate from this batch. Phone history stays in place; only own-app launches/navigation and calendar cancellation, with no setting/save/erase/restore/provider command.
 - **Readiness:** HOLD. Physical/source/data/accessibility/resource/compatibility/Console gates remain open. New features wait until after the next published release.
-- **Next concrete action:** batch 1: inspect latest artifact/evidence and cold Insights read implementation, reproduce the native read failure on the authorized connected debug phone, then make a targeted preservation-safe repair. If required phone access is absent, request connection and continue independent source/evidence review.
+- **Next concrete action:** distinguish native rejection (`BUSY`/`INTERRUPTED`/`STORAGE_UNAVAILABLE`) from strict JS history validation using bounded content-free diagnostic evidence when the failure next occurs; keep personal payloads off public artifacts. Then repair the established cause and cover retry/error and page-boundary replacement. Independently proceed with batch 2's known 200% bottom-tab ellipsis/detail-label wrapping and review pending Appearance grouping. Do not restart emulator work or source-negative probes implicitly.
 - **After publication:** record actual delivered version/track and supported limits, then select newer features from the tracker/queue.

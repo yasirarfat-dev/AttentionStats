@@ -1,6 +1,6 @@
 # Current state
 
-**Active maintainer-directed phase (14/11/26):** follow [Next Google Play publishing phase](PUBLISHING-PHASE.md). Verify and polish existing Android behavior, publish the next qualified version, then resume newer features. Planning batch documented; no new runtime acceptance. Next: baseline/artifact inventory and preservation-safe cold Insights read investigation. Publication remains HOLD; resume the plan's latest handoff after compaction/new sessions.
+**Active maintainer-directed phase (14/11/26):** follow [Next Google Play publishing phase](PUBLISHING-PHASE.md). Verify and polish existing Android behavior, publish the next qualified version, then resume newer features. Initial artifact/surface inventory and bounded history checks recorded in [baseline evidence](evidence/publishing-baseline.json). Current cold/warm loads pass in that narrow scope; earlier failure remains unresolved. Next: content-free failure-stage diagnosis and known large-text polish; full history acceptance remains open. Publication remains HOLD; resume the plan's latest handoff after compaction/new sessions.
 
 **Status:** MVP 1.0.0 (versionCode 10) built and previously phone-verified; maintainer reports closed-beta publication. Further development uses `develop`. Updated 2026-11-14.
 **Responsibility:** Records what exists now, how it was verified, and what is next. Older detail lives in git history and the [implementation log](IMPLEMENTATION_LOG/README.md).

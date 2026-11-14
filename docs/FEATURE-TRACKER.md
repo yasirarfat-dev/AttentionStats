@@ -1,5 +1,7 @@
 # Feature tracker
 
+**Publishing baseline (14/11/26; AS-014/AS-018/AS-037/AS-046):** installed preview identified, implemented-surface inventory recorded, 37 focused host checks and bounded cold/warm Insights loads pass. Earlier cold-history cause and full page/error/retry acceptance remain open; no feature status promotion. [Evidence](evidence/publishing-baseline.json), [next work](PUBLISHING-PHASE.md#latest-handoff--141126-initial-baselinehistory-batch).
+
 **Active delivery priority (14/11/26):** [Publishing-phase plan](PUBLISHING-PHASE.md) batches verification, defect repair and polish of implemented behavior toward AS-022/AS-046. New features follow the next Play publication. Existing task states, dependencies and release gates remain unchanged; planning is not runtime verification.
 
 For separate implementation/verification boxes, dates, versions and known failures, read the [feature verification checklist](FEATURE-VERIFICATION.md). Historical passes do not clear a later regression or qualify a different artifact.

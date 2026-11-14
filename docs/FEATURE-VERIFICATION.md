@@ -13,6 +13,10 @@ Update affected rows in the same change as code and evidence. Record failures an
 
 The product rows cover delivered and proposed user-facing behavior. The complete AS task checklist below maps the broader portfolio, including research and infrastructure. Its completion boxes mirror the authoritative tracker, not the narrower Code boxes above.
 
+## Publishing baseline — 14/11/26
+
+[Baseline evidence](evidence/publishing-baseline.json) identifies installed/local preview `f9da99d1703dd96ecf3f9766998bfb18d23e1c117612c4db5b1d828d4ae3b60a`, code10/API36. Its bundled JS matches 58 current mapped app source files, including pending UI work; native source provenance is not reconstructed. Three cold Week launches, six warm range switches and direct cold Month/All Time loads pass, plus scoped calendar cancellation/day/app navigation and 37 host tests. Earlier P8 failure is not reproduced, its cause remains unknown, and full history/page-boundary/error/retry acceptance stays unchecked. No runtime repair, install or status promotion.
+
 ## Artifact key
 
 | Key | Attention Stats version / artifact | Evidence scope |
