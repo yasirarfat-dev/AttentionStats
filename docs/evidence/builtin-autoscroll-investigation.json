@@ -153,5 +153,15 @@
   "uiTestSha256": "cb98ecd8c2af79c6363d6bbd3e9d5ccf5e555287ddf0c66d44818615780322fb",
   "initialNumericAuditProvenance": "Initial rebuilt instrumentation installed before native-probe changes; hash was not captured at invocation. These initial research observations are not exact-artifact acceptance; final provenance-qualified rerun follows.",
   "finalSourceProbeTestSha256": "f49689acc35ec0ceb8f5d07df5fd0226d71078e5a36dd12e2f47f53ca891d58f",
-  "finalSourceProbeRerun": "Final test hash: YouTube/Snapchat each 50 qualified viewer samples, zero progress/matches; 30 media samples each with zero usable values. Instagram HOME/129 nodes and Facebook HOME/108 nodes; both reject menu actions. Launch-race missing-root failures retained as unqualified. No automatic source gestures or provider toggles."
+  "finalSourceProbeRerun": "Final test hash: YouTube/Snapchat each 50 qualified viewer samples, zero progress/matches; 30 media samples each with zero usable values. Instagram HOME/129 nodes and Facebook HOME/108 nodes; both reject menu actions. Launch-race missing-root failures retained as unqualified. No automatic source gestures or provider toggles.",
+  "publication": {
+    "sourceCommit": "698cdb22dbd20479c22b23403b4f289e7fd26397",
+    "branch": "develop",
+    "normalPush": "success; remote ref independently matches",
+    "identityRemoteLoginChecks": "intended contributor no-reply identity and yasirarfat-dev remote/login verified separately",
+    "mainMerged": false,
+    "remoteWorkflowRun": false,
+    "binaryPublished": false,
+    "preexistingWork": "preserved unstaged"
+  }
 }
