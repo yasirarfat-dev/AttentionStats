@@ -134,6 +134,17 @@
     "reusableIsolatedAvdRetained": true,
     "realHistoryClearedOrReplaced": false,
     "savedRuleOrFocusStartRequested": false,
-    "backupProviderRequestRequested": false
+    "backupProviderRequestRequested": false,
+    "privatePhoneCapturesAndBaselineRemoved": true
+  },
+  "sourcePublication": {
+    "reviewedSourceCheckpoint": "6ef3627c96c9c001cebc1064b5f35f6779b12001",
+    "branch": "develop",
+    "checkpointIndependentlyMatchedRemotelyBeforeMetadataFollowup": true,
+    "intendedNoReplyAuthorAndCommitterVerified": true,
+    "intendedRemoteAndAuthenticatedAccountVerifiedSeparately": true,
+    "mainUnchanged": "1fc538221adfa3e66c1d94bdb9a0258509dc188c",
+    "binaryPublished": false,
+    "remoteWorkflowDispatched": false
   }
 }

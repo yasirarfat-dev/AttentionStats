@@ -527,3 +527,6 @@ Cleanup hash-checks/removes the owned test, restores exact original Accessibilit
 
 
 Reviewed source checkpoint `ab598db2901c59de0f5f5118bc01854bec96c9aa` is committed and normally pushed to origin/develop, independently matched remotely before this metadata follow-up. Intended no-reply author/committer, origin and authenticated GitHub login were checked separately. Main is unchanged; no merge, workflow dispatch, signing or binary publication. This follow-up records source publication only; scoped verification and the publication hold remain unchanged.
+
+
+Reviewed source checkpoint `6ef3627c96c9c001cebc1064b5f35f6779b12001` is normally pushed to origin/develop and independently matched remotely before this metadata follow-up. Intended no-reply author/committer, remote and authenticated account were verified separately. Main remains `1fc538221adfa3e66c1d94bdb9a0258509dc188c`. Installed P8, unaccepted final JS refinements, cold-history/source gates and explicit emulator deferral remain as recorded above. No main merge, workflow or binary publication.
