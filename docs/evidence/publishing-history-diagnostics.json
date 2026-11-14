@@ -15,7 +15,9 @@
     "mappedAppSourcesCompared": 60,
     "mappedAppSourceDifferences": 0,
     "apkBundleMatchesGeneratedBundle": true,
-    "comparison": "Generated final Hermes map sourcesContent compared with src TS/TSX/JS; normalized line endings, binary assets excluded; native/test compilation recorded separately"
+    "comparison": "Generated final Hermes map sourcesContent compared with src TS/TSX/JS; normalized line endings, binary assets excluded; native/test compilation recorded separately",
+    "reviewedCommit": "f618d3c2feddd0c54c2bd03643d90fd3090f12d8",
+    "publication": "Normal origin/develop push independently matched; initial pending work excluded from source commit"
   },
   "product": {
     "sha256": "4cf0f60fd1806c47331c6bc650c26b2577ca21e59763314f959d5df232792b2b",
