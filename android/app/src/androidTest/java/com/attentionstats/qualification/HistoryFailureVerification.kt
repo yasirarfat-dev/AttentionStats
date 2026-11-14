@@ -16,7 +16,7 @@ import java.io.File
 /** Injected read failures only; no store writes, grant changes or real corruption. */
 @Suppress("DEPRECATION")
 internal object HistoryFailureVerification {
-    fun run(instrumentation: Instrumentation): String {
+    fun run(instrumentation: Instrumentation, staleOnly: Boolean = false): String {
         val context = instrumentation.targetContext
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
         val before = listOf("appearance", "system-backup").associateWith { context.getSharedPreferences(it, 0).all.toMap() }
@@ -72,6 +72,8 @@ internal object HistoryFailureVerification {
             error("history failure bounded wait ${checks + 1}; native lifecycle ${reactContext?.lifecycleState?.name ?: "absent"}; insights selected $selected; loading $loading")
         }
         fun capture(name: String) {
+            // Foreground-return assertions can settle before the activity transition finishes.
+            SystemClock.sleep(1_000)
             expect(has("History couldn’t refresh"))
             val bitmap = checkNotNull(automation.takeScreenshot())
             File(context.cacheDir, "history-failure-$name.png").outputStream().use {
@@ -89,15 +91,15 @@ internal object HistoryFailureVerification {
             HistoryFailureFixture.Case.VALIDATION to "validation",
         )
         try {
-            HistoryFailureFixture.set(cases.first().first)
+            if (staleOnly) HistoryFailureFixture.clear() else HistoryFailureFixture.set(cases.first().first)
             context.startActivity(Intent(context, MainActivity::class.java).setAction(Intent.ACTION_VIEW)
                 .setData(Uri.parse("attentionstats://today")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             awaitReady { click("Today") }
             // Separate activity startup from the focused history-entry assertion.
             SystemClock.sleep(1_000)
             expect(click("Insights"))
-            awaitReady { has("History couldn’t refresh") }
-            for ((index, pair) in cases.withIndex()) {
+            if (!staleOnly) awaitReady { has("History couldn’t refresh") }
+            for ((index, pair) in (if (staleOnly) emptyList() else cases).withIndex()) {
                 val (case, code) = pair
                 HistoryFailureFixture.set(case)
                 if (index > 0) expect(click("Try again"))
@@ -112,9 +114,36 @@ internal object HistoryFailureVerification {
                 expect(!has("Troubleshooting code:", true))
             }
             HistoryFailureFixture.clear()
-            expect(click("Try again"))
+            if (!staleOnly) expect(click("Try again"))
             awaitReady { !has("History couldn’t refresh") && has("About Video Encounters") }
+            if (staleOnly) {
+                HistoryFailureFixture.set(HistoryFailureFixture.Case.BUSY)
+                expect(click("Today"))
+                expect(click("Insights"))
+                awaitReady { has("History couldn’t refresh") && has("Showing the last loaded observations.") }
+                expect(has("About Video Encounters"))
+                capture("stale")
+                HistoryFailureFixture.clear()
+                expect(click("Try again"))
+                awaitReady { !has("History couldn’t refresh") && has("About Video Encounters") }
+                expect(!has("Showing the last loaded observations."))
+                // A foreground generation must not show observations from an invalidated cache.
+                HistoryFailureFixture.set(HistoryFailureFixture.Case.BUSY)
+                automation.executeShellCommand("input keyevent KEYCODE_HOME").let {
+                    android.os.ParcelFileDescriptor.AutoCloseInputStream(it).use { stream -> check(stream.readBytes().isEmpty()) }
+                }
+                SystemClock.sleep(1_000)
+                context.startActivity(Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                awaitReady { has("History couldn’t refresh") }
+                expect(!has("Showing the last loaded observations."))
+                expect(!has("About Video Encounters"))
+                capture("foreground")
+                HistoryFailureFixture.clear()
+                expect(click("Try again"))
+                awaitReady { !has("History couldn’t refresh") && has("About Video Encounters") }
+            }
             for ((name, values) in before) expect(context.getSharedPreferences(name, 0).all == values)
+            if (staleOnly) return "PASS: $checks history stale/tab-return/foreground-invalidation/retry checks; no store writes; captures require visual review"
             return "PASS: $checks injected history failure/help/retry/recovery checks; seven fixed codes, no raw error; real regression cause unestablished; captures require visual review"
         } finally { HistoryFailureFixture.clear() }
     }

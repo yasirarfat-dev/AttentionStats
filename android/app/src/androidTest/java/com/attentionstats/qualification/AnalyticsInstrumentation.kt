@@ -52,6 +52,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var widgets = false
     private var historyPage = false
     private var historyFailure = false
+    private var historyStale = false
     private var numericAudit: String? = null
     private var numericAuditRefresh = false
     private var informationUi: String? = null
@@ -67,12 +68,13 @@ class AnalyticsInstrumentation : Instrumentation() {
         builtinScrollMenu = arguments?.getString("builtinScrollMenu") == "true"
         widgets = arguments?.getString("widgets") == "true"
         historyPage = arguments?.getString("historyPage") == "true"
-        historyFailure = arguments?.getString("historyFailure") == "true"
+        historyFailure = arguments?.getString("historyFailure") in setOf("true", "stale")
+        historyStale = arguments?.getString("historyFailure") == "stale"
         autoScrollLock = arguments?.getString("autoScrollLock") == "true"
         breakTiming = arguments?.getString("breakTiming") == "true"
         numericAudit = arguments?.getString("numericAudit")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         numericAuditRefresh = arguments?.getString("numericAuditRefresh") == "true"
-        informationUi = arguments?.getString("informationUi")?.takeIf { it in setOf("today", "insights", "settings", "protect", "native", "editors", "tour", "today-layout", "appearance-draft") }
+        informationUi = arguments?.getString("informationUi")?.takeIf { it in setOf("today", "insights", "settings", "protect", "native", "editors", "tour", "today-layout", "today-count-only", "appearance-draft") }
         numericMediaProbe = arguments?.getString("numericMediaProbe")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollContinuous = arguments?.getString("autoScrollContinuous")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         standaloneAdLive = arguments?.getString("standaloneAdLive") == "true"
@@ -120,7 +122,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         val result = Bundle()
         try {
             if (historyFailure) {
-                result.putString("stream", HistoryFailureVerification.run(this))
+                result.putString("stream", HistoryFailureVerification.run(this, staleOnly = historyStale))
                 finish(Activity.RESULT_OK, result); return
             }
             builtinScrollProbe?.let { source ->
@@ -130,6 +132,7 @@ class AnalyticsInstrumentation : Instrumentation() {
             informationUi?.let { mode ->
                 result.putString("stream", when (mode) {
                     "today-layout" -> TodayLayoutVerification.run(this)
+                    "today-count-only" -> TodayLayoutVerification.runCountOnly(this)
                     "appearance-draft" -> AppearanceDraftVerification.run(this)
                     else -> InformationUiVerification.run(this, mode)
                 })

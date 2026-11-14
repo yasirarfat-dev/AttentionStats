@@ -12,6 +12,94 @@ import java.io.File
 
 /** Display-only stress values in the actual RN screen. No database/preferences/collector writes. */
 internal object TodayLayoutVerification {
+    fun runCountOnly(instrumentation: Instrumentation): String {
+        val context = instrumentation.targetContext
+        val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
+        fun find(node: android.view.accessibility.AccessibilityNodeInfo,
+                 predicate: (android.view.accessibility.AccessibilityNodeInfo) -> Boolean): android.view.accessibility.AccessibilityNodeInfo? {
+            if (predicate(node)) return node
+            for (index in 0 until node.childCount) node.getChild(index)?.let { find(it, predicate)?.let { match -> return match } }
+            return null
+        }
+        fun root(): android.view.accessibility.AccessibilityNodeInfo {
+            if (android.os.Build.VERSION.SDK_INT >= 34) automation.clearCache()
+            return checkNotNull(automation.rootInActiveWindow).also {
+                check(it.packageName?.toString() == context.packageName) { "Own app required" }
+            }
+        }
+        try {
+            DiaryPresentationFixture.set("0", "0", "7", secondAppName = "Zero fixture")
+            context.startActivity(Intent(context, MainActivity::class.java).setAction(Intent.ACTION_VIEW)
+                .setData(Uri.parse("attentionstats://today")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            val deadline = SystemClock.elapsedRealtime() + 30_000
+            var ready = false
+            while (!ready && SystemClock.elapsedRealtime() < deadline) {
+                SystemClock.sleep(500)
+                val current = automation.rootInActiveWindow
+                if (current?.packageName?.toString() == context.packageName) {
+                    if (!ready) find(current) { it.contentDescription?.toString() == "Today" && it.isClickable }?.let { tab ->
+                        val bounds = android.graphics.Rect().also { tab.getBoundsInScreen(it) }
+                        automation.executeShellCommand("input touchscreen tap ${bounds.centerX()} ${bounds.centerY()}")
+                            .let { android.os.ParcelFileDescriptor.AutoCloseInputStream(it).use { stream -> check(stream.readBytes().isEmpty()) } }
+                    }
+                    ready = find(current) { it.contentDescription?.toString() == "7 video encounters today" } != null
+                }
+            }
+            check(ready) { "Count-only fixture not rendered" }
+            var found = false
+            repeat(20) {
+                if (!found) {
+                    val current = root()
+                    val row = find(current) { it.isVisibleToUser && it.contentDescription?.toString()?.startsWith("Instagram: 7 short videos,") == true }
+                    if (row != null) {
+                        val bitmap = checkNotNull(automation.takeScreenshot())
+                        File(context.cacheDir, "today-count-only.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+                        bitmap.recycle()
+                        check(find(row) { it.text?.toString() == "Nothing yet today" } == null) {
+                            "Count-only source incorrectly says Nothing yet today"
+                        }
+                        found = true
+                    } else {
+                        val bounds = android.graphics.Rect().also { current.getBoundsInScreen(it) }
+                        val x = bounds.left + bounds.width() / 8
+                        automation.executeShellCommand("input touchscreen swipe $x ${bounds.height() * 3 / 5} $x ${bounds.height() / 3} 350")
+                            .let { android.os.ParcelFileDescriptor.AutoCloseInputStream(it).use { stream -> check(stream.readBytes().isEmpty()) } }
+                        SystemClock.sleep(500)
+                    }
+                }
+            }
+            if (!found) {
+                root()
+                val bitmap = checkNotNull(automation.takeScreenshot())
+                File(context.cacheDir, "today-count-only-stop.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+                bitmap.recycle()
+            }
+            check(found) { "Count-only source not reached" }
+            var zeroFound = false
+            repeat(12) {
+                if (!zeroFound) {
+                    val current = root()
+                    val row = find(current) { it.isVisibleToUser && it.contentDescription?.toString()?.startsWith("Facebook: 0 short videos,") == true }
+                    if (row != null) {
+                        check(find(row) { it.text?.toString() == "Nothing yet today" } != null) { "Zero source lost empty copy" }
+                        val bitmap = checkNotNull(automation.takeScreenshot())
+                        File(context.cacheDir, "today-count-only-zero.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+                        bitmap.recycle()
+                        zeroFound = true
+                    } else {
+                        val bounds = android.graphics.Rect().also { current.getBoundsInScreen(it) }
+                        val x = bounds.left + bounds.width() / 8
+                        automation.executeShellCommand("input touchscreen swipe $x ${bounds.height() * 3 / 5} $x ${bounds.height() / 3} 350")
+                            .let { android.os.ParcelFileDescriptor.AutoCloseInputStream(it).use { stream -> check(stream.readBytes().isEmpty()) } }
+                        SystemClock.sleep(500)
+                    }
+                }
+            }
+            check(zeroFound) { "Zero source not reached" }
+            return "PASS: count-only source renders seven videos without empty copy; zero source retains empty copy; display-only fixture cleared in finally"
+        } finally { DiaryPresentationFixture.clear() }
+    }
+
     fun run(instrumentation: Instrumentation): String {
         val context = instrumentation.targetContext
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)

@@ -1,0 +1,115 @@
+{
+  "date": "2026-11-15",
+  "tasks": [
+    "AS-014",
+    "AS-018",
+    "AS-037",
+    "AS-045"
+  ],
+  "status": "experimental; Today count-only repair and scoped history recovery checks; publication HOLD",
+  "sourceBase": "8c3f4ba240a5a1604690030e77447e376ab1a81a",
+  "implementation": [
+    "Today source rows require zero video encounters as well as zero durations/ads/photos before showing Nothing yet today",
+    "Repaired required photoCount/revisitCount fields in the debug-only display fixture; no saved facts or collector changes",
+    "Added bounded actual-RN count-only and zero-source instrumentation using synthetic display values"
+  ],
+  "reproduction": {
+    "productSha256": "2c5606baa1c715d85e27cdf4c751922cbd292405e922467e5058f0d8cf1d92bf",
+    "result": "Actual native row shows seven videos and Nothing yet today; assertion fails with instrumentation code0; screenshot visually reviewed"
+  },
+  "product": {
+    "sha256": "cdf6ff16f896a6f8f4ec536d68752b0c32935ca116d515fb7e41b0468db786e9",
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "physicalApi": 36,
+    "provenance": "In-place working-tree preview; independently matched installed APK; not a signed clean-checkout release candidate"
+  },
+  "host": {
+    "jestTests": 148,
+    "jestSuites": 17,
+    "typesLintArchitectureBackupPaletteFormatMobile": "pass",
+    "previewTestLintBuild": "pass; 2m25s; 536 tasks, 39 executed",
+    "mappedAppSourcesMatching": 60,
+    "generatedBundleMatches": true,
+    "lintErrors": 0,
+    "lintWarnings": 170,
+    "finalHistoryTestBuild": "pass; 26s; 315 tasks, 31 executed"
+  },
+  "physical": {
+    "normal": {
+      "fontScale": 1.0,
+      "testSha256": "36d5d17a56d5873953ca652e896462040a8ba75fc6ee3a7f3ba958a757b18215",
+      "result": "PASS; count-only has no empty copy, zero source retains it; raw instrumentation -1; actual rendering visually reviewed"
+    },
+    "large": {
+      "fontScale": 2.0,
+      "testSha256": "36d5d17a56d5873953ca652e896462040a8ba75fc6ee3a7f3ba958a757b18215",
+      "result": "PASS; count-only and zero-source assertions, raw -1; actual count-only native rendering visually reviewed; zero-row message visual review scoped to normal text"
+    }
+  },
+  "retainedFailures": [
+    "First legacy single-count fixture lacks required photoCount/revisitCount and never renders; no UI acceptance from that code0 run",
+    "First 200% trial does not reach source row; code0; no large-text acceptance or copied earlier capture",
+    "Diagnostic 200% capture shows page still at top: three-quarter-height swipe starts within tall navigation bar; moving start to three-fifths height resolves the harness failure; final runs pass both scales",
+    "Initial foreground-return capture caught activity launch animation; assertions passed but steady rendering withheld until a settled capture on final test artifact"
+  ],
+  "cleanup": {
+    "ownedCapturePathsRemovedAndAbsent": 5,
+    "ownedTestRemovedAndAbsent": true,
+    "originalAppearanceBackupMatch": true,
+    "originalFontMatch": true,
+    "installedProductMatch": true,
+    "freshProcessTodaySelected": true,
+    "historyResetRestore": false,
+    "ownedPrivateHostFilesRemoved": 37,
+    "earlierOtherBatchIgnoredFiles": "untouched",
+    "finalTodayNativeRenderingReviewed": true
+  },
+  "limits": [
+    "Display-only synthetic values; no real source accuracy or watched-time acceptance",
+    "Existing AGP/Kotlin/Gradle/CMake/tooling warnings remain",
+    "No dependency/schema/version/permission/consent expansion",
+    "Cold-history cause, broader accessibility/device, auto-scroll, recovery/security/resources and Console/signing release gates stay open",
+    "No emulator, main merge, remote workflow, signing or Play action"
+  ],
+  "history": {
+    "actualNavigation": {
+      "checks": [
+        "Month selected and history loaded",
+        "All Time selected and history loaded",
+        "Mounted tab return retains All Time range",
+        "By App reaches search and app explorer",
+        "Actual app selection reaches app detail",
+        "App detail returns to list",
+        "By Day navigation reached",
+        "Previous day updates selected-date heading",
+        "Next day restores selected-date heading",
+        "Return to Week loads"
+      ],
+      "limits": [
+        "Existing real history only; no synthetic long-history pages",
+        "No injected failure/stale races, background or process-death qualification",
+        "Earlier P8 failure remains unresolved"
+      ]
+    },
+    "isolatedPaging": {
+      "checks": 43,
+      "testSha256": "767ce0719e47c1d5a1840c2bcf65775039eca49e3b1de793626f698c50306be8",
+      "instrumentationCode": -1,
+      "scope": "Synthetic encrypted store: 66 calendar days, latest/middle/oldest pages and both cursors, range aggregates, week/selected range bounds, midnight app-time pairing, invalid dates/page size; own directory/key cleaned in finally; no real-store writes"
+    },
+    "staleForeground": {
+      "checks": 19,
+      "initialTestSha256": "767ce0719e47c1d5a1840c2bcf65775039eca49e3b1de793626f698c50306be8",
+      "instrumentationCode": -1,
+      "scope": "Loaded Week observations retained with visible stale warning on failed tab-return refresh; retry recovers. Home/foreground changes cache generation, removes stale prior-generation observations during injected failure; retry recovers. Real native reads, injected BUSY only; no store writes",
+      "finalRender": "Settled native dark 100% stale and foreground-invalidated error states visually reviewed; full error/preservation/retry copy, stale annotation only with retained same-generation observations",
+      "finalTestSha256": "8a5474d4c56eaa3eb26bcc69cda4298730f159ffb6aa0e54c2f37435d240706e"
+    },
+    "limits": [
+      "Current one-phone/API36 normal-text dark scope; not long-history UI cross-page/calendar, multi-page in-flight race or process-death qualification",
+      "Injected BUSY establishes error handling, not the original P8 failure cause",
+      "Actual user-history navigation checks print no counts, dates or app identities; no logical history equality claim"
+    ]
+  }
+}

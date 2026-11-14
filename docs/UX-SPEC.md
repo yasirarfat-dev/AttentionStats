@@ -13,6 +13,8 @@ The experience should provide peace of mind, understandable evidence and user-ow
 
 ADR-055/AS-050 makes Today lead with concise per-app statistics: Reels encounters, Reels time and separate whole-app duration. Source health belongs in Settings; detailed explanations are available on demand. History shows saved counts and timer history; Patterns explicitly says it is being built until actual analysis exists. Protect supplies disabled-by-default configurable count/time reminders. These integrations remain planned at this checkpoint. Detail is available on demand. Show an explicit stopping point, not an infinite feed. Avoid repeated permission prompting, streak pressure, composite wellness scores or emotional dependency. Recreation is not automatically a problem. Every reflection can end with no change.
 
+Today source rows show “Nothing yet today” only when video encounters, video-surface time, whole-app time, ads and photos are all zero. A positive encounter count remains meaningful when no duration has been recorded; do not pair it with empty-state copy or infer watched time from that count.
+
 ADR-062 uses the exact summary labels App Time, Reels Time, Reels Encounters and Apps Timed. Allow Reels Encounters to wrap cleanly inside a growing card; keep 14sp summary labels and exact-value accessibility/dialogs. Whole-app rows show observed opens below the name, separately from used time and the disabled post-MVP timer column. Opens includes observed returns from other apps and suppresses internal activity navigation; it is not a cold-process launch count. Unknown opens remain an em dash. These refinements are experimental until the updated own-window and real app-entry trials pass.
 
 | Screen | Primary content/action | Required states |

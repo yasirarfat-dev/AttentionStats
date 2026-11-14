@@ -58,12 +58,12 @@ internal object DiaryPresentationFixture {
             .put("packageName", "synthetic.layout.fixture").put("name", current.appName)
             .put("social", "instagram").put("appMs", current.appMs).put("reelsMs", current.reelsMs)
             .put("appOpens", current.count)
-            .put("reelsCount", current.count).put("adCount", "0"))
+            .put("reelsCount", current.count).put("adCount", "0").put("photoCount", "0").put("revisitCount", "0"))
             current.secondAppName?.let { name -> apps.put(JSONObject()
                 .put("packageName", "synthetic.layout.second").put("name", name)
                 .put("social", "facebook").put("appMs", "0").put("reelsMs", "0")
                 .put("appOpens", "0")
-                .put("reelsCount", "0").put("adCount", "0")) }
+                .put("reelsCount", "0").put("adCount", "0").put("photoCount", "0").put("revisitCount", "0")) }
             days.getJSONObject(index).put("apps", apps)
         }
         return value.toString()

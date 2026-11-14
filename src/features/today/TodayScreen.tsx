@@ -295,7 +295,8 @@ export function TodayScreen({
                     {duration(item.appMs).replace(/ /g, '\u00a0')} in app time
                   </Text>
                 )}
-                {item.reelsMs === 0 &&
+                {item.videos === 0 &&
+                  item.reelsMs === 0 &&
                   item.appMs === 0 &&
                   item.ads === 0 &&
                   item.photos === 0 && (

@@ -1,6 +1,6 @@
 # Feature tracker
 
-**Publishing progress (15/11/26; AS-014/AS-018/AS-037/AS-045/AS-046/AS-057):** baseline/history diagnostics and Appearance/Today integration are recorded. Final Appearance passes 51 physical checks at each of 100%/200%, plus eight default-reset/tab-draft/discard checks; original settings preserved. Earlier cold-history cause and remaining gates stay open; no feature status promotion. [Latest evidence](evidence/publishing-appearance-today.json), [next work](PUBLISHING-PHASE.md#latest-handoff--151126-appearance-and-today-integration).
+**Publishing progress (15/11/26; AS-014/AS-018/AS-037/AS-045):** Today count-only empty-copy contradiction is reproduced/repaired and passes actual physical 100%/200% assertions. Zero rows retain empty copy. [Exact evidence](evidence/publishing-count-only.json). History adds ten actual navigation, 43 isolated paging and 19 stale/foreground/retry checks. Earlier Appearance acceptance retains its own artifact; original history cause, long-history UI races/process death and remaining gates stay open. No feature status promotion; publication HOLD.
 
 **Active delivery priority (14/11/26):** [Publishing-phase plan](PUBLISHING-PHASE.md) batches verification, defect repair and polish of implemented behavior toward AS-022/AS-046. New features follow the next Play publication. Existing task states, dependencies and release gates remain unchanged; planning is not runtime verification.
 
