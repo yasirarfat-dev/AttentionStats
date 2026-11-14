@@ -7,6 +7,7 @@ import {
   Button,
   Card,
   Row,
+  Explanation,
   SectionTitle,
   Segmented,
   Title,
@@ -287,16 +288,19 @@ export function SchedulesScreen({
       {!snapshot && !error && <Body muted>Loading your schedules…</Body>}
       {(view === 'slots' || packageName) && (
         <>
-          <SectionTitle>Your time slots</SectionTitle>
+          <Explanation title="Your Time Slots">
+            Times follow your phone's local clock. Slots act during the selected
+            periods, independently of daily video limits. Essential recovery
+            apps remain available; Android may interrupt enforcement. New slots
+            stay off until you review and enable them.
+          </Explanation>
           {windows.length === 0 && snapshot && (
-            <Card>
+            <Card
+              title="No Time Slots Yet"
+              info="Choose apps or groups, then add a morning, evening or overnight slot. A new slot saves Off until you enable it."
+            >
               <View style={styles.empty}>
                 <Title>A quieter routine starts here</Title>
-                <Body muted>
-                  {packageName
-                    ? 'Try 5–11 AM for mornings, then add another slot for your evenings. New slots stay off until you enable them.'
-                    : 'Choose apps or groups, then add a morning, evening or overnight slot. New slots stay off until enabled.'}
-                </Body>
               </View>
             </Card>
           )}
@@ -305,7 +309,11 @@ export function SchedulesScreen({
               item => item.id === slot.groupId,
             );
             return (
-              <Card key={slot.id}>
+              <Card
+                key={slot.id}
+                title="Time Slot"
+                info="The switch enables or disables this slot. Enabling first opens its review. Edit changes its draft; Remove asks for confirmation. Other schedules and video limits remain independent."
+              >
                 <ToggleRow
                   icon="clock"
                   title={group?.name ?? 'App group'}
@@ -366,7 +374,12 @@ export function SchedulesScreen({
         <>
           <SectionTitle>App groups</SectionTitle>
           {snapshot?.groups.map(group => (
-            <Card key={group.id} padded={false}>
+            <Card
+              key={group.id}
+              title="App Group"
+              info="Tap the group to change its members. Add Time Slot creates a new draft for this group. Removing a group also removes its slots after confirmation, preserving recorded history."
+              padded={false}
+            >
               <Row
                 leading={
                   <AppIcon
@@ -420,13 +433,6 @@ export function SchedulesScreen({
           />
         </>
       )}
-      <Card tone="soft">
-        <Body muted>
-          Times follow your phone’s local clock. Slots block during the chosen
-          periods, independently of daily video limits. Essential recovery apps
-          stay available; Android may interrupt enforcement.
-        </Body>
-      </Card>
     </Screen>
   );
 }

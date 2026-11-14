@@ -52,6 +52,8 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var widgets = false
     private var historyPage = false
     private var numericAudit: String? = null
+    private var numericAuditRefresh = false
+    private var informationUi: String? = null
     private var numericMediaProbe: String? = null
     private var autoScrollContinuous: String? = null
     private var standaloneAdLive = false
@@ -63,6 +65,8 @@ class AnalyticsInstrumentation : Instrumentation() {
         autoScrollLock = arguments?.getString("autoScrollLock") == "true"
         breakTiming = arguments?.getString("breakTiming") == "true"
         numericAudit = arguments?.getString("numericAudit")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
+        numericAuditRefresh = arguments?.getString("numericAuditRefresh") == "true"
+        informationUi = arguments?.getString("informationUi")?.takeIf { it in setOf("today", "insights", "settings", "protect", "native", "editors", "tour") }
         numericMediaProbe = arguments?.getString("numericMediaProbe")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollContinuous = arguments?.getString("autoScrollContinuous")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         standaloneAdLive = arguments?.getString("standaloneAdLive") == "true"
@@ -109,6 +113,10 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            informationUi?.let { mode ->
+                result.putString("stream", InformationUiVerification.run(this, mode))
+                finish(Activity.RESULT_OK, result); return
+            }
             autoScrollContinuous?.let { source ->
                 result.putString("stream", LiveAutoScrollContinuousVerification.run(this, source, standaloneAdLive, mixedAdsLive))
                 finish(Activity.RESULT_OK, result); return
@@ -156,7 +164,7 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             val audit = numericAudit
             if (audit != null) {
-                result.putString("stream", NumericPlaybackAudit.run(this, audit))
+                result.putString("stream", NumericPlaybackAudit.run(this, audit, numericAuditRefresh))
                 finish(Activity.RESULT_OK, result); return
             }
             if (autoScrollInterruption) {

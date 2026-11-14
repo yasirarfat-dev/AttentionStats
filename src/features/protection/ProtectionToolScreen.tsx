@@ -13,8 +13,6 @@ import {
   Button,
   Card,
   Divider,
-  Explanation,
-  SectionTitle,
   Segmented,
   Stepper,
   ToggleRow,
@@ -114,12 +112,13 @@ export function ProtectionToolScreen({
       />
       {tool === 'Breaks' && (
         <>
-          <SectionTitle>Mindful breaks</SectionTitle>
-          <Card>
+          <Card
+            title="Mindful Breaks"
+            info="A gentle pause after the video count or minutes you choose; you can always keep watching. A run resets on lock or after five minutes away. After a break, the next run begins. If playback cannot be safely paused, a compact reminder keeps player controls available and skips the wait."
+          >
             <ToggleRow
               icon="heart"
               title="Offer a break"
-              detail="A gentle pause after a run of short videos. You can always keep watching."
               value={!!snapshot?.reminderEnabled}
               onChange={value => {
                 if (timer.current) clearTimeout(timer.current);
@@ -171,12 +170,6 @@ export function ProtectionToolScreen({
                     later(() => diary.configure('break', true, value));
                   }}
                 />
-                <Body muted>
-                  A run starts over when you lock your phone or spend 5 minutes
-                  away from short videos. After a break, the next run begins. If
-                  the player cannot be safely paused, a compact reminder leaves
-                  its controls available and skips the wait.
-                </Body>
               </View>
             )}
           </Card>
@@ -184,17 +177,10 @@ export function ProtectionToolScreen({
       )}
       {tool === 'Blocks' && (
         <>
-          <SectionTitle>Short-video blocks</SectionTitle>
-          <Card>
-            <Body muted>
-              Saved Time Slots Apply Separately From These Video Limits.
-            </Body>
-            <Explanation title="About Video Blocks">
-              Daily limits count videos. Blocking leaves the player; other app
-              screens stay available. You can allow a five-minute visit. Time
-              Slots can target whole apps or short videos independently of Off /
-              Daily Limit / Always.
-            </Explanation>
+          <Card
+            title="Short-video Blocks"
+            info="Daily limits count videos. Blocking leaves the player; other app screens stay available. A five-minute allowance remains available. Saved time slots apply separately, targeting whole apps or short videos independently of Off / Limit / Always."
+          >
             {reelsSourceKeys
               .filter(key => installed.has(key) || modeOf(key) !== 'off')
               .map((key, index) => {
@@ -261,12 +247,13 @@ export function ProtectionToolScreen({
       )}
       {tool === 'Counter' && (
         <>
-          <SectionTitle>Live counter</SectionTitle>
-          <Card>
+          <Card
+            title="Live Counter"
+            info="The floating counter shows recognized encounters for this unlock session and today. Tap to expand, move or pause it. Today’s Total Across All Apps combines supported sources; Off shows only the current app. Hiding the counter affects display; separate source and counting choices remain authoritative."
+          >
             <ToggleRow
               icon="eye"
               title="Show the floating counter"
-              detail="A small, see-through count on top of short videos. Tap it for more; drag to move."
               value={!!reels.snapshot?.overlayEnabled}
               onChange={value => reels.setOverlay(value)}
               disabled={!reels.snapshot}
@@ -274,7 +261,6 @@ export function ProtectionToolScreen({
             <ToggleRow
               icon="layers"
               title="Today’s total across all apps"
-              detail="Off shows only the current app’s count for today."
               value={!!reels.snapshot?.counterAppearance.allAppsToday}
               onChange={value =>
                 reels.setAppearance(

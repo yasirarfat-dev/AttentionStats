@@ -120,6 +120,7 @@ internal object LiveAutoScrollVerification {
                     val event = MotionEvent.obtain(down, SystemClock.uptimeMillis(),
                         when (step) { 0 -> MotionEvent.ACTION_DOWN; 12 -> MotionEvent.ACTION_UP; else -> MotionEvent.ACTION_MOVE },
                         box.left + box.width * .4f, box.top + box.height * (.78f - .53f * step / 12), 0)
+                    event.source = android.view.InputDevice.SOURCE_TOUCHSCREEN
                     try { check(automation.injectInputEvent(event, true)) } finally { event.recycle() }
                     SystemClock.sleep(25)
                 }

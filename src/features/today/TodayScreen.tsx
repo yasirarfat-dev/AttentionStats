@@ -18,7 +18,6 @@ import {
   InfoButton,
   Meter,
   Row,
-  SectionTitle,
   Stat,
   StatDivider,
 } from '../../ui/Kit';
@@ -212,8 +211,11 @@ export function TodayScreen({
       </Card>
 
       <ViewingDetail days={diary.snapshot?.days ?? []} />
-      <SectionTitle>Reels by Apps</SectionTitle>
-      <Card padded={false}>
+      <Card
+        title="Reels by Apps"
+        info="Today's recognized video encounters by source. On-screen time, whole-app time, photos and ads are separate scopes and may overlap. Encounters do not prove watching."
+        padded={false}
+      >
         {sources
           .filter(item => installed.has(item.key) || item.videos > 0)
           .map((item, index) => (
@@ -258,25 +260,25 @@ export function TodayScreen({
           ))}
       </Card>
 
-      <SectionTitle>Your day</SectionTitle>
-      <Card>
+      <Card
+        title="Your Day"
+        info="Recognized short-video encounters by hour today. Bars describe observed activity, not attention or completed viewing."
+      >
         <BarChart
           values={hours}
           highlight={nowHour}
           labels={[0, 6, 12, 18, 23].map(hourLabel)}
           accessibilityLabel={`Short videos by hour. Busiest hour: ${hourLabel(hours.indexOf(Math.max(...hours, 0)))}`}
         />
-        <Body muted>Short videos by hour of the day.</Body>
       </Card>
 
-      <SectionTitle>Screen time</SectionTitle>
-      <Card padded={false}>
+      <Card
+        title="Screen Time"
+        info="Recorded whole-app time from Android usage events. Opens are observed entries and returns, not exact cold launches. Missing intervals are unknown; video-surface time overlaps these values. Android-managed backup follows your saved backup choice."
+        padded={false}
+      >
         {diary.snapshot && !diary.snapshot.usageEnabled ? (
           <View style={styles.padded}>
-            <Body muted>
-              See how long you spend in every app, the way Digital Wellbeing
-              does, but kept only on your phone.
-            </Body>
             <Button
               label="Turn on screen time"
               variant="tonal"

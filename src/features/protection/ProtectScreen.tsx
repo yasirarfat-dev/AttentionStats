@@ -4,7 +4,7 @@ import { FocusChooser } from './FocusChooser';
 import { FocusClock } from './FocusClock';
 import { daysLabel, slotLabel } from './schedulePresentation';
 import { useIsFocused } from '@react-navigation/native';
-import { Body, Button, Card, Row, SectionTitle } from '../../ui/Kit';
+import { Body, Button, Card, Divider, Row } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
 import type { ProtectionTool } from './ProtectionToolScreen';
 import { useSchedules } from './useSchedules';
@@ -33,7 +33,11 @@ export function ProtectScreen({
   const [chooser, setChooser] = useState(false);
   return (
     <Screen title="Protect" subtitle="Gentle tools you choose">
-      <Card tone="soft">
+      <Card
+        tone="soft"
+        title="Focus"
+        info="Start a voluntary timed session or set recurring time slots. Opening the chooser does not activate protection; review the selected apps and mode before Start."
+      >
         <Row
           icon="clock"
           title="Focus Sessions"
@@ -63,7 +67,11 @@ export function ProtectScreen({
         </Card>
       )}
       {active && (
-        <Card tone="soft">
+        <Card
+          tone="soft"
+          title="Active Focus"
+          info="The timer is native-authoritative. Blocking is best effort; system navigation and emergency recovery remain available. End Focus Now stops this voluntary session immediately."
+        >
           <FocusClock
             remainingMs={active.remainingMs}
             durationMs={active.durationMs}
@@ -85,8 +93,11 @@ export function ProtectScreen({
           />
         </Card>
       )}
-      <SectionTitle>Your groups & time slots</SectionTitle>
-      <Card padded={false}>
+      <Card
+        title="Your Groups & Time Slots"
+        info="Groups organize selected apps. Time slots apply recurring rules to those groups. Editing a group can affect its saved slots; changes require their existing review and Save flow."
+        padded={false}
+      >
         {snapshot?.groups.map(group => (
           <Row
             key={group.id}
@@ -115,18 +126,20 @@ export function ProtectScreen({
           onPress={() => onSchedules('groups')}
         />
       </Card>
-      <SectionTitle>Short-video boundaries</SectionTitle>
-      <Card padded={false}>
+      <Card
+        title="Short-video Boundaries"
+        info="Mindful Breaks offers a gentle pause after your chosen video count or minutes. Short-video Blocks sets daily video limits or blocks supported players; other app screens remain available."
+        padded={false}
+      >
         <Row
           icon="heart"
           title="Mindful breaks"
-          detail="Set a gentle pause after a number of videos or minutes."
           onPress={() => onTool('Breaks')}
         />
+        <Divider />
         <Row
           icon="block"
           title="Short-video blocks"
-          detail="Set daily video limits or block the player in selected apps."
           onPress={() => onTool('Blocks')}
         />
       </Card>

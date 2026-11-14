@@ -175,6 +175,14 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
               </View>
             ))}
           </Card>
+          <Card
+            title="A Little Help, When You Need It"
+            info="Card information stays collapsed by default. Tap the same information button again to hide it; opening explanations does not change your choices."
+          >
+            <Body muted>
+              Tap (i) at the top of a card to understand its stats or controls.
+            </Body>
+          </Card>
           <View style={styles.footer}>
             <Button label="Set it up" onPress={() => setStep(2)} />
             <Button label="Back" variant="text" onPress={() => setStep(0)} />

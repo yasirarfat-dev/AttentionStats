@@ -186,3 +186,10 @@ For isolated Android pending-file lifecycle or detached HUD checks, build/instal
 
 
 Current surface/HUD recovery qualification uses custom instrumentation flags `-e surfaceSampling true` (isolated scheduling) and `-e surfaceLifecycle true` (actual source/notification-shade return). The latter requires a visible HUD on an already-consented source, operates the notification shade and performs no source gestures. Preserve history/backup opt-out/accessibility settings and enforce artifact/test ownership as in the other phone trials. See [test scope](TESTING.md#surface-sampling-and-hud-recovery).
+
+
+### Current release inspection (AS-021)
+
+Build an unsigned inspection pair with `python tools/android_build.py :app:assembleRelease :app:bundleRelease --arch arm64-v8a --reuse-daemon`. Then run `python tools/audit_current_release.py --apk android/app/build/outputs/apk/release/app-release-unsigned.apk --aab android/app/build/outputs/bundle/release/app-release.aab --version-name 1.0.0 --version-code 10`. These explicit version values describe the current inspection source only; code 10 has already been reported uploaded and cannot be reused for publication. Select an unused higher code only after Console inspection. The audit is read-only and neither signs nor installs, archives, uploads or dispatches workflows.
+
+Run `python -m unittest discover -s tools/tests -p "test_*release*.py"` for historical/current manifest, backup-rule/parser and signature-rejection guards. Both binary manifests and compiled backup resources are inspected; the AAB XML decoder uses the hash-pinned bundletool and JDK source-file execution, with bounded inputs. Device/runtime/recovery, signatures, full resource equivalence and policy acceptance remain separate. See [Release](RELEASE.md) and [sequential evidence](evidence/publication-sequence.json).

@@ -243,3 +243,13 @@ ADR-089 adds actual-phone review of quiet Today/Viewing Details/Insights separat
 
 
 ADR-091 adds cache tests for three launch scopes, request deduplication, failure retry and pre-erase in-flight invalidation; RGB-grid contrast tests across light/dark accent/button/hero roles; zero-delay parser/native attachment checks; and actual-phone review of date fields, aligned range/day sources, direct focus group/type/duration/start/end, stable checkbox lists, all-app member synchronization, Settings counter Back, custom appearance save/restart, and three deletion steps cancelled without erasing real history. Preserve existing source/backup/accessibility settings and personal history; seed only the authorized editable default groups without active rules. Visual acceptance is scoped to the actual inspected artifact/device, with large type/RTL/TalkBack and other devices recorded separately.
+
+
+### Current release static inspection (2026-11-14; AS-021)
+
+`tools/audit_current_release.py` adds artifact-scoped S-01 preparation: current-version manifest invariants on both APK/AAB, actual referenced compiled backup allowlists/exclusions in both formats, matching assets/DEX/native libraries and ARM64/16-KiB checks. Mutation tests reject broadened permission/query/export/backup/transfer boundaries and malformed compiled XML; historical guards remain active. [Commands](DEVELOPMENT.md#current-release-inspection-as-021), [exact artifacts/results](evidence/publication-sequence.json). This does not accept OS recovery/transfer execution, release egress/logging, full resource equivalence, signatures or S-01–S-06 as a whole.
+
+
+### Compact-information qualification boundary (ADR-096)
+
+The operator-only `informationUi` modes cover own-app disclosures/navigation and must preserve saved appearance/backup choices. They are **not accepted as a complete suite**: current synthetic own-scroll injection returns false, with earlier search/collapse stops retained. Require a normal PASS and instrumentation -1 per mode before using a result. Exact successful attached-native, owned adb and failed/unrun scopes live in [compact evidence](evidence/compact-information.json). The source-setup helper now sets an explicit touchscreen source, but no real source pass follows merely from compiling that fix.

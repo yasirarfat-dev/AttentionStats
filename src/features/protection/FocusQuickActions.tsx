@@ -4,7 +4,7 @@ import {
   Body,
   Button,
   CheckRow,
-  SectionTitle,
+  Explanation,
   Segmented,
   Stepper,
 } from '../../ui/Kit';
@@ -52,7 +52,11 @@ export function FocusQuickActions({
   }, [active?.id, schedules.refresh]);
   return (
     <View style={{ gap: 8, flexShrink: 1 }}>
-      <SectionTitle>{active ? 'Active focus' : 'Focus now'}</SectionTitle>
+      <Explanation title={active ? 'Active Focus' : 'Focus Now'}>
+        Review apps, mode and duration before Start. Allow Only blocks other
+        apps; Block Apps blocks your selection. Other rules and emergency
+        recovery remain. End early or allow a five-minute visit.
+      </Explanation>
       {error && <Body>{error}</Body>}
       {busy && !snapshot && <Body muted>Loading app groups…</Body>}
       {active ? (
@@ -151,9 +155,6 @@ export function FocusQuickActions({
             step={5}
             suffix="minutes"
           />
-          <Body muted>
-            Other schedules still apply. Emergency access stays available.
-          </Body>
           {packages.length > 0 && (
             <>
               <Button

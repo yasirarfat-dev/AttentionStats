@@ -11,3 +11,9 @@ export function localToday(): string {
 export function fixedRange(start: string, days: 7 | 30) {
   return { start, end: shiftDate(start, days - 1) };
 }
+
+/** Center a selected civil day in a bounded 30-day detail page, clipped by range end. */
+export function dayPageEnd(day: string, through: string): string {
+  const centeredEnd = shiftDate(day, 14);
+  return centeredEnd > through ? through : centeredEnd;
+}

@@ -17,7 +17,8 @@ import org.json.JSONObject
 
 /** No-action operator audit. Only exact numeric formats and fixed player tokens leave live nodes. */
 internal object NumericPlaybackAudit {
-    fun run(instrumentation: Instrumentation, key: String): String {
+    fun run(instrumentation: Instrumentation, key: String, refreshProbe: Boolean = false): String {
+        check(!refreshProbe || Build.VERSION.SDK_INT >= 34) { "cache comparison requires API34+" }
         val app = checkNotNull(ReelApp.byKey(key))
         val coordinator = ReelsCoordinator.get(instrumentation.targetContext)
         val loaded = java.util.concurrent.CountDownLatch(1)
@@ -34,6 +35,9 @@ internal object NumericPlaybackAudit {
         var progressSamples = 0
         var standaloneAds = 0
         val classifications = mutableMapOf<String, Int>()
+        var rootRefreshes = 0; var cacheClears = 0
+        var rootNumeric = 0; var cacheNumeric = 0
+        var rootRecovered = 0; var cacheRecovered = 0; var sameItemPairs = 0
         fun sourceRoot(): AccessibilityNodeInfo {
             val until = SystemClock.elapsedRealtime() + 5_000
             do {
@@ -66,6 +70,41 @@ internal object NumericPlaybackAudit {
                 if (frame.surface == Surface.REELS && frame.route == ReelRoute.VIEWER) viewers++
                 if (frame.progress != null) progressSamples++
                 if (frame.standaloneAd) standaloneAds++
+                if (refreshProbe) {
+                    check(frame.surface == Surface.REELS && frame.route == ReelRoute.VIEWER && frame.identity != null) {
+                        "cache comparison requires a qualified dedicated viewer"
+                    }
+                    // Paired, no-action experiment: cached root, refreshed root, then a
+                    // newly acquired root after clearing only UiAutomation's own cache.
+                    // This does not change the production service's cache or settings.
+                    if (root.refresh()) {
+                        rootRefreshes++
+                        check(app.owns(root.packageName?.toString())) { "source changed after refresh" }
+                        val fresh = SnapshotReader.read(root, app.packages)
+                        check(fresh.complete && !fresh.typing) { "refreshed source incomplete/editable" }
+                        val updated = AdapterRegistry.of(app).read(fresh)
+                        if (updated.progress != null) rootNumeric++
+                        if (frame.identity != null && frame.identity == updated.identity && frame.progress == null && updated.progress != null)
+                            rootRecovered++
+                    }
+                    if (Build.VERSION.SDK_INT >= 34 && automation.clearCache()) {
+                        cacheClears++
+                        val freshRoot = sourceRoot()
+                        try {
+                            check(app.owns(freshRoot.packageName?.toString())) { "source changed after cache clear" }
+                            val fresh = SnapshotReader.read(freshRoot, app.packages)
+                            check(fresh.complete && !fresh.typing) { "uncached source incomplete/editable" }
+                            val updated = AdapterRegistry.of(app).read(fresh)
+                            if (updated.progress != null) cacheNumeric++
+                            if (frame.identity != null && frame.identity == updated.identity && snapshot.windowId == fresh.windowId) {
+                                sameItemPairs++
+                                if (frame.progress == null && updated.progress != null) cacheRecovered++
+                            }
+                        } finally { SnapshotReader.recycle(freshRoot) }
+                    }
+                    SystemClock.sleep(200)
+                    return@repeat
+                }
                 val viewer = frame.surface == Surface.REELS && frame.route == ReelRoute.VIEWER
                 val publicWatchAd = app == ReelApp.YOUTUBE && snapshot.has("watch_player") &&
                     snapshot.has("ad_details_container_layout") && !snapshot.has("comment_composer")
@@ -110,6 +149,9 @@ internal object NumericPlaybackAudit {
             .put("classifications", JSONObject(classifications as Map<*, *>)).put("progressSamples", progressSamples)
             .put("standaloneAdSamples", standaloneAds)
             .put("distinctValues", JSONObject(values.mapValues { it.value.size } as Map<*, *>))
+            .put("refreshProbe", refreshProbe).put("rootRefreshes", rootRefreshes).put("cacheClears", cacheClears)
+            .put("rootNumericSamples", rootNumeric).put("uncachedNumericSamples", cacheNumeric)
+            .put("sameItemPairs", sameItemPairs).put("sameItemRootRecoveries", rootRecovered).put("sameItemCacheRecoveries", cacheRecovered)
             .put("sourceGestures", 0).put("rawLabelsRetained", false).toString()
     }
 }

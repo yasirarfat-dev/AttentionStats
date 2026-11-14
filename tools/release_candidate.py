@@ -38,15 +38,24 @@ def call(*args):
     return result.stdout
 
 
-def audit_manifest(text, version_code=1):
+def audit_manifest(text, version_code=1, *, version_name="0.1.0", profile="legacy"):
     """Audit the decoded AAB manifest, not source intent."""
     manifest = ET.fromstring(text)
     def need(condition, message):
         if not condition:
             raise ValueError(message)
+    need(profile in {"legacy", "current"}, "Unknown release audit profile")
+    need(type(version_code) is int and version_code > 0, "Invalid expected version code")
+    need(bool(re.fullmatch(r"\d+\.\d+\.\d+", version_name)), "Invalid expected release version")
+    need(manifest.tag == "manifest" and len(manifest.findall("application")) == 1 and
+         len(manifest.findall("uses-sdk")) == 1 and len(manifest.findall("queries")) == 1,
+         "Unexpected manifest structure")
+    need(manifest.get(ANDROID + "sharedUserId") is None, "Shared UID is not allowed")
+    need(not any(x.tag.startswith("uses-permission-") for x in manifest),
+         "Unexpected version-scoped permission declaration")
     need(manifest.get("package") == PACKAGE, "Wrong production package")
     need(manifest.get(ANDROID + "versionCode") == str(version_code), "Unexpected version code")
-    need(manifest.get(ANDROID + "versionName") == "0.1.0", "Unexpected version name")
+    need(manifest.get(ANDROID + "versionName") == version_name, "Unexpected version name")
     sdk = manifest.find("uses-sdk")
     need(sdk is not None and sdk.get(ANDROID + "minSdkVersion") == "24" and
          sdk.get(ANDROID + "targetSdkVersion") == "37", "Unexpected SDK baseline")
@@ -54,7 +63,12 @@ def audit_manifest(text, version_code=1):
     need(app is not None, "Missing application")
     need(app.get(ANDROID + "debuggable", "false") == "false", "Debuggable release")
     need(app.get(ANDROID + "testOnly", "false") == "false", "Test-only release")
-    need(app.get(ANDROID + "allowBackup") == "false", "Backup must be disabled")
+    if profile == "legacy":
+        need(app.get(ANDROID + "allowBackup") == "false", "Backup must be disabled")
+    else:
+        need(app.get(ANDROID + "allowBackup") == "true" and
+             app.get(ANDROID + "backupAgent") == "com.attentionstats.backup.SystemBackupAgent" and
+             app.get(ANDROID + "fullBackupOnly") == "true", "Unexpected protected backup agent")
     need(app.get(ANDROID + "usesCleartextTraffic") == "false", "Cleartext must be disabled")
     need(app.get(ANDROID + "fullBackupContent") is not None and
          app.get(ANDROID + "dataExtractionRules") is not None, "Missing backup exclusions")
@@ -65,21 +79,38 @@ def audit_manifest(text, version_code=1):
                               "android.permission.PACKAGE_USAGE_STATS"},
          "Unexpected permission in release")
     queries = manifest.find("queries")
-    need(queries is not None and {x.get(ANDROID + "name") for x in queries.findall("package")} ==
-         {"com.instagram.android", "com.facebook.katana", "com.google.android.youtube", "com.zhiliaoapp.musically"} and
-         len(queries.findall("package")) == 4 and len(queries) == 5, "Unexpected package visibility")
+    packages = {"com.instagram.android", "com.facebook.katana", "com.google.android.youtube", "com.zhiliaoapp.musically"}
+    if profile == "current":
+        packages |= {"com.ss.android.ugc.trill", "com.zhiliaoapp.musically.go", "com.snapchat.android"}
+    expected_intents = 1 if profile == "legacy" else 3
+    need(queries is not None and {x.get(ANDROID + "name") for x in queries.findall("package")} == packages and
+         len(queries.findall("package")) == len(packages) and
+         len(queries) == len(packages) + expected_intents, "Unexpected package visibility")
     intents = queries.findall("intent")
-    need(len(intents) == 1 and len(intents[0]) == 2 and
-         len(intents[0].findall("action")) == 1 and len(intents[0].findall("category")) == 1 and
-         intents[0].find("action").attrib == {ANDROID + "name": "android.intent.action.MAIN"} and
-         intents[0].find("category").attrib == {ANDROID + "name": "android.intent.category.LAUNCHER"} and
-         not intents[0].attrib, "Unexpected launcher visibility query")
+    launcher = [x for x in intents if any(c.get(ANDROID + "name") == "android.intent.category.LAUNCHER" for c in x.findall("category"))]
+    need(len(intents) == expected_intents and len(launcher) == 1, "Unexpected visibility intents")
+    need(len(launcher[0]) == 2 and
+         len(launcher[0].findall("action")) == 1 and len(launcher[0].findall("category")) == 1 and
+         launcher[0].find("action").attrib == {ANDROID + "name": "android.intent.action.MAIN"} and
+         launcher[0].find("category").attrib == {ANDROID + "name": "android.intent.category.LAUNCHER"} and
+         not launcher[0].attrib, "Unexpected launcher visibility query")
+    if profile == "current":
+        remaining = [x for x in intents if x is not launcher[0]]
+        expected = ['<intent><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.HOME"/></intent>',
+                    '<intent><action android:name="android.intent.action.DIAL"/></intent>']
+        def shape(element):
+            return (element.tag, tuple(sorted(element.attrib.items())), tuple(shape(x) for x in element))
+        need(sorted(shape(x) for x in remaining) == sorted(shape(ET.fromstring(
+             '<queries xmlns:android="http://schemas.android.com/apk/res/android">' + x + '</queries>')[0]) for x in expected),
+             "Unexpected safety visibility queries")
     exported = set()
     for component in app:
         if component.tag in {"activity", "activity-alias", "service", "receiver", "provider"}:
             if component.get(ANDROID + "exported") == "true":
                 exported.add(component.get(ANDROID + "name"))
     required = {"com.attentionstats.MainActivity", "com.attentionstats.reels.ReelsAccessibilityService"}
+    if profile == "current":
+        required.add("com.attentionstats.widget.WidgetConfigureActivity")
     profiler = "androidx.profileinstaller.ProfileInstallReceiver"
     need(required <= exported <= required | {profiler}, "Unexpected exported components")
     if profiler in exported:
@@ -89,9 +120,9 @@ def audit_manifest(text, version_code=1):
                     x.get(ANDROID + "name") == "com.attentionstats.reels.ReelsAccessibilityService"), None)
     need(service is not None and service.get(ANDROID + "permission") ==
          "android.permission.BIND_ACCESSIBILITY_SERVICE", "Unprotected accessibility service")
-    return {"package": PACKAGE, "versionName": "0.1.0", "versionCode": version_code,
+    return {"package": PACKAGE, "versionName": version_name, "versionCode": version_code, "auditProfile": profile,
             "minSdk": 24, "targetSdk": 37, "debuggable": False, "testOnly": False,
-            "backupDisabled": True, "permissions": permissions,
+            "backupDisabled": profile == "legacy", "permissions": permissions,
             "exportedComponents": sorted(exported)}
 
 

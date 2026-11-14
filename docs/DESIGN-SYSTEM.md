@@ -128,3 +128,10 @@ ADR-091 adds aligned labelled metric lines for exact range/source data, DD/MM/YY
 
 
 ADR-094 adds separate foreground/background/accent appearance scopes through a full HSV canvas and hue rail. Retain existing starting palettes, live illustrative preview and explicit Save/reset. Exact selected backgrounds remain; card/raised tones derive gently from them. Foreground/accent text adapts to meet 4.5:1 across the normal canvas/cards; status colors retain their own semantic backgrounds. Keep hex/RGB and adjustable controls as alternatives to dragging; color changes alone start no behavior.
+
+
+## Compact information cards (ADR-096)
+
+Default cards prioritize values and actions. Use a clear internal heading with a right-aligned, at least 48-unit information target for routine explanations. Explanations start collapsed, open immediately below that heading and close from the same control; accessible labels name the card and expose expanded state. Shared React Native Card and native sections/choice cards own independent presentation state. Help never changes a setting or draft selection. Quiet vertical separators distinguish parallel statistics; short horizontal lines separate groups without boxing every number.
+
+Keep units, selected dates/ranges, missing values, active health/errors and concrete review/irreversible-action effects visible. Move definitions, source limitations, measurement method and optional instructions into help. Settings has grouped definitions; Appearance has separate Theme, Presets, Custom Colors and Layout & Numbers disclosures. Introductory tour points out the information controls. Native backup/widget help follows the same principle while preserving secure-window and explicit Save/confirmation behavior.

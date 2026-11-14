@@ -14,11 +14,16 @@ export function Card({
   children,
   tone = 'plain',
   padded = true,
+  title,
+  info,
 }: {
   children: ReactNode;
   tone?: 'plain' | 'soft' | 'hero' | 'warn';
   padded?: boolean;
+  title?: string;
+  info?: string;
 }) {
+  const [expanded, setExpanded] = useState(false);
   return (
     <View
       style={[
@@ -29,6 +34,37 @@ export function Card({
         tone === 'warn' && styles.warn,
       ]}
     >
+      {title && (
+        <View style={[styles.cardHeading, !padded && styles.cardHeadingInset]}>
+          <Text
+            accessibilityRole="header"
+            style={[styles.cardTitle, tone === 'hero' && styles.inverseText]}
+          >
+            {title}
+          </Text>
+          {info && (
+            <InfoButton
+              label={title}
+              expanded={expanded}
+              inverse={tone === 'hero'}
+              onPress={() => setExpanded(!expanded)}
+            />
+          )}
+        </View>
+      )}
+      {info && expanded && (
+        <View style={[styles.cardInfo, !padded && styles.cardHeadingInset]}>
+          <Text
+            style={[
+              styles.body,
+              styles.muted,
+              tone === 'hero' && styles.inverseText,
+            ]}
+          >
+            {info}
+          </Text>
+        </View>
+      )}
       {children}
     </View>
   );
@@ -631,6 +667,28 @@ export function Meter({ value, color }: { value: number; color: string }) {
 }
 
 const styles = StyleSheet.create(theme => ({
+  cardHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  cardHeadingInset: { paddingHorizontal: 12, paddingVertical: 4 },
+  cardTitle: {
+    flex: 1,
+    color: theme.text,
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: '700',
+    textTransform: 'capitalize',
+  },
+  cardInfo: {
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: theme.border,
+  },
+  inverseText: { color: theme.onHero },
   metricLine: {
     flexDirection: 'row',
     alignItems: 'baseline',

@@ -43,3 +43,8 @@ Implementation follows [Android flexible widget layouts](https://developer.andro
 
 
 ADR-094 refresh admission checks all five owned provider classes. A Reels By Apps, One Stat, Screen Time or Hourly Rhythm instance must load native projections even when no original Today Overview widget is placed. Zero placed widgets may still skip projection work. This keeps the existing bounded refresh throttle and actual-history projection authority.
+
+
+### Compact configuration help (ADR-096)
+
+Native gallery, stat/order/opacity/display sections and style/theme choices expose routine descriptions through independent inline information controls. Example previews stay visibly marked as examples. Statistics, draft values, selected state, Save/Cancel and host confirmation remain visible. Opening choice help must not select that choice or save the widget. No provider, data projection, instance ownership, resize or migration semantics change. Actual configuration/attached-host and phone scope must be recorded separately from source presence.

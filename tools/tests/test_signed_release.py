@@ -13,6 +13,12 @@ spec.loader.exec_module(signed)
 
 
 class SignedReleaseTests(unittest.TestCase):
+    def test_current_profile_requires_both_explicit_version_fields(self):
+        for fields in [[], ['--version-name', '1.1.0'], ['--version-code', '11']]:
+            with self.subTest(fields=fields), patch.object(sys, 'argv', ['verify_signed_release.py', '--certificate', 'synthetic.pem', '--profile', 'current', *fields]):
+                with self.assertRaisesRegex(ValueError, 'explicit expected version'):
+                    signed.main()
+
     def test_certificate_is_exactly_one_pem(self):
         data = b"artificial-certificate-for-parser-only"
         pem = "-----BEGIN CERTIFICATE-----\n" + base64.b64encode(data).decode() + "\n-----END CERTIFICATE-----\n"

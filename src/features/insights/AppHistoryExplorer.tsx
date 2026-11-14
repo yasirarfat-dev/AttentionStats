@@ -11,7 +11,6 @@ import {
   Divider,
   Meter,
   Row,
-  SectionTitle,
   Segmented,
   Stat,
   StatDivider,
@@ -43,9 +42,11 @@ export function AppHistoryExplorer({
   zone,
   onDay,
   onNavigate,
+  usageStatus,
 }: {
   days: HistoryDay[];
   zone: string;
+  usageStatus?: string;
   onDay: (day: string) => void;
   onNavigate: () => void;
 }) {
@@ -56,8 +57,12 @@ export function AppHistoryExplorer({
   const [selected, setSelected] = useState<string | null>(null);
   const [limit, setLimit] = useState(10);
   const [allDays, setAllDays] = useState(false);
-  const [explain, setExplain] = useState(false);
   const apps = useMemo(() => appHistories(days), [days]);
+  const windowKey = `${days[0]?.day}|${days[days.length - 1]?.day}`;
+  useEffect(() => {
+    setAllDays(false);
+    setLimit(10);
+  }, [windowKey]);
   const matches = useMemo(
     () => filterAppHistories(apps, query, sort),
     [apps, query, sort],
@@ -94,61 +99,24 @@ export function AppHistoryExplorer({
             onNavigate();
           }}
         />
-        <Card>
-          <View style={styles.heading}>
-            <AppIcon
-              uri={icons[app.packageName]}
-              mark={app.name.slice(0, 1).toUpperCase()}
-              color={theme.hero}
-              size={48}
-            />
-            <View style={styles.name}>
-              <Title>{app.name}</Title>
-              <Body muted>{days.length}-day app history</Body>
-            </View>
-          </View>
+        <Card
+          title={app.name}
+          info={`Recorded app time and observed opens on this date page. Time is available on ${app.timeDays} of ${days.length} dates; opens on ${app.opensDays}. These are known subtotals, not complete coverage. Android usage events estimate foreground time and entries/returns, not exact cold launches or attention. Missing values are unknown. App identifier: ${app.packageName}. Other editions are separate.`}
+        >
           <View style={styles.stats}>
-            <Stat value={time(app.appMs)} label="Recorded app time" />
+            <Stat value={time(app.appMs)} label="Recorded App Time" />
             <StatDivider />
             <Stat
               value={app.appOpens === null ? '—' : exactCount(app.appOpens)}
-              label="Observed opens"
+              label="Observed Opens"
             />
           </View>
-          <Body muted>
-            Time values available on {app.timeDays} of {days.length} days; opens
-            on {app.opensDays}. These are known subtotals, not complete
-            coverage.
-          </Body>
-          <Button
-            label={
-              explain ? 'Hide measurement details' : 'How this is measured'
-            }
-            variant="text"
-            onPress={() => setExplain(!explain)}
-          />
-          {explain && (
-            <>
-              <Body>
-                App time estimates foreground use from Android usage events.
-                Opens are observed entries and returns from another app, not
-                cold launches. Missing days or values are unavailable, not zero.
-              </Body>
-              <Body muted>
-                App identifier: {app.packageName}. Other editions are listed
-                separately. Video encounters appear in By day and may combine
-                editions. This view summarizes days; it does not show individual
-                sessions or measure attention.
-              </Body>
-            </>
-          )}
         </Card>
-        <SectionTitle>Daily app history</SectionTitle>
-        <Body muted>
-          Dates use {zone}. Select a day to see its full overview. Bars compare
-          recorded app time within this period; missing values have no bar.
-        </Body>
-        <Card padded={false}>
+        <Card
+          title="Daily App History"
+          info={`Dates use ${zone}. Select a date to open its full-day overview. Bars compare recorded app time within the current window; missing values have no bar. Only up to 30 dates are loaded, and changing the date window replaces these rows.`}
+          padded={false}
+        >
           {(allDays ? daily : daily.slice(0, 7)).map((row, index) => (
             <View key={row.day}>
               {index > 0 && <Divider />}
@@ -182,11 +150,25 @@ export function AppHistoryExplorer({
 
   return (
     <>
-      <SectionTitle>Explore an app</SectionTitle>
-      <Card>
-        <Body muted>
-          Find an app and follow its recorded time and opens across this period.
-        </Body>
+      <Card
+        title="Explore an App"
+        info={`Search and sort recorded app time and observed opens for the current ${days.length}-day window. Missing values sort after recorded values. These are page subtotals, not all-time app totals.`}
+      >
+        {usageStatus && usageStatus !== 'partial' && (
+          <Body muted>
+            {
+              (
+                {
+                  disabled: 'Screen Time Off',
+                  permission_needed: 'Usage Access Needed',
+                  unavailable: 'App Time Unavailable',
+                  dense_history: 'App Time Unavailable',
+                  interrupted: 'App Time Interrupted',
+                } as Record<string, string>
+              )[usageStatus]
+            }
+          </Body>
+        )}
         <TextInput
           accessibilityLabel="Search app history"
           placeholder="Search apps"
@@ -228,10 +210,14 @@ export function AppHistoryExplorer({
         />
         <Body muted>
           {matches.length} {matches.length === 1 ? 'app' : 'apps'} ·{' '}
-          {days.length} days. Missing values sort after recorded values.
+          {days.length} days
         </Body>
       </Card>
-      <Card padded={false}>
+      <Card
+        title="Apps in This Window"
+        info="Select an app for daily values. Missing time or opens are shown as unavailable, not zero. More Apps adds ten rows at a time; date windows stay bounded separately."
+        padded={false}
+      >
         {visible.map((item, index) => (
           <View key={item.packageName}>
             {index > 0 && <Divider />}
@@ -252,7 +238,6 @@ export function AppHistoryExplorer({
                 Keyboard.dismiss();
                 setSelected(item.packageName);
                 setAllDays(false);
-                setExplain(false);
                 onNavigate();
               }}
             />
@@ -263,18 +248,15 @@ export function AppHistoryExplorer({
             <Title>
               {query.trim() ? 'No matching apps' : 'No app observations yet'}
             </Title>
-            <Body muted>
-              {query.trim()
-                ? 'Try another name or clear the search.'
-                : 'Available app history will appear here. Missing history does not establish zero use.'}
-            </Body>
           </View>
         )}
         {matches.length > limit && (
           <Button
-            label={`Show All ${matches.length} Apps`}
+            label="More Apps"
             variant="text"
-            onPress={() => setLimit(matches.length)}
+            onPress={() =>
+              setLimit(current => Math.min(matches.length, current + 10))
+            }
           />
         )}
         {limit > 10 && matches.length > 10 && (

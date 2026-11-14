@@ -39,7 +39,7 @@
         <activity
         android:name=".backup.BackupActivity"
         android:exported="false"
-        android:label="Encrypted backup"
+        android:label="Backup &amp; Restore"
         android:theme="@android:style/Theme.Material.Light.NoActionBar" />
       <activity android:name=".widget.WidgetGalleryActivity" android:exported="false" android:label="Home Screen Widgets" android:theme="@android:style/Theme.Material.NoActionBar" />
       <activity

@@ -53,11 +53,12 @@ export function AppSelection({
         style={scheduleStyles.input}
         editable={!disabled}
       />
-      <Body muted>
-        {selected.length} selected · Group and individual choices stay in sync.
-        Apps stay alphabetical.
-      </Body>
-      <Card padded={false}>
+      <Body muted>{selected.length} selected</Body>
+      <Card
+        title="Apps & Groups"
+        info="Group and individual choices stay in sync. Expand a group to inspect its members; its switch selects all members. Apps remain alphabetical and may appear in more than one group. Up to 100 apps can be selected."
+        padded={false}
+      >
         {visibleGroups.map((group, index) => {
           const selectedCount = group.packages.filter(pkg =>
             selected.includes(pkg),

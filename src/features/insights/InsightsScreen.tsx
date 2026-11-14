@@ -1,11 +1,11 @@
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { ScrollViewInstance } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { reelsSources } from '../../platform';
 import NativeDiary from '../../platform/specs/NativeDiary';
-import { fixedRange } from './dateRange';
+import { dayPageEnd, fixedRange, shiftDate } from './dateRange';
 import { Icon } from '../../ui/Icon';
 import { AppIcon, BarChart } from '../../ui/Charts';
 import {
@@ -20,10 +20,8 @@ import {
   Button,
   Card,
   Divider,
-  Explanation,
   MetricLine,
   Row,
-  SectionTitle,
   Segmented,
   Stat,
   StatDivider,
@@ -54,13 +52,17 @@ const time = (value: string | null) =>
 export function InsightsScreen() {
   const scroll = useRef<ScrollViewInstance>(null);
   const explorerY = useRef(0);
+  const pendingExplorer = useRef(false);
   const insets = useSafeAreaInsets();
   const toTop = () => scroll.current?.scrollTo({ y: 0, animated: false });
-  const toExplorer = () =>
-    scroll.current?.scrollTo({
-      y: Math.max(0, explorerY.current - insets.top - 16),
-      animated: false,
-    });
+  const toExplorer = useCallback(
+    () =>
+      scroll.current?.scrollTo({
+        y: Math.max(0, explorerY.current - insets.top - 16),
+        animated: false,
+      }),
+    [insets.top],
+  );
   const { theme } = useUnistyles();
   const [range, setRange] = useState<'7' | '30' | 'all'>('7');
   const [endDay, setEndDay] = useState('');
@@ -71,6 +73,8 @@ export function InsightsScreen() {
   const [showAll, setShowAll] = useState(false);
   const [showHours, setShowHours] = useState(false);
   const [showSources, setShowSources] = useState(false);
+  const [pickingDay, setPickingDay] = useState(false);
+  const dayPickerOpen = useRef(false);
   const lifetime = useHistoryPage(
     true,
     endDay,
@@ -80,6 +84,8 @@ export function InsightsScreen() {
     range === 'all' ? 0 : range === '7' ? 7 : 30,
   );
   const history = lifetime.history;
+  const dayPickerContext = useRef('');
+  dayPickerContext.current = `${range}|${view}|${history?.rangeStart}|${history?.rangeEnd}`;
   const diary = { ...lifetime, snapshot: history?.snapshot ?? null };
   const changeRange = (value: '7' | '30' | 'all') => {
     setRange(value);
@@ -125,6 +131,19 @@ export function InsightsScreen() {
   };
   const days = orderedDays(diary.snapshot?.days ?? []);
   const day = resolveDay(days, selected);
+  useEffect(() => {
+    if (
+      !pendingExplorer.current ||
+      !history ||
+      (view === 'day' && day?.day !== selected)
+    )
+      return;
+    const frame = requestAnimationFrame(() => {
+      pendingExplorer.current = false;
+      toExplorer();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [history, day?.day, selected, view, toExplorer]);
   const summary = historySummary(days);
   const allTimeVideos = history
     ? sumCounts(history.sources.map(source => source.videos))
@@ -164,6 +183,45 @@ export function InsightsScreen() {
     setShowAll(false);
     setShowHours(false);
   };
+  const exploreDay = (key: string) => {
+    if (
+      range === 'all' &&
+      history &&
+      (key < history.pageStart! || key > history.pageEnd!)
+    ) {
+      pendingExplorer.current = true;
+      setEndDay(dayPageEnd(key, history.rangeEnd!));
+    }
+    selectDay(key);
+  };
+  const pickExploreDay = async () => {
+    if (!history || !day || !NativeDiary || dayPickerOpen.current) return;
+    const context = dayPickerContext.current;
+    dayPickerOpen.current = true;
+    setPickingDay(true);
+    try {
+      const chosen = await NativeDiary.pickDate(
+        'Explore a Day',
+        day.day,
+        history.rangeStart!,
+        history.rangeEnd!,
+      );
+      if (!chosen || dayPickerContext.current !== context) return;
+      if (chosen < history.rangeStart! || chosen > history.rangeEnd!) return;
+      if (view === 'app') {
+        pendingExplorer.current = chosen !== history.pageEnd;
+        setEndDay(chosen);
+        selectDay(chosen);
+      } else exploreDay(chosen);
+      setDateError('');
+    } catch {
+      if (dayPickerContext.current === context)
+        setDateError('Could not open the date picker. Try again.');
+    } finally {
+      dayPickerOpen.current = false;
+      setPickingDay(false);
+    }
+  };
 
   return (
     <Screen
@@ -182,7 +240,10 @@ export function InsightsScreen() {
         ]}
       />
       {history && (
-        <Card>
+        <Card
+          title="Date Range"
+          info={`Week and Month cover 7 or 30 civil days from the start date; the end follows automatically. All Time lets you choose both bounds. Available from ${calendarDate(history.installDay!)}. Dates use ${history.zone}; empty dates do not prove complete coverage.`}
+        >
           <View style={styles.rangeDates}>
             {(['start', 'end'] as const).map(field => (
               <Pressable
@@ -210,21 +271,7 @@ export function InsightsScreen() {
               </Pressable>
             ))}
           </View>
-          {range !== 'all' && (
-            <Body muted>
-              {range === '7' ? '7' : '30'} days · End date follows the start
-              date.
-            </Body>
-          )}
         </Card>
-      )}
-      {history && (
-        <Body muted>
-          Available From {dateLabel(history.installDay!, true)}
-          {history.rangeEnd! > history.throughDay
-            ? ' · Observations Through Today'
-            : ''}
-        </Body>
       )}
       {dateError !== '' && <Body>{dateError}</Body>}
       {endDay !== '' && (
@@ -263,125 +310,59 @@ export function InsightsScreen() {
       )}
       {diary.snapshot && (
         <>
-          <Card tone="hero">
-            <Text style={styles.eyebrow}>
-              VIDEO ENCOUNTERS ·{' '}
-              {range === 'all' ? 'SELECTED RANGE' : `${range} DAYS`}
-            </Text>
-            <Text style={styles.heroValue}>
-              {exactCount(allTimeVideos ?? summary.videos)}
-            </Text>
+          <Card
+            tone="hero"
+            title="Video Encounters"
+            info={`Totals cover the selected range, not only the day below. An encounter is a recognized visible item, not proof of watching. On Screen is recorded video-surface time, which can overlap whole-app time. Missing time is unknown; calendar dates are not coverage. Dates use ${diary.snapshot.zone}.`}
+          >
             <View style={styles.stats}>
               <Stat
                 inverse
-                value={time(history ? allTimeMs : summary.reelsMs)}
-                label="Recorded video surface time"
+                value={exactCount(allTimeVideos ?? summary.videos)}
+                label="Encounters"
               />
-              {!history && (
-                <>
-                  <StatDivider inverse />
-                  <Stat
-                    inverse
-                    value={time(summary.appMs)}
-                    label="Recorded app time"
-                  />
-                </>
-              )}
+              <StatDivider inverse />
+              <Stat
+                inverse
+                value={time(history ? allTimeMs : summary.reelsMs)}
+                label="On Screen"
+              />
             </View>
-            {history && (
-              <Text style={styles.heroNote}>
-                {history.firstDay
-                  ? `${calendarDate(history.rangeStart!)} – ${calendarDate(history.rangeEnd!)}`
-                  : 'No retained observations yet.'}
-              </Text>
-            )}
+            <View style={styles.heroLine} />
             <Text style={styles.heroNote}>
-              On screen does not mean watched. Missing time is not zero.
+              {history?.rangeStart && history.rangeEnd
+                ? `${calendarDate(history.rangeStart)} – ${calendarDate(history.rangeEnd)}`
+                : `${days.length} days`}
             </Text>
           </Card>
           {history && (
             <>
-              <Card>
-                <Button
-                  label={
-                    showSources ? 'Hide Range Sources' : 'Show Range Sources'
-                  }
-                  variant="tonal"
-                  onPress={() => setShowSources(value => !value)}
-                />
-                {showSources &&
-                  history.sources.map(source => (
-                    <View key={source.key} style={styles.sourceSummary}>
-                      <Title>{reelsSources[source.key].name}</Title>
-                      <MetricLine
-                        label="Video encounters"
+              <Button
+                label={
+                  showSources ? 'Hide App Breakdown' : 'Show App Breakdown'
+                }
+                variant="text"
+                onPress={() => setShowSources(value => !value)}
+              />
+              {showSources && (
+                <Card
+                  title="Range by Video App"
+                  info="These counts and recorded surface times cover the full selected range. Source totals can combine supported app editions; they are separate from whole-app usage. Missing time remains unknown."
+                  padded={false}
+                >
+                  {history.sources.map((source, index) => (
+                    <View key={source.key}>
+                      {index > 0 && <Divider />}
+                      <Row
+                        title={reelsSources[source.key].name}
                         value={exactCount(source.videos)}
-                      />
-                      <MetricLine
-                        label="Recorded surface time"
-                        value={time(source.reelsMs)}
+                        detail={`${time(source.reelsMs)} on screen`}
+                        accessibilityLabel={`${reelsSources[source.key].name}, ${exactCount(source.videos)} video encounters, ${time(source.reelsMs)} recorded surface time in the selected range`}
                       />
                     </View>
                   ))}
-                <Explanation title="About This Range">
-                  Totals cover the selected range. Missing time is unknown;
-                  calendar dates do not prove complete coverage. App time and
-                  app rankings cover only the date page below. Dates use{' '}
-                  {history.zone}.
-                </Explanation>
-              </Card>
-              <SectionTitle>Browse Dates</SectionTitle>
-              <Card>
-                <Title>
-                  {calendarDate(history.pageStart!)} –{' '}
-                  {calendarDate(history.pageEnd!)}
-                </Title>
-                <Body muted>
-                  Daily and app details below cover only these {days.length}{' '}
-                  days.
-                </Body>
-                <View style={styles.stats}>
-                  <Stat
-                    value={exactCount(summary.videos)}
-                    label="Video encounters in this page"
-                  />
-                  <StatDivider />
-                  <Stat
-                    value={time(summary.appMs)}
-                    label="Recorded app time in this page"
-                  />
-                </View>
-                <View style={styles.stats}>
-                  <View style={styles.grow}>
-                    <Button
-                      label="Older dates"
-                      variant="tonal"
-                      disabled={diary.busy || history.olderEnd === null}
-                      onPress={() => {
-                        if (history.olderEnd) {
-                          setEndDay(history.olderEnd);
-                          setSelected(null);
-                          toTop();
-                        }
-                      }}
-                    />
-                  </View>
-                  <View style={styles.grow}>
-                    <Button
-                      label="Newer dates"
-                      variant="tonal"
-                      disabled={diary.busy || history.newerEnd === null}
-                      onPress={() => {
-                        if (history.newerEnd) {
-                          setEndDay(history.newerEnd);
-                          setSelected(null);
-                          toTop();
-                        }
-                      }}
-                    />
-                  </View>
-                </View>
-              </Card>
+                </Card>
+              )}
             </>
           )}
           <View
@@ -401,9 +382,59 @@ export function InsightsScreen() {
           </View>
           {view === 'app' ? (
             <>
+              {history && range === 'all' && (
+                <Card
+                  title="App History Dates"
+                  info={`App totals and daily rows cover only these ${days.length} dates, not the entire range above. Dates use ${history.zone}. Older and Newer replace this window with at most 30 dates; Choose End Date replaces the window with up to 30 days ending on that date. Pages are never appended into a years-long list.`}
+                >
+                  <Title>
+                    {calendarDate(history.pageStart!)} –{' '}
+                    {calendarDate(history.pageEnd!)}
+                  </Title>
+                  <Button
+                    label="Choose End Date"
+                    variant="tonal"
+                    disabled={diary.busy || pickingDay}
+                    onPress={() => void pickExploreDay()}
+                  />
+                  {(history.olderEnd !== null || history.newerEnd !== null) && (
+                    <View style={styles.stats}>
+                      <View style={styles.grow}>
+                        <Button
+                          label="Older Dates"
+                          variant="tonal"
+                          disabled={diary.busy || history.olderEnd === null}
+                          onPress={() => {
+                            if (history.olderEnd) {
+                              pendingExplorer.current = true;
+                              setEndDay(history.olderEnd);
+                              setSelected(null);
+                            }
+                          }}
+                        />
+                      </View>
+                      <View style={styles.grow}>
+                        <Button
+                          label="Newer Dates"
+                          variant="tonal"
+                          disabled={diary.busy || history.newerEnd === null}
+                          onPress={() => {
+                            if (history.newerEnd) {
+                              pendingExplorer.current = true;
+                              setEndDay(history.newerEnd);
+                              setSelected(null);
+                            }
+                          }}
+                        />
+                      </View>
+                    </View>
+                  )}
+                </Card>
+              )}
               <AppHistoryExplorer
                 days={days}
                 zone={diary.snapshot.zone}
+                usageStatus={diary.snapshot.usageStatus}
                 onNavigate={toExplorer}
                 onDay={key => {
                   selectDay(key);
@@ -411,12 +442,13 @@ export function InsightsScreen() {
                   toExplorer();
                 }}
               />
-              <Body muted>{usageExplanation(diary.snapshot.usageStatus)}</Body>
             </>
           ) : (
             <>
-              <SectionTitle>Explore a day</SectionTitle>
-              <Card>
+              <Card
+                title="Explore a Day"
+                info={`Choose a day for the details below. The chart covers the current page of up to 30 days, never the full years-long range. The All Time calendar can jump across that range; Previous and Next replace the page when needed. Dates and hours use ${diary.snapshot.zone}. Today is still in progress; no saved encounters does not establish complete coverage.`}
+              >
                 <BarChart
                   values={daily.map(item => Number(item.videos))}
                   labels={days.map((item, index) =>
@@ -433,31 +465,48 @@ export function InsightsScreen() {
                   height={100}
                   accessibilityLabel={`Recorded video encounters over ${days.length} days. Choose a date below for exact counts.`}
                 />
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator
-                  accessibilityLabel="Choose a day"
-                >
-                  <View style={styles.dates}>
-                    {[...days].reverse().map(item => (
-                      <Pressable
-                        key={item.day}
-                        accessibilityRole="button"
-                        accessibilityState={{ selected: item.day === day?.day }}
-                        accessibilityLabel={`${dateLabel(item.day)}, ${exactCount(historySummary([item]).videos)} video encounters`}
-                        onPress={() => selectDay(item.day)}
-                        style={[
-                          styles.dateChip,
-                          item.day === day?.day && styles.selectedDate,
-                        ]}
-                      >
-                        <Text style={styles.dateText}>
-                          {dateLabel(item.day, true)}
-                        </Text>
-                      </Pressable>
-                    ))}
-                  </View>
-                </ScrollView>
+                {range === 'all' ? (
+                  <>
+                    <Button
+                      label={
+                        day
+                          ? `Choose Day · ${calendarDate(day.day)}`
+                          : 'Choose Day'
+                      }
+                      variant="tonal"
+                      disabled={!day || diary.busy || pickingDay}
+                      onPress={() => void pickExploreDay()}
+                    />
+                  </>
+                ) : (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator
+                    accessibilityLabel="Choose a day"
+                  >
+                    <View style={styles.dates}>
+                      {[...days].reverse().map(item => (
+                        <Pressable
+                          key={item.day}
+                          accessibilityRole="button"
+                          accessibilityState={{
+                            selected: item.day === day?.day,
+                          }}
+                          accessibilityLabel={`${dateLabel(item.day)}, ${exactCount(historySummary([item]).videos)} video encounters`}
+                          onPress={() => selectDay(item.day)}
+                          style={[
+                            styles.dateChip,
+                            item.day === day?.day && styles.selectedDate,
+                          ]}
+                        >
+                          <Text style={styles.dateText}>
+                            {dateLabel(item.day, true)}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  </ScrollView>
+                )}
                 {day && (
                   <>
                     <Title>{dateLabel(day.day)}</Title>
@@ -477,10 +526,19 @@ export function InsightsScreen() {
                         <Button
                           label="Previous day"
                           variant="tonal"
-                          disabled={selectedIndex <= 0}
+                          disabled={
+                            diary.busy ||
+                            (range === 'all'
+                              ? day.day <= history!.rangeStart!
+                              : selectedIndex <= 0)
+                          }
                           onPress={() => {
-                            const previous = days[selectedIndex - 1];
-                            if (previous) selectDay(previous.day);
+                            if (range === 'all')
+                              exploreDay(shiftDate(day.day, -1));
+                            else {
+                              const previous = days[selectedIndex - 1];
+                              if (previous) selectDay(previous.day);
+                            }
                           }}
                         />
                       </View>
@@ -488,24 +546,31 @@ export function InsightsScreen() {
                         <Button
                           label="Next day"
                           variant="tonal"
-                          disabled={selectedIndex >= days.length - 1}
+                          disabled={
+                            diary.busy ||
+                            (range === 'all'
+                              ? day.day >= history!.rangeEnd!
+                              : selectedIndex >= days.length - 1)
+                          }
                           onPress={() => {
-                            const next = days[selectedIndex + 1];
-                            if (next) selectDay(next.day);
+                            if (range === 'all')
+                              exploreDay(shiftDate(day.day, 1));
+                            else {
+                              const next = days[selectedIndex + 1];
+                              if (next) selectDay(next.day);
+                            }
                           }}
                         />
                       </View>
                     </View>
                   </>
                 )}
-                <Body muted>
-                  Dates and hourly activity use {diary.snapshot.zone}. Today is
-                  still in progress. Dates with no saved encounters do not
-                  establish complete coverage.
-                </Body>
               </Card>
-              <SectionTitle>Video encounters by app</SectionTitle>
-              <Card padded={false}>
+              <Card
+                title="Day by Video App"
+                info="Video encounters and recorded surface time for the selected day. Supported app editions may be combined here. These are not whole-app time or confirmed playback."
+                padded={false}
+              >
                 {sources.length === 0 ? (
                   <View style={styles.padded}>
                     <Body muted>
@@ -540,8 +605,10 @@ export function InsightsScreen() {
                   ))
                 )}
               </Card>
-              <SectionTitle>Hourly encounters</SectionTitle>
-              <Card>
+              <Card
+                title="Hourly Encounters"
+                info={`Counts include recognized videos, photos and ads, grouped in ${diary.snapshot.zone}. They do not measure attention or completed viewing. Open Hourly Values for exact bins.`}
+              >
                 {peak === null ? (
                   <Body muted>No saved hourly encounters for this day.</Body>
                 ) : (
@@ -553,9 +620,8 @@ export function InsightsScreen() {
                       accessibilityLabel={`Recorded media encounters by hour. Busiest hour ${hourLabel(peak)}, ${day?.hours[peak]} encounters.`}
                     />
                     <Body muted>
-                      Most recorded encounters: {hourLabel(peak)}. This
-                      describes encounters, including photos and ads, not
-                      attention or completed viewing.
+                      Peak · {hourLabel(peak)} ·{' '}
+                      {exactCount(day?.hours[peak] ?? '0')} encounters
                     </Body>
                   </>
                 )}
@@ -575,13 +641,26 @@ export function InsightsScreen() {
                     />
                   ))}
               </Card>
-              <SectionTitle>App time & opens</SectionTitle>
-              <Card padded={false}>
+              <Card
+                title="Day App Time & Opens"
+                info={`${usageExplanation(diary.snapshot.usageStatus)} Whole-app time overlaps video-surface time; do not add them. Opens are observed entries and returns, not exact cold starts.`}
+                padded={false}
+              >
                 <View style={styles.padded}>
                   <Stat value={time(detail.appMs)} label="Recorded app time" />
-                  <Body muted>
-                    {usageExplanation(diary.snapshot.usageStatus)}
-                  </Body>
+                  {diary.snapshot.usageStatus !== 'partial' && (
+                    <Body muted>
+                      {
+                        {
+                          disabled: 'Screen Time Off',
+                          permission_needed: 'Usage Access Needed',
+                          unavailable: 'App Time Unavailable',
+                          dense_history: 'App Time Unavailable',
+                          interrupted: 'App Time Interrupted',
+                        }[diary.snapshot.usageStatus]
+                      }
+                    </Body>
+                  )}
                 </View>
                 {visibleApps.map(app => (
                   <View key={app.packageName}>
@@ -629,8 +708,10 @@ export function InsightsScreen() {
                 key.startsWith('break.'),
               ) && (
                 <>
-                  <SectionTitle>Mindful breaks</SectionTitle>
-                  <Card>
+                  <Card
+                    title="Mindful Breaks"
+                    info="Recorded reminder choices for the selected day. Reminders recorded counts appearances; Chose to Leave counts the recorded leave action. Adjust reminders in Protect."
+                  >
                     <View style={styles.stats}>
                       <Stat
                         value={String(
@@ -646,17 +727,9 @@ export function InsightsScreen() {
                         label="Chose to leave"
                       />
                     </View>
-                    <Body muted>
-                      Your recorded reminder choices for this day. You can
-                      adjust your reminders in Protect.
-                    </Body>
                   </Card>
                 </>
               )}
-              <Body muted>
-                These details describe the selected day. Video surface time
-                overlaps app time; do not add them together.
-              </Body>
             </>
           )}
         </>
@@ -666,6 +739,7 @@ export function InsightsScreen() {
 }
 
 const styles = StyleSheet.create(theme => ({
+  heroLine: { height: 1, backgroundColor: theme.onHero, opacity: 0.16 },
   rangeDates: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   dateField: {
     flex: 1,

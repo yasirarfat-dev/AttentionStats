@@ -27,12 +27,9 @@ class BackupActivity : Activity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         page = com.attentionstats.appearance.NativePage(this)
         text("Backup & restore", 24f)
-        text("Keep a portable copy of your history and choices without remembering a backup key. Choose a private destination using Android's file picker; a cloud provider you choose may upload the file.")
-        text("Backups use this app's public package name as their key. Anyone who obtains a file can read or modify it using that public key. Keep files in private storage and protect your cloud account. No secret backup password is required.")
-        text("Snapshots currently support up to 20 MiB / 100,000 records. Restore checks the file and previews replacement of current history. Tracking, reminders, blocks and schedules stay off afterward until you choose to enable them. System permissions are never imported.")
+        page.section("Backup Files", "Keep a portable copy of your history and choices using Android's file picker. Your chosen provider may upload it. Files use the app's public package name as their key: anyone with a file can read or modify it. Keep files private and protect your cloud account. Snapshots support up to 20 MiB / 100,000 records. Restore validates and previews replacement; tracking and protection stay off afterward until enabled. System permissions are not imported.")
         status = text(SystemBackupState.status(this))
-        text("Automatic Android backup", 21f)
-        text("Automatic backup starts enabled unless you previously turned it off. Android uses the backup account already configured on this phone, usually roughly nightly after at least 24 hours, while idle with a suitable network. Timing is not guaranteed. Android backup must be enabled in device settings. No password to remember. Android 9 or newer, a screen lock and an encrypted backup transport are required. This protects recovery; it does not sync live history between devices.")
+        page.section("Automatic Android Backup", "Starts enabled unless you saved an off choice. Android uses the backup account configured on this phone, typically roughly nightly when idle and eligible; timing is not guaranteed. Android backup must be enabled in device settings. Android 9+, screen lock and an encrypted transport are required. This is recovery, not live history synchronization. The app does not connect to the Drive API or choose an account.")
         @Suppress("DEPRECATION")
         var changingAutomatic = false
         val automatic = Switch(this).apply {
@@ -77,10 +74,9 @@ class BackupActivity : Activity() {
                 }
             }
         }
-        text("Manual files", 21f)
+        page.section("Manual Files", "Create a backup through Android's file picker, or restore a file after its replacement preview. Exports rely on the destination's access controls; the public app key is not secret protection. Disabling automatic backup does not remove existing provider copies.")
         button("Create backup") { createBackup() }
         button("Restore backup") { restore() }
-        text("Android manages automatic cloud backup using your device backup settings. This app does not connect to the Drive API or choose an account for you. Manual exports rely on the privacy of the destination you choose.")
         button("Done") { finish() }
     }
     override fun onResume() {

@@ -13,6 +13,7 @@ import subprocess
 import zipfile
 
 import release_candidate as release
+import audit_current_release as current
 
 
 def certificate_digest(pem):
@@ -31,7 +32,7 @@ def verify_jar(path):
         raise ValueError("AAB signature verification failed or entries are unsigned")
 
 
-def audit(certificate, version_code):
+def audit(certificate, version_code, *, version_name="0.1.0", profile="legacy"):
     if not release.BUNDLETOOL.is_file() or release.digest(release.BUNDLETOOL) != release.BUNDLETOOL_SHA:
         raise ValueError("Reviewed bundletool is missing or changed")
     apk = release.ROOT / "android/app/build/outputs/apk/release/app-release.apk"
@@ -49,7 +50,8 @@ def audit(certificate, version_code):
     tool = ["java", "-jar", release.BUNDLETOOL]
     release.call(*tool, "validate", "--bundle=" + str(aab))
     manifest = release.call(*tool, "dump", "manifest", "--bundle=" + str(aab), "--module=base")
-    metadata = release.audit_manifest(manifest, version_code=version_code)
+    metadata = release.audit_manifest(manifest, version_code=version_code, version_name=version_name, profile=profile)
+    current_inspection = current.audit(apk, aab, version_name, version_code) if profile == "current" else None
     config = release.call(*tool, "dump", "config", "--bundle=" + str(aab))
     if "PAGE_ALIGNMENT_16K" not in config:
         raise ValueError("AAB is missing 16-KiB page alignment")
@@ -67,6 +69,7 @@ def audit(certificate, version_code):
             "manifest": metadata, "uploadCertificateSha256": fingerprint, "bundleValidated": True,
             "signatureIntegrityVerified": True, "apkAndBundlePayloadsMatch": True,
             "static16KiBAlignmentPassed": True, "nativeLibraries": libraries,
+            "currentStaticInspection": current_inspection,
             "sourceHead": release.call("git", "rev-parse", "HEAD").strip(),
             "sourceDirty": bool(release.call("git", "status", "--porcelain").strip()),
             "artifacts": [{"file": path.name, "bytes": path.stat().st_size, "sha256": release.digest(path)} for path in (apk, aab)],
@@ -76,14 +79,19 @@ def audit(certificate, version_code):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--certificate", type=Path, required=True)
-    parser.add_argument("--version-code", type=int, default=2)
+    parser.add_argument("--version-code", type=int)
+    parser.add_argument("--version-name")
+    parser.add_argument("--profile", choices=["legacy", "current"], default="legacy")
     parser.add_argument("--archive", type=Path, help="New external version directory; never overwritten")
     args = parser.parse_args()
+    if args.profile == "current" and (args.version_code is None or args.version_name is None):
+        raise ValueError("Current signed audit requires explicit expected version name and code")
     if args.archive:
         destination = args.archive.resolve()
         if destination == release.ROOT or release.ROOT in destination.parents or destination.exists():
             raise ValueError("Archive must be a new directory outside the repository")
-    evidence, artifacts = audit(args.certificate, args.version_code)
+    evidence, artifacts = audit(args.certificate, args.version_code if args.version_code is not None else 2,
+                                version_name=args.version_name if args.version_name is not None else "0.1.0", profile=args.profile)
     output = release.ROOT / ".cache/release-tools/signed-audit.json"
     output.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
     if args.archive:

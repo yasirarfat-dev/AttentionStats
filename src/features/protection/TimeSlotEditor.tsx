@@ -39,8 +39,10 @@ function ClockInput({
 }) {
   const { theme } = useUnistyles();
   return (
-    <Card>
-      <Body muted>{label}</Body>
+    <Card
+      title={label}
+      info="Enter hours 1–12 and minutes 00–59, then choose AM or PM. Overnight slots end on the following date; weekdays refer to their start."
+    >
       <View style={styles.row}>
         <TextInput
           accessibilityLabel={`${label} hour`}
@@ -190,13 +192,6 @@ export function TimeSlotEditor({
           if (value === 'allow') setScope('app');
         }}
       />
-      {allowOnly && (
-        <Body muted>
-          Only the selected apps and essential recovery controls stay available
-          under this rule. Other installed launchable apps are blocked during
-          the slot. Other rules still apply.
-        </Body>
-      )}
       <AppSelection
         groups={groups}
         apps={apps}
@@ -222,8 +217,16 @@ export function TimeSlotEditor({
           )}
         </>
       )}
-      <SectionTitle>What to block</SectionTitle>
-      <Card>
+      <Card
+        title="What to Block"
+        info={
+          slot.allowOnly
+            ? 'Other installed launchable apps are blocked. The selected apps and essential recovery controls remain available; other rules still apply.'
+            : slot.scope === 'app'
+              ? 'Every screen in the selected apps. Their content is not read for this rule. Other saved limits and schedules apply independently.'
+              : 'Only recognized short-video viewers. Messages and other screens remain available. Source tracking must be enabled.'
+        }
+      >
         <Segmented
           label="Blocking scope"
           disabled={busy}
@@ -238,13 +241,6 @@ export function TimeSlotEditor({
           }
           onChange={setScope}
         />
-        <Body muted>
-          {slot.allowOnly
-            ? 'Other installed launchable apps are blocked. Your selection and essential recovery controls stay available under this rule.'
-            : slot.scope === 'app'
-              ? 'Every screen in the selected apps. Their content is never read for this rule.'
-              : 'Only recognized short-video viewers. Messages and other screens stay available. Source tracking must be enabled.'}
-        </Body>
         {scope === 'short_videos' && !canSelectShortVideos && (
           <Body muted>
             Short-video blocking is unavailable for this group. Choose a
@@ -252,8 +248,10 @@ export function TimeSlotEditor({
           </Body>
         )}
       </Card>
-      <SectionTitle>When</SectionTitle>
-      <Card>
+      <Card
+        title="When"
+        info="Times follow your phone's local clock. Choose the weekdays on which the slot starts. Always covers each chosen day; a slot that crosses midnight ends the next day."
+      >
         <Segmented
           label="Slot timing"
           disabled={busy}
@@ -304,20 +302,22 @@ export function TimeSlotEditor({
           />
         </>
       )}
-      <Card tone="soft">
+      <Card
+        tone="soft"
+        title="Review Time Slot"
+        info="New slots save Off so you can review them before enabling. A five-minute allowance and essential recovery controls remain available. Overnight days refer to the date the slot starts."
+      >
         <Title>{valid ? slotLabel(slot) : 'Check your time slot'}</Title>
         <Body>
           {selected?.name ?? 'Choose apps'} · {scopeLabel(slot)}
         </Body>
         <Body muted>
           {valid
-            ? `${daysLabel(days)}. Saved off so you can review before enabling. You can always allow a 5-minute visit.`
+            ? `${daysLabel(days)} · Saves Off`
             : 'Use hours 1–12 and minutes 00–59, choose days, and use different start and end times.'}
         </Body>
         {!allDay && from !== null && to !== null && from > to && (
-          <Body muted>
-            This slot ends the next day. Days refer to when it starts.
-          </Body>
+          <Body muted>Ends Next Day</Body>
         )}
       </Card>
       {error && <Body>{error}</Body>}

@@ -164,6 +164,25 @@ internal object ProtectionVerification {
                     bitmap.recycle(); view.finish()
                 }
             }
+            instrumentation.runOnMainSync {
+                val savedAppearance = com.attentionstats.appearance.AppearanceOwner.snapshot(activity).toString()
+                val page = com.attentionstats.appearance.NativePage(activity)
+                var choices = 0
+                page.section("First Card", "First synthetic explanation")
+                page.section("Second Card", "Second synthetic explanation")
+                page.choice("Synthetic Choice", "Choice explanation", false) { choices++ }
+                val all = texts(activity.window.decorView)
+                val first = all.single { it.text.toString() == "First synthetic explanation" }
+                val second = all.single { it.text.toString() == "Second synthetic explanation" }
+                expect(first.visibility == View.GONE && second.visibility == View.GONE)
+                all.single { it.contentDescription == "About First Card" }.performClick()
+                expect(first.visibility == View.VISIBLE && second.visibility == View.GONE)
+                all.single { it.contentDescription == "About First Card" }.performClick()
+                expect(first.visibility == View.GONE)
+                all.single { it.contentDescription == "About Synthetic Choice" }.performClick()
+                expect(all.single { it.text.toString() == "Choice explanation" }.visibility == View.VISIBLE && choices == 0)
+                expect(com.attentionstats.appearance.AppearanceOwner.snapshot(activity).toString() == savedAppearance)
+            }
         } finally { instrumentation.runOnMainSync { activity.finish() } }
         return checks
     }

@@ -109,7 +109,11 @@ export function FocusScreen({
         </Body>
       ) : active ? (
         <>
-          <Card tone="soft">
+          <Card
+            tone="soft"
+            title="Active Focus"
+            info="The selected app rule lasts until this session ends. You can end early or allow a five-minute visit from the cover. Ending focus leaves other schedules and video limits unchanged. Closing this screen does not end the session."
+          >
             <FocusClock
               remainingMs={active.remainingMs}
               durationMs={active.durationMs}
@@ -117,10 +121,6 @@ export function FocusScreen({
             <Body>
               {active.allowOnly ? 'Allow Only' : 'Block Apps'} ·{' '}
               {names(active.packages)}
-            </Body>
-            <Body>
-              The chosen app rule lasts until this session ends. You can end
-              early or allow a five-minute visit from the cover.
             </Body>
             <Body muted>
               {snapshot.accessibility
@@ -133,13 +133,14 @@ export function FocusScreen({
             disabled={busy}
             onPress={() => void schedules.focus(null)}
           />
-          <Body muted>
-            Ending focus leaves your other schedules and video limits unchanged.
-          </Body>
         </>
       ) : review ? (
         <>
-          <Card tone="soft">
+          <Card
+            tone="soft"
+            title="Review Focus"
+            info="Existing schedules and limits still apply. Settings, emergency access and system navigation remain available. You can end at any time or allow a five-minute visit. Blocking depends on Accessibility; closing this screen does not end the session."
+          >
             <Title>{review.minutes} minutes for yourself</Title>
             <Body>
               {review.allowOnly ? 'Allow Only' : 'Block Apps'} ·{' '}
@@ -147,15 +148,8 @@ export function FocusScreen({
             </Body>
             <Body>
               {review.allowOnly
-                ? 'Other installed launchable apps will be blocked; the selected apps stay available under this focus rule.'
-                : 'These whole apps will be blocked while the session is active.'}
-              Existing schedules and limits still apply. Settings, emergency
-              access and system navigation stay available.
-            </Body>
-            <Body muted>
-              You can end focus at any time, or allow a five-minute visit.
-              Blocking depends on Accessibility remaining connected. Closing
-              this screen does not end the session.
+                ? 'Other Apps Blocked'
+                : 'Selected Apps Blocked'}
             </Body>
           </Card>
           {!snapshot.accessibility && (
@@ -202,7 +196,10 @@ export function FocusScreen({
           <Explanation title="Focus Session">
             Choose app groups or individual apps, then review before starting.
             Selected apps are frozen for this session; later group edits do not
-            change it. End whenever you need.
+            change it. End whenever you need. Block Apps targets the selected
+            apps. Allow Only blocks other installed launchable apps; essential
+            recovery, Settings and system navigation remain available. Other
+            rules still apply.
           </Explanation>
           <SectionTitle>Duration</SectionTitle>
           <Stepper
@@ -223,13 +220,7 @@ export function FocusScreen({
               { value: 'allow', label: 'Allow Only' },
             ]}
           />
-          {allowOnly && (
-            <Body muted>
-              Other installed launchable apps will be blocked. Phone, emergency,
-              keyboard, launcher, Settings and Attention Stats stay available.
-              Other schedules and limits still apply.
-            </Body>
-          )}
+
           <AppSelection
             groups={snapshot.groups}
             apps={apps}
@@ -255,10 +246,6 @@ export function FocusScreen({
             variant="text"
             onPress={onSchedules}
           />
-          <Body muted>
-            Focus uses a snapshot of the selected apps. Later group edits do not
-            change an active session.
-          </Body>
         </>
       )}
     </Screen>

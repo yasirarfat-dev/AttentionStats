@@ -1,0 +1,194 @@
+{
+  "date": "2026-11-14",
+  "status": "experimental; publication held",
+  "tasks": [
+    "AS-021",
+    "AS-044",
+    "AS-046",
+    "AS-059",
+    "AS-064"
+  ],
+  "baseSourceCommit": "ee4a585b82a2cb2a9294aa4a9dfc62cc90de87dc",
+  "product": {
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "sha256": "5297690115455a8336f089c302242facb56ea019b69966e87201ba078522a218",
+    "testSha256": "00be43e4d74dd155a8382d95428fb4f5a6e356c596095bab95797aa3fe3b8332",
+    "physicalApi": 36,
+    "source": "Facebook",
+    "sourceVersion": "586.0.0.52.53"
+  },
+  "liveTrials": [
+    {
+      "kind": "mixed, initially unavailable video",
+      "seconds": 182,
+      "samples": 176,
+      "numericSamples": 0,
+      "unavailableSamples": 176,
+      "attempts": 0,
+      "nativeArrivals": 0,
+      "independentArrivals": 0,
+      "required": 3,
+      "instrumentationCode": 0,
+      "result": "not accepted; unknown playback correctly withheld gestures",
+      "sourceSetupSwipes": 0,
+      "operatorSwipesAfterStart": 0
+    },
+    {
+      "kind": "one numeric video-end trial",
+      "secondsBound": 150,
+      "progressRange": [
+        0.0,
+        0.25099998712539673
+      ],
+      "attempts": 0,
+      "nativeArrivals": 0,
+      "instrumentationCode": 0,
+      "result": "not accepted; no end reached in bounded observation",
+      "setup": "existing one-transition harness permits up to three pre-Start setup swipes; exact number not returned by failed trial",
+      "operatorSwipesAfterStart": 0
+    },
+    {
+      "kind": "mixed standalone ad and numeric video end",
+      "seconds": 182,
+      "samples": 176,
+      "numericSamples": 80,
+      "unavailableSamples": 95,
+      "attempts": 2,
+      "standaloneAdProposals": 1,
+      "videoEndProposals": 1,
+      "acceptedCompletedGestures": 2,
+      "nativeArrivals": 2,
+      "independentArrivals": 2,
+      "required": 3,
+      "actualHudStartAndStop": true,
+      "operatorSetupSwipesBeforeStart": 1,
+      "operatorSwipesAfterStart": 0,
+      "instrumentationCode": 0,
+      "result": "partial positive stages; overall three-arrival goal fails when next reel supplies no numeric progress; no timer fallback or further gesture"
+    }
+  ],
+  "checks": {
+    "typecheck": "pass",
+    "lintArchitectureBackupPalette": "pass",
+    "jest": 136,
+    "hostCompletionGate": 31,
+    "releaseGuardUnittests": 27
+  },
+  "cleanup": {
+    "ownedTestRemoved": true,
+    "originalAccessibilityRestoredExactly": true,
+    "backupPreferenceBytesUnchanged": true,
+    "installedProductHashUnchanged": true,
+    "historyClearedOrReplaced": false,
+    "savedRulesModified": false,
+    "returnedToToday": true
+  },
+  "remaining": [
+    "Repeated final-candidate video ends, unavailable/overlay behavior and source/negative/lifecycle matrix",
+    "Framework fresh-install recovery, maximum logical restore and interruption/low-space preservation",
+    "Core accessibility, minimum API/device coverage and measured resource/soak gates",
+    "Release signatures, Console artifact/source mapping, current declarations, maintainer candidate agreement and separate publication authorization"
+  ],
+  "privacy": "Only bounded action/progress aggregates; no raw source text, personal counters, phone identifiers or private accessibility selections.",
+  "releaseInspection": {
+    "status": "static-audit-only",
+    "manifest": {
+      "package": "attention.stats",
+      "versionName": "1.0.0",
+      "versionCode": 10,
+      "auditProfile": "current",
+      "minSdk": 24,
+      "targetSdk": 37,
+      "debuggable": false,
+      "testOnly": false,
+      "backupDisabled": false,
+      "permissions": [
+        "android.permission.PACKAGE_USAGE_STATS",
+        "attention.stats.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+      ],
+      "exportedComponents": [
+        "androidx.profileinstaller.ProfileInstallReceiver",
+        "com.attentionstats.MainActivity",
+        "com.attentionstats.reels.ReelsAccessibilityService",
+        "com.attentionstats.widget.WidgetConfigureActivity"
+      ]
+    },
+    "apkAndAabCompiledBackup": {
+      "oneLogicalFileOnly": true,
+      "protectedCloudTransportRequired": true,
+      "deviceTransferExcluded": true
+    },
+    "apkAabAssetsDexNativeMatch": true,
+    "nativeLibraryCount": 23,
+    "artifacts": {
+      ".apk": "b043bb1e08ac76ee0ee8432846ecc10da3fd41fd8c9ea07ed1e5a40a22a04113",
+      ".aab": "f4a1c8bab54a9b78cba15dd3851f436fffd79989bbb3f92953c8c7961740c2ae"
+    },
+    "sourceHead": "ee4a585b82a2cb2a9294aa4a9dfc62cc90de87dc",
+    "sourceDirty": true,
+    "limitations": [
+      "Full APK/AAB resource equivalence beyond backup rules is not established",
+      "Signatures, device/runtime, OS recovery, egress, Console and policy acceptance are separate"
+    ],
+    "build": {
+      "tasks": [
+        ":app:assembleRelease",
+        ":app:bundleRelease"
+      ],
+      "arch": "arm64-v8a",
+      "duration": "11m57s",
+      "result": "pass",
+      "signed": false,
+      "installed": false,
+      "versionCodeReservedForPublication": false,
+      "existingReportedUploadedCode": 10,
+      "warnings": "Existing CMake minimum/path-length, Kotlin/API deprecations and Gradle 10 incompatibility warning remain; no downgrade or machine toolchain change."
+    },
+    "initialAuditStops": [
+      "APK baseline-profile assets reside under AAB BUNDLE-METADATA; compare their exact known mapping rather than treating representation as missing content. A regression test rejects changed/missing profiles.",
+      "Windows JVM resource output required task-local UTF-8; Java commands now set file.encoding explicitly. No global encoding setting changed."
+    ],
+    "predatesCalendarAndCompactInformationChanges": true
+  },
+  "policyReview": {
+    "date": "2026-11-14",
+    "scope": "Official public guidance rechecked; Console and candidate declaration approval not inspected",
+    "sources": [
+      "https://support.google.com/googleplay/android-developer/answer/10964491?hl=en",
+      "https://support.google.com/googleplay/android-developer/answer/14151465?hl=en-en",
+      "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en"
+    ],
+    "accessibilityApproval": false,
+    "consoleInspected": false
+  },
+  "cacheRefreshProbe": {
+    "productSha256": "a999a9a2e76db78ed9536c33512d29acf145ab51f7541db2474c26a6f47f6ed3",
+    "testSha256": "ea0d78e86058c6a75ac20a1ec4d41449d747e35794fed1aa3e9b31425d072049",
+    "result": {
+      "viewerSamples": 50,
+      "samples": 50,
+      "matches": {},
+      "classifications": {
+        "REELS/VIEWER/REEL/video": 50
+      },
+      "progressSamples": 0,
+      "standaloneAdSamples": 0,
+      "distinctValues": {},
+      "refreshProbe": true,
+      "rootRefreshes": 50,
+      "cacheClears": 50,
+      "rootNumericSamples": 0,
+      "uncachedNumericSamples": 0,
+      "sameItemPairs": 50,
+      "sameItemRootRecoveries": 0,
+      "sameItemCacheRecoveries": 0,
+      "sourceGestures": 0,
+      "rawLabelsRetained": false
+    },
+    "instrumentationCode": -1,
+    "scope": "Paired no-action feasibility audit only; no progress recovered. UiAutomation cache only; no production cache change.",
+    "cleanup": "Owned test removed; exact accessibility/backup and installed product hash matched."
+  },
+  "maintainerScopeDecision": "Retain auto-scroll in publication scope and keep publication blocked while continuing qualification."
+}

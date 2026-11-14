@@ -20,7 +20,7 @@ class WidgetGalleryActivity : ComponentActivity() {
     private fun show() {
         val page = NativePage(this)
         page.text("Home Screen Widgets", 32f)
-        page.text("Choose a widget, then confirm on your launcher. Examples below use illustrative values. Long-press a placed widget to change its style, stats, order and appearance.")
+        page.section("Example Gallery", "Choose a widget, then confirm on your launcher. Examples use illustrative values, not your history. Long-press a placed widget to change its style, stats, order and appearance.")
         page.button("Back to Settings") { finish() }
         val width = minOf(330, (resources.displayMetrics.widthPixels / resources.displayMetrics.density).toInt() - 76).coerceAtLeast(110)
         TodayWidget.providers.forEach { provider ->

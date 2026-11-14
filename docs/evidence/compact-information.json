@@ -1,0 +1,97 @@
+{
+  "date": "2026-11-14",
+  "status": "experimental checkpoint; implementation delivered; full UI acceptance incomplete; publication held",
+  "decisions": [
+    "ADR-095",
+    "ADR-096"
+  ],
+  "tasks": [
+    "AS-014",
+    "AS-018",
+    "AS-027",
+    "AS-037",
+    "AS-045",
+    "AS-057",
+    "AS-058"
+  ],
+  "product": {
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "sha256": "c00595b222dd72ebe358c24fc6ca5211188b5dbfa0ff1a071c4c4538660960b7",
+    "physicalApi": 36,
+    "installedInPlace": true
+  },
+  "implementation": {
+    "allTimeDayCalendar": true,
+    "maximumDetailDates": 30,
+    "appDateWindowsReplacedNotAppended": true,
+    "appCalendarSelectsWindowEnd": true,
+    "dayCalendarCentersPage": true,
+    "initialAppDailyRows": 7,
+    "moreAppsIncrement": 10,
+    "duplicateBrowseDatesTotalsRemoved": true,
+    "rangeMetricDividers": true,
+    "cardOwnedCollapsedInformation": true,
+    "nestedAppearanceInformation": true,
+    "nativeBackupWidgetInformation": true,
+    "welcomeTourTip": true,
+    "visibleConsentErrorsReviewAndDestructiveWarningsRetained": true,
+    "newDependencyPermissionSchemaVersion": false
+  },
+  "checks": {
+    "typecheck": "pass",
+    "lintArchitectureBackupPalette": "pass",
+    "format": "pass",
+    "jest": 137,
+    "releaseGuardTests": 27,
+    "previewTestLintBuild": "pass; 3m25s",
+    "nativeProtectionAttachedView": {
+      "checks": 93,
+      "testSha256": "e6f8ff148b85667fc68f1d9204995e9e242d1d33a7c75a20bdb360f74ee1eb56",
+      "instrumentationCode": -1,
+      "scope": "Includes independent native help, no choice-selection callback and saved appearance preservation."
+    },
+    "widgetProjectionConfigurationAttachedHost": {
+      "checks": 469,
+      "testSha256": "e6f8ff148b85667fc68f1d9204995e9e242d1d33a7c75a20bdb360f74ee1eb56",
+      "instrumentationCode": -1,
+      "scope": "Synthetic hosts and isolated configuration IDs; actual placed widgets unchanged."
+    }
+  },
+  "actualPhone": {
+    "insights": "Collapsed summary/dividers visually reviewed; actual range/day/source/hour/app-list/selected-app/daily-app and viewing-help open/close checks pass through the owned adb walkthrough. No duplicate Browse Dates totals.",
+    "protect": "Actual Focus, groups/time-slots, boundaries, breaks, blocks and live-counter help opens/closes pass.",
+    "today": "Hero information opens/closes; actual Viewing Details expanded render inspected. Full Today walkthrough not accepted.",
+    "nativeBackupGallery": "A bounded nine-check live traversal passes; exact test APK hash was not retained before the next test-only rebuild, so retain as partial evidence, not final harness acceptance.",
+    "calendarPredecessor": "Actual date select, Cancel, Android Back and Previous/Next pass on the earlier calendar-only build; final compact-screen date/navigation matrix remains incomplete.",
+    "settingsAppearanceEditorsTour": "Code/host checks pass; full final actual UI acceptance remains open after stopped/failed operator trials."
+  },
+  "operatorHarness": {
+    "latestTestSha256": "c90f310fb8bbd48953e43b516a39ce0a44f17b2de9cef1de9f88c3efae428e9b",
+    "status": "unaccepted; generated own-scroll injection rejected at InformationUiVerification.kt; no claim that every screen passed",
+    "earlierStops": [
+      "Coordinate traversal hit clipped/edge-scrolled controls; manual interior swipe and Viewing Details inspection succeed.",
+      "Earlier accessibility traversal passes individual controls and native backup/gallery but fails other searches/collapse checks.",
+      "Explicit touchscreen-source events are now set in the test UI and legacy source-setup helpers; latest own-input injection still returns false. This correction is not a source-runtime pass."
+    ],
+    "sourceGesturesFromInformationModes": 0
+  },
+  "cleanup": {
+    "ownedTestHashCheckedAndRemoved": true,
+    "originalAccessibilityRestoredExactly": true,
+    "backupPreferenceBytesUnchanged": true,
+    "appearancePreferenceBytesUnchanged": true,
+    "installedProductHashMatched": true,
+    "returnedToToday": true,
+    "historyClearedOrReplaced": false,
+    "savedRuleOrFocusSaveRequested": false,
+    "backupProviderRequestOrTransferRequested": false
+  },
+  "remaining": [
+    "Complete final Settings/Appearance, Today, editor/onboarding and calendar/accessibility visual acceptance; repair or replace rejected own-input test mechanism.",
+    "Qualify multi-year query latency, broad accessibility/RTL/large type and declared device/minimum API scope.",
+    "Continue Facebook numeric-unavailability/repeated-end qualification with auto-scroll retained.",
+    "Concrete release recovery/security/resources/Console/signature/merge/publication gates remain open."
+  ],
+  "privacy": "No real counters, app-history names, raw source content, screenshots, phone identifiers or private baseline published. Normal consented observations can add their usual facts."
+}

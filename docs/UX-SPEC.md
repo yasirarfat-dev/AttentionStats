@@ -140,3 +140,15 @@ ADR-088 adds quick focus suggestions based only on installed approved Reels targ
 
 
 ADR-089 uses card-level Settings help: one named info control at each section heading, with a progressive definition list immediately below that heading, before controls. Each concept has its own bold term, concise description and separator; Hide Explanations offers an explicit exit. Routine per-row descriptions/info controls are removed, while actual health/status and deletion warnings remain visible. Switches are the final controls at the right edge. Help changes only presentation. Today, Viewing Details and paired Insights/app-history statistics gain subtle partial-height decorative separators, with no new spoken nodes or metric changes.
+
+
+### All Time day calendar (ADR-095)
+
+Replace the All Time Explore a day date strip with one Choose Day control showing DD/MM/YYYY. Open the existing native calendar inside the selected range; choosing a date updates day details and, when necessary, a bounded detail page without changing range totals. Cancel and Android Back preserve selection. Previous/Next day move through the selected range, including page edges. The chart and app statistics continue to identify their page scope. Week/Month retain bounded date strips. Do not append years of date buttons or raw history to the screen. No new collection, preference or permission.
+
+
+### Compact cards across the app (ADR-096)
+
+Routine paragraphs in Today, Insights, Viewing Details, Settings/Appearance, focus/schedule/group editors, protection tools, native backup and widget flows move into independently toggled card/section information panels. Default views emphasize labels, values and actions. Preserve explicit consent/review, errors and destructive warnings. The welcome tour introduces the top-right information convention. Opening/closing explanations changes no preference, selection or grant.
+
+Insights replaces repeated Browse Dates totals with a range summary, optional source breakdown and clearly scoped day/app explorers. Range encounter/surface-time metrics have subtle separators. By App date controls appear for All Time only; Choose End Date replaces the page with up to 30 dates ending on that date. Older/Newer replace the window rather than append rows. Week/Month already use bounded ranges. Daily app history starts with seven rows, expanding only within its maximum-30-day page. App search shows ten more app rows per request. Day calendar/Previous/Next preserve range totals, and a completed page change returns to the explorer.

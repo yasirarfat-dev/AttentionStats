@@ -103,18 +103,51 @@ internal class NativePage(private val activity: Activity) {
             view.thumbTintList = ColorStateList(arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()), intArrayOf(it.onAccent, it.muted))
         }
     }
+    /** Card-owned help. Opening it never changes the underlying draft or preferences. */
+    fun section(title: String, detail: String) {
+        group = null
+        help(ensureGroup(), title, detail)
+    }
+    private fun help(parent: LinearLayout, title: String, detail: String) {
+        val row = LinearLayout(activity).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        val heading = TextView(activity).apply {
+            text = titleCase(title); textSize = 16f; typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            if (Build.VERSION.SDK_INT >= 28) isAccessibilityHeading = true
+        }
+        row.addView(heading, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        val body = TextView(activity).apply {
+            text = detail; textSize = 14f; setLineSpacing(dp(3).toFloat(), 1.05f)
+            setPadding(0, dp(8), 0, dp(8)); visibility = View.GONE
+        }
+        val info = TextView(activity).apply {
+            text = "ⓘ"; textSize = 24f; gravity = Gravity.CENTER; minWidth = dp(48); minHeight = dp(48)
+            contentDescription = "About $title"; isClickable = true; isFocusable = true
+            setOnClickListener {
+                body.visibility = if (body.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+                if (Build.VERSION.SDK_INT >= 30) stateDescription = if (body.visibility == View.VISIBLE) "Expanded" else "Collapsed"
+            }
+            if (Build.VERSION.SDK_INT >= 30) stateDescription = "Collapsed"
+            accessibilityDelegate = object : View.AccessibilityDelegate() {
+                override fun onInitializeAccessibilityNodeInfo(host: View, info: android.view.accessibility.AccessibilityNodeInfo) {
+                    super.onInitializeAccessibilityNodeInfo(host, info); info.className = "android.widget.Button"
+                }
+            }
+        }
+        row.addView(info, LinearLayout.LayoutParams(dp(48), dp(48)))
+        add(row, parent, 4); add(body, parent, 4)
+        bind { heading.setTextColor(it.text); info.setTextColor(it.accent); body.setTextColor(it.muted) }
+    }
     fun choice(title: String, detail: String, selected: Boolean, action: () -> Unit) {
         group = null
         val card = LinearLayout(activity).apply {
             orientation = LinearLayout.VERTICAL; setPadding(dp(20), dp(18), dp(20), dp(18))
             isClickable = true; isFocusable = true; isSelected = selected
-            contentDescription = "$title. $detail${if (selected) ". Selected" else ""}"
+            contentDescription = "$title${if (selected) ". Selected" else ""}"
             setOnClickListener { action() }
         }
-        val heading = TextView(activity).apply { text = if (selected) "$title · Selected" else title; textSize = 17f; typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL) }
-        val body = TextView(activity).apply { text = detail; textSize = 13f; setPadding(0, dp(6), 0, 0); setLineSpacing(dp(2).toFloat(), 1f) }
-        card.addView(heading); card.addView(body); add(card, content, 10)
-        bind { card.background = shape(if (selected) it.accentSoft else it.surface, if (selected) it.accent else it.border); heading.setTextColor(it.text); body.setTextColor(it.muted) }
+        help(card, if (selected) "$title · Selected" else title, detail)
+        add(card, content, 10)
+        bind { card.background = shape(if (selected) it.accentSoft else it.surface, if (selected) it.accent else it.border) }
     }
     fun custom(view: View, heightDp: Int) {
         group = null

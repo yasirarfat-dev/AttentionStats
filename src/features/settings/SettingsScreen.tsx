@@ -276,12 +276,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         title="Display & experience"
         entries={settingsHelp.measurement}
       >
-        <Row
-          icon="eye"
-          title="Live counter"
-          detail="Floating display, numbers and icons"
-          onPress={() => setCounter(true)}
-        />
+        <Row icon="eye" title="Live counter" onPress={() => setCounter(true)} />
         <Divider />
         <ToggleRow
           icon="layers"
@@ -385,7 +380,6 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <Row
           icon="lock"
           title="Backup & restore"
-          detail="Android backup and encrypted files"
           onPress={async () => {
             if (!(await NativeDiary?.openBackup()))
               Alert.alert(

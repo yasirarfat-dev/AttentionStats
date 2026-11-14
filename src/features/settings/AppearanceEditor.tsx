@@ -11,6 +11,8 @@ import {
   Body,
   Button,
   SectionTitle,
+  Explanation,
+  Divider,
   Segmented,
   Stepper,
   ToggleRow,
@@ -56,7 +58,10 @@ export function AppearanceEditor({
   };
   return (
     <>
-      <SectionTitle>Theme</SectionTitle>
+      <Explanation title="Theme">
+        Choose Light, Dark or follow the system. Appearance changes stay in this
+        draft until Save Appearance.
+      </Explanation>
       <Segmented
         label="Theme"
         value={draft.mode}
@@ -68,10 +73,10 @@ export function AppearanceEditor({
         onChange={mode => setDraft({ ...draft, mode })}
       />
       <View style={styles.colorGroup}>
-        <SectionTitle>Presets</SectionTitle>
-        <Body muted>
-          Ready-made palettes. Choosing one resets your custom colors.
-        </Body>
+        <Explanation title="Presets">
+          Ready-made palettes. Choosing one resets the custom colors in this
+          draft. Save Appearance applies your changes.
+        </Explanation>
         <AppearanceChoices
           grid
           label="Presets"
@@ -103,11 +108,14 @@ export function AppearanceEditor({
         />
       </View>
       <View style={styles.colorGroup}>
-        <SectionTitle>Custom colors</SectionTitle>
-        <Body muted>
-          Choose Color, Background or Accent, then drag across the palette to
-          customize that part. Changes stay in your draft until Save appearance.
-        </Body>
+        <Explanation title="Custom Colors">
+          Color changes text and numbers; Background changes page and card
+          backgrounds; Accent changes buttons and highlights. Choose a scope,
+          drag the hue strip and color canvas, or enter hex/RGB. Your selected
+          background is preserved; text and accent tones adjust for readability.
+          Status and deletion colors retain their meaning. Changes stay in the
+          draft until Save Appearance.
+        </Explanation>
         <AppearanceChoices
           label="Color scope"
           value={scope}
@@ -128,14 +136,6 @@ export function AppearanceEditor({
             );
           }}
         />
-        <Body muted>
-          {scope === 'foregroundColor'
-            ? 'Text and numbers'
-            : scope === 'backgroundColor'
-              ? 'Page and card backgrounds'
-              : 'Buttons and highlights'}{' '}
-          · drag the hue strip, then the color canvas.
-        </Body>
         <ColorCanvas
           onDragChange={onDragChange}
           key={scope}
@@ -227,11 +227,6 @@ export function AppearanceEditor({
                   onChange={next => updateChannel(i, next)}
                 />
               ))}
-            <Body muted>
-              Your background stays as selected. Text and accent tones adjust
-              when needed for readability. Status and deletion colors keep their
-              meaning.
-            </Body>
           </>
         }
       </View>
@@ -242,6 +237,12 @@ export function AppearanceEditor({
       />
       {advanced && (
         <>
+          <Divider />
+          <Explanation title="Layout & Numbers">
+            Adjust app-card corners, spacing and statistic size. System text
+            scaling still applies. Native tools and launcher widgets retain
+            their own layout controls.
+          </Explanation>
           <SectionTitle>Card corners</SectionTitle>
           <Stepper
             label="Card corners"
@@ -272,10 +273,6 @@ export function AppearanceEditor({
             suffix="sp · follows system text size"
             onChange={numberSize => setDraft({ ...draft, numberSize })}
           />
-          <Body muted>
-            Layout controls apply to app cards and statistic numbers. Native
-            tools and launcher widgets have their own layouts.
-          </Body>
         </>
       )}
       <ToggleRow

@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import type { DiarySnapshot } from '../../platform/diaryStatus';
-import { Card, Explanation, Stat, StatDivider } from '../../ui/Kit';
+import { Card, Stat, StatDivider } from '../../ui/Kit';
 import { duration, exactCount } from '../../ui/format';
 
 /** Media type, advertising and playback are separate facets; totals must not be added together. */
@@ -20,14 +20,10 @@ export function ViewingDetail({ days }: { days: DiarySnapshot['days'] }) {
   const measured = apps.some(app => app.measuredVideoCount !== null);
   return (
     <>
-      <Explanation title="Viewing Details">
-        Encounters mean on screen, not watched. Photos and videos describe
-        media; ads can overlap either. Playback is opt-in where numeric player
-        times are available. A watch needs 3 seconds in one visit; completions
-        need an observed run from the start. Missing signals stay unknown;
-        pauses and gaps add no time.
-      </Explanation>
-      <Card>
+      <Card
+        title="Viewing Details"
+        info="Encounters mean on screen, not watched. Photos and videos describe media; ads can overlap either. Playback is opt-in where numeric player times are available. A watch needs 3 seconds in one visit; completions need an observed run from the start. Missing signals stay unknown; pauses and gaps add no time."
+      >
         <View style={styles.row}>
           <Stat
             value={exactCount(sum('photoCount'))}

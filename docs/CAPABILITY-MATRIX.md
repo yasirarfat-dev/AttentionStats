@@ -142,3 +142,6 @@ ADR-091 refines existing experimental presentation, focus, protection and appear
 
 
 November 14 C-30/C-32/AS-027/AS-057 continuation: full-spectrum presentation and actual widget source-name defaults remain experimental with scoped native/UI evidence. The C-32 standalone Facebook subset passes one actual Start/confirmed-next-page/Stop trial; it does not admit universal video-end or provider Skip Ad support. [Exact artifacts and remaining gates](evidence/facebook-appearance-widget-continuation.json). No capability status promotion.
+
+
+November 14 AS-021 begins a current-candidate static C-28 inspection subset: independently audited APK/AAB manifests and compiled one-file/encrypted-cloud/device-transfer rules. No runtime capability admission advances; actual OS recovery/transfer and S-01–S-06 remain open. The same continuation records two native/independent C-32 convenience arrivals but fails repeated scrolling on unavailable progress. [Sequential evidence](evidence/publication-sequence.json).

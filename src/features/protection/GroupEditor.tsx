@@ -82,16 +82,17 @@ export function GroupEditor({
         selectionColor={theme.accent}
       />
       <Body muted>
-        {selected.size} selected · {choices.length} available. Pick one app or
-        build your own group.
+        {selected.size} selected · {choices.length} available
       </Body>
-      {shortVideosOnly && (
-        <Body muted>
-          This group has short-video slots, so only supported apps can be added.
-          Remove those slots first to include other apps.
-        </Body>
-      )}
-      <Card padded={false}>
+      <Card
+        title="Installed Apps"
+        info={
+          shortVideosOnly
+            ? 'This group has short-video slots, so only supported apps can be added. Remove those slots first to include other apps. Up to 100 selected apps; Save applies the draft.'
+            : 'Choose one app or build a group of up to 100. Apps stay alphabetical while selected. Save applies the draft; Back discards it.'
+        }
+        padded={false}
+      >
         {visible.map(app => (
           <CheckRow
             key={app.packageName}

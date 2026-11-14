@@ -11,7 +11,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Icon } from '../../ui/Icon';
-import { Button, Row } from '../../ui/Kit';
+import { Body, Button, Divider, InfoButton, Row } from '../../ui/Kit';
 import { FocusChooser, type QuickFocusRequest } from '../protection';
 
 export type QuickDestination = 'Focus' | 'Schedules' | 'Breaks' | 'Blocks';
@@ -28,6 +28,7 @@ export function QuickActions({
   const { theme } = useUnistyles();
   const [visible, setVisible] = useState(false);
   const [chooser, setChooser] = useState(false);
+  const [help, setHelp] = useState(false);
   const trigger = useRef<ComponentRef<typeof View>>(null);
   const heading = useRef<ComponentRef<typeof Text>>(null);
   const insets = useSafeAreaInsets();
@@ -98,13 +99,33 @@ export function QuickActions({
             ]}
           >
             <ScrollView contentContainerStyle={styles.content}>
-              <Text
-                ref={heading}
-                accessibilityRole="header"
-                style={styles.title}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
               >
-                Quick Actions
-              </Text>
+                <Text
+                  ref={heading}
+                  accessibilityRole="header"
+                  style={styles.title}
+                >
+                  Quick Actions
+                </Text>
+                <InfoButton
+                  label="Quick Actions"
+                  expanded={help}
+                  onPress={() => setHelp(!help)}
+                />
+              </View>
+              {help && (
+                <Body muted>
+                  Open a focus review, mindful-break controls or video limits.
+                  These shortcuts change no choice until you use the
+                  destination's controls.
+                </Body>
+              )}
               <Button
                 label="Focus Now"
                 onPress={() => {
@@ -112,16 +133,16 @@ export function QuickActions({
                   setChooser(true);
                 }}
               />
+              <Divider />
               <Row
                 icon="heart"
                 title="Adjust mindful breaks"
-                detail="Choose when to offer a pause."
                 onPress={() => open('Breaks')}
               />
+              <Divider />
               <Row
                 icon="block"
                 title="Manage video limits"
-                detail="Review short-video blocks for each app."
                 onPress={() => open('Blocks')}
               />
             </ScrollView>
