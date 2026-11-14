@@ -3,6 +3,8 @@
   "tasks": ["AS-018", "AS-045", "AS-057"],
   "status": "experimental; scoped Appearance behavior/render checks pass; publication HOLD",
   "sourceBase": "0f2c61bfd20a0c6d01ce5df2bef1dbc84984f642",
+  "reviewedSourceCommit": "26ba74da25c4e2624db9b324cf60e75abef475a5",
+  "sourcePublication": "Normally pushed and independently matched on origin/develop; source publication only",
   "implementation": [
     "Independently reviewed and integrated the earlier compact Appearance/Today implementation, debug-only process-memory display fixtures and historical evidence",
     "Templates combines theme mode/accent presets; Customization contains Text/Background/Accent overrides; accent presets preserve text/background",
