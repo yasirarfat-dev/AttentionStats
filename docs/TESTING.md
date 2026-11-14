@@ -256,3 +256,8 @@ The operator-only `informationUi` modes cover own-app disclosures/navigation and
 
 
 ADR-097/ADR-098/ADR-099 adds artifact-scoped daily summary/icon/navigation checks and isolated size-matrix preparation. Verify historical selection changes every dated card without changing range totals; unknown app time/opens are not zero and overlapping durations are not added. App and source rows need left-side icons with accessible names retained; exact package icons must not be replaced by another edition's. Check normal-width Previous Day/Next Day labels and large-type reflow. Use the dedicated emulator only for layout/API scope actually exercised, and physical devices/system traces for declared source/lifecycle/performance coverage. Current results and retained failures are in [day/icon/layout evidence](evidence/day-insights-continuation.json); older own-scroll failure entries remain historical, superseded only by specific successful modes.
+
+
+### Publishing large-text presentation qualification
+
+Use X-02/X-07/X-10 to inspect actual full tab names at 100%/200%, selected states, minimum 48dp targets, Android/tab-history Back and repeated-tab nested-stack return. Verify Viewing Details pairs reflow to full-width statistics without splitting Observed Completions mid-word; check help opens/closes and unknown values stay explicit. Inspect final Appearance Templates/Customization grouping separately from color selection/Save behavior. Hash installed APK, match bundled sources, preserve saved history/appearance/backup, restore original font scale and remove private captures. Host tests/builds alone do not qualify rendering, TalkBack or other widths/themes. [Scoped November 14 evidence](evidence/publishing-large-text.json).

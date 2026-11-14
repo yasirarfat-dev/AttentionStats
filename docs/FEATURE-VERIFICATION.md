@@ -17,6 +17,10 @@ The product rows cover delivered and proposed user-facing behavior. The complete
 
 [Baseline evidence](evidence/publishing-baseline.json) identifies installed/local preview `f9da99d1703dd96ecf3f9766998bfb18d23e1c117612c4db5b1d828d4ae3b60a`, code10/API36. Its bundled JS matches 58 current mapped app source files, including pending UI work; native source provenance is not reconstructed. Three cold Week launches, six warm range switches and direct cold Month/All Time loads pass, plus scoped calendar cancellation/day/app navigation and 37 host tests. Earlier P8 failure is not reproduced, its cause remains unknown, and full history/page-boundary/error/retry acceptance stays unchecked. No runtime repair, install or status promotion.
 
+## Publishing presentation batch — 14/11/26
+
+[Large-text evidence](evidence/publishing-large-text.json) binds preview `5754370c325eb939e56fb01175af017d29c4cc49f74c003e0098f6c30b07b90b`, code10/API36, to 59 matching bundled app sources including pending work. Tab labels and Viewing Details render at 100%/200%; 200% nested/Android/repeated-tab Back passes. Pending Templates/Customization grouping/help is visually reviewed at 100%, with saved appearance/backup unchanged. 139 Jest and preview assembly/lint pass (zero errors, 170 warnings). This accepts only those presentation checks; history, source, broad accessibility and publication gates remain open.
+
 ## Artifact key
 
 | Key | Attention Stats version / artifact | Evidence scope |
@@ -39,6 +43,7 @@ The product rows cover delivered and proposed user-facing behavior. The complete
 
 | Feature / task owners | Code | Verified | Date; artifact / source version where relevant | Exact verified scope and remaining work |
 |---|---|---|---|---|
+| Large-text primary tabs and Viewing Details; AS-018/AS-045 | [x] | [x] | 14/11/26; API36 working-tree preview | Full labels, two-row tabs and stacked details at 200%; normal layout and scoped navigation/Back/help pass. Other accessibility/device scopes remain open. [Evidence](evidence/publishing-large-text.json). |
 | Disclosure, onboarding and independent source choices; AS-010/AS-049 | [x] | [x] | 30/10/26; B0 | Baseline onboarding/enable flow; broader revocation, accessibility and final-candidate onboarding still open. [State](STATE.md#verification-2026-10-30). |
 | Direct accessibility setup and service label; AS-056 | [x] | [ ] | Historical partial evidence | Label observed; final direct-navigation path needs acceptance. [Tracker](FEATURE-TRACKER.md). |
 | Instagram Reels counting; AS-013/AS-048 | [x] | [x] | 30/10/26; B0 | Five manual swipes, +5 encounters; broader routes/source updates and negative contexts remain. [State](STATE.md#verification-2026-10-30). |

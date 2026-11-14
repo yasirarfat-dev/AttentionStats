@@ -28,6 +28,7 @@ import { applyAppearance, useAppearance } from '../ui/theme';
 import { loadAppearance } from '../platform/appearance';
 import { luminance } from '../ui/customPalette';
 import { useUnistyles } from 'react-native-unistyles';
+import { ResponsiveTabBar } from './ResponsiveTabBar';
 
 type Tabs = {
   Today: undefined;
@@ -89,6 +90,7 @@ function MainTabs({ onWelcome }: { onWelcome: () => void }) {
   }, []);
   return (
     <Tab.Navigator
+      tabBar={props => <ResponsiveTabBar {...props} />}
       initialRouteName="Today"
       backBehavior="history"
       screenOptions={({ route }) => ({

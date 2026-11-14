@@ -1,0 +1,144 @@
+{
+  "date": "2026-11-14",
+  "tasks": [
+    "AS-018",
+    "AS-045",
+    "AS-057"
+  ],
+  "status": "experimental; scoped presentation checks pass; publication HOLD",
+  "product": {
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "package": "com.attentionstats.debug",
+    "sha256": "5754370c325eb939e56fb01175af017d29c4cc49f74c003e0098f6c30b07b90b",
+    "physicalApi": 36,
+    "installedInPlace": true,
+    "testArtifact": null
+  },
+  "provenance": {
+    "sourceBase": "e713f37a0399053b4321470b677f9908b0905021",
+    "workingTree": "owned tab/detail changes plus preserved pre-existing Appearance/Today/native edits; not a committed-only candidate",
+    "mappedAppSourcesMatch": 59,
+    "apkBundleMatchesGeneratedBundle": true,
+    "nativeDexAndLibraryEntries": 52,
+    "nativePayloadByteIdenticalToPreviousInstalledPreview": true,
+    "previousPreviewSha256": "f9da99d1703dd96ecf3f9766998bfb18d23e1c117612c4db5b1d828d4ae3b60a",
+    "qualificationTransfer": "No source, lifecycle, history or release qualification transferred from payload equality"
+  },
+  "implementation": [
+    "Two-row, two-column primary navigation below 300dp safe effective width; standard BottomTabBar retained otherwise",
+    "Named selected tabs, scaled full labels, safe insets, minimum 48dp targets and standard preventable press/long-press/repeated-press event semantics",
+    "Viewing Details metric pairs stack below 330dp effective width; vertical separators omitted in stacked layout; names/values/unknown states unchanged",
+    "Preserved pending Appearance grouping reviewed; its existing source remains separate and unstaged"
+  ],
+  "host": {
+    "typescript": "pass",
+    "lintArchitectureBackupPalette": "pass",
+    "format": "pass",
+    "mobilePolicy": "pass; no dependency change or live registry review",
+    "jestSuites": 16,
+    "jestTests": 139,
+    "previewAssemblyAndLint": "pass; 4m9s; local locked incremental build",
+    "lintErrors": 0,
+    "lintWarnings": 170,
+    "warnings": [
+      "Existing AGP legacy DSL/variant and Kotlin plugin deprecations; Gradle 10 compatibility remains open",
+      "CMake ordering/minimum-version and object-path warnings",
+      "Repository SDK lacks platform-tools; existing external adb used without changing SDK/shared adb state"
+    ],
+    "documentation": "pass; see dated log"
+  },
+  "physical": {
+    "normalText": [
+      "Four actual tab selections and selected-state checks pass",
+      "One-row tab geometry and full labels reviewed",
+      "Viewing Details paired layout/all six labels visually reviewed; help opens/closes"
+    ],
+    "largeText": {
+      "fontScale": 2.0,
+      "navigation": {
+        "tabBoundsPx": {
+          "Today": [
+            0,
+            1212,
+            360,
+            1355
+          ],
+          "Insights": [
+            360,
+            1212,
+            720,
+            1355
+          ],
+          "Protect": [
+            0,
+            1356,
+            360,
+            1500
+          ],
+          "Settings": [
+            360,
+            1356,
+            720,
+            1500
+          ]
+        },
+        "densityDpi": 300,
+        "scale": 2.0,
+        "nestedBack": true,
+        "repeatedTabPop": true,
+        "tabHistoryBack": true
+      },
+      "passes": [
+        "All four tabs selectable with full labels in two rows",
+        "Measured tab targets at least 48dp",
+        "Actual Scheduled Focus entry, Android Back to Protect, repeated Protect press pops nested stack, tab-history Android Back",
+        "Viewing Details help opens/closes",
+        "Full-width Observed Completions statistic reached and visually reviewed; surrounding labels have no mid-word split"
+      ],
+      "completionGeometry": {
+        "observedCompletionBoundsPx": [
+          73,
+          455,
+          647,
+          619
+        ],
+        "scale": 2.0
+      }
+    },
+    "appearance": {
+      "fontScale": 1.0,
+      "visual": "Templates contains Theme Mode and four Accent Presets; separate Customization contains Text/Background/Accent palette controls",
+      "help": "Both named panels open/close; collapsed final presentation inspected",
+      "savedAppearanceBackupByteIdentical": true,
+      "notExercised": [
+        "Accent/theme/color selection or Save",
+        "Full 200% Appearance editor, keyboard and draft/save/cancel persistence matrix"
+      ]
+    }
+  },
+  "operatorCorrections": [
+    "Initial post-install check ran before Today tabs appeared; bounded startup wait added; no UI pass from failed attempt",
+    "Nested locator expected Back; actual control is Back to Protect; corrected before actual Back/repeated-tab checks",
+    "Initial lower large-text capture scrolled past the target statistic; separate bounded target capture/geometry and visual review establish Observed Completions acceptance"
+  ],
+  "cleanup": {
+    "fontScaleRestored": true,
+    "appearanceBackupByteIdentical": true,
+    "installedHashIndependentlyMatched": true,
+    "noTestPackage": true,
+    "returnedToToday": true,
+    "historyReset": false,
+    "sourceOrPermissionSettingsWrites": false,
+    "mainMergeWorkflowBinaryPublication": false,
+    "ownedPrivatePhoneFilesRemoved": 16
+  },
+  "preservation": "No reset/erase/export/restore or source/provider/permission/rule changes. Only own-app install/update, launches/force-stop, navigation/help, scrolling and temporary font scale. Normal consented collection may append facts; no database equality claimed.",
+  "limits": [
+    "Physical API36, current width, dark saved palette and 100%/200% scope only; no TalkBack/RTL/light/landscape/reduced-motion/universal-device or resource-performance acceptance",
+    "Earlier cold-history failure remains unresolved and was not requalified in this batch",
+    "Auto-scroll stays in release scope and unresolved; no provider/source trial repeated",
+    "Pre-existing pending edits remain uncommitted; no committed-only release provenance",
+    "No emulator, signing, main merge, remote workflow or Play action"
+  ]
+}
