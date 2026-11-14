@@ -142,6 +142,10 @@ internal object WidgetRenderer {
                 sources.forEachIndexed { index, source ->
                     val name = if (config.names) source.first else "App ${index + 1}"
                     root.addView(R.id.widget_body, RemoteViews(context.packageName, R.layout.widget_app_row).apply {
+                        val sourceApp = org.attentionstats.reels.ReelApp.entries.firstOrNull { it.displayName == source.first }
+                        val icon = sourceApp?.let { com.attentionstats.appearance.AppIconLoader.bitmap(context, it.packageName, dp(context, 24), sourceAliases = true) }
+                        if (icon != null) setImageViewBitmap(R.id.w_app_icon, icon)
+                        else setImageViewResource(R.id.w_app_icon, R.drawable.ic_app_placeholder)
                         setTextViewText(R.id.w_label, name)
                         setTextViewText(R.id.w_value, count(source.second))
                         setTextColor(R.id.w_label, palette.muted); setTextColor(R.id.w_value, palette.text)

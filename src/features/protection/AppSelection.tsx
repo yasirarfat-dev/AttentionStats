@@ -3,6 +3,8 @@ import { Pressable, Switch, Text, TextInput, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Body, Card, Divider, SectionTitle, CheckRow } from '../../ui/Kit';
 import { Icon } from '../../ui/Icon';
+import { AppIcon } from '../../ui/Charts';
+import { useAppIcons } from '../diary';
 import type { AppGroup, ProtectableApp } from '../../platform/protectionStatus';
 import { scheduleStyles } from './schedulePresentation';
 
@@ -33,6 +35,18 @@ export function AppSelection({
   const visibleGroups = groups.filter(
     group =>
       matching(group.name) || group.packages.some(pkg => matching(nameOf(pkg))),
+  );
+  const icons = useAppIcons([
+    ...others.map(app => app.packageName),
+    ...visibleGroups.flatMap(group => group.packages),
+  ]);
+  const appIcon = (pkg: string) => (
+    <AppIcon
+      uri={icons[pkg]}
+      mark={nameOf(pkg).slice(0, 1)}
+      color={theme.accentFill}
+      size={36}
+    />
   );
   const choose = (packages: string[], enabled: boolean) => {
     const next = new Set(selected);
@@ -124,6 +138,7 @@ export function AppSelection({
                       <CheckRow
                         key={pkg}
                         title={nameOf(pkg)}
+                        leading={appIcon(pkg)}
                         value={selected.includes(pkg)}
                         disabled={
                           disabled ||
@@ -142,6 +157,7 @@ export function AppSelection({
             {(index > 0 || visibleGroups.length > 0) && <Divider />}
             <CheckRow
               title={app.name}
+              leading={appIcon(app.packageName)}
               value={selected.includes(app.packageName)}
               disabled={
                 disabled ||

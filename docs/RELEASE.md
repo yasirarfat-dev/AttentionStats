@@ -115,3 +115,6 @@ Security incidents follow [reporting policy](../SECURITY.md). Withdraw unsafe re
 
 
 November 14 concluding development checkpoint: one source-qualified standalone Facebook ad now passes actual HUD Start/automatic different-page confirmation/Stop, with exact artifact and native payload comparison in [continuation evidence](evidence/facebook-appearance-widget-continuation.json). This removes the earlier zero-confirmation result only for that bounded trial; repeated Facebook end scrolling, unknown-progress/overlay behavior, genuine provider controls and broader release gates remain open. Appearance/widget delivery is separate from scroll acceptance. No main merge, signing, binary publication or remote workflow follows this checkpoint.
+
+
+November 14 day/icon concluding checkpoint remains HOLD: installed P8 has scoped UI/native evidence, but fresh cold Insights shows history unavailable and the final two JS refinements await build/render acceptance. Facebook current trials stop before Start on the settled-viewer precondition; no earlier repeated-end gate is cleared. Emulator/other-device work is explicitly deferred until product completion, with zero accepted size profiles. No merge, version/signing/Console or binary publication clearance. [Exact scope and cleanup](evidence/day-insights-continuation.json).

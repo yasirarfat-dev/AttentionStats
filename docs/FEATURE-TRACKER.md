@@ -190,3 +190,12 @@ November 14 ADR-096 continuation: AS-014/AS-018/AS-037/AS-045/AS-057 adds compac
 
 
 ADR-095/ADR-096 concluding checkpoint: installed P6 implements bounded calendars, compact Insights and card-owned help. 137 Jest/27 release tests and physical native 93/469 pass; actual Insights/Protect scope passes, while final Settings/Appearance/Today/editor/tour/date and accessibility acceptance remain incomplete after operator-harness failures. Tasks stay experimental. See [bounded evidence](evidence/compact-information.json); no publication clearance.
+
+
+November 14 ADR-097 continuation: AS-014/AS-018/AS-037 adds a visually bounded By Day group, date-scoped detail cards and recorded screen time/video-app time/app opens/break reminders beside daily video counts and surface time. Historical sessions remain unavailable in the current contract. By App and range aggregates retain their scope. Tasks remain experimental; [day evidence](evidence/day-insights-continuation.json) separates implementation, host checks, actual UI and outstanding publication gates.
+
+
+November 14 ADR-098 extends AS-018/AS-027/AS-045 presentation: consistent left-side app icons in missing Insights/source/editor/focus/review/widget rows, source-specific regional lookup, exact package-history icon identity, decorative accessibility semantics and nonwrapping normal-width day navigation. Runtime evidence remains artifact-scoped; no task/capability promotion.
+
+
+ADR-097/ADR-098/ADR-099 concluding checkpoint: P8 has scoped 27/15 actual UI and 93/477 native checks; later cold Insights history-unavailable invalidates current read acceptance. Final focus-review/placeholder-ink source refinements await build/phone review. Emulator/other-device work is stopped and explicitly deferred until product completion, with no size/performance acceptance. Tasks remain experimental; [evidence](evidence/day-insights-continuation.json) and State carry exact artifacts, cleanup and next actions. Publication remains HOLD.

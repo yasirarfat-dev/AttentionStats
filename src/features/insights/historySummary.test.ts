@@ -47,6 +47,7 @@ test('counts source facts once but retains each package’s app time', () => {
   expect(result.videos).toBe('8');
   expect(result.reelsMs).toBe('60000');
   expect(result.appMs).toBe('120000');
+  expect(result.videoAppMs).toBe('120000');
 });
 
 test('preserves exact counts above JavaScript integer precision across days', () => {
@@ -83,6 +84,46 @@ test('falls back to legacy encounter counts only when video counts are absent', 
       day('2026-11-12', [app({ videoCount: '0', reelsCount: '7' })]),
     ]).videos,
   ).toBe('0');
+});
+
+test('day opens preserve unknowns and sum package observations independently of repeated source facts', () => {
+  expect(historySummary([day('2026-11-12', [app()])]).appOpens).toBeNull();
+  expect(
+    historySummary([day('2026-11-12', [app({ appOpens: '0' })])]).appOpens,
+  ).toBe('0');
+  const days = [
+    day('2026-11-11', [app({ appOpens: '99' })]),
+    day('2026-11-12', [
+      app({ appOpens: '9007199254740993', videoCount: '8' }),
+      app({
+        packageName: 'com.example.variant',
+        appOpens: '2',
+        videoCount: '8',
+      }),
+      app({ packageName: 'com.example.unknown' }),
+    ]),
+  ];
+  expect(historySummary([resolveDay(days, '2026-11-12')!])).toMatchObject({
+    appOpens: '9007199254740995',
+    videos: '8',
+    appMs: null,
+  });
+});
+
+test('video app time excludes other packages and preserves missing observations', () => {
+  expect(historySummary([day('2026-11-12', [app()])]).videoAppMs).toBeNull();
+  expect(
+    historySummary([
+      day('2026-11-12', [
+        app({ appMs: '0' }),
+        app({
+          packageName: 'com.example.utility',
+          social: null,
+          appMs: '60000',
+        }),
+      ]),
+    ]),
+  ).toMatchObject({ appMs: '60000', videoAppMs: '0' });
 });
 
 test('sorts calendar keys without mutating the snapshot and resolves stale dates safely', () => {

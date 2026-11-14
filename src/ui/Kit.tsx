@@ -16,12 +16,16 @@ export function Card({
   padded = true,
   title,
   info,
+  scope,
+  leading,
 }: {
   children: ReactNode;
   tone?: 'plain' | 'soft' | 'hero' | 'warn';
   padded?: boolean;
   title?: string;
   info?: string;
+  scope?: string;
+  leading?: ReactNode;
 }) {
   const [expanded, setExpanded] = useState(false);
   return (
@@ -36,6 +40,7 @@ export function Card({
     >
       {title && (
         <View style={[styles.cardHeading, !padded && styles.cardHeadingInset]}>
+          {leading}
           <Text
             accessibilityRole="header"
             style={[styles.cardTitle, tone === 'hero' && styles.inverseText]}
@@ -50,6 +55,13 @@ export function Card({
               onPress={() => setExpanded(!expanded)}
             />
           )}
+        </View>
+      )}
+      {scope && (
+        <View style={!padded && styles.cardHeadingInset}>
+          <Text style={[styles.caption, tone === 'hero' && styles.inverseText]}>
+            {scope}
+          </Text>
         </View>
       )}
       {info && expanded && (
@@ -479,16 +491,20 @@ export function Pill({
 
 export function Button({
   label,
+  accessibilityLabel,
   onPress,
   variant = 'filled',
   disabled = false,
   icon,
+  compact = false,
 }: {
   label: string;
+  accessibilityLabel?: string;
   onPress: () => void;
   variant?: 'filled' | 'tonal' | 'text' | 'danger' | 'safe';
   disabled?: boolean;
   icon?: IconName;
+  compact?: boolean;
 }) {
   const { theme } = useUnistyles();
   const color =
@@ -502,11 +518,13 @@ export function Button({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
+        compact && { paddingHorizontal: 10 },
         variant === 'tonal' && styles.tonal,
         variant === 'text' && styles.textButton,
         variant === 'danger' && styles.dangerButton,

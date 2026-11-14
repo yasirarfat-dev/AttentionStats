@@ -15,7 +15,7 @@ import {
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
 import { AppIcon } from '../../ui/Charts';
-import { useAppIcons } from '../diary';
+import { AppIdentityList, useAppIcons } from '../diary';
 import {
   newProtectionId,
   type AppGroup,
@@ -58,7 +58,9 @@ export function SchedulesScreen({
   }, [screenFocused, initialView]);
   const [draft, setDraft] = useState<Draft | null>(null);
   const icons = useAppIcons(
-    packageName ? [packageName] : apps.slice(0, 80).map(app => app.packageName),
+    packageName
+      ? [packageName]
+      : (snapshot?.groups.flatMap(group => group.packages) ?? []),
   );
   useEffect(() => {
     if (!screenFocused) return;
@@ -151,15 +153,7 @@ export function SchedulesScreen({
         />
         <Card tone="soft">
           <Title>{group?.name ?? 'Selected apps'}</Title>
-          <Body>
-            {group?.packages
-              .map(
-                pkg =>
-                  apps.find(app => app.packageName === pkg)?.name ??
-                  'Previously selected app',
-              )
-              .join(' · ')}
-          </Body>
+          <AppIdentityList packages={group?.packages ?? []} apps={apps} />
           {slot && (
             <>
               <Text style={styles.time}>{slotLabel(slot)}</Text>

@@ -114,6 +114,10 @@ internal object WidgetVerification {
                         ui {
                             if (style == WidgetStyle.APPS && width >= 160 && height >= 140)
                                 expect(texts(host).any { it.id == R.id.w_label && it.text.toString() == "Instagram" })
+                            if (style == WidgetStyle.APPS && width >= 160 && height >= 140) {
+                                val icon = host.findViewById<android.widget.ImageView>(R.id.w_app_icon)
+                                expect(icon != null && icon.drawable != null && icon.width > 0 && icon.height > 0)
+                            }
                             check(texts(host).any { it.id == R.id.w_value && it.text.toString() == "7" } ||
                                 (style == WidgetStyle.SCREEN && host.findViewById<View>(R.id.w_screen_value) != null) ||
                                 (style == WidgetStyle.RHYTHM && width >= 160 && height >= 140 && host.findViewById<View>(R.id.w_chart) != null)) {

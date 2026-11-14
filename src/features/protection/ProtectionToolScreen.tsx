@@ -18,7 +18,7 @@ import {
   ToggleRow,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
-import { useAppIcons, useDiary } from '../diary';
+import { sourceIcon, useAppIcons, useDiary } from '../diary';
 import { useReels } from '../sources';
 
 type BlockMode = 'off' | 'limit' | 'always';
@@ -190,7 +190,7 @@ export function ProtectionToolScreen({
                     {index > 0 && <Divider />}
                     <View style={styles.blockHead}>
                       <AppIcon
-                        uri={icons[reelsSources[key].packageName]}
+                        uri={sourceIcon(icons, key)}
                         mark={reelsSources[key].mark}
                         color={reelsSources[key].color}
                         size={36}

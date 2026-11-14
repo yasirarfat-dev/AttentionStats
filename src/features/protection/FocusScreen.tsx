@@ -16,6 +16,7 @@ import { FocusClock } from './FocusClock';
 import { AppSelection } from './AppSelection';
 import { focusChoices, type QuickFocusRequest } from './focusChoices';
 import { useSchedules } from './useSchedules';
+import { AppIdentityList } from '../diary';
 
 export function FocusScreen({
   onBack,
@@ -82,10 +83,6 @@ export function FocusScreen({
     }, 5000);
     return () => clearInterval(timer);
   }, [focused, refresh]);
-  const names = (packages: string[]) =>
-    packages
-      .map(pkg => apps.find(app => app.packageName === pkg)?.name ?? pkg)
-      .join(' · ');
 
   return (
     <Screen title="Focus session" subtitle="A little space for what you choose">
@@ -118,10 +115,8 @@ export function FocusScreen({
               remainingMs={active.remainingMs}
               durationMs={active.durationMs}
             />
-            <Body>
-              {active.allowOnly ? 'Allow Only' : 'Block Apps'} ·{' '}
-              {names(active.packages)}
-            </Body>
+            <Body>{active.allowOnly ? 'Allow Only' : 'Block Apps'}</Body>
+            <AppIdentityList packages={active.packages} apps={apps} />
             <Body muted>
               {snapshot.accessibility
                 ? 'Accessibility is connected. Blocking is best effort.'
@@ -142,10 +137,8 @@ export function FocusScreen({
             info="Existing schedules and limits still apply. Settings, emergency access and system navigation remain available. You can end at any time or allow a five-minute visit. Blocking depends on Accessibility; closing this screen does not end the session."
           >
             <Title>{review.minutes} minutes for yourself</Title>
-            <Body>
-              {review.allowOnly ? 'Allow Only' : 'Block Apps'} ·{' '}
-              {names(review.packages)}
-            </Body>
+            <Body>{review.allowOnly ? 'Allow Only' : 'Block Apps'}</Body>
+            <AppIdentityList packages={review.packages} apps={apps} />
             <Body>
               {review.allowOnly
                 ? 'Other Apps Blocked'

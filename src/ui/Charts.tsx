@@ -1,6 +1,7 @@
 import { Image, Text, View } from 'react-native';
 import Svg, { Rect } from 'react-native-svg';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { contrast } from './customPalette';
 
 /** Vertical bars with sparse labels; the highlighted bar (e.g. "now" or "today") is solid. */
 export function BarChart({
@@ -108,10 +109,14 @@ export function AppIcon({
         source={{ uri }}
         style={{ width: size, height: size, borderRadius: size * 0.28 }}
         accessibilityIgnoresInvertColors
+        accessible={false}
+        importantForAccessibility="no"
       />
     );
   return (
     <View
+      accessible={false}
+      importantForAccessibility="no-hide-descendants"
       style={[
         styles.mark,
         {
@@ -122,7 +127,17 @@ export function AppIcon({
         },
       ]}
     >
-      <Text style={[styles.markText, { fontSize: size * 0.36 }]}>{mark}</Text>
+      <Text
+        style={[
+          styles.markText,
+          {
+            fontSize: size * 0.36,
+            color: contrast(color, '#FFFFFF') >= 4.5 ? '#FFFFFF' : '#000000',
+          },
+        ]}
+      >
+        {mark}
+      </Text>
     </View>
   );
 }

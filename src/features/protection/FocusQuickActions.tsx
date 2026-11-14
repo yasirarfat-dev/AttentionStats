@@ -15,6 +15,7 @@ import {
 } from './focusChoices';
 import { useSchedules } from './useSchedules';
 import { FocusClock } from './FocusClock';
+import { AppIdentityList } from '../diary';
 
 /** The chooser is itself the review: targets, effect, duration and explicit Start stay together. */
 export function FocusQuickActions({
@@ -85,6 +86,7 @@ export function FocusQuickActions({
               if ((value === 'allow') === allowOnly) return;
               setAllowOnly(value === 'allow');
               setSelected([]);
+              setShowApps(false);
               setShowAll(false);
             }}
             options={[
@@ -96,42 +98,36 @@ export function FocusQuickActions({
             style={{ maxHeight: 216, flexShrink: 1 }}
             contentContainerStyle={{ gap: 0 }}
           >
-            {visibleChoices.map(choice => (
-              <CheckRow
-                compact
-                key={choice.kind + choice.id}
-                title={`${choice.name} · ${choice.packages.length} apps`}
-                value={selected.includes(choice.kind + choice.id)}
-                disabled={busy}
-                onChange={enabled => {
-                  if (
-                    !ruleChosen.current &&
-                    enabled &&
-                    selected.length === 0 &&
-                    (choice.id === 'default-productive' ||
-                      choice.id === 'default-essentials')
-                  )
-                    setAllowOnly(true);
-                  setSelected(current =>
-                    enabled
-                      ? [...current, choice.kind + choice.id]
-                      : current.filter(id => id !== choice.kind + choice.id),
-                  );
-                }}
-              />
-            ))}
-            {showApps && (
-              <Body muted>
-                {packages
-                  .map(
-                    pkg =>
-                      apps.find(app => app.packageName === pkg)?.name ?? pkg,
-                  )
-                  .join(' · ')}
-              </Body>
+            {showApps ? (
+              <AppIdentityList packages={packages} apps={apps} />
+            ) : (
+              visibleChoices.map(choice => (
+                <CheckRow
+                  compact
+                  key={choice.kind + choice.id}
+                  title={`${choice.name} · ${choice.packages.length} apps`}
+                  value={selected.includes(choice.kind + choice.id)}
+                  disabled={busy}
+                  onChange={enabled => {
+                    if (
+                      !ruleChosen.current &&
+                      enabled &&
+                      selected.length === 0 &&
+                      (choice.id === 'default-productive' ||
+                        choice.id === 'default-essentials')
+                    )
+                      setAllowOnly(true);
+                    setSelected(current =>
+                      enabled
+                        ? [...current, choice.kind + choice.id]
+                        : current.filter(id => id !== choice.kind + choice.id),
+                    );
+                  }}
+                />
+              ))
             )}
           </ScrollView>
-          {(choices.length > visibleChoices.length || showAll) && (
+          {!showApps && (choices.length > visibleChoices.length || showAll) && (
             <Button
               label={showAll ? 'Show fewer groups' : 'All groups'}
               variant="text"

@@ -27,7 +27,7 @@ import { SettingsGroup } from './SettingsGroup';
 import { settingsHelp } from './settingsHelp';
 import { ProtectionToolScreen } from '../protection';
 import { clearHistoryCache } from '../diary';
-import { useAppIcons, useDiary } from '../diary';
+import { sourceIcon, useAppIcons, useDiary } from '../diary';
 import { useDeleteHistory } from './DeleteHistory';
 import { useReels } from '../sources';
 import { applyAppearance, useAppearance } from '../../ui/theme';
@@ -169,7 +169,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
               <ToggleRow
                 leading={
                   <AppIcon
-                    uri={icons[reelsSources[key].packageName]}
+                    uri={sourceIcon(icons, key)}
                     mark={reelsSources[key].mark}
                     color={reelsSources[key].color}
                     size={36}

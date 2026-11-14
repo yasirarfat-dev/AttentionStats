@@ -28,7 +28,12 @@ import {
   Title,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
-import { useAppIcons, useHistoryPage, ViewingDetail } from '../diary';
+import {
+  sourceIcon,
+  useAppIcons,
+  useHistoryPage,
+  ViewingDetail,
+} from '../diary';
 import { AppHistoryExplorer } from './AppHistoryExplorer';
 import {
   historySummary,
@@ -155,6 +160,7 @@ export function InsightsScreen() {
   const allTimeMs = recordedTimes.length ? sumCounts(recordedTimes) : null;
   const daily = days.map(item => historySummary([item]));
   const detail = historySummary(day ? [day] : []);
+  const dayScope = day ? calendarDate(day.day) : undefined;
   const selectedIndex = days.findIndex(item => item.day === day?.day);
   const hours = day?.hours.map(Number) ?? [];
   const peak =
@@ -175,7 +181,9 @@ export function InsightsScreen() {
           : 1,
     );
   const icons = useAppIcons([
-    ...sources.map(source => reelsSources[source.key].packageName),
+    ...(history?.sources ?? sources).map(
+      source => reelsSources[source.key].packageName,
+    ),
     ...visibleApps.map(app => app.packageName),
   ]);
   const selectDay = (key: string) => {
@@ -354,6 +362,14 @@ export function InsightsScreen() {
                     <View key={source.key}>
                       {index > 0 && <Divider />}
                       <Row
+                        leading={
+                          <AppIcon
+                            uri={sourceIcon(icons, source.key)}
+                            mark={reelsSources[source.key].mark}
+                            color={reelsSources[source.key].color}
+                            size={36}
+                          />
+                        }
                         title={reelsSources[source.key].name}
                         value={exactCount(source.videos)}
                         detail={`${time(source.reelsMs)} on screen`}
@@ -444,10 +460,10 @@ export function InsightsScreen() {
               />
             </>
           ) : (
-            <>
+            <View style={styles.dayGroup}>
               <Card
                 title="Explore a Day"
-                info={`Choose a day for the details below. The chart covers the current page of up to 30 days, never the full years-long range. The All Time calendar can jump across that range; Previous and Next replace the page when needed. Dates and hours use ${diary.snapshot.zone}. Today is still in progress; no saved encounters does not establish complete coverage.`}
+                info={`Choose a day for every detail in this outlined group. Screen time sums recorded whole-app time; Video App Time is its supported video-app subset, including non-video screens. Neither should be added to video-surface time. App opens are observed entries and returns, not unlock sessions. The chart covers the current page of up to 30 days, never the full years-long range. The All Time calendar can jump across that range; Previous and Next replace the page when needed. Dates and hours use ${diary.snapshot.zone}. Today is still in progress; no saved encounters does not establish complete coverage.`}
               >
                 <BarChart
                   values={daily.map(item => Number(item.videos))}
@@ -510,6 +526,11 @@ export function InsightsScreen() {
                 {day && (
                   <>
                     <Title>{dateLabel(day.day)}</Title>
+                    <Body muted>
+                      {day.day === history?.throughDay
+                        ? 'Day insights · In progress'
+                        : 'Day insights'}
+                    </Body>
                     <View style={styles.stats}>
                       <Stat
                         value={exactCount(detail.videos)}
@@ -522,9 +543,43 @@ export function InsightsScreen() {
                       />
                     </View>
                     <View style={styles.stats}>
+                      <Stat value={time(detail.appMs)} label="Screen time" />
+                      <StatDivider />
+                      <Stat
+                        value={
+                          detail.appOpens === null
+                            ? '—'
+                            : exactCount(detail.appOpens)
+                        }
+                        label="App opens"
+                      />
+                    </View>
+                    <View style={styles.stats}>
+                      <Stat
+                        value={time(detail.videoAppMs)}
+                        label="Video app time"
+                      />
+                      <StatDivider />
+                      <Stat
+                        value={String(
+                          Object.entries(day.interventions)
+                            .filter(([key]) => key.startsWith('break.'))
+                            .reduce((sum, [, count]) => sum + count, 0),
+                        )}
+                        label="Break reminders"
+                      />
+                    </View>
+                    <Body muted>
+                      {detail.appMs === null
+                        ? 'Screen time unavailable'
+                        : 'Recorded app time · May be incomplete'}
+                    </Body>
+                    <View style={styles.stats}>
                       <View style={styles.grow}>
                         <Button
-                          label="Previous day"
+                          label="Previous Day"
+                          compact
+                          accessibilityLabel="Previous day"
                           variant="tonal"
                           disabled={
                             diary.busy ||
@@ -544,7 +599,9 @@ export function InsightsScreen() {
                       </View>
                       <View style={styles.grow}>
                         <Button
-                          label="Next day"
+                          label="Next Day"
+                          compact
+                          accessibilityLabel="Next day"
                           variant="tonal"
                           disabled={
                             diary.busy ||
@@ -568,6 +625,7 @@ export function InsightsScreen() {
               </Card>
               <Card
                 title="Day by Video App"
+                scope={dayScope}
                 info="Video encounters and recorded surface time for the selected day. Supported app editions may be combined here. These are not whole-app time or confirmed playback."
                 padded={false}
               >
@@ -584,7 +642,7 @@ export function InsightsScreen() {
                       <Row
                         leading={
                           <AppIcon
-                            uri={icons[reelsSources[source.key].packageName]}
+                            uri={sourceIcon(icons, source.key)}
                             mark={reelsSources[source.key].mark}
                             color={reelsSources[source.key].color}
                           />
@@ -607,6 +665,7 @@ export function InsightsScreen() {
               </Card>
               <Card
                 title="Hourly Encounters"
+                scope={dayScope}
                 info={`Counts include recognized videos, photos and ads, grouped in ${diary.snapshot.zone}. They do not measure attention or completed viewing. Open Hourly Values for exact bins.`}
               >
                 {peak === null ? (
@@ -643,6 +702,7 @@ export function InsightsScreen() {
               </Card>
               <Card
                 title="Day App Time & Opens"
+                scope={dayScope}
                 info={`${usageExplanation(diary.snapshot.usageStatus)} Whole-app time overlaps video-surface time; do not add them. Opens are observed entries and returns, not exact cold starts.`}
                 padded={false}
               >
@@ -703,13 +763,14 @@ export function InsightsScreen() {
                   />
                 )}
               </Card>
-              <ViewingDetail days={day ? [day] : []} />
+              <ViewingDetail days={day ? [day] : []} scope={dayScope} />
               {Object.keys(day?.interventions ?? {}).some(key =>
                 key.startsWith('break.'),
               ) && (
                 <>
                   <Card
                     title="Mindful Breaks"
+                    scope={dayScope}
                     info="Recorded reminder choices for the selected day. Reminders recorded counts appearances; Chose to Leave counts the recorded leave action. Adjust reminders in Protect."
                   >
                     <View style={styles.stats}>
@@ -730,7 +791,7 @@ export function InsightsScreen() {
                   </Card>
                 </>
               )}
-            </>
+            </View>
           )}
         </>
       )}
@@ -739,6 +800,14 @@ export function InsightsScreen() {
 }
 
 const styles = StyleSheet.create(theme => ({
+  dayGroup: {
+    borderWidth: 1,
+    borderColor: theme.accent,
+    backgroundColor: theme.accentSoft,
+    borderRadius: 28,
+    padding: 8,
+    gap: 12,
+  },
   heroLine: { height: 1, backgroundColor: theme.onHero, opacity: 0.16 },
   rangeDates: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   dateField: {

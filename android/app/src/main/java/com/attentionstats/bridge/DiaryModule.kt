@@ -168,7 +168,6 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
     override fun getAppIcons(packages: com.facebook.react.bridge.ReadableArray, promise: Promise) {
         Thread {
             val result = org.json.JSONObject()
-            val manager = context.packageManager
             val size = (48 * context.resources.displayMetrics.density).toInt().coerceIn(48, 144)
             for (index in 0 until minOf(packages.size(), 80)) {
                 val name = packages.getString(index) ?: continue
@@ -176,10 +175,7 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
                 val cached = iconCache[name]
                 if (cached != null) { result.put(name, cached); continue }
                 try {
-                    val drawable = manager.getApplicationIcon(name)
-                    val bitmap = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888)
-                    val canvas = android.graphics.Canvas(bitmap)
-                    drawable.setBounds(0, 0, size, size); drawable.draw(canvas)
+                    val bitmap = com.attentionstats.appearance.AppIconLoader.bitmap(context, name, size) ?: continue
                     val stream = java.io.ByteArrayOutputStream()
                     bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream)
                     bitmap.recycle()

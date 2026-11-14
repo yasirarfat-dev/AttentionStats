@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import NativeDiary from '../../platform/specs/NativeDiary';
+import { iconPackages } from './sourceIcons';
 
 const cache = new Map<string, string>();
 
 /** Launcher icons as data URIs, fetched once per package per process. */
 export function useAppIcons(packages: string[]): Record<string, string> {
-  const key = [...new Set(packages)].sort().join('|');
+  const key = [...new Set(packages.flatMap(iconPackages))].sort().join('|');
   const [icons, setIcons] = useState<Record<string, string>>(() =>
     Object.fromEntries(
       packages.filter(p => cache.has(p)).map(p => [p, cache.get(p)!]),

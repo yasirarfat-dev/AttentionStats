@@ -48,3 +48,6 @@ ADR-094 refresh admission checks all five owned provider classes. A Reels By App
 ### Compact configuration help (ADR-096)
 
 Native gallery, stat/order/opacity/display sections and style/theme choices expose routine descriptions through independent inline information controls. Example previews stay visibly marked as examples. Statistics, draft values, selected state, Save/Cancel and host confirmation remain visible. Opening choice help must not select that choice or save the widget. No provider, data projection, instance ownership, resize or migration semantics change. Actual configuration/attached-host and phone scope must be recorded separately from source presence.
+
+
+ADR-098 adds a decorative 24dp installed-source icon at the left of Reels By Apps names in native RemoteViews and their gallery/configuration previews. Regional/lite source editions may supply the icon; synthetic example sources and unavailable packages use a neutral app glyph. Data, rankings, per-instance Hide App Names and protection/collection behavior remain unchanged. Validate attached light/dark/small hosts and actual private visual renders before claiming the new layout accepted.

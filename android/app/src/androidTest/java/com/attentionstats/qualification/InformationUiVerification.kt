@@ -8,8 +8,6 @@ import android.os.Bundle
 import android.os.Build
 import android.os.SystemClock
 import android.graphics.Rect
-import android.view.MotionEvent
-import android.view.InputDevice
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
 import com.attentionstats.MainActivity
@@ -69,16 +67,16 @@ internal object InformationUiVerification {
                     if (root != null) {
                         val bounds = Rect().also { root.getBoundsInScreen(it) }
                         SnapshotReader.recycle(root)
-                        val down = SystemClock.uptimeMillis()
                         val start = bounds.top + bounds.height() * .65f
                         val end = start + bounds.height() * (if (direction == AccessibilityNodeInfo.ACTION_SCROLL_FORWARD) -.28f else .28f)
-                        for (step in 0..10) {
-                            val event = MotionEvent.obtain(down, SystemClock.uptimeMillis(), when (step) {
-                                0 -> MotionEvent.ACTION_DOWN; 10 -> MotionEvent.ACTION_UP; else -> MotionEvent.ACTION_MOVE
-                            }, bounds.left + bounds.width() * .125f, start + (end - start) * step / 10, 0)
-                            event.source = InputDevice.SOURCE_TOUCHSCREEN
-                            try { check(automation.injectInputEvent(event, true)) } finally { event.recycle() }
-                            SystemClock.sleep(45)
+                        // The platform rejects injected MotionEvents on the current phone.
+                        // Use shell's touchscreen driver only after rechecking our focused window.
+                        val focused = checkNotNull(ownRoot()) { "Own app left foreground; no input sent" }
+                        SnapshotReader.recycle(focused)
+                        val x = (bounds.left + bounds.width() * .125f).toInt()
+                        val descriptor = automation.executeShellCommand("input touchscreen swipe $x ${start.toInt()} $x ${end.toInt()} 450")
+                        android.os.ParcelFileDescriptor.AutoCloseInputStream(descriptor).use {
+                            check(it.readBytes().isEmpty()) { "Own scroll command failed" }
                         }
                     }
                     SystemClock.sleep(120)
@@ -135,7 +133,7 @@ internal object InformationUiVerification {
                     help("Date Range", "Week and Month cover")
                     help("Video Encounters", "Totals cover the selected range")
                     click("Show App Breakdown"); help("Range by Video App", "These counts and recorded")
-                    click("Hide App Breakdown"); help("Explore a Day", "Choose a day for the details")
+                    click("Hide App Breakdown"); help("Explore a Day", "Choose a day for every detail")
                     help("Day by Video App", "Video encounters and recorded")
                     help("Hourly Encounters", "Counts include recognized")
                     help("Day App Time & Opens", "Whole-app time overlaps")

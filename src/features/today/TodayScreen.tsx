@@ -24,7 +24,7 @@ import {
 import type { QuickFocusRequest } from '../protection';
 import { QuickActions, type QuickDestination } from './QuickActions';
 import { Screen } from '../../ui/Screen';
-import { useAppIcons, useDiary, ViewingDetail } from '../diary';
+import { sourceIcon, useAppIcons, useDiary, ViewingDetail } from '../diary';
 import { countingReady, useReels } from '../sources';
 
 export type SourceDay = {
@@ -224,7 +224,7 @@ export function TodayScreen({
               <Row
                 leading={
                   <AppIcon
-                    uri={icons[reelsSources[item.key].packageName]}
+                    uri={sourceIcon(icons, item.key)}
                     mark={reelsSources[item.key].mark}
                     color={reelsSources[item.key].color}
                   />

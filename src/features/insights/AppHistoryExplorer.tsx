@@ -101,6 +101,14 @@ export function AppHistoryExplorer({
         />
         <Card
           title={app.name}
+          leading={
+            <AppIcon
+              uri={icons[app.packageName]}
+              mark={app.name.slice(0, 1)}
+              color={theme.accentFill}
+              size={36}
+            />
+          }
           info={`Recorded app time and observed opens on this date page. Time is available on ${app.timeDays} of ${days.length} dates; opens on ${app.opensDays}. These are known subtotals, not complete coverage. Android usage events estimate foreground time and entries/returns, not exact cold launches or attention. Missing values are unknown. App identifier: ${app.packageName}. Other editions are separate.`}
         >
           <View style={styles.stats}>

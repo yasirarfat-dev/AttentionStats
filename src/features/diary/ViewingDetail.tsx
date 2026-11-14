@@ -5,7 +5,13 @@ import { Card, Stat, StatDivider } from '../../ui/Kit';
 import { duration, exactCount } from '../../ui/format';
 
 /** Media type, advertising and playback are separate facets; totals must not be added together. */
-export function ViewingDetail({ days }: { days: DiarySnapshot['days'] }) {
+export function ViewingDetail({
+  days,
+  scope,
+}: {
+  days: DiarySnapshot['days'];
+  scope?: string;
+}) {
   const apps = days.flatMap(day => day.apps).filter(app => app.social !== null);
   const sum = (
     key:
@@ -22,6 +28,7 @@ export function ViewingDetail({ days }: { days: DiarySnapshot['days'] }) {
     <>
       <Card
         title="Viewing Details"
+        scope={scope}
         info="Encounters mean on screen, not watched. Photos and videos describe media; ads can overlap either. Playback is opt-in where numeric player times are available. A watch needs 3 seconds in one visit; completions need an observed run from the start. Missing signals stay unknown; pauses and gaps add no time."
       >
         <View style={styles.row}>

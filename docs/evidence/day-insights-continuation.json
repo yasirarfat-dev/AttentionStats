@@ -1,0 +1,139 @@
+{
+  "date": "2026-11-14",
+  "tasks": [
+    "AS-014",
+    "AS-018",
+    "AS-027",
+    "AS-037",
+    "AS-045",
+    "AS-057",
+    "AS-058"
+  ],
+  "status": "experimental checkpoint; installed P8 has scoped phone evidence; final JS refinements await phone acceptance; emulator deferred; publication HOLD",
+  "product": {
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "sha256": "4d47323563167b78afbfee58d01cba7707c1fd903f8956bdee23026ed9cdf17f",
+    "physicalApi": 36,
+    "installedInPlace": true,
+    "independentlyHashMatched": true
+  },
+  "testSha256": "047287d1dcd767b3fa1009820ba6d1da110db1a83a2724dfaf4bf7ba6df78712",
+  "implementation": [
+    "One outlined/tinted By Day group from Explore a Day through reminder details",
+    "Selected date on source, hourly, app-time, viewing and reminder cards",
+    "Daily video encounters/surface time, recorded screen time, video-app time, app opens and break reminders",
+    "Known package subtotals preserve missing/zero and exact count arithmetic",
+    "Historical session count not inferred; current native contract has none",
+    "By App and range aggregate behavior preserved",
+    "Left-side icons added to range breakdown, selected-app heading, app selection/group members, focus target lists, schedule review and widget source rows",
+    "Source alias lookup separated from exact package-history identity; source list icon reads not limited to the selected day or first 80 catalog apps",
+    "Decorative icons avoid duplicate accessibility announcements; missing icons retain placeholders",
+    "Previous Day/Next Day keeps full labels with compact horizontal padding and unchanged target height"
+  ],
+  "host": {
+    "jest": 139,
+    "typecheck": "pass",
+    "lintArchitectureBackupPalette": "pass",
+    "format": "pass",
+    "mobilePolicy": "pass; dependencies unchanged",
+    "layoutToolPyCompile": "pass",
+    "androidBuilds": "P7 preview/test/lint 3m35; P8 final ARM preview/test 1m04; icon preview/test/lint predecessors pass; native x86_64 preview 9m50. Last two JS refinements are not final phone/build acceptance."
+  },
+  "actualPhone": {
+    "informationModes": {
+      "insights": 27,
+      "editors": 15,
+      "result": "PASS; instrumentation -1; installed P8/test bound above"
+    },
+    "attachedNative": {
+      "protection": 93,
+      "widgetsConfigurationHosts": 477,
+      "result": "PASS; instrumentation -1; synthetic fixtures and attached hosts, not universal launcher/device acceptance"
+    },
+    "visualReview": [
+      "Daily six-metric summary and continuous day group",
+      "Repeated historical dates on four detail cards",
+      "Normal-width full Previous Day/Next Day labels on one line",
+      "Range and selected-app identities, expanded group member icons and group editor",
+      "Synthetic light/dark widget renders with source icons/placeholders"
+    ],
+    "navigation": "Actual All Time select/Cancel/Android Back/Previous/Next and matching historical date captions pass on P8. No saved rules, focus Start, provider request or history reset.",
+    "coldHistoryFailure": "Later fresh Week launches show History Couldn\u2019t Refresh / history unavailable; preceding locator failures do not establish a day-strip defect or pass. Week/Month final acceptance is withheld; cause unestablished. Earlier successful cold/warmed reads remain historical.",
+    "focusReviewLimit": "P8 chosen-app review is traversed, but its initial render is partly below group rows. Final source replaces that bounded catalog with selected icon/name rows; final product render is unverified."
+  },
+  "remaining": [
+    "Investigate cold Insights history refresh failure; withhold final Week/Month and overall cold-load acceptance",
+    "Compile/install/visually check the last two JS refinements on phone",
+    "Resume Facebook qualified-viewer/repeated-end investigation with existing safety fences",
+    "Other-device/emulator work deferred by maintainer until product completion",
+    "Recovery/security/resources/physical performance/accessibility/minimum API/Console/signatures/merge gates remain open"
+  ],
+  "privacy": "No phone counters, app-history names, raw source content, screenshots, identifiers or private baseline included. Normal consented observations can add their usual facts. Private phone captures/baseline are removed after review; isolated emulator data is empty/synthetic.",
+  "decisions": [
+    "ADR-097",
+    "ADR-098",
+    "ADR-099"
+  ],
+  "predecessor": {
+    "productSha256": "412b320f17ec1500e4a80a1e5ce410d6d0948e5f331d2d25ec87b6f895c8a00f",
+    "testSha256": "805b8120b6f6bef9cbc31e446a3e1e2b0c594e2480d5f24999317227c0a49ef3",
+    "ownInformationModes": {
+      "settingsAppearance": 21,
+      "today": 15,
+      "editors": 15,
+      "nativeBackupGallery": 9,
+      "tour": 4
+    },
+    "result": "PASS and instrumentation -1 per mode; saved appearance/backup unchanged; predecessor scope only"
+  },
+  "finalSourceNotInstalledOrPhoneAccepted": [
+    "Chosen focus app review replaces group rows inside the bounded scroll area, with selection retained and review reset on mode change",
+    "Placeholder monogram text selects contrasting black/white ink; final Android/render pass remains pending"
+  ],
+  "facebook": {
+    "sourceVersion": "586.0.0.52.53",
+    "product": "P8",
+    "continuousTrials": 2,
+    "started": false,
+    "result": "Both stop before actual Start: settled dedicated viewer required; instrumentation code0. Not an auto-scroll acceptance.",
+    "noActionAudit": {
+      "samples": 50,
+      "viewerSamples": 0,
+      "progressSamples": 0,
+      "classification": "OUTSIDE/HOME/REEL/video",
+      "sourceGestures": 0
+    },
+    "operatorSetup": "One uniquely recognized fixed Reels navigation tap; subsequent inspection remains Home. No source timer/marker relaxation.",
+    "automaticGestures": 0,
+    "qualification": "Earlier absent-progress/repeated-end and broader release gates remain open; no source fix claimed."
+  },
+  "emulator": {
+    "status": "stopped; maintainer explicitly deferred further device-support work until product completion",
+    "api": 37,
+    "image": "Google Play x86_64 revision 7; existing SDK image",
+    "emulatorVersion": "37.2.12",
+    "hypervisor": "WHPX",
+    "scope": "Repository-local AVD; explicit emulator target; no account/source grants or real phone-history copy",
+    "armTranslation": "Advertised ABI installs P8 but produces no accepted rendered UI; app-stopping dialog observed; cause unestablished",
+    "nativeX86Sha256": "014c742396e2b07115f8db2873f308088591f4e6a3e34e6a216f61ca3c64a4b3",
+    "nativeX86": "Build passes; UI automation/blank captures/System UI ANRs remain unaccepted; no layout matrix or performance pass",
+    "graphicsTrials": "Initial 1536 MiB/software trial unaccepted; 2048 MiB/Vulkan-disabled boots about 67 seconds but runtime unstable; final 2560 MiB/host-GPU boot leaves more host memory yet still establishes no UI acceptance before deferral",
+    "acceptedSizeProfiles": [],
+    "noMinimumApiOrUniversalPerformanceClaim": true
+  },
+  "cleanup": {
+    "ownedTestHashCheckedAndRemoved": true,
+    "originalAccessibilityRestoredExactly": true,
+    "backupPreferenceBytesUnchanged": true,
+    "appearancePreferenceBytesUnchanged": true,
+    "installedProductHashMatched": true,
+    "returnedToToday": true,
+    "ownedPhoneDiagnosticRendersRemoved": true,
+    "emulatorStopped": true,
+    "reusableIsolatedAvdRetained": true,
+    "realHistoryClearedOrReplaced": false,
+    "savedRuleOrFocusStartRequested": false,
+    "backupProviderRequestRequested": false
+  }
+}

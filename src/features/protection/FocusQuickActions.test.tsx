@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { FocusQuickActions } from './FocusQuickActions';
+jest.mock('../diary', () => ({ AppIdentityList: 'AppIdentityList' }));
 jest.mock('react', () => ({
   ...jest.requireActual('react'),
   useState: jest.fn(),

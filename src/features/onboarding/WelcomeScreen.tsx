@@ -7,7 +7,7 @@ import NativeDiary from '../../platform/specs/NativeDiary';
 import { Icon, type IconName } from '../../ui/Icon';
 import { AppIcon } from '../../ui/Charts';
 import { Body, Button, Caption, Card, Pill } from '../../ui/Kit';
-import { useAppIcons, useDiary } from '../diary';
+import { sourceIcon, useAppIcons, useDiary } from '../diary';
 import { countingReady, useReels } from '../sources';
 
 const SOURCE_URL = 'https://github.com/yasirarfat-dev/AttentionStats';
@@ -151,7 +151,7 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
               {reelsSourceKeys.map(key => (
                 <AppIcon
                   key={key}
-                  uri={icons[reelsSources[key].packageName]}
+                  uri={sourceIcon(icons, key)}
                   mark={reelsSources[key].mark}
                   color={reelsSources[key].color}
                   size={44}

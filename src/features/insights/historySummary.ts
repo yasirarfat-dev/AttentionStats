@@ -23,6 +23,14 @@ export function historySummary(days: HistoryDay[]) {
     videos: sumCounts(sources.map(source => source.videos)),
     reelsMs: nullableSum(sources.map(source => source.reelsMs)),
     appMs: nullableSum(days.flatMap(day => day.apps.map(app => app.appMs))),
+    videoAppMs: nullableSum(
+      days.flatMap(day =>
+        day.apps.filter(app => app.social !== null).map(app => app.appMs),
+      ),
+    ),
+    appOpens: nullableSum(
+      days.flatMap(day => day.apps.map(app => app.appOpens)),
+    ),
   };
 }
 

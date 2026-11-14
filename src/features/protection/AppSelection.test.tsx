@@ -1,5 +1,6 @@
 import React from 'react';
 import { AppSelection } from './AppSelection';
+jest.mock('../diary', () => ({ useAppIcons: () => ({}) }));
 jest.mock('react', () => ({
   ...jest.requireActual('react'),
   useState: (value: unknown) => [value, jest.fn()],

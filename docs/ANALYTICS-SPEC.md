@@ -108,3 +108,6 @@ All Time's Explore a day uses the existing native calendar picker, bounded by th
 
 
 ADR-096 clarifies explorer scopes and presentation: selected-range encounters/surface-time totals appear once, with an optional source breakdown. Remove duplicate page-statistic cards. Day charts and app/date rows remain page-scoped and nonadditive across metric types; app whole-history totals are not inferred. By App's calendar selects a page end and replaces at most 30 dates, while By Day retains ADR-095 centering. Neither path materializes years of dates in JavaScript. Native cache/query bounds and unknown-value semantics remain unchanged. Definitions and source/coverage explanations move behind each card's information button; data scope, nulls and current unavailability remain visible.
+
+
+ADR-097 scopes the entire By Day explorer visually and repeats its selected civil date on each detail card. Its summary exposes existing recorded whole-app screen time, whole-app video-app time, package opens and break reminders alongside video encounters/surface time. Preserve null versus known zero, package/source deduplication and exact count arithmetic. These durations overlap; recorded app time may be incomplete. Opens are not unlock sessions; no historical session total is inferred. By App, native paging and range aggregates retain their existing scope.
