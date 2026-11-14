@@ -109,3 +109,59 @@ test('validation failures are not recategorized as native and retain only same-p
   native.mockResolvedValue('{"fresh":true}');
   await expect(readHistory(args)).resolves.toEqual({ fresh: true });
 });
+
+test('out-of-order range and page responses stay in their own scopes', async () => {
+  const requests = [
+    ['', '', '', 7, 7],
+    ['', '', '', 30, 30],
+    ['', '', '', 30, 0],
+    ['', '', '2026-09-01', 30, 0],
+  ] as Parameters<typeof readHistory>[0][];
+  const finish: ((raw: string) => void)[] = [];
+  native.mockImplementation(
+    () => new Promise<string>(resolve => finish.push(resolve)),
+  );
+  const reads = requests.map(readHistory);
+  for (const index of [3, 1, 2, 0]) {
+    finish[index]!(JSON.stringify({ scope: index }));
+    await expect(reads[index]).resolves.toEqual({ scope: index });
+    expect(cachedHistory(requests[index]!)).toEqual({ scope: index });
+  }
+  expect(requests.map(cachedHistory)).toEqual(
+    requests.map((_, scope) => ({ scope })),
+  );
+});
+
+test('foreground invalidation stops obsolete warmup before other scopes are queried', async () => {
+  let finish!: (raw: string) => void;
+  native.mockImplementationOnce(
+    () => new Promise<string>(resolve => (finish = resolve)),
+  );
+  const warming = warmHistory();
+  clearHistoryCache();
+  finish('{"obsolete":true}');
+  await warming;
+  expect(native).toHaveBeenCalledTimes(1);
+  expect(cachedHistory(['', '', '', 7, 7])).toBeNull();
+  native.mockResolvedValue('{"fresh":true}');
+  await warmHistory();
+  expect(native).toHaveBeenCalledTimes(4);
+  expect(cachedHistory(['', '', '', 30, 0])).toEqual({ fresh: true });
+});
+
+test('browsing many pages retains at most eight completed page scopes', async () => {
+  native.mockResolvedValue('{"page":true}');
+  const requests = Array.from({ length: 10 }, (_, index) => [
+    '',
+    '',
+    `2026-09-${String(index + 1).padStart(2, '0')}`,
+    30,
+    0,
+  ]) as Parameters<typeof readHistory>[0][];
+  for (const request of requests) await readHistory(request);
+  expect(requests.map(cachedHistory)).toEqual([
+    null,
+    null,
+    ...Array.from({ length: 8 }, () => ({ page: true })),
+  ]);
+});

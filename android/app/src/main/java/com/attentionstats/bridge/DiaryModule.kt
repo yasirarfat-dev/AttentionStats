@@ -47,6 +47,7 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
             it.isNotEmpty() && (!it.matches(Regex("\\d{4}-\\d{2}-\\d{2}")) || runCatching { java.time.LocalDate.parse(it) }.isFailure)
         }) { failure(promise, "INVALID_ARGUMENT"); return }
         if (HistoryFailureFixture.respond(promise)) return
+        if (HistoryPageFixture.respond(HistoryPageFixture.Request(startDay, throughDay, pageEnd, pageSize.toInt(), windowDays.toInt()), promise)) return
         coordinator.diaryHistoryRange(startDay, throughDay, pageEnd, pageSize.toInt(), windowDays.toInt(), { promise.resolve(it) }, { failure(promise, it) })
     }
     override fun pickDate(label: String, value: String, minimum: String, maximum: String, promise: Promise) {

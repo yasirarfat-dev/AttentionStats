@@ -51,6 +51,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var breakTiming = false
     private var widgets = false
     private var historyPage = false
+    private var historyNavigation = false
     private var historyFailure = false
     private var historyStale = false
     private var numericAudit: String? = null
@@ -68,6 +69,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         builtinScrollMenu = arguments?.getString("builtinScrollMenu") == "true"
         widgets = arguments?.getString("widgets") == "true"
         historyPage = arguments?.getString("historyPage") == "true"
+        historyNavigation = arguments?.getString("historyNavigation") == "true"
         historyFailure = arguments?.getString("historyFailure") in setOf("true", "stale")
         historyStale = arguments?.getString("historyFailure") == "stale"
         autoScrollLock = arguments?.getString("autoScrollLock") == "true"
@@ -121,6 +123,10 @@ class AnalyticsInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            if (historyNavigation) {
+                result.putString("stream", HistoryNavigationVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
             if (historyFailure) {
                 result.putString("stream", HistoryFailureVerification.run(this, staleOnly = historyStale))
                 finish(Activity.RESULT_OK, result); return

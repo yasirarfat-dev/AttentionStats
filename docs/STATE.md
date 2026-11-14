@@ -1,5 +1,7 @@
 # Current state
 
+**Latest continuation (15/11/26):** 151 host tests pass, including three new history ordering/warmup/cache-bound regressions. A debug-only isolated 100-day actual-RN navigation/race runner compiles; its first phone run stops at bounded wait 7/code0. A subsequent observation finds another app foreground, so phone operations are paused pending availability; no new runtime acceptance. Owned test remains installed, final independent reconciliation/cleanup pending. [Exact evidence](evidence/publishing-history-navigation.json), [latest publishing handoff](PUBLISHING-PHASE.md). Publication HOLD.
+
 **Active maintainer-directed phase (15/11/26):** follow [Next Google Play publishing phase](PUBLISHING-PHASE.md). Today count-only empty-copy bug reproduced and repaired; actual count-only/zero-source assertions pass at 100%/200%. [Exact evidence](evidence/publishing-count-only.json). Appearance integration retains its separate prior artifact. History now has ten actual navigation, 43 isolated paging and 19 stale/foreground/retry checks; long-history UI races/process death and remaining release gates continue. Original cold-history cause remains unresolved. Publication HOLD; resume the latest publishing handoff across sessions.
 
 **Status:** MVP 1.0.0 (versionCode 10) built and previously phone-verified; maintainer reports closed-beta publication. Further development uses `develop`. Updated 2026-11-15.

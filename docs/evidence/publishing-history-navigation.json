@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-15",
+  "tasks": [
+    "AS-014",
+    "AS-018",
+    "AS-037"
+  ],
+  "status": "experimental; host ordering checks pass; phone trial interrupted/unaccepted; publication HOLD",
+  "sourceBase": "32c49be0d4ac9c1ceb836fbea7f06ad2a9f1bd0f",
+  "implementation": [
+    "Three cache regressions for out-of-order range/page responses, foreground-invalidated warmup and eight-page retention",
+    "Internal debug-only process-memory range seam; no JS/intent setter or release response",
+    "Actual RN navigation runner backed by separate encrypted 100-day synthetic reminder history with usage collection disabled; delayed range and foreground responses; finally cleans its owned store/executor/key"
+  ],
+  "product": {
+    "sha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690",
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "physicalApi": 36,
+    "provenance": "Working-tree debug preview installed in-place and independently hash-matched; no signed candidate"
+  },
+  "host": {
+    "jestTests": 151,
+    "jestSuites": 17,
+    "typesLintArchitectureBackupPaletteFormatMobile": "pass",
+    "previewTestLintBuild": "pass; 3m27s; 536 tasks, 44 executed",
+    "lintErrors": 0,
+    "lintWarnings": 170
+  },
+  "physical": {
+    "testSha256": "c08dd3a71599de72fd2f0d8456d435d0f275e5ee070a7b441042f3c339249539",
+    "instrumentationCode": 0,
+    "result": "Bounded wait 7 after initial Today/Insights/All Time/By App actions; no page/calendar/race acceptance",
+    "interference": "Follow-up observation found a different foreground app. Phone operations stopped; foreign-window diagnostic immediately deleted from private host storage. No app identity or content retained in public evidence",
+    "cause": "Unestablished; do not infer a product defect or pass from this interrupted run"
+  },
+  "cleanup": {
+    "responderClearedByFinally": true,
+    "isolatedStoreExecutorAndKeyCleanup": "Runner finally completed before FAIL result; independent phone reconciliation pending",
+    "originalAppearanceBackupAtInstall": "hashes match fresh baseline",
+    "finalPreferencesFontProductReconciliation": "pending phone availability",
+    "ownedTestAndPhoneCaptures": "test remains installed at last observation; no capture step reached; defer cleanup until phone available",
+    "privateBaseline": "ignored fresh ownership/preservation records retained solely for safe resumption"
+  },
+  "limits": [
+    "No accepted runtime navigation/race coverage from this batch",
+    "No real-history reset/replacement, dependency/schema/version/permission/consent expansion",
+    "Original cold-history cause, actual calendar selection, process death, density/performance and remaining release gates open",
+    "No emulator, main merge, workflow, signing or Play action"
+  ]
+}

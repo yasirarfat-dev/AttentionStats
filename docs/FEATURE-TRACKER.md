@@ -1,5 +1,7 @@
 # Feature tracker
 
+**Latest history continuation (15/11/26; AS-014/AS-018/AS-037):** host suite now passes 151 tests with out-of-order response, interrupted warmup and bounded-cache regressions. Isolated 100-day actual-RN runner builds; phone run stops at bounded wait 7/code0, followed by an unrelated foreground window. Phone work paused pending availability and safe cleanup; no runtime acceptance/status promotion. [Exact evidence](evidence/publishing-history-navigation.json).
+
 **Publishing progress (15/11/26; AS-014/AS-018/AS-037/AS-045):** Today count-only empty-copy contradiction is reproduced/repaired and passes actual physical 100%/200% assertions. Zero rows retain empty copy. [Exact evidence](evidence/publishing-count-only.json). History adds ten actual navigation, 43 isolated paging and 19 stale/foreground/retry checks. Earlier Appearance acceptance retains its own artifact; original history cause, long-history UI races/process death and remaining gates stay open. No feature status promotion; publication HOLD.
 
 **Active delivery priority (14/11/26):** [Publishing-phase plan](PUBLISHING-PHASE.md) batches verification, defect repair and polish of implemented behavior toward AS-022/AS-046. New features follow the next Play publication. Existing task states, dependencies and release gates remain unchanged; planning is not runtime verification.
