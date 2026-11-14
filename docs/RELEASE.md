@@ -7,6 +7,8 @@
 
 ## Production-access continuation (2026-11-12)
 
+**Active execution plan (14/11/26):** [Next Google Play publishing phase](PUBLISHING-PHASE.md) organizes verification and polish of implemented features into small checkpointed batches before the next Play release. New features follow publication; existing readiness gates and the concrete-candidate merge agreement still apply.
+
 The maintainer confirms the uploaded closed-test version is **1.0.0 / versionCode 10**, and expects the test period to end on November 13. This confirms the reported version, not artifact/source mapping, continuous tester eligibility, Console warnings or approval. The source on `develop` contains subsequent changes which are not established as distributed to those testers.
 
 [Google's testing guidance](https://support.google.com/googleplay/android-developer/answer/14151465?hl=en), rechecked November 12, requires eligible new personal accounts to have at least 12 testers continuously opted in for the preceding 14 days when applying. The application asks about engagement, feedback, improvements and readiness; review usually takes seven days or less but can take longer. Eligibility to apply, access approval and release rollout are separate milestones. Continue closed testing while resolving issues; do not present develop-only device trials as feedback on an uploaded beta update.

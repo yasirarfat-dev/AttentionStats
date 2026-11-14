@@ -1,5 +1,7 @@
 # Feature tracker
 
+**Active delivery priority (14/11/26):** [Publishing-phase plan](PUBLISHING-PHASE.md) batches verification, defect repair and polish of implemented behavior toward AS-022/AS-046. New features follow the next Play publication. Existing task states, dependencies and release gates remain unchanged; planning is not runtime verification.
+
 For separate implementation/verification boxes, dates, versions and known failures, read the [feature verification checklist](FEATURE-VERIFICATION.md). Historical passes do not clear a later regression or qualify a different artifact.
 
 **Status:** MVP 1.0.0 implemented within its documented scope; maintainer reports closed beta. AS-052 establishes continuation on `develop`; export/restore, broader qualification and remaining full-product work are open. Updated 2026-11-14.
