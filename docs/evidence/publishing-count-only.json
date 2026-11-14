@@ -111,5 +111,7 @@
       "Injected BUSY establishes error handling, not the original P8 failure cause",
       "Actual user-history navigation checks print no counts, dates or app identities; no logical history equality claim"
     ]
-  }
+  },
+  "reviewedSourceCommit": "40f9ca89dfb94c10c62af0c13776f5f906cfe6f1",
+  "sourcePublication": "Normally pushed and independently matched on origin/develop; source publication only"
 }
