@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-15",
+  "sourceBase": "7413c94f2d1589be85e27ff299600031bc332d28",
+  "tasks": [
+    "AS-018",
+    "AS-045",
+    "AS-057"
+  ],
+  "status": "experimental; review deferred; stopped at maintainer request; publication HOLD",
+  "productSha256": "d9d7d1b65dadb0fe92582c2e4eec26d5b36ccc1794a3a6bad1ba1c46811870ea",
+  "attempt": {
+    "goal": "Own Appearance Templates/Customization frame at normal and 200% text, without editing",
+    "outcome": "Both initial attempts stop at own-window guard. Own activity is resumed but hierarchy contains only a system window and no own nodes. Guard is not bypassed. No font change, capture or editor input; no product defect established.",
+    "remaining": "Fresh phone reconciliation and actual own-window acquisition before rendering review. No new accessibility/frame acceptance."
+  },
+  "finalChecks": {
+    "freshBaselinePreserved": true,
+    "exactInstalledProductMatched": true,
+    "appearanceBackupFontAccessibilitySelectionsAndMasterMatch": true,
+    "actualOwnAccessibilityServiceBound": true,
+    "testPackageAbsent": true,
+    "noActiveInstrumentation": true,
+    "phoneWorkStopped": true
+  },
+  "changes": "Documentation/evidence only; no production, dependency, schema, version, release or source action",
+  "limits": [
+    "System-window cause unestablished; no private hierarchy content/captures retained publicly",
+    "Original source absolute-time acquisition remains unresolved",
+    "Seven-day resource baseline not started; other release gates unchanged"
+  ]
+}

@@ -248,3 +248,10 @@ Resumed source/test/evidence checkpoint `d38e13607578ca703ed81d6c5413e0c0b838f8c
 Next: a new source-readable absolute-time acquisition hypothesis before live watch/completion acceptance; do not repeat unchanged negative source probes. Independent remaining frame/accessibility, protection/lifecycle and isolated recovery/security work can proceed in bounded batches. Preserve real history and fresh phone choices. Emulator remains deferred. No release build, main merge, signing, workflow or Play action. User requests finishing the batch before limits; phone work ends safely before reviewed source publication.
 
 Tour/editor checkpoint `73d505eb0b0baf8d1a97782ee1e90490d0c7bf00` is normally pushed and independently matched on origin/develop. Intended no-reply author/committer, remote and active GitHub login were checked separately. Nine scoped files pass documentation/public-artifact and staged-whitespace review; both test-only builds and four final raw phone runs pass. Phone work is complete; installed product is unchanged and publication HOLD remains. No release build, main merge, workflow, signing or Play action.
+
+
+## Appearance frame stop — 15/11/26
+
+**Maintainer-requested stop (15/11/26):** fresh baseline matches installed preview `d9d7d1`; Appearance frame review stops before any editor input because the hierarchy exposes only a system window, despite own resumed activity. No screenshot or acceptance; foreground activity alone is insufficient window ownership. Two attempts hit the same guard; no bypass or further retry. Original appearance, backup, font and Accessibility selections/master remain unchanged; actual own service bound, no test package or active instrumentation. Phone work stopped. Next continuation must freshly reconcile phone state and acquire the actual own window before normal/200% frame review. Other verification and publication HOLD remain unchanged. [Evidence](evidence/publishing-appearance-frame-stop.json).
+
+No production change, build, font/color change, test installation, source action or release action in this continuation. Required seven-day baseline remains unstarted. Resume only on maintainer continuation.
