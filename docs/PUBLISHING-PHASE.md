@@ -15,6 +15,23 @@ Scope is the implemented Android experience on `develop`: consent/source choices
 
 Auto-scroll stays in scope under the existing maintainer decision. Missing source signals must remain explicitly unavailable with safe suspension. Do not remove the capability, relax consent/confirmation fences or invent timer-based completion to obtain clearance. Material scope changes require an explicit recorded decision. Existing AS IDs, task states and normative specifications remain authoritative; batch numbers are execution order, not new feature IDs.
 
+## Remaining work assessment — 15/11/26
+
+The next build is not publication-ready. The two reported regressions have different outcomes: theme selection has scoped phone acceptance; playback presentation and consent handling have scoped acceptance, while actual source playback-time acquisition remains unavailable on the latest tested TikTok layout. Do not count a synthetic store/UI pass as live-source acceptance.
+
+Six work areas remain. These group existing gates rather than add features or require every planned AS task to ship:
+
+| Work area | Concrete remaining work |
+|---|---|
+| Source fidelity and optional scrolling | Qualify a source-readable absolute-time path for live watches/completions; finish repeated mixed-item end/arrival/Stop and suspension/manual-input safety for the declared supported sources. Preserve explicit unavailable states. |
+| Final interface and accessibility | Complete remaining frame and core TalkBack/RTL/reduced-motion/keyboard journeys after the scoped tour/editor checks below; reconcile final-candidate visual evidence. |
+| Protection and lifecycle | Close remaining overlap/allowance/expiry, pause/reset and process/restart/lock/revocation/time-boundary scenarios without losing real settings/history. |
+| Preservation and security | Actual isolated recovery and interrupted/corrupt/key-loss/low-space/deletion scenarios; candidate logs/egress, input bounds and dependency/license review. Static backup audit alone does not close recovery. |
+| Resources and compatibility | Measure the declared long-history dataset and resource baseline, widget lifecycle and release runtime. The required seven-day battery/CPU baseline is not started; deferred compatibility work remains an explicit unresolved gate. |
+| Candidate and store | Inspect actual Console artifact/version state, choose an unused higher version code, review current official policies/forms, build and test the signed update, then obtain the required concrete-candidate main-merge agreement and submit/verify delivery. |
+
+This is several focused work sessions plus elapsed qualification time, not a reliable percentage or same-day publication promise. Under the unchanged seven-day baseline requirement, full readiness is at least a week away and can take longer if defects, compatibility or source feasibility remain unresolved. Preparing an installable test build is a separate, smaller milestone. Production access reported by the maintainer does not close candidate gates. New feature expansion and emulator work remain deferred.
+
 ## Starting checkpoint
 
 - Reported Play baseline: 1.0.0 / code 10 closed beta. Exact Console artifact/source mapping, track/access state and review remain uninspected.
@@ -223,3 +240,9 @@ Resumed cleanup removes 15 owned captures, verifies all 31 fixed paths and both 
 Next task is a separately qualified source-readable absolute-time path; existing live source fidelity, tour/editor/surface/accessibility/lifecycle/recovery/security gates remain open. Keep emulator deferred and publication HOLD; no release build, main merge, workflow, signing or Play action.
 
 Resumed source/test/evidence checkpoint `d38e13607578ca703ed81d6c5413e0c0b838f8c5` is normally pushed and independently matched on origin/develop. Intended no-reply author/committer, remote and active GitHub login checked separately. All ten scoped files pass staged whitespace and documentation/public-artifact checks; final test-only build passes. Installed product remains unchanged; live source/release holds remain. Phone work complete and safely checkpointed for the next continuation.
+
+## Latest handoff — 15/11/26, tour/editor and readiness assessment
+
+**Tour/editor continuation (15/11/26):** unchanged installed preview `d9d7d1` passes ten tour checks at each 100%/200% and 17 strict filtered-editor checks at each scale, raw -1. All six top-of-step captures reviewed; Forward/explicit Back/Android Back and help/draft departure pass. Test waits for settled refreshed coordinates; final editor test rejects the earlier eight-pixel Create app group strip. No production/dependency/schema/version change or full accessibility/enforcement acceptance. [Exact artifacts, retained failures and cleanup](evidence/publishing-tour-editor.json). Phone original choices/font/product match, owned tests/captures absent and actual own service bound after cleanup. Publication HOLD; [six remaining work areas](PUBLISHING-PHASE.md#remaining-work-assessment--151126) include the unstarted required seven-day resource baseline. At least a week under unchanged gates, plus uncertain fixes/qualification time; no completion percentage.
+
+Next: a new source-readable absolute-time acquisition hypothesis before live watch/completion acceptance; do not repeat unchanged negative source probes. Independent remaining frame/accessibility, protection/lifecycle and isolated recovery/security work can proceed in bounded batches. Preserve real history and fresh phone choices. Emulator remains deferred. No release build, main merge, signing, workflow or Play action. User requests finishing the batch before limits; phone work ends safely before reviewed source publication.

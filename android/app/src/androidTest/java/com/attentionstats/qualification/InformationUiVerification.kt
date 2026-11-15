@@ -107,6 +107,12 @@ internal object InformationUiVerification {
         }
         fun click(label: String) = find(label) { node ->
             if (!node.isEnabled || !node.isClickable) false else {
+                // A discovered control can still be moving after the preceding swipe.
+                // Wait before reading its coordinates so the touch reaches the settled
+                // control rather than the location it occupied during scrolling.
+                automation.waitForIdle(500, 5_000)
+                SystemClock.sleep(250)
+                if (!node.refresh() || !node.isVisibleToUser) return@find false
                 val bounds = Rect().also(node::getBoundsInScreen)
                 val root = ownRoot()
                 if (root == null) false else {
@@ -118,7 +124,11 @@ internal object InformationUiVerification {
                     // Our fixed-size information controls are square; a truncated rectangle
                     // must be scrolled fully into view before input.
                     val clippedInfo = label.startsWith("About ") && kotlin.math.abs(bounds.width() - bounds.height()) > 2
-                    if (bounds.isEmpty || clippedInfo || !viewport.contains(bounds)) false else {
+                    // This Kit tonal button has a 52dp minimum height. Android can
+                    // report only its clipped strip as the visible rectangle.
+                    val clippedCreateGroup = label == "+ Create app group" &&
+                        bounds.height() < (52 * context.resources.displayMetrics.density).toInt() - 2
+                    if (bounds.isEmpty || clippedInfo || clippedCreateGroup || !viewport.contains(bounds)) false else {
                         val focused = checkNotNull(ownRoot()) { "Own app left foreground; no input sent" }
                         SnapshotReader.recycle(focused)
                         instrumentation.sendStatus(1, Bundle().apply { putString("stream", "Own information tap: $label; $bounds") })

@@ -426,5 +426,6 @@
     "Remaining surface/function/source/lifecycle/data/security/resource/compatibility and store gates remain open"
   ],
   "reviewedSourceCommit": "66ceb5c4a42b1216c4554eeb4e053f256aa1686c",
-  "sourcePublication": "Normally pushed and independently matched on origin/develop; source publication only, final UI acceptance pending"
+  "sourcePublication": "Normally pushed and independently matched on origin/develop; source publication only, final UI acceptance pending",
+  "tourEditorFollowup": "publishing-tour-editor.json; separately scoped normal/200% tour and strict filtered-editor qualification on unchanged d9d7d1; historical remainingWork above retains its original checkpoint scope"
 }

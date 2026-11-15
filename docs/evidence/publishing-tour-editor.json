@@ -1,0 +1,97 @@
+{
+  "date": "2026-11-15",
+  "tasks": [
+    "AS-018",
+    "AS-045",
+    "AS-049",
+    "AS-053",
+    "AS-057"
+  ],
+  "status": "experimental; scoped tour/editor qualification complete; publication HOLD",
+  "sourceBase": "bfc4f097fd4cc2e4111a224b7433610504cc0334",
+  "product": {
+    "sha256": "d9d7d1b65dadb0fe92582c2e4eec26d5b36ccc1794a3a6bad1ba1c46811870ea",
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "physicalApi": 36,
+    "productionUnchanged": true
+  },
+  "tour": {
+    "testSha256": "5113495a83beed628813c5f22c5dd44e4ff079109769c0e7631251d301b59baf",
+    "normalChecks": 10,
+    "largeTextChecks": 10,
+    "fontScales": [
+      1.0,
+      2.0
+    ],
+    "rawInstrumentationCodes": [
+      -1,
+      -1
+    ],
+    "scope": "Forward, explicit Back, Android Back, visible top marker after transitions, help expand/collapse and unchanged appearance/backup",
+    "visualReview": "All six own-app top-of-step captures reviewed privately; scrollable content below the viewport is not claimed fully visible at once; no grant or onboarding-completion action"
+  },
+  "editors": {
+    "testSha256": "9f794357e77dec130e585fceef2f7352e815c5de47c5e5399a5dce449512114d",
+    "normalChecks": 17,
+    "largeTextChecks": 17,
+    "rawInstrumentationCodes": [
+      -1,
+      -1
+    ],
+    "scope": "Seven help controls, draft-only synthetic no-match search and unsaved schedule/group departure; full minimum-height Create app group acquisition",
+    "limits": "No full installed-app catalog, keyboard typing, enforcement, TalkBack or universal control-visibility acceptance"
+  },
+  "retainedTrials": [
+    {
+      "testSha256": "415a5e9172fe8f5b86013eaf6d4a027ae6c84d6a40b18a5cc7455102fce85ac3",
+      "mode": "tour",
+      "rawInstrumentationCode": 0,
+      "outcome": "After a Continue coordinate tap, step-two marker absent and guarded capture still shows page one. A separate settled host tap reaches page two. Test now waits for idle/settling and refreshes bounds; no production transition repair claimed."
+    },
+    {
+      "testSha256": "5113495a83beed628813c5f22c5dd44e4ff079109769c0e7631251d301b59baf",
+      "mode": "editors",
+      "checks": 17,
+      "rawInstrumentationCode": -1,
+      "outcome": "Help/draft checks pass but Create app group trace has only an eight-pixel visible strip. Not full button reachability acceptance; strict 52dp minimum-height gate added before final editor runs."
+    }
+  ],
+  "builds": [
+    {
+      "scope": "Settled-coordinate test only",
+      "duration": "1m58s",
+      "tasks": 315,
+      "executed": 31,
+      "result": "PASS"
+    },
+    {
+      "scope": "Strict Create app group test only",
+      "duration": "41s",
+      "tasks": 315,
+      "executed": 31,
+      "result": "PASS"
+    }
+  ],
+  "hostChecks": "Production unchanged; previously passed host suites not repeated. Documentation/public-artifact and whitespace checks run for this checkpoint.",
+  "cleanup": {
+    "freshBaselineReconciled": true,
+    "originalAppearanceBackupFontAndAccessibilityMatch": true,
+    "installedProductIndependentlyMatched": true,
+    "ownedTestAbsent": true,
+    "sixCapturePathsAbsent": true,
+    "noActiveInstrumentation": true,
+    "actualOwnServiceBound": true,
+    "currentUserPackageRunning": true,
+    "freshTodayOwnForeground": true,
+    "noSetupWarning": true
+  },
+  "remaining": [
+    "Live absolute-time source acquisition and repeated mixed auto-scroll",
+    "Remaining Appearance frame/core accessibility/keyboard/RTL/motion checks",
+    "Protection/lifecycle, isolated recovery/security and measured resources/compatibility",
+    "Signed candidate/Console/policy/merge agreement and distribution"
+  ],
+  "releaseAssessment": "Six existing gate groups remain; required seven-day battery/CPU baseline not started. At least a week under unchanged requirements, with additional engineering/elapsed time uncertain. No reliable percentage or same-day promise.",
+  "cleanupGuardCorrections": "Initial host cleanup guard rejected the expected absent-package exit 1 and searched the wrong capitalization/spacing for Bound services. Read-only checks corrected before final independent absence/binding reconciliation; only the original own service was temporarily restarted."
+}
