@@ -1,0 +1,88 @@
+{
+  "date": "15/11/26",
+  "tasks": [
+    "AS-006",
+    "AS-009",
+    "AS-020",
+    "AS-058"
+  ],
+  "capabilities": [
+    "C-25",
+    "C-28"
+  ],
+  "status": "experimental",
+  "publication": "HOLD",
+  "sourceBase": "8add5c3a3db835d3cc5f960470e2da3df0869b55",
+  "product": {
+    "sha256": "ebc13d37166e3f258d7c890c87decfdefc2b4e21ab17a62540eda7e9417e3e56",
+    "version": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "physicalApi": 36,
+    "abi": "arm64-v8a",
+    "unchanged": true
+  },
+  "test": {
+    "sha256": "16346bc3d279c9cf54f6e518cc1016e912e267bf1a0a78b654f9bbc28392cae7",
+    "argument": "archiveInterruption=true",
+    "rawCode": -1,
+    "checks": 222,
+    "exportCancellationBoundaries": 13,
+    "stageCancellationBoundaries": 13,
+    "replaceCancellationBoundaries": 26,
+    "totalCancellationTrials": 52,
+    "reopenAfterEveryCancellation": true
+  },
+  "coverage": [
+    "Distinct source and destination synthetic facts in unique production SQLCipher/Room stores and Keystore aliases.",
+    "Count actual logical-record callbacks, inject a distinct CancellationException at each, require exact exception identity and callback number.",
+    "Compare every persisted application table, including FactOrigin and StoreMetadata, immediately and after close/reopen at every cancellation.",
+    "Pre-outer-commit injected IOException rolls back a fully applied replacement, immediately and after reopen.",
+    "Post-commit injected observer IOException leaves imported rows durable after reopen and destination metadata unchanged.",
+    "Repeated low-level replacement yields identical persisted rows/provenance; source and validated staging remain unchanged."
+  ],
+  "implementation": {
+    "testOnly": true,
+    "productionChange": false,
+    "dependencyPermissionSchemaVersionChange": false,
+    "sourceSha256": {
+      "android/app/src/androidTest/java/com/attentionstats/qualification/ArchiveInterruptionVerification.kt": "be6e07ddd87b25fdf039468cd56a6e9379c2eee5108f9afb37ed4be904de1da9",
+      "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt": "accf4a024bf1f94e2eabfe631aef0fc8e8280a1955d657412f213293bebba2b4",
+      "android/app/src/main/java/com/attentionstats/backup/LogicalArchive.kt": "6023256167e5b2870c96faf183530f2acb0ead65358d641461197a0028fe07d2",
+      "android/app/src/main/java/com/attentionstats/storage/HistoryStore.kt": "ec95b8df9aef4f4697a755c5b0752e7ce7b7e1452d5b94c074ad407982e36180"
+    },
+    "sourceHashScope": "sourceSha256 records working-tree bytes used by the build; repositoryLfSourceSha256 records Git LF-normalized bytes.",
+    "repositoryLfSourceSha256": {
+      "android/app/src/androidTest/java/com/attentionstats/qualification/ArchiveInterruptionVerification.kt": "be6e07ddd87b25fdf039468cd56a6e9379c2eee5108f9afb37ed4be904de1da9",
+      "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt": "b60bc332bf55de226c29a9a52de688fd52221075217750c9b1f66cbda63b79d1",
+      "android/app/src/main/java/com/attentionstats/backup/LogicalArchive.kt": "6023256167e5b2870c96faf183530f2acb0ead65358d641461197a0028fe07d2",
+      "android/app/src/main/java/com/attentionstats/storage/HistoryStore.kt": "ec95b8df9aef4f4697a755c5b0752e7ce7b7e1452d5b94c074ad407982e36180"
+    }
+  },
+  "checks": {
+    "testAssembly": "PASS in 2m20s; 315 tasks, 31 executed",
+    "physicalDiagnostic": "PASS222; raw-1"
+  },
+  "cleanup": {
+    "freshAppearanceBackupFontAccessibilityHashesMatch": true,
+    "installedProductIndependentlyMatches": true,
+    "actualOwnServiceBound": true,
+    "testHashOwnedRemoved": true,
+    "noActiveInstrumentation": true,
+    "runnerAssertsAllOwnedAliasesAbsent": true,
+    "runnerAssertsOwnedDirectoriesAbsent": true,
+    "hostIndependentlyChecksDirectoryPrefixAbsent": true,
+    "ownedPlaintextWiped": true,
+    "ownAppOpened": true,
+    "realHistoryNotResetOrReplaced": true,
+    "noTransportOrSourceActions": true,
+    "noCapturesOrRealHistoryReads": true
+  },
+  "limits": [
+    "Logical-record callback coverage only; not every instruction, coroutine suspension or durable-storage boundary.",
+    "Injected cancellation and IOException, not OS process kill, power loss, disk-full/ENOSPC or crash durability.",
+    "Low-level store replacement, not coordinator command replay, concurrent ingestion, owner/UI success reporting or consent-disable integration.",
+    "No provider transport, Android-managed fresh-install recovery, actual callback overlap, maximum logical history or resource qualification.",
+    "No new production behavior, capability promotion, release clearance or auto-scroll/playback progress qualification; seven-day baseline unstarted; emulator deferred."
+  ],
+  "next": "Advance isolated process-interruption/low-space/owner recovery, protection/lifecycle and core accessibility gates without replacing real history. Source acquisition still needs a new source-qualified hypothesis; do not repeat unchanged cache/time/vision negatives."
+}
