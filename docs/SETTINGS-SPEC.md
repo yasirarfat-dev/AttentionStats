@@ -156,3 +156,6 @@ Publishing polish (15/11/26): **Discard Appearance Changes** restores the latest
 
 
 ADR-101 (14/11/26): Display & Experience → Extras adds **Built-in Reels auto-scroll**, an optional guidance dialog for Facebook/Instagram playback/options menus. Show availability as conditional. Explain stopping our session before using provider scrolling and that our Stop cannot stop a provider mode. Opening/dismissing the dialog changes no source, permission, session or provider preference. Auto-scroll help discloses independent behavior and unqualified YouTube/Snapchat video-end support. No provider-control switch is represented as implemented.
+
+
+ADR-103 gives the Appearance editor a uniform eight-dp gap inside its outer Settings frame, matching its existing top gap and the bounded Insights group convention. Templates/Customization contents retain their own padding and spacing. This presentation inset stays uniform across card-spacing preferences; it does not save or change a draft.

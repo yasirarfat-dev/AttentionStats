@@ -279,3 +279,8 @@ Use `informationUi=appearance-draft` with raw instrumentation output on the owne
 This bounded 100-day fixture does not qualify large-event-density latency, real collection, process death, TalkBack/RTL or the original cold-history failure cause. Cache host checks separately cover out-of-order range/page responses, generation-interrupted warmup and the eight-completed-page bound; they do not substitute for rendered-device evidence.
 
 Independent `historyNavigation=cleanup` runs separately from the navigation fixture and verifies that its owned temporary-directory and Keystore-alias prefixes are absent without opening the production history store. The latest continuation passes 123 actual RN checks and two independent cleanup checks; [exact artifacts and retained failures](evidence/publishing-history-navigation.json).
+
+
+## Current surface qualification runner — 15/11/26
+
+The bounded own-information instrumentation uses visible clickable nodes in the owned application window, contained safe-content bounds (excluding status/system chrome and the persistent tab bar) and a foreground recheck before touchscreen input. The active-window fallback remains package-scoped. Discovery does not request ACTION_SHOW_ON_SCREEN before coordinate input. Primary test failures survive a failed return-to-Today cleanup. These are operator test changes, not production accessibility actions or feature acceptance. Record each mode's exact test hash and raw instrumentation result in the [surface ledger](evidence/publishing-surface-review.json); rendered review, help traversal, behavioral enforcement and frame measurements have separate scopes. Preserve source/grant/rule/history choices and recheck the fresh baseline after the batch.

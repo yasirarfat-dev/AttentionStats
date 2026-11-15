@@ -8,20 +8,20 @@
     "AS-056",
     "AS-057"
   ],
-  "status": "paused for maintainer taking phone; full feature/UI acceptance incomplete; publication HOLD",
+  "status": "experimental; 57 earlier-artifact help/navigation checks pass; final tour/frame/editor review pending; checkpoint for requested compaction; publication HOLD",
   "maintainerOrder": "Verify every implemented feature and rendered UI surface before further release build/publication; only initial closed-test 1.0.0 has been published",
   "product": {
-    "sha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690",
+    "sha256": "c81c06c1f330ee71d8501a6659ea0fed8cfc4b22dd8646902024a95791ab2a3d",
     "versionName": "1.0.0-reels-preview",
     "versionCode": 10,
     "physicalApi": 36
   },
-  "testSha256": "28c2df1a5e576b48d524f5a55939865a80d4db865e76bf2082c4c98d2395bd82",
+  "testSha256": "9fe124c9a7ffef991b9deee83e39b06925981acba37eddf1907c85bc8325c51a",
   "surfaces": [
     {
       "key": "today",
       "scope": "Today, Viewing Details, source/app/hour details and quick actions",
-      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+      "status": "15 current own-app help/quick-action/focus-chooser checks pass, normal dark; current stats/source-help/time rendering reviewed. Counting and app/hour drill-down behavior retain separate gates."
     },
     {
       "key": "insights",
@@ -31,7 +31,7 @@
     {
       "key": "focus",
       "scope": "Protect hub, focus chooser/review, Block Apps/Allow Only and safe End",
-      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+      "status": "Current normal dark Protect hub rendered review and help pass; Today chooser open/close passes; focus review/Start/End behavior retains separate gates"
     },
     {
       "key": "schedules",
@@ -41,37 +41,37 @@
     {
       "key": "breaks",
       "scope": "Mindful breaks, count/time, invitations, interruption/dismissal",
-      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+      "status": "Current normal dark count/time/unlock controls rendered review and help pass; live timing/interruption/reset behavior unrun this batch"
     },
     {
       "key": "blocks",
       "scope": "Short-video blocks/daily limits, per-app controls and safe exits",
-      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+      "status": "Current normal dark per-source mode controls rendered review and help pass; live enforcement/daily-limit behavior unrun this batch"
     },
     {
       "key": "sources",
       "scope": "Counting/source disclosure, independent choices and permission health",
-      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+      "status": "Current source and permission rows visually reviewed; help opens/collapses; live collection unrun this batch with original service disconnected"
     },
     {
       "key": "counter",
       "scope": "Live Counter configuration and actual HUD controls",
-      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+      "status": "Current counter route/help open/collapse pass; actual HUD behavior unrun this batch"
     },
     {
       "key": "settings",
       "scope": "Settings navigation, help, feedback and provider guidance",
-      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+      "status": "20 current artifact-scoped help/navigation checks pass; normal dark Settings sections visually reviewed; feedback external actions not sent"
     },
     {
       "key": "appearance",
       "scope": "Templates/Customization, color/layout drafts, save/discard/reset",
-      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+      "status": "Current normal dark rendered controls/help and layout expansion pass within Settings mode; save/draft/theme/large-type behaviors retain separate historical evidence"
     },
     {
       "key": "backup",
       "scope": "Native backup/status, file export/import review/cancel and recovery",
-      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+      "status": "Current native route and three disclosure open/collapse checks pass. Secure-window visual capture not taken; export/import/recovery and interruption behavior remain open."
     },
     {
       "key": "deletion",
@@ -86,7 +86,7 @@
     {
       "key": "widgets",
       "scope": "Five galleries, attached rendering/configuration and launcher boundaries",
-      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+      "status": "Current native gallery route/help and return pass; attached configuration/launcher behavior retain separate historical scope and current acceptance gaps"
     },
     {
       "key": "crosscutting",
@@ -100,22 +100,322 @@
       "result": "FAIL: own information control unavailable: Today",
       "instrumentationCode": 0,
       "scope": "No named help checks completed; failure may be startup/window/action harness-related but cause is unestablished. No Settings defect or acceptance inferred.",
-      "next": "Inspect actual own-app window acquisition/startup and click route before retrying; retain failure instead of repeating unchanged mode."
+      "next": "Inspect actual own-app window acquisition/startup and click route before retrying; retain failure instead of repeating unchanged mode.",
+      "productSha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690",
+      "testSha256": "28c2df1a5e576b48d524f5a55939865a80d4db865e76bf2082c4c98d2395bd82"
+    },
+    {
+      "mode": "informationUi=settings, bounded touchscreen runner",
+      "result": "PASS: 20 actual own-app information checks",
+      "instrumentationCode": -1,
+      "scope": "Counting, Permissions, Display & experience, Data & Privacy, Appearance, Templates, Customization, Layout & Numbers, Help & Feedback open/collapse; provider guidance read/dismiss; saved appearance/backup unchanged",
+      "testSha256": "e1d9224bb84c205a424f08e8e64ca4c46cc1d2553d2a8e0480d2de357a8154d9",
+      "limits": "Physical API36/current normal text/dark appearance only. No source setting/save/action or all-feature acceptance.",
+      "productSha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690"
+    },
+    {
+      "mode": "informationUi=today, first bounded touchscreen runner",
+      "result": "FAIL: Own information control unavailable: Today's recognized video",
+      "instrumentationCode": 0,
+      "testSha256": "e1d9224bb84c205a424f08e8e64ca4c46cc1d2553d2a8e0480d2de357a8154d9",
+      "scope": "Today Stats and Viewing Details open/collapse reported; no full Today-mode acceptance",
+      "investigation": "Actual own-app direct tap exposes the exact expected Reels-by-Apps explanation; host own-UI probe finds one matching text node. Remove ACTION_SHOW_ON_SCREEN during discovery because it can move a matched node before coordinate input. This is a harness hypothesis; no product repair or historical root-cause claim.",
+      "productSha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690"
+    },
+    {
+      "mode": "informationUi=today, read-only discovery",
+      "result": "FAIL: Own information control unavailable: Encounters mean on screen",
+      "instrumentationCode": 0,
+      "testSha256": "70adac458c964191884ac2b552deb3cf7a4a6979dc2845cd367b0113264b7575",
+      "scope": "Today Stats opens/closes reported; no full Today-mode acceptance",
+      "nextHypothesis": "Root-window containment alone admits nodes obscured by status/tab/system chrome. Restrict content input/scroll to safe viewport with current own tab bounds; log fixed tap labels/bounds privately.",
+      "productSha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690"
+    },
+    {
+      "mode": "informationUi=today, safe-content viewport",
+      "result": "PASS: 15 actual own-app information checks",
+      "instrumentationCode": -1,
+      "testSha256": "299c77c598cc5cd1bd76e2211a20065b55d62ea43db64f8fcc1342ea8d1b6a3b",
+      "scope": "Today Stats, Viewing Details, Reels by Apps, Your Day, Screen Time, Quick Actions and Focus Now help open/collapse; chooser closes without starting focus; saved appearance/backup unchanged",
+      "productSha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690"
+    },
+    {
+      "mode": "informationUi=protect, safe-content viewport",
+      "result": "FAIL: Own information control unavailable: Mindful Breaks offers",
+      "instrumentationCode": 0,
+      "testSha256": "299c77c598cc5cd1bd76e2211a20065b55d62ea43db64f8fcc1342ea8d1b6a3b",
+      "scope": "Focus and Groups help report open/collapse; no full Protect-mode acceptance",
+      "investigation": "Fixed tap log shows a 90-by-79 partially clipped information control. Own-app direct opening shows the expected boundary explanation. Native/RN information controls are fixed squares; reject truncated rectangles before tapping.",
+      "productSha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690"
+    },
+    {
+      "mode": "informationUi=protect, reject clipped information controls",
+      "result": "PASS: 13 actual own-app information checks",
+      "instrumentationCode": -1,
+      "testSha256": "56b45cc73678892e02ac6634862e47b668298e7efe0096e058ba0094e6af0287",
+      "scope": "Focus, Groups & Time Slots, Short-video Boundaries, Mindful Breaks, Short-video Blocks and Live Counter help open/collapse; native-authoritative saved appearance/backup unchanged; no rule/save or live enforcement",
+      "productSha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690"
+    },
+    {
+      "mode": "informationUi=native, square-control guard",
+      "result": "FAIL: Own information control unavailable: Keep a portable copy",
+      "instrumentationCode": 0,
+      "testSha256": "56b45cc73678892e02ac6634862e47b668298e7efe0096e058ba0094e6af0287",
+      "scope": "No full native backup/gallery acceptance",
+      "investigation": "Direct own-app native information tap exposes one exact expected explanation. Add bounded accessibility-idle acquisition after native Activity transitions; initial 180ms post-navigation delay does not establish input readiness. Native secure-window flag remains unchanged.",
+      "productSha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690"
+    },
+    {
+      "mode": "informationUi=native, native Activity idle acquisition",
+      "result": "PASS: 9 actual own-app information checks",
+      "instrumentationCode": -1,
+      "testSha256": "628e06bed70da416c7db74f2c19bc60e0a0707c513dab6ce81216abfd8077854",
+      "scope": "Backup Files, Automatic Android Backup, Manual Files and Example Gallery help open/collapse; native-to-RN return; saved appearance/backup unchanged; no backup request/export/import or widget pin",
+      "productSha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690"
+    },
+    {
+      "mode": "informationUi=editors, unfiltered catalog",
+      "result": "FAIL: Own information control unavailable: About What to Block",
+      "instrumentationCode": 0,
+      "testSha256": "628e06bed70da416c7db74f2c19bc60e0a0707c513dab6ce81216abfd8077854",
+      "scope": "Apps & Groups help opens/collapses; no full editor acceptance",
+      "investigation": "Required full alphabetical installed-app catalog exceeds the bounded 14-swipe scan. Next trial uses actual temporary search yielding no matches before remaining controls; it does not change product catalog/selection. Full-catalog traversal remains separate.",
+      "productSha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690"
+    },
+    {
+      "mode": "informationUi=tour, native-idle runner",
+      "result": "FAIL: Own information control unavailable: Tap (i) at the top",
+      "instrumentationCode": 0,
+      "testSha256": "628e06bed70da416c7db74f2c19bc60e0a0707c513dab6ce81216abfd8077854",
+      "scope": "Welcome route/Continue attempted; no full tour acceptance",
+      "nextHypothesis": "Apply bounded accessibility-idle readiness after RN taps too; a successful input command does not establish the next state is touch-ready. No production onboarding/configuration repair claimed.",
+      "productSha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690"
+    },
+    {
+      "mode": "informationUi=tour, first scroll-reset candidate",
+      "result": "FAIL: first step marker unavailable before moving forward",
+      "instrumentationCode": 0,
+      "productSha256": "fcfec489bfd94fb473995d72e63a7be7c2001c9e4dbba32e1aa282b7b16d54d3",
+      "testSha256": "ccb07e3353c5174ff01ca848bf3adc13d5e051343d58580f65cad130f8c5ea43",
+      "scope": "No tour regression-suite acceptance. Own UI probe finds zero exposed Step labels; add accessible semantics to existing step indicator."
+    },
+    {
+      "mode": "informationUi=tour, explicit accessible marker",
+      "result": "FAIL: step-two marker not acquired by immediate assertion",
+      "instrumentationCode": 0,
+      "productSha256": "427ec841225578d0c72e0284fbb6e29cddb6428d4823c068ad7fa4cb319f6697",
+      "testSha256": "86a835d28ea14ef154605e3434acfbd4ca5deceb099d33e7362e50b936011d41",
+      "scope": "First step marker/capture acquired; no complete tour acceptance",
+      "nextHypothesis": "Poll the actual expected marker read-only for at most ten seconds after input; event-stream idle is not RN state completion. Capture the requested state before reporting failure. No searching scroll may satisfy the reset assertion."
+    },
+    {
+      "mode": "host Appearance frame acquisition",
+      "result": "Bounded scan exhausted; final after-frame review unaccepted",
+      "productSha256": "c81c06c1f330ee71d8501a6659ea0fed8cfc4b22dd8646902024a95791ab2a3d",
+      "scope": "No save or preference change; investigate actual tab/window and use explicit Settings tab before bounded section reveal"
     }
   ],
   "cleanup": {
-    "state": "complete for this attempted batch; phone released to maintainer",
+    "state": "safe checkpoint for user-requested compaction",
     "noActiveInstrumentation": true,
     "ownedTestRemovedAndAbsenceChecked": true,
-    "originalProductAppearanceBackupFontAccessibility": "independently match fresh baseline",
-    "deviceCaptures": "none created by failed Settings mode",
-    "resume": "Require phone availability again; create fresh ownership/preservation baseline and do not reuse removed private records",
-    "privateHostRecordsRemoved": true
+    "currentProductAppearanceBackupFontAccessibility": "Latest installed preview and original preference/font/Accessibility hashes independently match; original font 1.0, service disconnected preserved",
+    "deviceCaptures": "One guarded step-one capture reviewed, hash-owned removal and absence checked; all six new tour capture paths independently absent at checkpoint",
+    "freshToday": "Fresh own process launched; normal dark Today visually reviewed",
+    "privateHostRecordsRemoved": false,
+    "privateHostRecords": "Ignored current-batch baseline, logs and captures retained for continuation; do not reuse other batch baselines",
+    "resume": "Resume from PUBLISHING-PHASE and ignored SURFACE-CONTINUATION; finish final frame/tour/editor checks, font restoration and reviewed source publication; no release clearance"
   },
   "limits": [
     "Help opens/closes and static visual inspection alone do not qualify feature behavior or smooth frame pacing",
     "This phone cannot qualify every OEM/API/locale; emulator/other-device work remains deferred",
     "History synthetic navigation acceptance retains its separate product/test evidence",
-    "No release artifact installation, upload-key signing, main merge, Console submission or rollout"
+    "No release artifact installation, upload-key signing, main merge, Console submission or rollout",
+    "Original service was disconnected in the new baseline and is preserved; help trials do not qualify source counting, HUD or enforcement"
+  ],
+  "resumeAuthorization": "Maintainer reconfirmed connected phone free to use on 15/11/26; fresh baseline taken before navigation",
+  "testArtifacts": [
+    {
+      "sha256": "28c2df1a5e576b48d524f5a55939865a80d4db865e76bf2082c4c98d2395bd82",
+      "scope": "Historical failed first Settings mode; retained unchanged"
+    },
+    {
+      "sha256": "e1d9224bb84c205a424f08e8e64ca4c46cc1d2553d2a8e0480d2de357a8154d9",
+      "scope": "20 actual Settings information/navigation checks; raw instrumentation -1; product unchanged"
+    },
+    {
+      "sha256": "70adac458c964191884ac2b552deb3cf7a4a6979dc2845cd367b0113264b7575",
+      "scope": "Read-only discovery Today retry fails before full acceptance; retained separately"
+    },
+    {
+      "sha256": "299c77c598cc5cd1bd76e2211a20065b55d62ea43db64f8fcc1342ea8d1b6a3b",
+      "scope": "Safe-content viewport runner; current actual-phone modes recorded separately below"
+    },
+    {
+      "sha256": "56b45cc73678892e02ac6634862e47b668298e7efe0096e058ba0094e6af0287",
+      "scope": "Safe-content viewport plus truncated-information-control rejection; modes below retain their exact hash"
+    },
+    {
+      "sha256": "628e06bed70da416c7db74f2c19bc60e0a0707c513dab6ce81216abfd8077854",
+      "scope": "Native Activity idle acquisition; final modes recorded separately"
+    },
+    {
+      "sha256": "9fe124c9a7ffef991b9deee83e39b06925981acba37eddf1907c85bc8325c51a",
+      "scope": "Current compiled local test with read-only marker polling, guarded captures, font-scaled scan bound, discarded editor query and safe left-gutter swipes; removed from phone at checkpoint; final modes unrun"
+    }
+  ],
+  "runnerChanges": [
+    "Use bounded touchscreen taps on visible clickable own-app nodes instead of accessibility ACTION_CLICK; require contained bounds and recheck owned foreground root before input",
+    "Fallback to owned active-window root and allow two-second activity startup; combined harness changes do not isolate the historical failure cause",
+    "Preserve primary failure when finally navigation also fails; later test build has separate artifact binding",
+    "Keep discovery read-only: remove ACTION_SHOW_ON_SCREEN before coordinate input, avoiding a viewport-moving side effect between match and tap",
+    "Restrict content taps and swipes to the viewport above the actual own Today-tab button minus bar padding; retain status/system insets and a separate tab-input viewport",
+    "Reject truncated square information-control bounds, since Accessibility can clip the node rectangle itself at a scroll edge",
+    "Wait for bounded accessibility idle after native backup/gallery Activity transitions before first input",
+    "Editor mode uses its real named draft search with a fixed synthetic no-match token before lower controls; saves remain untouched",
+    "Wait for bounded accessibility idle after every owned tap, including RN route/tour transitions"
+  ],
+  "builds": [
+    {
+      "scope": "Initial bounded touchscreen test",
+      "result": "PASS",
+      "duration": "2m25s",
+      "tasks": 315,
+      "executed": 31
+    },
+    {
+      "scope": "Primary-error preservation test",
+      "result": "PASS",
+      "duration": "1m15s",
+      "tasks": 315,
+      "executed": 31
+    },
+    {
+      "scope": "Read-only discovery test",
+      "result": "PASS",
+      "duration": "29s",
+      "tasks": 315,
+      "executed": 31
+    },
+    {
+      "scope": "Safe-content viewport test",
+      "result": "PASS",
+      "duration": "41s",
+      "tasks": 315,
+      "executed": 31
+    },
+    {
+      "scope": "Truncated information control guard",
+      "result": "PASS",
+      "duration": "54s",
+      "tasks": 315,
+      "executed": 31
+    },
+    {
+      "scope": "Native Activity readiness wait",
+      "result": "PASS",
+      "duration": "28s",
+      "tasks": 315,
+      "executed": 31
+    },
+    {
+      "scope": "First tour preview/test/lint",
+      "result": "PASS",
+      "duration": "1m38s",
+      "tasks": 536,
+      "executed": 36
+    },
+    {
+      "scope": "Accessible tour marker preview/test/lint",
+      "result": "PASS",
+      "duration": "56s",
+      "tasks": 536,
+      "executed": 36
+    },
+    {
+      "scope": "Appearance uniform frame preview/test/lint",
+      "result": "PASS",
+      "duration": "59s",
+      "tasks": 536,
+      "executed": 31
+    },
+    {
+      "scope": "Final left-gutter test runner",
+      "result": "PASS",
+      "duration": "24s",
+      "tasks": 315,
+      "executed": 31
+    }
+  ],
+  "sourceBase": "6c26a1bd514beef8e070b3ff98654bda14a9e4a5",
+  "products": [
+    {
+      "sha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690",
+      "versionName": "1.0.0-reels-preview",
+      "versionCode": 10,
+      "physicalApi": 36,
+      "scope": "Initial preview; earlier help/navigation passes and retained failures"
+    },
+    {
+      "sha256": "fcfec489bfd94fb473995d72e63a7be7c2001c9e4dbba32e1aa282b7b16d54d3",
+      "versionName": "1.0.0-reels-preview",
+      "versionCode": 10,
+      "physicalApi": 36,
+      "scope": "First tour-scroll/Back repair; failed initial marker assertion; direct own-tree probe confirms no exposed step marker"
+    },
+    {
+      "sha256": "427ec841225578d0c72e0284fbb6e29cddb6428d4823c068ad7fa4cb319f6697",
+      "scope": "Intermediate explicit accessible tour marker; immediate step-two assertion fails; no complete tour acceptance"
+    },
+    {
+      "sha256": "c81c06c1f330ee71d8501a6659ea0fed8cfc4b22dd8646902024a95791ab2a3d",
+      "versionName": "1.0.0-reels-preview",
+      "versionCode": 10,
+      "physicalApi": 36,
+      "scope": "Latest installed preview: uniform Appearance outer gap plus tour scroll/Back/accessibility repair; final normal/large rendered and regression acceptance pending"
+    }
+  ],
+  "implementation": [
+    "Welcome tour resets scroll to top on every step transition without animation",
+    "Setup page adds Back; Android Back on steps two/three returns one step without completing onboarding or changing choices",
+    "Welcome uses a status-bar shade and explicitly exposes its existing page count to accessibility",
+    "Protection full alphabetical catalogs remain unchanged; test-only synthetic search bounds the editor scenario"
+  ],
+  "hostChecks": {
+    "jest": {
+      "suites": 17,
+      "tests": 151,
+      "result": "PASS"
+    },
+    "typecheck": "PASS",
+    "lintArchitectureBackupPalette": "PASS",
+    "format": "PASS",
+    "mobilePins": "PASS",
+    "initialCommandFailure": "Extra forwarded Jest --runInBand was interpreted as a test-name filter and found no tests; corrected pnpm test passes. No acceptance from the failed invocation."
+  },
+  "initialFailedTestSha256": "28c2df1a5e576b48d524f5a55939865a80d4db865e76bf2082c4c98d2395bd82",
+  "artifactInspection": {
+    "mappedAppSources": 60,
+    "sourceMismatches": 0,
+    "bundleMatches": true,
+    "lintErrors": 0,
+    "lintWarnings": 170,
+    "nativePayloadEntriesByteIdentical": 52,
+    "comparedWith": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690",
+    "limits": "Payload/source checks do not transfer earlier UI acceptance to the new tour/frame artifact"
+  },
+  "appearanceFrame": {
+    "request": "Match the narrow existing top gap between Appearance and Templates on the left/right; keep section internals unchanged",
+    "implementation": "AppearanceEditor margin is 8 minus theme.spacing on all sides; outer effective inset remains eight dp across spacing preferences",
+    "maintainerClarification": "Maintainer confirms the intended change and says perfect/go ahead; no final rendered acceptance inferred",
+    "before": "Actual normal dark wider-side/narrow-top capture reviewed privately",
+    "after": "Two bounded host locator scans fail to settle the requested section; no final after-capture acceptance. Investigate cold deep-link route/current tab acquisition before retrying; explicit own Settings-tab navigation is used by the successful instrumentation."
+  },
+  "remainingWork": [
+    "Final normal/200% Appearance outer-frame visual review with original choices preserved",
+    "Final tour normal/200% read-only top-of-step Forward/Back regression and guarded capture review; final runner not yet executed",
+    "Filtered editor scenario and actual keyboard/Back where relevant; no full-catalog traversal claim",
+    "Bounded frame observation is prepared but unrun; no smoothness claim",
+    "Remaining surface/function/source/lifecycle/data/security/resource/compatibility and store gates remain open"
   ]
 }

@@ -2,7 +2,7 @@
 
 > **Current behavior (1.0.0):** [ADR-066](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30) supersedes version-pinned detectors, per-app notices 3–5, structure-check diagnostics and the five-tab preview described below where they conflict. See [State](STATE.md) and the public [privacy policy](../policies/PRIVACY.md).
 
-**Status:** AS-045 implements an experimental native five-tab shell; most domain features remain unavailable. Updated 2026-11-13.
+**Status:** Experimental Android screens and three-step welcome tour; scope-specific phone evidence is in State. Broader accessibility/performance verification remains open. Updated 2026-11-15.
 **Responsibility:** Defines journeys, screen states, permissions, chart semantics and accessible interactions.
 **Related specifications:** [Human factors](HUMAN-FACTORS.md), [Navigation](NAVIGATION.md), [Design](DESIGN-SYSTEM.md), [Settings](SETTINGS-SPEC.md), [Product](PRODUCT.md), [Privacy](PRIVACY.md).
 **Unresolved feasibility:** F-01, F-02 and F-06 in [Decisions](DECISIONS.md); native grant routes, detectors and provider flows require device validation.
@@ -160,3 +160,8 @@ ADR-097 makes Explore a Day and all following By Day details one outlined/tinted
 
 
 ADR-098 requires a left-side local app icon beside listed app names, including source/range rows, app selection/group members, focus target reviews and widget sources. Retain accessible names and neutral unavailable-icon placeholders. Previous Day/Next Day retains full labels with compact horizontal padding, without shrinking its touch target or disabling font scaling.
+
+
+## Welcome tour during publishing qualification (ADR-102)
+
+The three existing tour pages start at the top when moving forward or back. Step three offers Back, and Android Back from steps two/three returns one step without completing setup or changing source/grant choices. Scrolled content stays behind a canvas status-bar shade; the step count is named accessible text. Actual normal/large-text Forward/Back and disclosure visibility require [artifact-scoped evidence](evidence/publishing-surface-review.json); opening help alone does not qualify permission/setup completion.

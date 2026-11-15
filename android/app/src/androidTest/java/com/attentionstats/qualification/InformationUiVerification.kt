@@ -24,6 +24,7 @@ internal object InformationUiVerification {
         }
         val before = listOf("appearance", "system-backup").associateWith { context.getSharedPreferences(it, 0).all.toMap() }
         var checks = 0
+        val scanSteps = kotlin.math.ceil(14 * context.resources.configuration.fontScale.toDouble()).toInt().coerceIn(14, 42)
         fun ownRoot(): AccessibilityNodeInfo? {
             if (Build.VERSION.SDK_INT >= 34) automation.clearCache()
             for (window in automation.windows) {
@@ -32,9 +33,13 @@ internal object InformationUiVerification {
                 if (root.packageName?.toString() == context.packageName) return root
                 SnapshotReader.recycle(root)
             }
+            // A focused own-app active root is also used by the current history runner.
+            val active = automation.rootInActiveWindow ?: return null
+            if (active.packageName?.toString() == context.packageName) return active
+            SnapshotReader.recycle(active)
             return null
         }
-        fun visit(label: String?, contains: Boolean = false, action: (AccessibilityNodeInfo) -> Boolean): Boolean {
+        fun visit(label: String?, contains: Boolean = false, includeEditable: Boolean = false, action: (AccessibilityNodeInfo) -> Boolean): Boolean {
             val root = ownRoot() ?: return false
             val queue = ArrayDeque<AccessibilityNodeInfo>(); queue.add(root)
             try {
@@ -42,13 +47,13 @@ internal object InformationUiVerification {
                 while (queue.isNotEmpty() && seen++ < 2_000) {
                     val node = queue.removeFirst()
                     try {
-                        if (node.packageName?.toString() != context.packageName || node.isPassword || node.isEditable) continue
+                        if (node.packageName?.toString() != context.packageName || node.isPassword || (node.isEditable && !includeEditable)) continue
                         val match = if (label == null) node.isScrollable && node.isVisibleToUser else
                             listOf(node.text?.toString(), node.contentDescription?.toString()).any {
                                 it != null && if (contains) it.contains(label, ignoreCase = true) else it.equals(label, ignoreCase = true)
                             }
                         if (match) {
-                            if (label != null) node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SHOW_ON_SCREEN.id)
+                            // Discovery must not move the viewport between matching and tapping.
                             if (node.isVisibleToUser && action(node)) return true
                         }
                         for (i in 0 until node.childCount) node.getChild(i)?.let { queue.add(it) }
@@ -57,15 +62,31 @@ internal object InformationUiVerification {
                 return false
             } finally { queue.forEach { if (it !== root) SnapshotReader.recycle(it) }; SnapshotReader.recycle(root) }
         }
-        fun find(label: String, contains: Boolean = false, action: (AccessibilityNodeInfo) -> Boolean) {
+        fun viewport(forTab: Boolean = false): Rect {
+            val metrics = context.resources.displayMetrics
+            fun inset(name: String): Int = context.resources.getIdentifier(name, "dimen", "android").let {
+                if (it == 0) 0 else context.resources.getDimensionPixelSize(it)
+            }
+            val result = Rect(0, inset("status_bar_height"), metrics.widthPixels, metrics.heightPixels - inset("navigation_bar_height"))
+            if (!forTab) visit("Today") { node ->
+                if (!node.isClickable) false else {
+                    val tab = Rect().also(node::getBoundsInScreen)
+                    // Tab buttons sit inside eight dp of top padding in the persistent bar.
+                    if (tab.top > metrics.heightPixels / 2) result.bottom = minOf(result.bottom, tab.top - (8 * metrics.density).toInt())
+                    true
+                }
+            }
+            return result
+        }
+        fun find(label: String, contains: Boolean = false, includeEditable: Boolean = false, action: (AccessibilityNodeInfo) -> Boolean) {
             for (direction in listOf(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD, AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)) {
-                repeat(14) {
-                    if (visit(label, contains, action)) { SystemClock.sleep(180); return }
+                repeat(scanSteps) {
+                    if (visit(label, contains, includeEditable, action)) { SystemClock.sleep(180); return }
                     // Scroll the real own-app viewport. Some RN scroll containers expose
                     // accessibility scroll actions without moving the requested section.
                     val root = ownRoot()
                     if (root != null) {
-                        val bounds = Rect().also { root.getBoundsInScreen(it) }
+                        val bounds = viewport()
                         SnapshotReader.recycle(root)
                         val start = bounds.top + bounds.height() * .65f
                         val end = start + bounds.height() * (if (direction == AccessibilityNodeInfo.ACTION_SCROLL_FORWARD) -.28f else .28f)
@@ -73,7 +94,7 @@ internal object InformationUiVerification {
                         // Use shell's touchscreen driver only after rechecking our focused window.
                         val focused = checkNotNull(ownRoot()) { "Own app left foreground; no input sent" }
                         SnapshotReader.recycle(focused)
-                        val x = (bounds.left + bounds.width() * .125f).toInt()
+                        val x = (bounds.left + 8 * context.resources.displayMetrics.density).toInt()
                         val descriptor = automation.executeShellCommand("input touchscreen swipe $x ${start.toInt()} $x ${end.toInt()} 450")
                         android.os.ParcelFileDescriptor.AutoCloseInputStream(descriptor).use {
                             check(it.readBytes().isEmpty()) { "Own scroll command failed" }
@@ -85,18 +106,30 @@ internal object InformationUiVerification {
             error("Own information control unavailable: $label")
         }
         fun click(label: String) = find(label) { node ->
-            if (!node.isEnabled) false else if (node.isClickable) node.performAction(AccessibilityNodeInfo.ACTION_CLICK) else {
-                var parent = node.parent
-                try {
-                    var depth = 0
-                    while (parent != null && depth++ < 5) {
-                        val current = parent
-                        if (current.packageName?.toString() != context.packageName) return@find false
-                        if (current.isClickable && current.isEnabled) return@find current.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                        parent = current.parent; SnapshotReader.recycle(current)
+            if (!node.isEnabled || !node.isClickable) false else {
+                val bounds = Rect().also(node::getBoundsInScreen)
+                val root = ownRoot()
+                if (root == null) false else {
+                    SnapshotReader.recycle(root)
+                    val viewport = viewport(label in setOf("Today", "Insights", "Protect", "Settings"))
+                    // Use the same bounded touchscreen route as the history runner.
+                    // Reject clipped controls before touching the owned window.
+                    // Accessibility can clip the reported rectangle itself to the scroll edge.
+                    // Our fixed-size information controls are square; a truncated rectangle
+                    // must be scrolled fully into view before input.
+                    val clippedInfo = label.startsWith("About ") && kotlin.math.abs(bounds.width() - bounds.height()) > 2
+                    if (bounds.isEmpty || clippedInfo || !viewport.contains(bounds)) false else {
+                        val focused = checkNotNull(ownRoot()) { "Own app left foreground; no input sent" }
+                        SnapshotReader.recycle(focused)
+                        instrumentation.sendStatus(1, Bundle().apply { putString("stream", "Own information tap: $label; $bounds") })
+                        val descriptor = automation.executeShellCommand("input touchscreen tap ${bounds.centerX()} ${bounds.centerY()}")
+                        android.os.ParcelFileDescriptor.AutoCloseInputStream(descriptor).use {
+                            check(it.readBytes().isEmpty()) { "Own tap command failed" }
+                        }
+                        automation.waitForIdle(500, 5_000)
+                        true
                     }
-                    false
-                } finally { SnapshotReader.recycle(parent) }
+                }
             }
         }
         fun help(title: String, fragment: String, report: String = title) {
@@ -112,9 +145,10 @@ internal object InformationUiVerification {
         fun open(path: String) {
             context.startActivity(Intent(context, MainActivity::class.java).setAction(Intent.ACTION_VIEW)
                 .setData(Uri.parse("attentionstats://$path")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            SystemClock.sleep(1_200)
+            SystemClock.sleep(2_000)
             click(when (path) { "insights" -> "Insights"; "settings" -> "Settings"; "protect" -> "Protect"; else -> "Today" })
         }
+        var primaryFailure: Throwable? = null
         try {
             when (mode) {
                 "today" -> {
@@ -179,15 +213,26 @@ internal object InformationUiVerification {
                 }
                 "native" -> {
                     open("settings"); click("Backup & Restore")
+                    automation.waitForIdle(500, 5_000)
                     help("Backup Files", "Keep a portable copy")
                     help("Automatic Android Backup", "Starts enabled unless")
                     help("Manual Files", "Create a backup through")
-                    click("Done"); click("Add a home-screen widget")
+                    click("Done"); automation.waitForIdle(500, 5_000)
+                    click("Add a home-screen widget"); automation.waitForIdle(500, 5_000)
                     help("Example Gallery", "Choose a widget"); click("Back to Settings")
                 }
                 "editors" -> {
                     open("protect"); click("Scheduled Focus"); click("+ Add Time Slot")
                     help("Apps & Groups", "Group and individual choices")
+                    // The required full alphabetical catalog can exceed this runner's
+                    // bounded outer-page scan. Exercise its actual draft search to reach
+                    // the remaining controls without changing catalog presentation/selection.
+                    find("Search Focus Apps", includeEditable = true) { node ->
+                        node.isEditable && node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply {
+                            putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, "attentionstats-ui-empty-catalog-8ea7")
+                        })
+                    }; checks++
+                    find("No Matching Apps or Groups") { true }; checks++
                     help("What to Block", "Every screen in the selected")
                     help("When", "Times follow your phone")
                     help("From", "Enter hours 1–12")
@@ -198,9 +243,37 @@ internal object InformationUiVerification {
                     click("Back to schedules")
                 }
                 "tour" -> {
-                    open("settings"); click("Show the welcome tour"); click("Continue")
+                    open("settings"); click("Show the welcome tour")
+                    val capturedSteps = mutableSetOf<Int>()
+                    fun atTop(step: Int) {
+                        val until = SystemClock.elapsedRealtime() + 10_000
+                        while (!visit("Step $step of 3") { true } && SystemClock.elapsedRealtime() < until) SystemClock.sleep(100)
+                        val capture = java.io.File(context.cacheDir, "surface-tour-${context.resources.configuration.fontScale}-step$step.png")
+                        if (capturedSteps.add(step)) check(!capture.exists()) { "Unowned tour capture already exists" }
+                        val beforeCapture = checkNotNull(ownRoot()) { "Own tour left foreground; no capture" }
+                        SnapshotReader.recycle(beforeCapture)
+                        val bitmap = checkNotNull(automation.takeScreenshot())
+                        try {
+                            val afterCapture = checkNotNull(ownRoot()) { "Own tour left foreground; capture discarded" }
+                            SnapshotReader.recycle(afterCapture)
+                            capture.outputStream().use { check(bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)) }
+                        } finally { bitmap.recycle() }
+                        check(visit("Step $step of 3") { true }) { "Tour step $step top marker unavailable before test scrolling" }
+                        checks++
+                        instrumentation.sendStatus(1, Bundle().apply { putString("stream", "Information UI: tour step $step starts at top") })
+                    }
+                    atTop(1); click("Continue"); atTop(2)
                     find("Tap (i) at the top", true) { true }; checks++
                     help("A Little Help, When You Need It", "Card information stays collapsed")
+                    click("Set it up"); atTop(3)
+                    check(visit("How counting works") { true }); checks++
+                    click("Back"); atTop(2)
+                    val focused = checkNotNull(ownRoot()) { "Own app left foreground; no Back sent" }
+                    SnapshotReader.recycle(focused)
+                    android.os.ParcelFileDescriptor.AutoCloseInputStream(automation.executeShellCommand("input keyevent KEYCODE_BACK")).use {
+                        check(it.readBytes().isEmpty())
+                    }
+                    automation.waitForIdle(500, 5_000); atTop(1)
                 }
                 else -> error("Unsupported own information mode")
             }
@@ -209,6 +282,16 @@ internal object InformationUiVerification {
             }
             checks++
             return "PASS: $checks actual own-app information checks; mode=$mode; appearance/backup unchanged; no source input or save"
-        } finally { if (mode != "tour") open("today") }
+        } catch (failure: Throwable) {
+            primaryFailure = failure
+            throw failure
+        } finally {
+            if (mode != "tour") {
+                try { open("today") } catch (cleanup: Throwable) {
+                    val failure = primaryFailure
+                    if (failure == null) throw cleanup else failure.addSuppressed(cleanup)
+                }
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 > **Current behavior (1.0.0):** [ADR-066](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30) supersedes version-pinned detectors, per-app notices 3–5, structure-check diagnostics and the five-tab preview described below where they conflict. See [State](STATE.md) and the public [privacy policy](../policies/PRIVACY.md).
 
-**Status:** Experimental native four-tab navigation with feature-owned protection routes and Today quick actions. Historical five-tab evidence remains below; current scoped evidence is in State. Broader accessibility/performance qualification remains open. Updated 2026-11-13.
+**Status:** Experimental native four-tab navigation with feature-owned protection routes and Today quick actions. Historical five-tab evidence remains below; current scoped evidence is in State. Broader accessibility/performance qualification remains open. Updated 2026-11-15.
 **Responsibility:** Defines route ownership, hierarchy, parameters, back behavior and external entrypoints.
 **Related specifications:** [UX](UX-SPEC.md), [Design](DESIGN-SYSTEM.md), [Contracts](NATIVE-CONTRACTS.md), [Settings](SETTINGS-SPEC.md).
 **Unresolved feasibility:** F-03 in [Decisions](DECISIONS.md); the current ARM64 build/traversal passes; minimum API, wider devices and full accessibility remain open.
@@ -90,3 +90,6 @@ ADR-092 preserves Today’s non-focus Quick Actions and replaces its inline focu
 
 
 ADR-096 retains routes and functional controls while grouping routine explanations into card-owned information panels. Insights has one selected-range summary, optional source breakdown and bounded day/app explorers; repeated Browse Dates statistics disappear. Calendar/Older/Newer replace detail windows and return to the explorer after loading. By App's calendar selects the window end; By Day's selects a day. Information actions do not navigate, save or activate rules. Consent/review/erase flows and their safe exits remain explicit.
+
+
+ADR-102 repairs the current three-step welcome tour: every step transition resets its scroll offset; step-three Back and Android Back on steps two/three return to the previous step. They do not invoke onboarding completion, enable collection or change permissions. Normal/large-text runtime results remain scoped in the [publishing surface ledger](evidence/publishing-surface-review.json).

@@ -445,8 +445,8 @@ function ColorChannel({
   );
 }
 const styles = StyleSheet.create(theme => ({
-  // Keep the owning card compact vertically, independent of its horizontal inset.
-  editor: { gap: 8, marginVertical: 8 - theme.spacing },
+  // Keep the owning card's inset at eight dp on every side.
+  editor: { gap: 8, margin: 8 - theme.spacing },
   choices: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   choice: {
     minWidth: 0,

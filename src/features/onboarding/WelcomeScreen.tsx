@@ -1,5 +1,13 @@
-import { useState } from 'react';
-import { Image, Linking, ScrollView, Text, View } from 'react-native';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  BackHandler,
+  Image,
+  Linking,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
+import type { ScrollViewInstance } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { reelsSources, reelsSourceKeys } from '../../platform';
@@ -64,6 +72,18 @@ const features: { icon: IconName; title: string; detail: string }[] = [
 /** First run: earn trust first, explain value second, then a guided two-step setup. */
 export function WelcomeScreen({ onDone }: { onDone: () => void }) {
   const [step, setStep] = useState(0);
+  const scrollRef = useRef<ScrollViewInstance>(null);
+  useLayoutEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, [step]);
+  useEffect(() => {
+    if (step === 0) return;
+    const back = BackHandler.addEventListener('hardwareBackPress', () => {
+      setStep(step - 1);
+      return true;
+    });
+    return () => back.remove();
+  }, [step]);
   const insets = useSafeAreaInsets();
   const { theme } = useUnistyles();
   const reels = useReels(2_000);
@@ -86,193 +106,207 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <ScrollView
-      style={styles.scroll}
-      contentContainerStyle={[
-        styles.page,
-        { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 16 },
-      ]}
-    >
-      <View style={styles.dots} accessibilityLabel={`Step ${step + 1} of 3`}>
-        {[0, 1, 2].map(index => (
-          <View
-            key={index}
-            style={[styles.dot, index === step && styles.dotOn]}
-          />
-        ))}
-      </View>
-
-      {step === 0 && (
-        <View style={styles.body}>
-          <View style={styles.hero}>
-            <Image
-              source={require('../../assets/app-icon.png')}
-              style={styles.logo}
-              accessibilityIgnoresInvertColors
-              accessibilityLabel="Attention Stats"
+    <View style={styles.scroll}>
+      <ScrollView
+        ref={scrollRef}
+        style={styles.scroll}
+        contentContainerStyle={[
+          styles.page,
+          { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 16 },
+        ]}
+      >
+        <View
+          accessible
+          accessibilityRole="text"
+          style={styles.dots}
+          accessibilityLabel={`Step ${step + 1} of 3`}
+        >
+          {[0, 1, 2].map(index => (
+            <View
+              key={index}
+              style={[styles.dot, index === step && styles.dotOn]}
             />
-            <Text accessibilityRole="header" style={styles.headline}>
-              Your attention,{'\n'}in your hands.
-            </Text>
-            <Body muted center>
-              A private, open-source companion that helps you see and shape how
-              you scroll.
-            </Body>
-          </View>
-          <Card>
-            {promises.map(item => (
-              <View key={item.title} style={styles.promise}>
-                <View style={styles.promiseIcon}>
-                  <Icon name={item.icon} color={theme.accent} size={22} />
-                </View>
-                <View style={styles.flex}>
-                  <Text style={styles.promiseTitle}>{item.title}</Text>
-                  <Text style={styles.promiseDetail}>{item.detail}</Text>
-                </View>
-              </View>
-            ))}
-          </Card>
-          <View style={styles.footer}>
-            <Button label="Continue" onPress={() => setStep(1)} />
-            <Button
-              label="Read the source code"
-              variant="text"
-              icon="code"
-              onPress={() => Linking.openURL(SOURCE_URL)}
-            />
-          </View>
+          ))}
         </View>
-      )}
 
-      {step === 1 && (
-        <View style={styles.body}>
-          <View style={styles.hero}>
-            <View style={styles.appStrip}>
-              {reelsSourceKeys.map(key => (
-                <AppIcon
-                  key={key}
-                  uri={sourceIcon(icons, key)}
-                  mark={reelsSources[key].mark}
-                  color={reelsSources[key].color}
-                  size={44}
-                />
-              ))}
+        {step === 0 && (
+          <View style={styles.body}>
+            <View style={styles.hero}>
+              <Image
+                source={require('../../assets/app-icon.png')}
+                style={styles.logo}
+                accessibilityIgnoresInvertColors
+                accessibilityLabel="Attention Stats"
+              />
+              <Text accessibilityRole="header" style={styles.headline}>
+                Your attention,{'\n'}in your hands.
+              </Text>
+              <Body muted center>
+                A private, open-source companion that helps you see and shape
+                how you scroll.
+              </Body>
             </View>
-            <Text accessibilityRole="header" style={styles.headline}>
-              Understand your scrolling,{'\n'}without judgement.
-            </Text>
+            <Card>
+              {promises.map(item => (
+                <View key={item.title} style={styles.promise}>
+                  <View style={styles.promiseIcon}>
+                    <Icon name={item.icon} color={theme.accent} size={22} />
+                  </View>
+                  <View style={styles.flex}>
+                    <Text style={styles.promiseTitle}>{item.title}</Text>
+                    <Text style={styles.promiseDetail}>{item.detail}</Text>
+                  </View>
+                </View>
+              ))}
+            </Card>
+            <View style={styles.footer}>
+              <Button label="Continue" onPress={() => setStep(1)} />
+              <Button
+                label="Read the source code"
+                variant="text"
+                icon="code"
+                onPress={() => Linking.openURL(SOURCE_URL)}
+              />
+            </View>
           </View>
-          <Card>
-            {features.map(item => (
-              <View key={item.title} style={styles.promise}>
-                <View style={styles.promiseIcon}>
-                  <Icon name={item.icon} color={theme.accent} size={22} />
-                </View>
-                <View style={styles.flex}>
-                  <Text style={styles.promiseTitle}>{item.title}</Text>
-                  <Text style={styles.promiseDetail}>{item.detail}</Text>
-                </View>
+        )}
+
+        {step === 1 && (
+          <View style={styles.body}>
+            <View style={styles.hero}>
+              <View style={styles.appStrip}>
+                {reelsSourceKeys.map(key => (
+                  <AppIcon
+                    key={key}
+                    uri={sourceIcon(icons, key)}
+                    mark={reelsSources[key].mark}
+                    color={reelsSources[key].color}
+                    size={44}
+                  />
+                ))}
               </View>
-            ))}
-          </Card>
-          <Card
-            title="A Little Help, When You Need It"
-            info="Card information stays collapsed by default. Tap the same information button again to hide it; opening explanations does not change your choices."
-          >
-            <Body muted>
-              Tap (i) at the top of a card to understand its stats or controls.
-            </Body>
-          </Card>
-          <View style={styles.footer}>
-            <Button label="Set it up" onPress={() => setStep(2)} />
-            <Button label="Back" variant="text" onPress={() => setStep(0)} />
+              <Text accessibilityRole="header" style={styles.headline}>
+                Understand your scrolling,{'\n'}without judgement.
+              </Text>
+            </View>
+            <Card>
+              {features.map(item => (
+                <View key={item.title} style={styles.promise}>
+                  <View style={styles.promiseIcon}>
+                    <Icon name={item.icon} color={theme.accent} size={22} />
+                  </View>
+                  <View style={styles.flex}>
+                    <Text style={styles.promiseTitle}>{item.title}</Text>
+                    <Text style={styles.promiseDetail}>{item.detail}</Text>
+                  </View>
+                </View>
+              ))}
+            </Card>
+            <Card
+              title="A Little Help, When You Need It"
+              info="Card information stays collapsed by default. Tap the same information button again to hide it; opening explanations does not change your choices."
+            >
+              <Body muted>
+                Tap (i) at the top of a card to understand its stats or
+                controls.
+              </Body>
+            </Card>
+            <View style={styles.footer}>
+              <Button label="Set it up" onPress={() => setStep(2)} />
+              <Button label="Back" variant="text" onPress={() => setStep(0)} />
+            </View>
           </View>
-        </View>
-      )}
+        )}
 
-      {step === 2 && (
-        <View style={styles.body}>
-          <Text accessibilityRole="header" style={styles.headlineSmall}>
-            Two quick steps
-          </Text>
-          <Card tone="soft">
-            <Text style={styles.disclosureTitle}>How counting works</Text>
-            <Body muted>
-              Attention Stats uses Android’s Accessibility service to notice
-              when a short-video player or a feed video is on screen in
-              Instagram, Facebook, YouTube, TikTok or Snapchat. It looks at the
-              screen’s layout and labels in memory, only to tell one video from
-              the next.
-            </Body>
-            <Body muted>
-              It never records, saves or sends what you watch, type or message.
-              Counts are stored encrypted on this phone and are eligible for
-              Android backup. It only presses Back or swipes for you when you
-              turn on blocking or auto-scroll.
-            </Body>
-          </Card>
+        {step === 2 && (
+          <View style={styles.body}>
+            <Text accessibilityRole="header" style={styles.headlineSmall}>
+              Two quick steps
+            </Text>
+            <Card tone="soft">
+              <Text style={styles.disclosureTitle}>How counting works</Text>
+              <Body muted>
+                Attention Stats uses Android’s Accessibility service to notice
+                when a short-video player or a feed video is on screen in
+                Instagram, Facebook, YouTube, TikTok or Snapchat. It looks at
+                the screen’s layout and labels in memory, only to tell one video
+                from the next.
+              </Body>
+              <Body muted>
+                It never records, saves or sends what you watch, type or
+                message. Counts are stored encrypted on this phone and are
+                eligible for Android backup. It only presses Back or swipes for
+                you when you turn on blocking or auto-scroll.
+              </Body>
+            </Card>
 
-          <SetupStep
-            number={1}
-            done={allowed}
-            title="Allow counting"
-            detail="Agree to the explanation above for all five apps. You can turn apps off later."
-            action={
-              allowed
-                ? undefined
-                : {
-                    label: 'I agree, allow counting',
-                    run: () => reels.enableAll(true),
-                  }
-            }
-          />
-          <SetupStep
-            number={2}
-            done={accessibility}
-            title="Turn on Accessibility"
-            detail={
-              'In the next screen: Installed apps (or Downloaded apps) → Attention Stats → turn it on → Allow. Then come back here.'
-            }
-            action={
-              accessibility
-                ? undefined
-                : {
-                    label: 'Open Accessibility settings',
-                    run: () => reels.openAccessibility(),
-                  }
-            }
-          />
-          <SetupStep
-            number={3}
-            done={usage}
-            optional
-            title="See screen time per app"
-            detail="Optional. Shows how long you spend in each app, like Digital Wellbeing."
-            action={
-              usage
-                ? undefined
-                : {
-                    label: 'Allow usage access',
-                    run: async () => {
-                      if (!diary.snapshot?.usageEnabled)
-                        await diary.configure('usage', true);
-                      await NativeDiary?.openUsageSettings();
-                    },
-                  }
-            }
-          />
-
-          <View style={styles.footer}>
-            <Button
-              label={countingReady(reels.snapshot) ? 'Start' : 'Finish later'}
-              variant={countingReady(reels.snapshot) ? 'filled' : 'tonal'}
-              onPress={finish}
+            <SetupStep
+              number={1}
+              done={allowed}
+              title="Allow counting"
+              detail="Agree to the explanation above for all five apps. You can turn apps off later."
+              action={
+                allowed
+                  ? undefined
+                  : {
+                      label: 'I agree, allow counting',
+                      run: () => reels.enableAll(true),
+                    }
+              }
             />
-            <Caption>You can change any of this in Settings.</Caption>
+            <SetupStep
+              number={2}
+              done={accessibility}
+              title="Turn on Accessibility"
+              detail={
+                'In the next screen: Installed apps (or Downloaded apps) → Attention Stats → turn it on → Allow. Then come back here.'
+              }
+              action={
+                accessibility
+                  ? undefined
+                  : {
+                      label: 'Open Accessibility settings',
+                      run: () => reels.openAccessibility(),
+                    }
+              }
+            />
+            <SetupStep
+              number={3}
+              done={usage}
+              optional
+              title="See screen time per app"
+              detail="Optional. Shows how long you spend in each app, like Digital Wellbeing."
+              action={
+                usage
+                  ? undefined
+                  : {
+                      label: 'Allow usage access',
+                      run: async () => {
+                        if (!diary.snapshot?.usageEnabled)
+                          await diary.configure('usage', true);
+                        await NativeDiary?.openUsageSettings();
+                      },
+                    }
+              }
+            />
+
+            <View style={styles.footer}>
+              <Button
+                label={countingReady(reels.snapshot) ? 'Start' : 'Finish later'}
+                variant={countingReady(reels.snapshot) ? 'filled' : 'tonal'}
+                onPress={finish}
+              />
+              <Caption>You can change any of this in Settings.</Caption>
+              <Button label="Back" variant="text" onPress={() => setStep(1)} />
+            </View>
           </View>
-        </View>
-      )}
-    </ScrollView>
+        )}
+      </ScrollView>
+      <View
+        pointerEvents="none"
+        style={[styles.statusShade, { height: insets.top }]}
+      />
+    </View>
   );
 }
 
@@ -323,6 +357,13 @@ function SetupStep({
 
 const styles = StyleSheet.create(theme => ({
   scroll: { flex: 1, backgroundColor: theme.canvas },
+  statusShade: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: theme.canvas,
+  },
   page: { flexGrow: 1, paddingHorizontal: 20, gap: 12 },
   dots: { flexDirection: 'row', gap: 6, justifyContent: 'center' },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: theme.track },

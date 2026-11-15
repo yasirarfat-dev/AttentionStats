@@ -1,6 +1,6 @@
 # Decisions and feasibility register
 
-**Status:** Accepted foundation decisions; feasibility gates open. Updated 2026-10-29.
+**Status:** Accepted foundation decisions; feasibility gates open. Updated 2026-11-15.
 **Responsibility:** Owns deliberate architectural/product choices, evidence and unresolved gates.
 **Related specifications:** [Product](PRODUCT.md), [Architecture](ARCHITECTURE.md), [Dependencies](DEPENDENCIES.md), [Backup](BACKUP-RESTORE.md), [Tracker](FEATURE-TRACKER.md).
 **Unresolved feasibility:** F-01–F-10 below; none is cleared by pure calculation tests, including synthetic physical-Android execution.
@@ -475,3 +475,15 @@ Offer a compact Settings guidance row for checking a Reel's playback/options men
 A future direct toggle requires an identified source-owned Reels control, explicit requested state rather than blind toggle, known current state, fresh window/context/consent checks, bounded single action and independently read-back state. The separate request must explain that provider scrolling may outlive our service, HUD, Stop or permission. Unknown state, ambiguous/absent controls or changed layout must offer manual guidance. No private API, arbitrary deep-link setting write, hidden setting or silent provider change. The current guidance/probe does not implement that production action.
 
 Reviewed official [Meta Instagram platform scope](https://developers.facebook.com/documentation/instagram-platform) and [Android node/action/state API](https://developer.android.com/reference/android/view/accessibility/AccessibilityNodeInfo) on 14/11/26. No documented public Reels autoscroll-setting API was identified; this is a research result, not proof that every private interface is absent. Android click/checkable APIs alone establish no target-app control identity. Exact installed-version findings, artifacts and remaining qualification are in [evidence](evidence/builtin-autoscroll-investigation.json). AS-044/AS-059 remain experimental.
+
+
+## Welcome-tour step position and Back — ADR-102 — 2026-11-15
+
+During the maintainer-directed existing-feature/UI qualification, direct phone review shows page two inheriting page one's scroll offset after Continue, obscuring its heading. Reset the tour scroll to the top on every step change without animation. Keep a canvas-colored status-bar shade like other app screens and expose the existing step count as named accessible text. The setup page also provides an explicit Back action, and Android Back on steps two/three returns to the preceding step. Returning does not complete onboarding, enable collection/grants or write preferences; existing Start/Finish Later completion retains its native configuration acknowledgement.
+
+This is an AS-018/AS-045/AS-049/AS-056 navigation repair within the authorized publishing-polish phase. No permission, dependency, schema, source action, backup or release-version change. Verify actual scrolled Forward/Back transitions and top-of-step disclosure at normal/large text; a searching locator must not scroll the page into compliance before asserting reset. The full alphabetical protection app catalog remains unchanged; editor testing may use a discarded synthetic no-match search to bound its scenario, without claiming full-catalog traversal acceptance.
+
+
+## Uniform Appearance frame inset — ADR-103 — 2026-11-15
+
+The maintainer requests the same small, uniform outer-frame gap used around Insights By Day, specifically retaining Appearance's current top gap and reducing its wider left/right gap. Apply an eight-dp inset on all four sides between the Settings Appearance frame and its editor sections, independent of the chosen card-spacing preference. Keep Templates/Customization section padding, controls and inter-section spacing unchanged. This is an AS-018/AS-045/AS-057 presentation repair, without preference, collection or permission changes. Review the actual normal/large-text rendered frame; earlier Appearance checks retain their own artifacts.
