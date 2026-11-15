@@ -2,7 +2,9 @@
   "date": "2026-11-15",
   "tasks": ["AS-018", "AS-037", "AS-045", "AS-055", "AS-057"],
   "status": "experimental; scoped theme and normal playback-pipeline checks pass; strict large-text/consent-epoch/service-binding qualification pending at maintainer-requested pause; publication HOLD",
-  "sourceBase": "66ceb5c4a42b1216c4554eeb4e053f256aa1686c",
+  "sourceBase": "91d99da59c0f50ac23ead730be4093269e062812",
+  "reviewedSourceCommit": "37c3c1f58c9c00644bbcd863ff38cdddd7734132",
+  "sourcePublication": "Normally pushed and independently matched on origin/develop before this metadata follow-up; source checkpoint only, user-requested pause and qualification/publication holds unchanged",
   "product": {
     "sha256": "69b0563d0fcfdec6c767d6e0856d290139d0b2d3bb89a349e0c40d2ef45630fe",
     "versionName": "1.0.0-reels-preview",
