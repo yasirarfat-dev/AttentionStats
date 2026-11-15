@@ -1,6 +1,6 @@
 # Storage and retention
 
-**Status:** Normative design; storage implementation pending. Updated 2026-10-29.
+**Status:** Experimental schema-9 encrypted product store exists; broader durability, migration, lifetime-scale and retention implementation/qualification remain open. Updated 2026-11-15.
 **Responsibility:** Owns durability, retention, deletion, deduplication, growth and recovery.
 **Related specifications:** [Models](DATA-MODELS.md), [Privacy](PRIVACY.md), [Backup](BACKUP-RESTORE.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-02 and F-04 in [Decisions](DECISIONS.md); encrypted storage performance and filesystem behavior require tests.
@@ -73,3 +73,7 @@ At 1000 encounters/day, 50 years is roughly 18.25 million rows before other even
 A future explicitly prioritized Chrome extension may use IndexedDB with the same event envelope and separate origin. Browser persistence/quota handling and export are required; the browser database alone is not a lifetime archive. Chrome documents extension storage protections separately from normal web-origin storage: [Chrome extension storage and cookies](https://developer.chrome.com/docs/extensions/develop/concepts/storage-and-cookies). The extension remains deferred under ADR-024/ADR-048.
 
 The November 12 experimental All-time Insights read returns SQL source aggregates and a single maximum-30-day detail page without loading lifetime events into memory or deleting facts. It uses existing authoritative schema-9 tables, with no durable summary/cache migration. Direct grouped COUNT/SUM and retained-bound queries can scan retained index entries; this remains an explicit latency/scalability limitation against the long-term materialized-summary target above. It does not qualify 1M/10M/50M histories, compaction, origin merge or restore capacity. Lifetime reads run on entry/paging/foreground/retry rather than a ten-second poll; per-page usage/timer density and bridge payload bounds remain enforced.
+
+## Continuous behavior-history foundation — ADR-106
+
+**Database/behavior priority (15/11/26; ADR-106):** the maintainer requires durable continuous local behavior evidence for later personal patterns, analytics and predictions, including sequences/context rather than totals alone. Preserve useful supported explicitly enabled facts, provenance, uncertainty and deletion rights; do not broaden collection or invent missing history. [Database evolution](DATABASE-EVOLUTION.md) records the schema-9 static audit, behavior evidence checklist and ordered migration/durability/backup work. Historical migration matrix, effective durability, owner/process/ENOSPC recovery and lifetime archive scale remain open; no new collector/schema or runtime acceptance. Saved backup choices and F-05 remain authoritative; publication HOLD.

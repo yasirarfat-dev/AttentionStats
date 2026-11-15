@@ -60,6 +60,7 @@ The earlier [interactive design study](../design/prototype/README.md), scaffold 
 | Interfaces | [NATIVE-CONTRACTS.md](NATIVE-CONTRACTS.md) | Operations, types, paging, errors, events and revisions |
 | Schema | [DATA-MODELS.md](DATA-MODELS.md) | Entities, time, provenance, relations and migrations |
 | Durability | [STORAGE-AND-RETENTION.md](STORAGE-AND-RETENTION.md) | Preservation, pruning, deletion, dedup and growth |
+| Database evolution | [DATABASE-EVOLUTION.md](DATABASE-EVOLUTION.md) | Continuous behavior evidence, schema audit and ordered migration/durability/recovery qualification |
 | Privacy | [PRIVACY.md](PRIVACY.md) | Inventory, consent, transfers, no-developer-data claims |
 | Security | [SECURITY.md](SECURITY.md) | Threat model, keys, encryption target and release gates |
 | Crypto qualification | [CRYPTO-ARCHIVE-DESIGN.md](CRYPTO-ARCHIVE-DESIGN.md) | AS-006 suite/envelope, encrypted Room candidate, key lifecycle, resource limits and open qualification gates |

@@ -111,3 +111,7 @@ ADR-096 clarifies explorer scopes and presentation: selected-range encounters/su
 
 
 ADR-097 scopes the entire By Day explorer visually and repeats its selected civil date on each detail card. Its summary exposes existing recorded whole-app screen time, whole-app video-app time, package opens and break reminders alongside video encounters/surface time. Preserve null versus known zero, package/source deduplication and exact count arithmetic. These durations overlap; recorded app time may be incomplete. Opens are not unlock sessions; no historical session total is inferred. By App, native paging and range aggregates retain their existing scope.
+
+## Continuous behavior-history foundation — ADR-106
+
+**Database/behavior priority (15/11/26; ADR-106):** the maintainer requires durable continuous local behavior evidence for later personal patterns, analytics and predictions, including sequences/context rather than totals alone. Preserve useful supported explicitly enabled facts, provenance, uncertainty and deletion rights; do not broaden collection or invent missing history. [Database evolution](DATABASE-EVOLUTION.md) records the schema-9 static audit, behavior evidence checklist and ordered migration/durability/backup work. Historical migration matrix, effective durability, owner/process/ENOSPC recovery and lifetime archive scale remain open; no new collector/schema or runtime acceptance. Saved backup choices and F-05 remain authoritative; publication HOLD.
