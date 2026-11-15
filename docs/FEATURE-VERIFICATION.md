@@ -205,3 +205,8 @@ Completion here mirrors tracker task acceptance. Experimental tasks can contain 
 ### Appearance frame review deferred — 15/11/26
 
 **Maintainer-requested stop (15/11/26):** fresh baseline matches installed preview `d9d7d1`; Appearance frame review stops before any editor input because the hierarchy exposes only a system window, despite own resumed activity. No screenshot or acceptance; foreground activity alone is insufficient window ownership. Two attempts hit the same guard; no bypass or further retry. Original appearance, backup, font and Accessibility selections/master remain unchanged; actual own service bound, no test package or active instrumentation. Phone work stopped. Next continuation must freshly reconcile phone state and acquire the actual own window before normal/200% frame review. Other verification and publication HOLD remain unchanged. [Evidence](evidence/publishing-appearance-frame-stop.json).
+
+
+### Appearance frame resumed — 15/11/26
+
+**[x] Code; [x] Verified for the named visual scope only.** Six actual own-app captures on unchanged preview `d9d7d1`, code10/physical API36, cover Templates, Customization and the editor bottom at 100%/200%. Compact outer inset and readable large-text choices reviewed; original font/preferences/Accessibility/product preserved, no editor action or test installation. Earlier acquisition failures retained; broader functional/accessibility/frame-pacing and release acceptance remain unchecked. [Exact evidence](evidence/publishing-appearance-frame-resume.json).

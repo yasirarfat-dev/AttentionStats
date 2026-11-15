@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-15",
+  "sourceBase": "798232c77882940f718fb0c5423828de6105dc6a",
+  "tasks": [
+    "AS-018",
+    "AS-045",
+    "AS-057"
+  ],
+  "status": "experimental; named frame visual scope reviewed; publication HOLD",
+  "product": {
+    "sha256": "d9d7d1b65dadb0fe92582c2e4eec26d5b36ccc1794a3a6bad1ba1c46811870ea",
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "physicalApi": 36,
+    "productionUnchanged": true
+  },
+  "verification": {
+    "method": "Host adb operator; actual own hierarchy required before capture; no instrumentation installed",
+    "fontScales": [
+      1.0,
+      2.0
+    ],
+    "capturesReviewed": 6,
+    "surfaces": [
+      "Templates top and side frame",
+      "Customization side frame and section boundary",
+      "Editor bottom frame and action labels"
+    ],
+    "outcome": "Compact consistent outer inset visually reviewed; normal choices and stacked large-text choices remain readable. Source implements eight dp; this is visual review, not a pixel-calibrated measurement. No edit, Save, Reset, color-canvas input or consent change."
+  },
+  "retainedTrials": [
+    "Earlier stopped system-only window acquisition remains in publishing-appearance-frame-stop.json; cause unestablished. Fresh continuation obtains an own root with own nodes after launch.",
+    "Forward-only normal scan overshoots Templates; owned scan stopped and reverse traversal recovers target.",
+    "First large-text scan exhausts bound with font restored in finally. Direction-only follow-up stopped, original font explicitly restored and checked. Final run reacquires Settings after configuration change before bounded heading traversal."
+  ],
+  "cleanup": {
+    "freshBaselinePreserved": true,
+    "exactInstalledProductMatched": true,
+    "appearanceBackupFontAccessibilitySelectionsAndMasterMatch": true,
+    "actualOwnAccessibilityServiceBound": true,
+    "testPackageAbsent": true,
+    "noActiveInstrumentation": true,
+    "freshOwnTodayAcquired": true,
+    "noPhoneScreenshotFilesCreated": true,
+    "reviewedHostCapturesRemoved": true,
+    "freshOwnTodayVisuallyReviewed": true
+  },
+  "limits": [
+    "Phone size/current saved dark appearance only; no light-mode or multi-device frame claim.",
+    "No full TalkBack, RTL, keyboard, motion, frame pacing, collection-readiness or functional acceptance.",
+    "Other source, protection/lifecycle, recovery/security/resource and distribution gates unchanged; seven-day baseline not started.",
+    "No production/dependency/schema/version change, emulator, release build, main merge, workflow, signing or Play action."
+  ]
+}

@@ -161,3 +161,6 @@ ADR-101 (14/11/26): Display & Experience → Extras adds **Built-in Reels auto-s
 
 
 ADR-103 gives the Appearance editor a uniform eight-dp gap inside its outer Settings frame, matching its existing top gap and the bounded Insights group convention. Templates/Customization contents retain their own padding and spacing. This presentation inset stays uniform across card-spacing preferences; it does not save or change a draft.
+
+
+ADR-103 frame verification (15/11/26): six own-app captures on unchanged preview `d9d7d1` cover Templates, Customization and the editor bottom at normal/200% text. The compact outer inset and stacked large-text labels are visually reviewed without editing or saving. This accepts that artifact/phone visual subset only; broader accessibility/behavior remains open. [Evidence](evidence/publishing-appearance-frame-resume.json).
