@@ -151,3 +151,6 @@ ADR-097/AS-014/AS-018/AS-037 refines the existing experimental Insights presenta
 
 
 ADR-101 (14/11/26), C-32/AS-044/AS-059: independent accessibility autoscroll remains experimental. Built-in Facebook/Instagram manual guidance is a separate Settings aid, not a provider API/adapter capability or an automatic fallback. Direct provider control and YouTube/Snapchat completion/action remain unqualified. [Investigation evidence](evidence/builtin-autoscroll-investigation.json).
+
+
+15/11/26 C-32/AS-044/AS-055/AS-059: the [same-item TikTok cache investigation](evidence/autoscroll-tiktok-cache.json) adds diagnostic evidence only. Three native/independent arrivals precede missing progress; 50 same-item/window root-refresh and test-cache comparisons recover neither normalized progress nor absolute times. No production workaround or capability promotion; publication HOLD.

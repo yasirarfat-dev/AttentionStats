@@ -19,8 +19,9 @@ import java.util.concurrent.TimeUnit
 /** Actual HUD Start, bounded consecutive automatic transitions, then actual Stop. No source input. */
 internal object LiveAutoScrollContinuousVerification {
     fun run(instrumentation: Instrumentation, key: String, adOnly: Boolean = false, mixedAds: Boolean = false,
-        transitions: Int = 3, seconds: Int = 180): String {
+        transitions: Int = 3, seconds: Int = 180, cacheAuditAfterStop: Boolean = false): String {
         require(transitions in 1..20 && seconds in 30..900)
+        require(!cacheAuditAfterStop || (key == "tiktok" && !adOnly && !mixedAds))
         val required = if (adOnly) 1 else transitions
         val durationMs = if (adOnly) 15_000L else seconds * 1_000L
         val owner = ReelsCoordinator.get(instrumentation.targetContext)
@@ -165,6 +166,13 @@ internal object LiveAutoScrollContinuousVerification {
             SystemClock.sleep(2_000)
             check(!AutoScrollSession.running && AutoScrollSession.attempts == attemptsAtStop) { "Stop did not fence later actions" }
             instrumentation.sendStatus(1, android.os.Bundle().apply { putString("stream", "Ordered fixed-code trace=$trace") })
+            if (cacheAuditAfterStop) {
+                // Keep this UiAutomation connection and the stopped source item in place.
+                // A new instrumentation connection or provider reentry would confound cache evidence.
+                instrumentation.sendStatus(1, android.os.Bundle().apply {
+                    putString("stream", "POST_STOP_CACHE_AUDIT: " + NumericPlaybackAudit.run(instrumentation, key, refreshProbe = true))
+                })
+            }
             check(independent == required && attemptsAtStop == required && AutoScrollSession.confirmedTransitions == required) {
                 "continuous scrolling not achieved; seconds=${(SystemClock.elapsedRealtime()-start)/1_000}; attempts=$attemptsAtStop; confirmed=${AutoScrollSession.confirmedTransitions}; independent=$independent; samples=$samples; numeric=$numeric; unavailable=$unknown; kinds=$kinds; stages=$stages"
             }

@@ -64,6 +64,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var autoScrollContinuous: String? = null
     private var autoScrollTransitions = 3
     private var autoScrollSeconds = 180
+    private var autoScrollCacheAudit = false
     private var standaloneAdLive = false
     private var mixedAdsLive = false
     private var builtinScrollProbe: String? = null
@@ -89,6 +90,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         autoScrollContinuous = arguments?.getString("autoScrollContinuous")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollTransitions = arguments?.getString("autoScrollTransitions")?.toIntOrNull()?.takeIf { it in 1..20 } ?: 3
         autoScrollSeconds = arguments?.getString("autoScrollSeconds")?.toIntOrNull()?.takeIf { it in 30..900 } ?: 180
+        autoScrollCacheAudit = arguments?.getString("autoScrollCacheAudit") == "true"
         standaloneAdLive = arguments?.getString("standaloneAdLive") == "true"
         mixedAdsLive = arguments?.getString("mixedAdsLive") == "true"
         autoScrollInterruption = arguments?.getString("autoScrollInterruption") == "true"
@@ -163,7 +165,7 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             autoScrollContinuous?.let { source ->
                 result.putString("stream", LiveAutoScrollContinuousVerification.run(this, source, standaloneAdLive, mixedAdsLive,
-                    autoScrollTransitions, autoScrollSeconds))
+                    autoScrollTransitions, autoScrollSeconds, autoScrollCacheAudit))
                 finish(Activity.RESULT_OK, result); return
             }
             numericMediaProbe?.let { source ->

@@ -43,6 +43,10 @@ internal object NumericPlaybackAudit {
         var rootRefreshes = 0; var cacheClears = 0
         var rootNumeric = 0; var cacheNumeric = 0
         var rootRecovered = 0; var cacheRecovered = 0; var sameItemPairs = 0
+        var sameItemRootPairs = 0; var missingRootPairs = 0; var missingCachePairs = 0
+        var rootAbsoluteTimes = 0; var cacheAbsoluteTimes = 0; var changedPairs = 0
+        var refreshContext: Pair<Int, Long>? = null
+        var refreshContextSamples = 0
         fun sourceRoot(): AccessibilityNodeInfo {
             val until = SystemClock.elapsedRealtime() + 5_000
             do {
@@ -90,9 +94,16 @@ internal object NumericPlaybackAudit {
                     check(frame.surface == Surface.REELS && frame.route == ReelRoute.VIEWER && frame.identity != null) {
                         "cache comparison requires a qualified dedicated viewer"
                     }
+                    val context = snapshot.windowId to checkNotNull(frame.identity)
+                    check(refreshContext == null || refreshContext == context) { "cache comparison item/window changed" }
+                    refreshContext = context
+                    refreshContextSamples++
                     // Paired, no-action experiment: cached root, refreshed root, then a
                     // newly acquired root after clearing only UiAutomation's own cache.
                     // This does not change the production service's cache or settings.
+                    fun sameViewer(fresh: org.attentionstats.detection.ScreenSnapshot, updated: org.attentionstats.detection.AdapterFrame): Boolean =
+                        fresh.windowId == snapshot.windowId && updated.identity == frame.identity &&
+                            updated.surface == Surface.REELS && updated.route == ReelRoute.VIEWER
                     if (root.refresh()) {
                         rootRefreshes++
                         check(app.owns(root.packageName?.toString())) { "source changed after refresh" }
@@ -100,8 +111,14 @@ internal object NumericPlaybackAudit {
                         check(fresh.complete && !fresh.typing) { "refreshed source incomplete/editable" }
                         val updated = AdapterRegistry.of(app).read(fresh)
                         if (updated.progress != null) rootNumeric++
-                        if (frame.identity != null && frame.identity == updated.identity && frame.progress == null && updated.progress != null)
-                            rootRecovered++
+                        if (updated.positionMs != null && updated.durationMs != null) rootAbsoluteTimes++
+                        if (sameViewer(fresh, updated)) {
+                            sameItemRootPairs++
+                            if (frame.progress == null) {
+                                missingRootPairs++
+                                if (updated.progress != null) rootRecovered++
+                            }
+                        } else changedPairs++
                     }
                     if (Build.VERSION.SDK_INT >= 34 && automation.clearCache()) {
                         cacheClears++
@@ -112,10 +129,14 @@ internal object NumericPlaybackAudit {
                             check(fresh.complete && !fresh.typing) { "uncached source incomplete/editable" }
                             val updated = AdapterRegistry.of(app).read(fresh)
                             if (updated.progress != null) cacheNumeric++
-                            if (frame.identity != null && frame.identity == updated.identity && snapshot.windowId == fresh.windowId) {
+                            if (updated.positionMs != null && updated.durationMs != null) cacheAbsoluteTimes++
+                            if (sameViewer(fresh, updated)) {
                                 sameItemPairs++
-                                if (frame.progress == null && updated.progress != null) cacheRecovered++
-                            }
+                                if (frame.progress == null) {
+                                    missingCachePairs++
+                                    if (updated.progress != null) cacheRecovered++
+                                }
+                            } else changedPairs++
                         } finally { SnapshotReader.recycle(freshRoot) }
                     }
                     SystemClock.sleep(200)
@@ -177,6 +198,12 @@ internal object NumericPlaybackAudit {
             .put("distinctValues", JSONObject(values.mapValues { it.value.size } as Map<*, *>))
             .put("refreshProbe", refreshProbe).put("rootRefreshes", rootRefreshes).put("cacheClears", cacheClears)
             .put("rootNumericSamples", rootNumeric).put("uncachedNumericSamples", cacheNumeric)
+            // Legacy NumericSamples keys above mean normalized progress, not absolute time.
+            .put("rootProgressSamples", rootNumeric).put("uncachedProgressSamples", cacheNumeric)
+            .put("rootAbsoluteTimeSamples", rootAbsoluteTimes).put("uncachedAbsoluteTimeSamples", cacheAbsoluteTimes)
+            .put("sameItemRootPairs", sameItemRootPairs).put("missingProgressRootPairs", missingRootPairs)
+            .put("missingProgressCachePairs", missingCachePairs).put("changedContextPairs", changedPairs)
+            .put("refreshContextSamples", refreshContextSamples)
             .put("sameItemPairs", sameItemPairs).put("sameItemRootRecoveries", rootRecovered).put("sameItemCacheRecoveries", cacheRecovered)
             .put("sourceGestures", 0).put("rawLabelsRetained", false).toString()
     }
