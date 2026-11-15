@@ -220,7 +220,12 @@ export function TodayScreen({
         )}
       </Card>
 
-      <ViewingDetail days={diary.snapshot?.days ?? []} />
+      <ViewingDetail
+        days={diary.snapshot?.days ?? []}
+        measurementEnabled={diary.snapshot?.measurePlayback}
+        loading={!diary.snapshot && !diary.error}
+        unavailable={Boolean(diary.error)}
+      />
       <Card
         title="Reels by Apps"
         info="Today's recognized video encounters by source. On-screen time, whole-app time, photos and ads are separate scopes and may overlap. Encounters do not prove watching."

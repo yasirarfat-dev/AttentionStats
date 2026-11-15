@@ -44,13 +44,13 @@ export function AppearanceEditor({
   const valid = /^#[0-9a-f]{6}$/i.test(hex);
   const dark =
     draft.mode === 'dark' ||
-    (draft.mode === 'system' && rt.themeName === 'dark');
+    (draft.mode === 'system' && rt.colorScheme === 'dark');
   const preview = appearancePreview(draft, dark);
   function selectedColor(next: Appearance, selected: typeof scope): string {
     const colors = appearancePreview(
       next,
       next.mode === 'dark' ||
-        (next.mode === 'system' && rt.themeName === 'dark'),
+        (next.mode === 'system' && rt.colorScheme === 'dark'),
     );
     return (
       next[selected] ||
@@ -74,9 +74,10 @@ export function AppearanceEditor({
     <View style={styles.editor}>
       <View style={styles.colorGroup}>
         <Explanation compact title="Templates">
-          Choose Light, Dark or System, then an accent preset. Custom text and
-          background colors override the template. Choosing an accent preset
-          replaces only the custom accent. Save Appearance applies this draft.
+          Choose Light, Dark or System to restore that theme's text and
+          background colors. Your accent and layout stay the same. Choosing an
+          accent preset replaces only the custom accent. Save Appearance applies
+          this draft.
         </Explanation>
         <SectionTitle compact>Theme mode</SectionTitle>
         <AppearanceChoices
@@ -88,7 +89,12 @@ export function AppearanceEditor({
             { value: 'system', label: 'System' },
           ]}
           onChange={mode => {
-            const next = { ...draft, mode };
+            const next = {
+              ...draft,
+              mode,
+              foregroundColor: '',
+              backgroundColor: '',
+            };
             setDraft(next);
             setHex(selectedColor(next, scope));
           }}

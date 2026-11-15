@@ -10,6 +10,12 @@ internal object DiaryPresentationFixture {
         val appName: String, val secondAppName: String?)
     @Volatile private var values: Values? = null
     @Volatile private var todayCase: String? = null
+    @Volatile private var playbackSnapshot: String? = null
+    /** Only instrumentation supplies an isolated native-store snapshot; never a JS/intent setter. */
+    fun playback(snapshot: String) {
+        check(BuildConfig.DEBUG && snapshot.length <= 2_000_000 && JSONObject(snapshot).getInt("contractVersion") == 3)
+        playbackSnapshot = snapshot
+    }
     fun today(case: String) {
         check(BuildConfig.DEBUG && case in setOf("zero", "typical", "large", "extreme"))
         todayCase = case
@@ -20,7 +26,7 @@ internal object DiaryPresentationFixture {
         check(listOf(appMs, reelsMs, count).all { it.toLongOrNull()?.let { number -> number >= 0 } == true })
         values = Values(appMs, reelsMs, count, appName, secondAppName)
     }
-    fun clear() { values = null; todayCase = null }
+    fun clear() { values = null; todayCase = null; playbackSnapshot = null }
     fun applyReels(snapshot: String): String {
         if (!BuildConfig.DEBUG) return snapshot
         val case = todayCase ?: return snapshot
@@ -29,6 +35,7 @@ internal object DiaryPresentationFixture {
     }
     fun apply(snapshot: String): String {
         if (!BuildConfig.DEBUG) return snapshot
+        playbackSnapshot?.let { return it }
         todayCase?.let { case ->
             val count = when (case) { "zero" -> 0L; "typical" -> 965L; "large" -> 999_999L; else -> 9_999_999_999_999L }
             val value = JSONObject(snapshot)

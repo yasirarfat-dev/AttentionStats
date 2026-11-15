@@ -8,7 +8,14 @@
     "AS-056",
     "AS-057"
   ],
-  "status": "experimental; 57 earlier-artifact help/navigation checks pass; final tour/frame/editor review pending; checkpoint for requested compaction; publication HOLD",
+  "status": "experimental; 57 earlier-artifact help/navigation checks remain historical; separate theme/playback regression checkpoint follows; full tour/editor/surface acceptance pending; publication HOLD",
+  "regressionContinuation": {
+    "date": "2026-11-15",
+    "evidence": "theme-playback-regressions.json",
+    "scope": "45 theme preview/native Save checks each at normal/large text on 69b0563; 121 normal-text native-store-to-Today checks; strict large viewing details and final native consent-epoch qualification pending",
+    "installedCheckpoint": "d9d7d1b65dadb0fe92582c2e4eec26d5b36ccc1794a3a6bad1ba1c46811870ea",
+    "pause": "Explicit maintainer pause before compaction. Test/captures removed, original selected settings restored. Fresh Today still warns counting not on; actual native service binding unresolved. No acceptance transferred from this ledger's older artifacts."
+  },
   "maintainerOrder": "Verify every implemented feature and rendered UI surface before further release build/publication; only initial closed-test 1.0.0 has been published",
   "product": {
     "sha256": "c81c06c1f330ee71d8501a6659ea0fed8cfc4b22dd8646902024a95791ab2a3d",

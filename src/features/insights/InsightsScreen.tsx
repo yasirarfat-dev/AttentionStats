@@ -766,7 +766,11 @@ export function InsightsScreen() {
                   />
                 )}
               </Card>
-              <ViewingDetail days={day ? [day] : []} scope={dayScope} />
+              <ViewingDetail
+                days={day ? [day] : []}
+                scope={dayScope}
+                measurementEnabled={diary.snapshot.measurePlayback}
+              />
               {Object.keys(day?.interventions ?? {}).some(key =>
                 key.startsWith('break.'),
               ) && (

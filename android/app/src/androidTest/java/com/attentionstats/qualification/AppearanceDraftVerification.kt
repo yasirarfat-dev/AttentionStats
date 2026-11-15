@@ -17,7 +17,7 @@ import org.json.JSONObject
 /** Actual RN draft/save/reset controls; temporary visual preferences restored exactly in finally. */
 @Suppress("DEPRECATION")
 internal object AppearanceDraftVerification {
-    fun run(instrumentation: Instrumentation): String {
+    fun run(instrumentation: Instrumentation, themesOnly: Boolean = false): String {
         val context = instrumentation.targetContext
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
         val preferences = context.getSharedPreferences("appearance", 0)
@@ -50,14 +50,16 @@ internal object AppearanceDraftVerification {
                 check(it.readBytes().isEmpty())
             }
         }
-        fun scroll(up: Boolean) {
+        fun scroll(up: Boolean, fine: Boolean = false) {
             val root = checkNotNull(automation.rootInActiveWindow)
             val bounds = Rect().also { root.getBoundsInScreen(it) }
             check(root.packageName?.toString() == context.packageName); root.recycle()
             // Match the independently working own-app touchscreen scroll path.
             val start = bounds.top + bounds.height() * (if (up) 62 else 30) / 100
-            val end = bounds.top + bounds.height() * (if (up) 30 else 62) / 100
-            val x = bounds.left + bounds.width() / 8
+            val end = bounds.top + bounds.height() * (if (fine) { if (up) 54 else 38 } else { if (up) 30 else 62 }) / 100
+            // The widened Appearance frame puts the canvas under the old 1/8-width swipe.
+            // Scroll in the page gutter so finding the preview cannot edit its colors.
+            val x = bounds.left + (8 * context.resources.displayMetrics.density).toInt()
             shell("input touchscreen swipe $x $start $x $end 350")
             SystemClock.sleep(250)
         }
@@ -92,14 +94,20 @@ internal object AppearanceDraftVerification {
             }
             error("appearance draft hex ${checks + 1}")
         }
-        fun reveal(name: String) {
+        fun reveal(name: String, up: Boolean = true) {
             repeat(35) {
+                var direction = up
+                var near = false
                 if (visit { node ->
                     val bounds = Rect().also { node.getBoundsInScreen(it) }
-                    named(node, name) && node.isVisibleToUser && bounds.top > 90 &&
-                        bounds.bottom < context.resources.displayMetrics.heightPixels * .72
+                    if (!named(node, name)) false else {
+                        near = true; direction = bounds.top >= 90
+                        node.isVisibleToUser && bounds.top > 90 &&
+                            bounds.bottom < context.resources.displayMetrics.heightPixels * .72
+                    }
                 }) { checks++; return }
-                scroll(true)
+                // Coarse reverse swipes can overshoot the tall preview at 200% text.
+                scroll(direction, fine = near)
             }
             error("appearance draft reveal ${checks + 1}")
         }
@@ -108,6 +116,29 @@ internal object AppearanceDraftVerification {
             val bitmap = checkNotNull(automation.takeScreenshot())
             File(context.cacheDir, "appearance-draft-$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
             bitmap.recycle()
+        }
+        fun preview(dark: Boolean) {
+            val label = "Appearance preview. Video encounters 965. Recorded surface time 6 hours 51 minutes."
+            // At 200%, reading the hex below the preview can scroll the preview above us.
+            reveal(label, up = false)
+            var bounds: Rect? = null
+            expect(visit { node ->
+                if (!named(node, label)) false else {
+                    bounds = Rect().also { node.getBoundsInScreen(it) }; true
+                }
+            })
+            val bitmap = checkNotNull(automation.takeScreenshot())
+            val rect = checkNotNull(bounds)
+            val pixel = bitmap.getPixel(rect.right - 35, rect.centerY())
+            bitmap.recycle()
+            expect((androidx.core.graphics.ColorUtils.calculateLuminance(pixel) < .179) == dark)
+        }
+        fun typeColor(color: String) {
+            expect(visit { node ->
+                named(node, "Selected hex color") && node.isEditable && node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT,
+                    Bundle().apply { putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, color) })
+            })
+            SystemClock.sleep(300)
         }
         val fixture = JSONObject().put("mode", "dark").put("accent", "graphite").put("motion", true)
             .put("foregroundColor", "#E5E7EB").put("backgroundColor", "#15191F").put("customColor", "#4477AA")
@@ -128,13 +159,34 @@ internal object AppearanceDraftVerification {
             })
             click("About Templates"); unchanged(); capture("templates-help")
             click("About Templates", false)
+            click("Light"); unchanged()
+            click("Background"); field("#F5F7FC"); preview(false); capture("light-preview")
+            click("Save appearance")
+            fixture.put("mode", "light").put("foregroundColor", "").put("backgroundColor", "")
+            unchanged()
+            expect(AppearanceOwner.palette(context).canvas == android.graphics.Color.parseColor("#F5F7FC"))
+            // System must follow the OS even while a different app theme is forced.
+            val systemDark = context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            click("System", false); unchanged()
+            click("Background"); field(if (systemDark) "#08090B" else "#F5F7FC"); preview(systemDark); capture("system-from-light")
+            click("Dark", false); unchanged()
+            click("Background"); field("#08090B"); preview(true); capture("dark-preview")
+            click("Save appearance")
+            val themed = AppearanceOwner.snapshot(context)
+            expect(themed.getString("mode") == "dark" && themed.getString("foregroundColor").isEmpty() && themed.getString("backgroundColor").isEmpty())
+            expect(themed.getString("customColor") == "#4477AA" && themed.getInt("spacing") == 20)
+            fixture.put("mode", "dark")
+            expect(AppearanceOwner.palette(context).canvas == android.graphics.Color.parseColor("#08090B"))
             click("System"); unchanged()
             expect(visit { named(it, "System") && it.isSelected })
+            click("Background"); field(if (systemDark) "#08090B" else "#F5F7FC"); preview(systemDark); capture("system-preview")
+            if (themesOnly) return "PASS: $checks actual Light/Dark/System preview/save/native palette checks; original preferences restored in finally"
             click("Dark", false); capture("theme")
             click("Blue"); unchanged(); capture("templates")
             click("About Customization"); unchanged(); capture("customization-help")
             click("About Customization", false)
-            click("Text"); field("#E5E7EB")
+            click("Background"); field("#08090B"); typeColor("#15191F")
+            click("Text", false); field("#F1F2F4")
             expect(visit { node ->
                 named(node, "Selected hex color") && node.isEditable && node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT,
                     Bundle().apply { putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, "#AABBCC") })

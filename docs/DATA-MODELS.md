@@ -1,5 +1,7 @@
 # Data models
 
+Playback regression clarification (15/11/26): no schema or migration change. Existing Exposure playback/qualification/completion facts remain authoritative. A consent toggle ends playback continuity while preserving previously confirmed facts and the active visit identity. UI projections retain unknown per metric, deduplicate repeated source/day package facts and do not reinterpret confirmed playback duration as a completion count. Live source readability remains independently qualified in State/feature evidence.
+
 > Development additions (2026-11-03, ADR-068/ADR-069): Room 6→7 adds `ProtectionConfiguration` (revision and bounded validated group/window document). Room 7→8 adds `Exposure.mediaKind` (`unknown` for historical rows), `playbackMs` (-1 for unknown), `qualifiedWatch` and `observedCompletion` (initially false), plus `DiaryConfiguration.measurePlayback` (off) and `countPhotos` (compatible on). Ad category and media kind are independent facets. Encounters, opted-in per-visit playback and completions are distinct. Imported current-device enablement stays disabled; old unknown playback is never backfilled from surface time. Schema snapshots and actual migration/device evidence govern acceptance.
 
 **Status:** Logical schema accepted; SQL/Room implementation and migrations pending. Updated 2026-11-13.

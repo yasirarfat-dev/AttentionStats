@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-15",
+  "tasks": ["AS-018", "AS-037", "AS-045", "AS-055", "AS-057"],
+  "status": "experimental; scoped theme and normal playback-pipeline checks pass; strict large-text/consent-epoch/service-binding qualification pending at maintainer-requested pause; publication HOLD",
+  "sourceBase": "66ceb5c4a42b1216c4554eeb4e053f256aa1686c",
+  "product": {
+    "sha256": "69b0563d0fcfdec6c767d6e0856d290139d0b2d3bb89a349e0c40d2ef45630fe",
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "physicalApi": 36,
+    "installedInPlaceAndIndependentlyMatched": true,
+    "mappedCurrentAppSourcesMatching": 61,
+    "generatedBundleMatchesApk": true,
+    "provenance": "Working-tree debug preview; not a clean committed production candidate"
+  },
+  "installedCheckpoint": {
+    "sha256": "d9d7d1b65dadb0fe92582c2e4eec26d5b36ccc1794a3a6bad1ba1c46811870ea",
+    "changeAfterVerifiedProduct": "One native collection-epoch increment after successful playback-consent commit fences queued pre-change acquisitions",
+    "scope": "Build/lint, installed hash, bundle/61 mapped sources and fresh actual Today rendering reviewed; native epoch/toggle behavior qualification pending; earlier checks do not transfer automatically",
+    "currentWarning": "Counting is not on yet remains visible in the fresh Today review. Original selected-service/master hashes match, but actual service binding/readiness is unqualified; do not describe collection as restored/working. No original binding baseline or cause established."
+  },
+  "initialPlaybackTestSha256": "595a1d4ba31dd3e90a71d60c45371b40dbd0382888e45a5235ad16dcd2698c21",
+  "appearance": {
+    "repair": "Mode selection restores template ink/canvas in the draft, retaining accent/layout/motion; System preview uses OS scheme; explicit Save retained (ADR-104)",
+    "finalNormalText": "45 actual Light/Dark/System preview/native palette/Save checks, raw -1",
+    "finalLargeText": "45 actual checks at 200%, raw -1",
+    "testSha256": "f4782489312d18a33e8e1c597a243b8a46f676e3c3f93d873c774f51b1292aab",
+    "earlierArtifact": "e7deab285a68fc8ced3966eb0e03dc10a364789c1c2913fb681d1eec458344d1",
+    "earlierFullDraftTest": "cb72c72a65381b87a4942ef8a8484142daf40cb9965c35fedc683c4be4b20644; 78 actual draft/save/discard/reset/help checks, raw -1",
+    "earlierFocusedTest": "89b3c63ac4eb7ffdfd89cda6312b18e46aad329a55a570b9960154324578e44e; 37 normal theme/preview/native palette/Save checks, raw -1",
+    "renderReview": "White Light, dark Dark and OS-dark System preview while app is saved Light reviewed at normal/large text; effective hex matches; outer frame and stacked large theme choices reviewed within these captures",
+    "preservation": "Original appearance/backup/font/selected Accessibility services/master independently hash-matched after cleanup; actual service binding is a separate pending gate"
+  },
+  "playback": {
+    "repair": "Consent toggle breaks numeric continuity while retaining active accumulators and confirmed facts; same visit can resume without filling disabled time or claiming completion across the gap",
+    "presentation": "Independent nullable metrics, once-per-source/day facts, loading/read-error/off/no-readable-times statuses; saved measurements remain when collection is off",
+    "finalNormalText": "121 isolated encrypted-store/actual Today checks, raw -1",
+    "finalLargeText": "Unaccepted: stricter actual-nav-container trial de72519 fails to reach full unknown-status label (code0); stopped at maintainer's pause request without unchanged retry. Viewport/direction hypothesis remains unproven.",
+    "largeTextTrials": "Earlier 150 checks (test 595a1d4) and 157 checks (test 9a30e03af5304e0e89e5633c99b138bc10222b6543652639fb4b486d0172f9f6) return raw -1, but visual review shows Measured Visits under navigation. They do not accept full large-text visibility. Latest strict test SHA de725191d45764ddae2d4e7aa13ec756434204388751a79be7e6f025c3940a7f fails the unknown stage.",
+    "pipeline": "Synthetic advancing numeric player times -> production PlaybackEvidence -> isolated encrypted Exposure facts -> actual DiaryEngine snapshot -> existing bridge/strict parser -> real Today UI",
+    "cases": ["disabled and unknown", "enabled without readable times", "measured zero", "4000ms, one three-second watch, one observed completion, one measured visit", "saved values after disabling", "malformed-response error retaining prior observations", "recovery"],
+    "renderReview": "Actual normal-text unknown/zero/complete/off-retained/read-error states reviewed",
+    "cleanup": "Runner finally clears fixture, closes/deletes isolated store and deletes unique Keystore alias, asserting absence on successful and failed trials; independent final owned-directory absence check passes",
+    "limits": "Synthetic signal/store/UI verification only. No new live provider trial, universal source fidelity, historical backfill or production-service toggle qualification. Earlier source-specific missing-progress evidence remains; no wall-time watch/completion fallback. Confirmed playback is duration, not a completion count."
+  },
+  "host": {
+    "jest": "155 tests / 18 suites pass",
+    "nativeDomain": "60 encounter checks / 238 source fixture checks pass; includes consent-gap confirmed-time preservation/resumption/no-bridged-completion",
+    "typesLintArchitectureBackupPaletteFormatMobile": "pass",
+    "previewTestLintNativeBuild": "pass; 1m52s, 538 tasks, 48 executed",
+    "latestTestOnlyBuild": "pass; 26s, 315 tasks, 31 executed",
+    "checkpointEpochGuardPreviewLintBuild": "pass; 59s, 478 tasks, 35 executed; no runtime qualification of the added epoch fence",
+    "nativeLint": "0 errors, 170 warnings",
+    "dependenciesSchemaVersion": "unchanged"
+  },
+  "retainedFailures": [
+    "Initial input check fails code0 during the maintainer-reported call interruption; exact product/input cause unestablished, no acceptance",
+    "Legacy one-eighth-width test scroll crosses widened color canvas and changes draft; eight-dp page-gutter correction precedes the 78-check pass",
+    "First 200% preview reveal scans in the wrong direction; later coarse reverse search overshoots the tall preview. Adaptive smaller steps precede the 45-check passes at 100%/200%",
+    "After owned-test removal, selected own Accessibility state differs and the guarded product install rejects; shell sequence incorrectly continues and a newer test hits NoSuchMethod on old product. No feature acceptance or proven OEM cause; guarded sequence, exact original restoration and independently matched product precede retry",
+    "Initial isolated playback fixture has onboardingSeen=false and enters the tour instead of Today; returning-user fixture correction precedes 121-check pass",
+    "150/157 large-text streams miss lower-stat occlusion in visual review. Latest stricter navigation-container/parent boundary trial fails unknown-status reveal; no full large-text acceptance or diagnosed product defect",
+    "Some immediate Accessibility master restores revert to zero despite own service selection. Targeted restart of only the hash-matched original own service establishes final exact selected-service/master equality. Final Today still warns counting is not on; actual binding remains unresolved."
+  ],
+  "boundaries": "No real history reset/restore, source/provider/grant expansion, saved rule/group changes, backup-choice change, emulator, release build, main merge, workflow, signing or Play action; temporary own-service/font changes are restored against the fresh baseline",
+  "finalCleanup": "29 owned phone captures removed; all 30 allowlisted capture paths independently absent, isolated playback directories absent, hash-owned test removed and absence checked, no active instrumentation, volatile fixtures cleared through own-app restart. Exact installed checkpoint product and original appearance/backup/font/selected Accessibility/master hashes match. Fresh own Today visually reviewed; actual collection readiness remains unqualified. Private host baseline/captures/checkpoint remain ignored for continuation."
+}

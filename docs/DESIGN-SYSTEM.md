@@ -148,6 +148,8 @@ ADR-100 combines Appearance's theme mode and accent presets into one compact Tem
 
 Publishing follow-up (15/11/26): theme modes use the same named choice controls as the color scopes. At large system text they stack at full width so System remains an intact word. Save, Discard Appearance Changes (saved choices) and Reset Appearance Draft (defaults awaiting Save) have distinct labels and effects; none of these actions changes collection or history.
 
+ADR-104 (15/11/26) clarifies template intent: Light/Dark/System restore template ink and canvas in the draft, retaining accent/layout, so custom background cannot silently mask a selected theme. System preview uses the actual OS scheme independently of the applied app theme. Explicit Save still applies app-wide; opening, previewing and Discard do not persist.
+
 
 ### Large-text navigation and viewing facets (publishing polish)
 

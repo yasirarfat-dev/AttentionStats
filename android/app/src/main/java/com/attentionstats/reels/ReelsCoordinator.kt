@@ -321,7 +321,13 @@ internal class ReelsCoordinator private constructor(private val context: Context
                 failure("REVISION_CONFLICT"); return@enqueue
             }
             if (action.startsWith("block.")) ReelApp.byKey(action.removePrefix("block."))?.let { allowances.remove(it) }
-            if (action == "playback") { playback.clear(); lastPlayback.clear() }
+            if (action == "playback") {
+                // Reject queued acquisitions from before the committed consent change.
+                epoch.incrementAndGet()
+                // Keep the active visit and already confirmed facts. Break continuity at
+                // consent changes so re-enabling on this item works without filling the gap.
+                playback.values.forEach { it.sample(SystemClock.elapsedRealtime(), null, null) }
+            }
             acquisitionSettings.incrementAndGet()
             publish()
             success(diary.snapshot(history, 1, blockingAvailable = ::blockingAvailable))
