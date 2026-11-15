@@ -103,6 +103,10 @@ internal object HistoryNavigationVerification {
             repeat(18) { if (click(text)) { checks++; return }; scroll(up) }
             error("history navigation control not reached at ${checks + 1}")
         }
+        fun seekVisible(text: String) {
+            repeat(18) { if (has(text)) { checks++; return }; scroll(true) }
+            error("history navigation heading not reached at ${checks + 1}")
+        }
         fun capture(name: String) {
             SystemClock.sleep(800)
             expect(has("Insights"))
@@ -145,7 +149,8 @@ internal object HistoryNavigationVerification {
             expect(click("All Time"))
             awaitReady { has("${date(first)} – ${date(today)}") }
             seekClick("By app")
-            awaitReady { has("${date(today.minusDays(29))} – ${date(today)}") }
+            // Switching explorer does not scroll the newly mounted date card into view.
+            seekVisible("${date(today.minusDays(29))} – ${date(today)}")
             seekClick("Older Dates")
             awaitReady { has("${date(today.minusDays(59))} – ${date(today.minusDays(30))}") }
             expect(has("Newer Dates"))

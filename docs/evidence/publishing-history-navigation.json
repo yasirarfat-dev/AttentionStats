@@ -49,5 +49,12 @@
     "No emulator, main merge, workflow, signing or Play action"
   ],
   "reviewedSourceCommit": "4bbf846ecf0d65e122b0844c83cdfdbf825d5897",
-  "sourcePublication": "Normally pushed and independently matched on origin/develop; source only; phone reconciliation remains pending"
+  "sourcePublication": "Normally pushed and independently matched on origin/develop; source only; phone reconciliation remains pending",
+  "hostFollowup": {
+    "scope": "Bounded scroll-to-heading after By App; private helper checks own-app foreground before/after capture and omits hierarchy acquisition",
+    "cause": "Viewport explanation is a host-review hypothesis; original phone failure cause remains unestablished",
+    "phone": "No phone operations; availability confirmation and final cleanup still pending",
+    "testBuild": "pass; 1m32s; 315 tasks, 31 executed; local only, not installed",
+    "localTestSha256": "3f598833c549299f9181ca2fd236b12aa52e4e81c5062df66ceeb2c641fde8a5"
+  }
 }
