@@ -417,5 +417,7 @@
     "Filtered editor scenario and actual keyboard/Back where relevant; no full-catalog traversal claim",
     "Bounded frame observation is prepared but unrun; no smoothness claim",
     "Remaining surface/function/source/lifecycle/data/security/resource/compatibility and store gates remain open"
-  ]
+  ],
+  "reviewedSourceCommit": "66ceb5c4a42b1216c4554eeb4e053f256aa1686c",
+  "sourcePublication": "Normally pushed and independently matched on origin/develop; source publication only, final UI acceptance pending"
 }
