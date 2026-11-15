@@ -116,5 +116,14 @@
     "result": "Bounded no-action read completes raw -1; source fidelity for confirmed playback remains unavailable in this layout. New exact-time counters distinguish normalized progress from the position/duration inputs consumed by statistics; no repeated unchanged generic progress trial.",
     "privacy": "Existing allowed source only, no consent/provider preference changes or raw labels/screenshots retained; no notification/media/root access."
   },
-  "continuationSourceBase": "73467ee6f3e02747d6f5bb7b29896849fc5245a8"
+  "continuationSourceBase": "73467ee6f3e02747d6f5bb7b29896849fc5245a8",
+  "continuationPublication": {
+    "sourceCommit": "d38e13607578ca703ed81d6c5413e0c0b838f8c5",
+    "normalPush": "success; independently matched on origin/develop",
+    "identityRemoteAuth": "Intended contributor no-reply author/committer, origin and active GitHub account checked separately",
+    "reviewedFiles": 10,
+    "checks": "Documentation links/metadata/ledger/public-artifact check and staged whitespace pass; final test-only build 25s/315 tasks/31 executed",
+    "finalCompileOnlyTestSha256": "415a5e9172fe8f5b86013eaf6d4a027ae6c84d6a40b18a5cc7455102fce85ac3",
+    "scope": "Test/evidence refinement only; unchanged installed product, runtime passes retain their exact test hashes; no release/main/workflow/Play action"
+  }
 }
