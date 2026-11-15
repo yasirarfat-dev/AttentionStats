@@ -1,7 +1,13 @@
 {
   "date": "2026-11-15",
-  "tasks": ["AS-018", "AS-037", "AS-045", "AS-055", "AS-057"],
-  "status": "experimental; scoped theme and normal playback-pipeline checks pass; strict large-text/consent-epoch/service-binding qualification pending at maintainer-requested pause; publication HOLD",
+  "tasks": [
+    "AS-018",
+    "AS-037",
+    "AS-045",
+    "AS-055",
+    "AS-057"
+  ],
+  "status": "experimental; theme, normal pipeline, strict large-text pipeline and isolated actual-owner consent checks pass within separate artifact scopes; live numeric times unavailable in tested TikTok layout; publication HOLD",
   "sourceBase": "91d99da59c0f50ac23ead730be4093269e062812",
   "reviewedSourceCommit": "37c3c1f58c9c00644bbcd863ff38cdddd7734132",
   "sourcePublication": "Normally pushed and independently matched on origin/develop before this metadata follow-up; source checkpoint only, user-requested pause and qualification/publication holds unchanged",
@@ -18,8 +24,8 @@
   "installedCheckpoint": {
     "sha256": "d9d7d1b65dadb0fe92582c2e4eec26d5b36ccc1794a3a6bad1ba1c46811870ea",
     "changeAfterVerifiedProduct": "One native collection-epoch increment after successful playback-consent commit fences queued pre-change acquisitions",
-    "scope": "Build/lint, installed hash, bundle/61 mapped sources and fresh actual Today rendering reviewed; native epoch/toggle behavior qualification pending; earlier checks do not transfer automatically",
-    "currentWarning": "Counting is not on yet remains visible in the fresh Today review. Original selected-service/master hashes match, but actual service binding/readiness is unqualified; do not describe collection as restored/working. No original binding baseline or cause established."
+    "scope": "On this exact installed product: 74 strict large-text real-Today checks and 24 isolated actual-owner consent/admission checks pass (-1), with visual review. Earlier theme/normal checks keep their own artifacts. No live-source watch/completion acceptance.",
+    "currentWarning": "Historical pause warning cleared on resumption and after final cleanup: actual own service bound, user-zero package not stopped, original selected/master hashes match and fresh Today has no setup warning. This establishes current readiness, not past uninterrupted collection or provider playback availability."
   },
   "initialPlaybackTestSha256": "595a1d4ba31dd3e90a71d60c45371b40dbd0382888e45a5235ad16dcd2698c21",
   "appearance": {
@@ -37,13 +43,38 @@
     "repair": "Consent toggle breaks numeric continuity while retaining active accumulators and confirmed facts; same visit can resume without filling disabled time or claiming completion across the gap",
     "presentation": "Independent nullable metrics, once-per-source/day facts, loading/read-error/off/no-readable-times statuses; saved measurements remain when collection is off",
     "finalNormalText": "121 isolated encrypted-store/actual Today checks, raw -1",
-    "finalLargeText": "Unaccepted: stricter actual-nav-container trial de72519 fails to reach full unknown-status label (code0); stopped at maintainer's pause request without unchanged retry. Viewport/direction hypothesis remains unproven.",
+    "finalLargeText": "74 strict full-viewport actual Today checks at 200% pass (-1) on installed d9d7d1b65dadb0fe92582c2e4eec26d5b36ccc1794a3a6bad1ba1c46811870ea / test d6cbf0e4adfd75559b7b0af35f7dd9e24f2aa82c225c3e4cd0ca55bd3b7bd86e. All seven stages reached; actual unknown/off/error paragraphs and zero/complete bottom Measured Visits clear navigation.",
     "largeTextTrials": "Earlier 150 checks (test 595a1d4) and 157 checks (test 9a30e03af5304e0e89e5633c99b138bc10222b6543652639fb4b486d0172f9f6) return raw -1, but visual review shows Measured Visits under navigation. They do not accept full large-text visibility. Latest strict test SHA de725191d45764ddae2d4e7aa13ec756434204388751a79be7e6f025c3940a7f fails the unknown stage.",
     "pipeline": "Synthetic advancing numeric player times -> production PlaybackEvidence -> isolated encrypted Exposure facts -> actual DiaryEngine snapshot -> existing bridge/strict parser -> real Today UI",
-    "cases": ["disabled and unknown", "enabled without readable times", "measured zero", "4000ms, one three-second watch, one observed completion, one measured visit", "saved values after disabling", "malformed-response error retaining prior observations", "recovery"],
-    "renderReview": "Actual normal-text unknown/zero/complete/off-retained/read-error states reviewed",
+    "cases": [
+      "disabled and unknown",
+      "enabled without readable times",
+      "measured zero",
+      "4000ms, one three-second watch, one observed completion, one measured visit",
+      "saved values after disabling",
+      "malformed-response error retaining prior observations",
+      "recovery"
+    ],
+    "renderReview": "Historical normal states plus resumed exact-product 200% off/unknown/zero/complete/off-retained/error/recovery and full lower-stat visibility reviewed. No universal width/accessibility acceptance.",
     "cleanup": "Runner finally clears fixture, closes/deletes isolated store and deletes unique Keystore alias, asserting absence on successful and failed trials; independent final owned-directory absence check passes",
-    "limits": "Synthetic signal/store/UI verification only. No new live provider trial, universal source fidelity, historical backfill or production-service toggle qualification. Earlier source-specific missing-progress evidence remains; no wall-time watch/completion fallback. Confirmed playback is duration, not a completion count."
+    "limits": "Synthetic signal/store/UI and actual-owner admission verification only; no accepted live provider watch/completion signal or historical backfill. Tested TikTok exposes a changing normalized range without actual position/duration; that cannot supply these duration-based metrics. Other source/layout and lifecycle gates remain. Confirmed playback is duration, not a completion count.",
+    "largeTextDiagnosis": "Diagnostic test 7a9792b02b2105d5a23a61146841037f313a1f50f3e39963c9780c1be7e2677e returns code0 at unknown: recorded bounds jump from above the viewport to its clipped bottom then below it. Guarded failure capture confirms sweep ends at page top. Direction-aware smaller slow gutter swipes precede the 74-check pass. Historical 150/157 streams remain insufficient.",
+    "consentQualification": {
+      "testSha256": "5537fbbfe7906439c7c54c3ad2b25ed326c09fd6f8bf1f382dc7d2b36c297e5e",
+      "checks": 24,
+      "result": "PASS; raw instrumentation -1 on installed d9d7d1",
+      "scope": "Separate actual ReelsCoordinator instance, unique encrypted store/key, existing fingerprint secret read only, real serialized production methods and synthetic AdapterFrame/ItemFrame input. Live singleton/history untouched; optional widget writes suppressed; owned worker cancelled/joined, folder/key removed and absence asserted.",
+      "cases": [
+        "successful consent advances epoch",
+        "pre-disable and disabled-epoch frames rejected without fact writes",
+        "fresh frames admitted and same visit resumes retained 3-second qualification",
+        "disabled gap adds no confirmed time or completion",
+        "stale revision fails without changing acquisition epoch",
+        "new uninterrupted visit qualifies completion separately",
+        "confirmed facts survive disabling"
+      ],
+      "grantSetup": "Initial test 1b07d7f3703184e8eec36f62e961a33e0923db8677142cdb1f54dbe557e193f2 fails actual-grant precondition after instrumentation startup; no behavioral acceptance. Final test signals bounded grant wait; host restores only hash-matched original own service after attachment. Real grant required, never mocked."
+    }
   },
   "host": {
     "jest": "155 tests / 18 suites pass",
@@ -53,7 +84,8 @@
     "latestTestOnlyBuild": "pass; 26s, 315 tasks, 31 executed",
     "checkpointEpochGuardPreviewLintBuild": "pass; 59s, 478 tasks, 35 executed; no runtime qualification of the added epoch fence",
     "nativeLint": "0 errors, 170 warnings",
-    "dependenciesSchemaVersion": "unchanged"
+    "dependenciesSchemaVersion": "unchanged",
+    "continuationTestBuilds": "Diagnostic 1m29s/315 tasks/34 executed; adaptive 1m4s/315/31; grant-wait 25s/315/31; final numeric audit 24s/315/31. One nullable-Triple compile failure corrected before the final audit build. Later failure-capture pre-window guard is compile-only; prior passes retain their original test hashes."
   },
   "retainedFailures": [
     "Initial input check fails code0 during the maintainer-reported call interruption; exact product/input cause unestablished, no acceptance",
@@ -62,8 +94,27 @@
     "After owned-test removal, selected own Accessibility state differs and the guarded product install rejects; shell sequence incorrectly continues and a newer test hits NoSuchMethod on old product. No feature acceptance or proven OEM cause; guarded sequence, exact original restoration and independently matched product precede retry",
     "Initial isolated playback fixture has onboardingSeen=false and enters the tour instead of Today; returning-user fixture correction precedes 121-check pass",
     "150/157 large-text streams miss lower-stat occlusion in visual review. Latest stricter navigation-container/parent boundary trial fails unknown-status reveal; no full large-text acceptance or diagnosed product defect",
-    "Some immediate Accessibility master restores revert to zero despite own service selection. Targeted restart of only the hash-matched original own service establishes final exact selected-service/master equality. Final Today still warns counting is not on; actual binding remains unresolved."
+    "Some immediate Accessibility master restores revert to zero despite own service selection. Targeted restart of only the hash-matched original own service establishes final exact selected-service/master equality. Final Today still warns counting is not on; actual binding remains unresolved.",
+    "Resumed diagnostic sweep repeats the unknown-stage failure with new bounds/capture evidence, then direction-aware smaller swipes pass; original offset hypothesis is narrowed to observed overshoot rather than assumed product defect.",
+    "Initial isolated actual-owner trial fails actual-grant precondition after instrumentation startup; bounded host restoration of original own service precedes final 24-check pass.",
+    "First exact-time audit build fails nullable Triple typing; local non-null values correct compilation before any final audit invocation."
   ],
   "boundaries": "No real history reset/restore, source/provider/grant expansion, saved rule/group changes, backup-choice change, emulator, release build, main merge, workflow, signing or Play action; temporary own-service/font changes are restored against the fresh baseline",
-  "finalCleanup": "29 owned phone captures removed; all 30 allowlisted capture paths independently absent, isolated playback directories absent, hash-owned test removed and absence checked, no active instrumentation, volatile fixtures cleared through own-app restart. Exact installed checkpoint product and original appearance/backup/font/selected Accessibility/master hashes match. Fresh own Today visually reviewed; actual collection readiness remains unqualified. Private host baseline/captures/checkpoint remain ignored for continuation."
+  "finalCleanup": "Resumed batch: 15 hash-owned phone captures removed; all 31 allowlisted paths independently absent, both isolated playback directory prefixes absent, unique aliases asserted deleted by runners. Hash-owned test removed, no active instrumentation, own process restarted and original appearance/backup/font/selected services/master independently match. Installed d9 product independently matches; actual own service bound, user-zero package not stopped, own Today foreground and no setup warning visually reviewed. Real history retained; source launch contributes ordinary usage observations. Private host records remain ignored.",
+  "liveNumericTimeAudit": {
+    "source": "tiktok",
+    "sourceVersion": "47.7.3",
+    "productSha256": "d9d7d1b65dadb0fe92582c2e4eec26d5b36ccc1794a3a6bad1ba1c46811870ea",
+    "testSha256": "9f8c044f80c5757045ce8ee05eae8ef688553a81b244ac6fae8c8b2be9fa2606",
+    "samples": 50,
+    "qualifiedViewerSamples": 50,
+    "normalizedProgressSamples": 50,
+    "distinctNormalizedValues": 38,
+    "numericPositionDurationSamples": 0,
+    "sameItemNumericAdvances": 0,
+    "sourceGestures": 0,
+    "result": "Bounded no-action read completes raw -1; source fidelity for confirmed playback remains unavailable in this layout. New exact-time counters distinguish normalized progress from the position/duration inputs consumed by statistics; no repeated unchanged generic progress trial.",
+    "privacy": "Existing allowed source only, no consent/provider preference changes or raw labels/screenshots retained; no notification/media/root access."
+  },
+  "continuationSourceBase": "73467ee6f3e02747d6f5bb7b29896849fc5245a8"
 }

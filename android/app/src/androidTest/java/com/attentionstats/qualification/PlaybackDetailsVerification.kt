@@ -74,17 +74,18 @@ internal object PlaybackDetailsVerification {
             }
             error("Playback own tab unavailable")
         }
-        fun scroll(up: Boolean) {
+        fun scroll(up: Boolean, distance: Int? = null) {
             expect(visit { it.isVisibleToUser })
             val density = target.resources.displayMetrics.density
             val height = target.resources.displayMetrics.heightPixels
             val x = (8 * density).toInt()
-            val a = height * (if (up) 62 else 30) / 100
-            val z = height * (if (up) 30 else 62) / 100
-            shell("input touchscreen swipe $x $a $x $z 300"); SystemClock.sleep(300)
+            val a = height / 2
+            val delta = distance ?: height / 5
+            val z = a + if (up) -delta else delta
+            shell("input touchscreen swipe $x $a $x $z 600"); SystemClock.sleep(300)
         }
         fun requireLabel(label: String) {
-            repeat(24) { index ->
+            repeat(48) { index ->
                 // Large text makes the tab bar two rows tall; derive the real occlusion
                 // boundary instead of accepting a statistic underneath the navigation.
                 var bottom = Int.MAX_VALUE
@@ -109,12 +110,29 @@ internal object PlaybackDetailsVerification {
                     false
                 }
                 check(bottom != Int.MAX_VALUE) { "Playback content viewport unavailable" }
+                var foundBounds: Rect? = null
                 if (visit { node ->
                     val b = Rect().also { node.getBoundsInScreen(it) }
+                    if (named(node, label)) foundBounds = b
                     named(node, label) && node.isVisibleToUser && b.top >= 70 && b.bottom < bottom - 12
                 }) { checks++; return }
-                scroll(index < 12)
+                instrumentation.sendStatus(1, Bundle().apply {
+                    putString("stream", "Playback seek: step=$index bounds=$foundBounds bottom=$bottom")
+                })
+                // Node bounds can be clipped (even inverted) outside the ScrollView.
+                // Follow their side of the viewport and slow near its visible edges;
+                // a fixed down/up sweep can jump over a whole large-text paragraph.
+                val b = foundBounds
+                val up = b?.let { it.top >= 70 && it.bottom >= 70 } ?: (index < 24)
+                val near = b != null && b.top < bottom && b.bottom > 0
+                scroll(up, if (near) target.resources.displayMetrics.heightPixels / 12 else null)
             }
+            check(visit { it.isVisibleToUser }) { "Own playback failure window unavailable" }
+            val bitmap = checkNotNull(automation.takeScreenshot())
+            if (visit { it.isVisibleToUser }) File(target.cacheDir, "playback-details-failure.png").outputStream().use {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+            }
+            bitmap.recycle()
             error("Playback expected state unavailable: $label")
         }
         fun capture(name: String) {

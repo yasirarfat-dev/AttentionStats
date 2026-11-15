@@ -33,6 +33,9 @@ internal object NumericPlaybackAudit {
         val values = mutableMapOf<String, MutableSet<Double>>()
         var viewers = 0
         var progressSamples = 0
+        var numericTimeSamples = 0
+        var sameItemNumericAdvances = 0
+        var previousNumeric: Triple<Long, Long, Long>? = null
         var standaloneAds = 0
         val classifications = mutableMapOf<String, Int>()
         var rootRefreshes = 0; var cacheClears = 0
@@ -69,6 +72,17 @@ internal object NumericPlaybackAudit {
                 // It never becomes an eligible auto-scroll viewer from this audit.
                 if (frame.surface == Surface.REELS && frame.route == ReelRoute.VIEWER) viewers++
                 if (frame.progress != null) progressSamples++
+                val identity = frame.identity; val position = frame.positionMs; val duration = frame.durationMs
+                val numeric = if (frame.surface == Surface.REELS && frame.route == ReelRoute.VIEWER &&
+                    identity != null && position != null && duration != null)
+                    Triple(identity, position, duration) else null
+                if (numeric != null) {
+                    numericTimeSamples++
+                    val previous = previousNumeric
+                    if (previous != null && previous.first == numeric.first && previous.third == numeric.third &&
+                        numeric.second > previous.second) sameItemNumericAdvances++
+                }
+                previousNumeric = numeric
                 if (frame.standaloneAd) standaloneAds++
                 if (refreshProbe) {
                     check(frame.surface == Surface.REELS && frame.route == ReelRoute.VIEWER && frame.identity != null) {
@@ -147,6 +161,7 @@ internal object NumericPlaybackAudit {
         }
         return JSONObject().put("viewerSamples", viewers).put("samples", 50).put("matches", JSONObject(matches as Map<*, *>))
             .put("classifications", JSONObject(classifications as Map<*, *>)).put("progressSamples", progressSamples)
+            .put("numericPositionDurationSamples", numericTimeSamples).put("sameItemNumericAdvances", sameItemNumericAdvances)
             .put("standaloneAdSamples", standaloneAds)
             .put("distinctValues", JSONObject(values.mapValues { it.value.size } as Map<*, *>))
             .put("refreshProbe", refreshProbe).put("rootRefreshes", rootRefreshes).put("cacheClears", cacheClears)
