@@ -16,10 +16,13 @@ import org.json.JSONObject
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-/** Actual HUD Start, up to three consecutive automatic transitions, then actual Stop. No source input. */
+/** Actual HUD Start, bounded consecutive automatic transitions, then actual Stop. No source input. */
 internal object LiveAutoScrollContinuousVerification {
-    fun run(instrumentation: Instrumentation, key: String, adOnly: Boolean = false, mixedAds: Boolean = false): String {
-        val required = if (adOnly) 1 else 3
+    fun run(instrumentation: Instrumentation, key: String, adOnly: Boolean = false, mixedAds: Boolean = false,
+        transitions: Int = 3, seconds: Int = 180): String {
+        require(transitions in 1..20 && seconds in 30..900)
+        val required = if (adOnly) 1 else transitions
+        val durationMs = if (adOnly) 15_000L else seconds * 1_000L
         val owner = ReelsCoordinator.get(instrumentation.targetContext)
         val app = checkNotNull(ReelApp.byKey(key))
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
@@ -90,6 +93,15 @@ internal object LiveAutoScrollContinuousVerification {
         var samples = 0; var numeric = 0; var unknown = 0; var independent = 0
         var previous = initial
         val kinds = mutableMapOf<String, Int>()
+        fun awaitHud(label: String, matches: (LiveHudVerification.State) -> Boolean): LiveHudVerification.State {
+            val until = SystemClock.elapsedRealtime() + 3_000
+            do {
+                val state = LiveHudVerification.state(instrumentation, automation)
+                if (matches(state)) return state
+                SystemClock.sleep(100)
+            } while (SystemClock.elapsedRealtime() < until)
+            error("owned HUD did not settle: $label")
+        }
         try {
             reminders(false)
             main {
@@ -109,7 +121,9 @@ internal object LiveAutoScrollContinuousVerification {
             check(hud.header != null && !hud.paused) { "visible unpaused HUD required" }
             expandedByTest = !hud.expanded
             if (expandedByTest) LiveHudVerification.choose(instrumentation, automation, "header")
+            awaitHud("expanded Off control") { it.header != null && it.expanded && !it.paused && it.controls.singleOrNull()?.first == "off" }
             LiveHudVerification.choose(instrumentation, automation, "off")
+            awaitHud("started On control") { AutoScrollSession.running && it.controls.singleOrNull()?.first == "on" }
             check(AutoScrollSession.running) { "actual HUD Start failed" }
             instrumentation.sendStatus(1, android.os.Bundle().apply {
                 putString("stream", "CONTINUOUS_STARTED: actual HUD On; source=$key; setupSwipes=0; requiredTransitions=$required; standaloneAd=$adOnly")
@@ -117,7 +131,10 @@ internal object LiveAutoScrollContinuousVerification {
             val start = SystemClock.elapsedRealtime()
             var nextStatus = start
             var nextScan = start
-            while (SystemClock.elapsedRealtime() - start < (if (adOnly) 15_000 else 180_000) && independent < required) {
+            while (SystemClock.elapsedRealtime() - start < durationMs && independent < required) {
+                check(stages.keys.none { it in setOf("manual_scroll", "manual_click") }) {
+                    "manual source input interrupted the trial; stages=$stages"
+                }
                 check(owner.allowed(app) && owner.serviceConnected && AutoScrollSession.running) { "source/service/run interrupted" }
                 val now = SystemClock.elapsedRealtime()
                 if (now >= nextScan) {

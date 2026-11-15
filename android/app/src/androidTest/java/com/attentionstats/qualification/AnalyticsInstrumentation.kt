@@ -57,9 +57,13 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var historyStale = false
     private var numericAudit: String? = null
     private var numericAuditRefresh = false
+    private var numericAuditExpanded = false
+    private var visualProgressAudit: String? = null
     private var informationUi: String? = null
     private var numericMediaProbe: String? = null
     private var autoScrollContinuous: String? = null
+    private var autoScrollTransitions = 3
+    private var autoScrollSeconds = 180
     private var standaloneAdLive = false
     private var mixedAdsLive = false
     private var builtinScrollProbe: String? = null
@@ -78,9 +82,13 @@ class AnalyticsInstrumentation : Instrumentation() {
         breakTiming = arguments?.getString("breakTiming") == "true"
         numericAudit = arguments?.getString("numericAudit")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         numericAuditRefresh = arguments?.getString("numericAuditRefresh") == "true"
+        numericAuditExpanded = arguments?.getString("numericAuditExpanded") == "true"
+        visualProgressAudit = arguments?.getString("visualProgressAudit")?.takeIf { it in setOf("tiktok", "youtube") }
         informationUi = arguments?.getString("informationUi")?.takeIf { it in setOf("today", "insights", "settings", "protect", "native", "editors", "tour", "today-layout", "today-count-only", "appearance-draft", "appearance-themes", "playback-details", "playback-consent") }
         numericMediaProbe = arguments?.getString("numericMediaProbe")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollContinuous = arguments?.getString("autoScrollContinuous")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
+        autoScrollTransitions = arguments?.getString("autoScrollTransitions")?.toIntOrNull()?.takeIf { it in 1..20 } ?: 3
+        autoScrollSeconds = arguments?.getString("autoScrollSeconds")?.toIntOrNull()?.takeIf { it in 30..900 } ?: 180
         standaloneAdLive = arguments?.getString("standaloneAdLive") == "true"
         mixedAdsLive = arguments?.getString("mixedAdsLive") == "true"
         autoScrollInterruption = arguments?.getString("autoScrollInterruption") == "true"
@@ -154,11 +162,16 @@ class AnalyticsInstrumentation : Instrumentation() {
                 finish(Activity.RESULT_OK, result); return
             }
             autoScrollContinuous?.let { source ->
-                result.putString("stream", LiveAutoScrollContinuousVerification.run(this, source, standaloneAdLive, mixedAdsLive))
+                result.putString("stream", LiveAutoScrollContinuousVerification.run(this, source, standaloneAdLive, mixedAdsLive,
+                    autoScrollTransitions, autoScrollSeconds))
                 finish(Activity.RESULT_OK, result); return
             }
             numericMediaProbe?.let { source ->
                 result.putString("stream", NumericMediaSessionProbe.run(this, source))
+                finish(Activity.RESULT_OK, result); return
+            }
+            visualProgressAudit?.let { source ->
+                result.putString("stream", VisualProgressAudit.run(this, source))
                 finish(Activity.RESULT_OK, result); return
             }
             if (widgets) {
@@ -200,7 +213,7 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             val audit = numericAudit
             if (audit != null) {
-                result.putString("stream", NumericPlaybackAudit.run(this, audit, numericAuditRefresh))
+                result.putString("stream", NumericPlaybackAudit.run(this, audit, numericAuditRefresh, numericAuditExpanded))
                 finish(Activity.RESULT_OK, result); return
             }
             if (autoScrollInterruption) {

@@ -17,7 +17,8 @@ import org.json.JSONObject
 
 /** No-action operator audit. Only exact numeric formats and fixed player tokens leave live nodes. */
 internal object NumericPlaybackAudit {
-    fun run(instrumentation: Instrumentation, key: String, refreshProbe: Boolean = false): String {
+    fun run(instrumentation: Instrumentation, key: String, refreshProbe: Boolean = false,
+        expandedViews: Boolean = false): String {
         check(!refreshProbe || Build.VERSION.SDK_INT >= 34) { "cache comparison requires API34+" }
         val app = checkNotNull(ReelApp.byKey(key))
         val coordinator = ReelsCoordinator.get(instrumentation.targetContext)
@@ -28,6 +29,7 @@ internal object NumericPlaybackAudit {
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
         automation.serviceInfo = automation.serviceInfo.apply {
             flags = flags or android.accessibilityservice.AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
+            if (expandedViews) flags = flags or android.accessibilityservice.AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS
         }
         val matches = mutableMapOf<String, Int>()
         val values = mutableMapOf<String, MutableSet<Double>>()
@@ -143,6 +145,14 @@ internal object NumericPlaybackAudit {
                                 PlaybackTimeParser.parse(label)?.let { (position, duration) -> found(field, position.toDouble() / duration) }
                                 PlaybackTimeParser.elapsed(label)?.let { found("$field-clock", it.toDouble()) }
                                 if (label?.toString() in setOf("Play", "Pause", "Replay", "Replay video", "Watch again")) found("fixed_player_token")
+                                val fixedContext = label?.toString()?.takeIf { it in setOf("LIVE", "Live", "Watch LIVE",
+                                    "Tap to watch LIVE", "Photo mode", "View photos", "Sponsored", "Paid partnership", "Ad") }
+                                if (fixedContext != null) found("fixed_context_${fixedContext.lowercase().replace(' ', '_')}")
+                                if ((cls.endsWith("SeekBar") || cls.endsWith("ProgressBar") ||
+                                        listOf("seek", "progress", "time").any { id.contains(it, ignoreCase = true) }) &&
+                                    label != null && label.length <= 160 &&
+                                    Regex("(?<![0-9:])[0-9]{1,2}:[0-9]{2}(?::[0-9]{2})?(?![0-9:])").findAll(label)
+                                        .any { PlaybackTimeParser.elapsed(it.value) != null }) found("$field-clock_shape_on_player_candidate")
                                 if (label?.toString() in setOf("Skip ad", "Skip ads", "Skip Ad", "Skip Ads", "Skip")) {
                                     found("skip_label")
                                     if (node.isClickable && node.isEnabled) found("skip_label_clickable_enabled")
@@ -162,6 +172,7 @@ internal object NumericPlaybackAudit {
         return JSONObject().put("viewerSamples", viewers).put("samples", 50).put("matches", JSONObject(matches as Map<*, *>))
             .put("classifications", JSONObject(classifications as Map<*, *>)).put("progressSamples", progressSamples)
             .put("numericPositionDurationSamples", numericTimeSamples).put("sameItemNumericAdvances", sameItemNumericAdvances)
+            .put("expandedVisibleViews", expandedViews)
             .put("standaloneAdSamples", standaloneAds)
             .put("distinctValues", JSONObject(values.mapValues { it.value.size } as Map<*, *>))
             .put("refreshProbe", refreshProbe).put("rootRefreshes", rootRefreshes).put("cacheClears", cacheClears)

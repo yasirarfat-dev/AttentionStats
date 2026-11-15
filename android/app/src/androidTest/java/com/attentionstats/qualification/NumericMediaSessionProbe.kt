@@ -22,6 +22,9 @@ import java.util.concurrent.TimeUnit
 
 /** Operator-only numeric research. No provider controls, titles, artwork or production grant. */
 internal object NumericMediaSessionProbe {
+    @Suppress("DEPRECATION") // Research-only API29 discovery; deprecated in API37, never a product dependency.
+    private fun alternativeSessions(manager: MediaSessionManager, app: ReelApp): Int =
+        manager.session2Tokens.count { app.owns(it.packageName) }
     fun run(instrumentation: Instrumentation, key: String): String {
         check(Build.VERSION.SDK_INT >= 29) { "shell-scoped probe requires API29" }
         val app = checkNotNull(ReelApp.byKey(key))
@@ -49,11 +52,20 @@ internal object NumericMediaSessionProbe {
             error("selected source lost foreground")
         }
         val manager = context.getSystemService(MediaSessionManager::class.java)
+        check(owner.allowed(app) && !AutoScrollSession.running)
+        val initialRoot = sourceRoot()
+        val initialSnapshot = try { SnapshotReader.read(initialRoot, app.packages) } finally { SnapshotReader.recycle(initialRoot) }
+        val initialFrame = AdapterRegistry.of(app).read(initialSnapshot)
+        check(initialSnapshot.complete && !initialSnapshot.typing && initialFrame.surface == Surface.REELS && initialFrame.route == ReelRoute.VIEWER)
+        // Discovery before shell adoption distinguishes the ordinary-UID alternative.
+        val alternativeSessionCount = alternativeSessions(manager, app)
         var matching = 0
         var ambiguous = 0
         var positiveDuration = 0
         var playing = 0
         var usable = 0
+        var freshPlaying = 0
+        var positiveSpeed = 0
         val positions = mutableSetOf<Long>()
         val durations = mutableSetOf<Long>()
         automation.adoptShellPermissionIdentity("android.permission.MEDIA_CONTENT_CONTROL")
@@ -76,6 +88,10 @@ internal object NumericMediaSessionProbe {
                     val position = state?.position ?: -1L
                     if (duration > 0) { positiveDuration++; durations.add(duration) }
                     if (state?.state == PlaybackState.STATE_PLAYING) playing++
+                    if (state != null && state.playbackSpeed.isFinite() && state.playbackSpeed > 0) positiveSpeed++
+                    if (state != null && state.state == PlaybackState.STATE_PLAYING &&
+                        state.lastPositionUpdateTime > 0 && SystemClock.elapsedRealtime() - state.lastPositionUpdateTime in 0..2_000)
+                        freshPlaying++
                     if (duration > 0 && position in 0..duration && state?.state == PlaybackState.STATE_PLAYING) {
                         usable++; positions.add(position)
                     }
@@ -84,8 +100,10 @@ internal object NumericMediaSessionProbe {
             }
         } finally { automation.dropShellPermissionIdentity() }
         return JSONObject().put("samples", 30).put("matchingSessionSamples", matching)
+            .put("unprivilegedSession2Tokens", alternativeSessionCount)
             .put("ambiguousSessionSamples", ambiguous).put("positiveDurationSamples", positiveDuration)
             .put("playingStateSamples", playing).put("usableNumericSamples", usable)
+            .put("freshPlayingStateSamples", freshPlaying).put("positivePlaybackSpeedSamples", positiveSpeed)
             .put("distinctUsablePositions", positions.size).put("distinctPositiveDurations", durations.size)
             .put("sourceGestures", 0).put("contentFieldsRead", false).put("productionPermissionAdded", false).toString()
     }

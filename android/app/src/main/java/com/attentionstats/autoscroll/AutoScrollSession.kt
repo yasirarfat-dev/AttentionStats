@@ -119,7 +119,10 @@ internal object AutoScrollSession {
         // Suppress only that bounded scroll tail. Clicks, context changes and Stop
         // remain immediate; an actual different page still fails the frame fence.
         if (running && (reason != "manual_scroll" ||
-            (waitingUntil == 0L && SystemClock.elapsedRealtime() >= scrollSettlingUntil))) suspendActions(reason)
+            (waitingUntil == 0L && SystemClock.elapsedRealtime() >= scrollSettlingUntil))) {
+            onDispatchDiagnostic?.invoke(reason)
+            suspendActions(reason)
+        }
     }
     fun frame(value: Frame, next: (Frame, Long) -> Unit) {
         latest = value
@@ -133,16 +136,28 @@ internal object AutoScrollSession {
             value.position?.let { gate.sample(key, value.atMs, it, true) }
             return
         }
-        if (!enabled || !value.eligible || !fresh(value) || value.app.key != previous.app ||
+        if (!enabled || !value.eligible || value.app.key != previous.app ||
             value.window != previous.window || value.epoch != previous.epoch) {
             onDispatchDiagnostic?.invoke(when {
                 !enabled -> "frame_disabled"
                 !value.eligible -> "frame_ineligible"
-                !fresh(value) -> "frame_stale"
                 value.app.key != previous.app -> "frame_source_changed"
                 value.window != previous.window -> "frame_window_changed"
                 else -> "frame_epoch_changed"
             })
+            suspendActions("context_changed"); return
+        }
+        if (!fresh(value)) {
+            val now = SystemClock.elapsedRealtime()
+            // A slow acquisition during our swipe is not an arrival or a new action.
+            // Keep waiting for a fresh page within the original deadline. Context,
+            // consent and Stop still invalidate the token; future timestamps do too.
+            if (waitingUntil > 0 && value.atMs <= now) {
+                if (now >= waitingUntil) suspendActions("next_page_unconfirmed")
+                else onDispatchDiagnostic?.invoke("arrival_stale_frame")
+                return
+            }
+            onDispatchDiagnostic?.invoke("frame_stale")
             suspendActions("context_changed"); return
         }
         if (waitingUntil > 0) {

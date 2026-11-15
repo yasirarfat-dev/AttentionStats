@@ -16,6 +16,8 @@ internal object AutoScrollSafetyVerification {
         var checks = 0
         var proposals = 0
         var observer: (() -> Unit)? = null
+        var originalDiagnostic: ((String) -> Unit)? = null
+        val diagnosticCodes = mutableSetOf<String>()
         var wasEnabled = false
         var hadNotice = false
         fun main(action: () -> Unit) {
@@ -23,7 +25,7 @@ internal object AutoScrollSafetyVerification {
             instrumentation.runOnMainSync { try { action() } catch (caught: Throwable) { failure = caught } }
             failure?.let { throw it }
         }
-        fun expect(value: Boolean) { check(value) { "auto-scroll safety ${checks + 1}" }; checks++ }
+        fun expect(value: Boolean) { check(value) { "auto-scroll safety ${checks + 1}; proposals=$proposals; attempts=${AutoScrollSession.attempts}; confirmed=${AutoScrollSession.confirmedTransitions}; reason=${AutoScrollSession.reason}; running=${AutoScrollSession.running}" }; checks++ }
         main {
             check(!AutoScrollSession.running) {
                 "active convenience run preserved; stop it before isolated checks"
@@ -31,6 +33,8 @@ internal object AutoScrollSafetyVerification {
             wasEnabled = AutoScrollSession.enabled
             hadNotice = AutoScrollSession.noticeAccepted
             observer = AutoScrollSession.onChanged
+            originalDiagnostic = AutoScrollSession.onDispatchDiagnostic
+            AutoScrollSession.onDispatchDiagnostic = { diagnosticCodes.add(it) }
             AutoScrollSession.onChanged = {}
         }
         fun feed(page: Long, position: Double?, kind: String = "unknown") = main {
@@ -67,6 +71,15 @@ internal object AutoScrollSafetyVerification {
                 expect(AutoScrollSession.current(pending))
                 expect(AutoScrollSession.reason == "advancing")
                 expect(!AutoScrollSession.canStart())
+                diagnosticCodes.clear()
+                AutoScrollSession.manualInteraction("manual_scroll")
+                expect(AutoScrollSession.current(pending) && "manual_scroll" !in diagnosticCodes)
+                for (page in listOf(1L, 2L)) {
+                    AutoScrollSession.frame(AutoScrollSession.Frame(ReelApp.INSTAGRAM, 1, page, 1,
+                        SystemClock.elapsedRealtime() - 1_000, .2, true)) { _, _ -> proposals++ }
+                    expect(AutoScrollSession.current(pending) && AutoScrollSession.reason == "advancing")
+                    expect(AutoScrollSession.confirmedTransitions == 0 && proposals == 1)
+                }
                 AutoScrollSession.transientUnavailable("hud_snapshot_missing", ReelApp.INSTAGRAM, 1)
                 expect(AutoScrollSession.current(pending) && AutoScrollSession.reason == "advancing")
             }
@@ -91,6 +104,9 @@ internal object AutoScrollSafetyVerification {
             main {
                 AutoScrollSession.transientUnavailable("synthetic_incomplete_layout", ReelApp.INSTAGRAM, 1)
                 expect(AutoScrollSession.current(token))
+                AutoScrollSession.frame(AutoScrollSession.Frame(ReelApp.INSTAGRAM, 1, 4, 1,
+                    SystemClock.elapsedRealtime() - 1_000, .2, true)) { _, _ -> proposals++ }
+                expect(AutoScrollSession.current(token) && AutoScrollSession.confirmedTransitions == 0)
                 AutoScrollSession.expire(token, SystemClock.elapsedRealtime() + 2_500)
                 expect(!AutoScrollSession.current(token))
                 expect(AutoScrollSession.reason == "next_page_unconfirmed")
@@ -144,6 +160,7 @@ internal object AutoScrollSafetyVerification {
                         "locked" -> AutoScrollSession.unavailable("locked")
                         else -> AutoScrollSession.clear()
                     }
+                    if (boundary == "click") expect("manual_click" in diagnosticCodes)
                     expect(!AutoScrollSession.current(pending))
                     AutoScrollSession.expire(pending, SystemClock.elapsedRealtime() + 3_000)
                     AutoScrollSession.frame(AutoScrollSession.Frame(ReelApp.INSTAGRAM, 1, 11, 1,
@@ -154,6 +171,13 @@ internal object AutoScrollSafetyVerification {
                     AutoScrollSession.stop()
                 }
             }
+            main {
+                AutoScrollSession.configure(true, 2); AutoScrollSession.start()
+                diagnosticCodes.clear()
+                AutoScrollSession.manualInteraction("manual_scroll")
+                expect("manual_scroll" in diagnosticCodes && AutoScrollSession.reason == "manual_scroll" && AutoScrollSession.running)
+                AutoScrollSession.stop()
+            }
             // Separate full-page ads can advance without numeric playback, but only with
             // the source-qualified marker and the same fresh context/one-shot fences.
             fun adFrame(marked: Boolean = true, app: ReelApp = ReelApp.FACEBOOK,
@@ -162,6 +186,22 @@ internal object AutoScrollSafetyVerification {
             main {
                 AutoScrollSession.stop()
                 expect(runCatching { AutoScrollSession.configure(true, 1) }.isFailure)
+                // Old samples cannot erase pending arrival, cross context fences, or
+                // extend its deadline. Future samples remain invalid in every state.
+                val old = adFrame().copy(atMs = SystemClock.elapsedRealtime() - 1_000)
+                for (unsafe in listOf(old.copy(app = ReelApp.TIKTOK), old.copy(window = 2),
+                    old.copy(epoch = 2), old.copy(eligible = false),
+                    old.copy(atMs = SystemClock.elapsedRealtime() + 60_000))) {
+                    proposals = 0; AutoScrollSession.configure(true, 2)
+                    AutoScrollSession.configureAds(true, 2); AutoScrollSession.start()
+                    AutoScrollSession.frame(adFrame()) { _, _ -> proposals++ }
+                    AutoScrollSession.frame(adFrame()) { _, _ -> proposals++ }
+                    val pending = AutoScrollSession.revision
+                    expect(proposals == 1 && AutoScrollSession.current(pending))
+                    AutoScrollSession.frame(unsafe) { _, _ -> proposals++ }
+                    expect(!AutoScrollSession.current(pending) && AutoScrollSession.confirmedTransitions == 0 && proposals == 1)
+                }
+                AutoScrollSession.configure(false, 2)
                 proposals = 0; AutoScrollSession.configure(true, 2); AutoScrollSession.start()
                 expect(!AutoScrollSession.skipStandaloneAds)
                 AutoScrollSession.frame(adFrame()) { _, _ -> proposals++ }
@@ -223,6 +263,7 @@ internal object AutoScrollSafetyVerification {
                     if (!wasEnabled) AutoScrollSession.configure(false, 2)
                 }
                 AutoScrollSession.onChanged = checkNotNull(observer)
+                AutoScrollSession.onDispatchDiagnostic = originalDiagnostic
             }
         }
         return checks
