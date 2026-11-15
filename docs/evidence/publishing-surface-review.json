@@ -1,0 +1,121 @@
+{
+  "date": "2026-11-15",
+  "tasks": [
+    "AS-018",
+    "AS-027",
+    "AS-045",
+    "AS-049",
+    "AS-056",
+    "AS-057"
+  ],
+  "status": "paused for maintainer taking phone; full feature/UI acceptance incomplete; publication HOLD",
+  "maintainerOrder": "Verify every implemented feature and rendered UI surface before further release build/publication; only initial closed-test 1.0.0 has been published",
+  "product": {
+    "sha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690",
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "physicalApi": 36
+  },
+  "testSha256": "28c2df1a5e576b48d524f5a55939865a80d4db865e76bf2082c4c98d2395bd82",
+  "surfaces": [
+    {
+      "key": "today",
+      "scope": "Today, Viewing Details, source/app/hour details and quick actions",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "insights",
+      "scope": "Week/Month/All Time, day/app explorers and calendars",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "focus",
+      "scope": "Protect hub, focus chooser/review, Block Apps/Allow Only and safe End",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "schedules",
+      "scope": "Schedules, slots, group editor, installed-app selection, drafts/Back",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "breaks",
+      "scope": "Mindful breaks, count/time, invitations, interruption/dismissal",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "blocks",
+      "scope": "Short-video blocks/daily limits, per-app controls and safe exits",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "sources",
+      "scope": "Counting/source disclosure, independent choices and permission health",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "counter",
+      "scope": "Live Counter configuration and actual HUD controls",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "settings",
+      "scope": "Settings navigation, help, feedback and provider guidance",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "appearance",
+      "scope": "Templates/Customization, color/layout drafts, save/discard/reset",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "backup",
+      "scope": "Native backup/status, file export/import review/cancel and recovery",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "deletion",
+      "scope": "Consequential history deletion review/cancel and isolated actual erase",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "onboarding",
+      "scope": "Three-step welcome tour, disclosures, optional setup and Back",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "widgets",
+      "scope": "Five galleries, attached rendering/configuration and launcher boundaries",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    },
+    {
+      "key": "crosscutting",
+      "scope": "Large type, themes, keyboard/insets, focus/TalkBack, motion and frame behavior",
+      "status": "pending current review; historical scoped evidence retained in FEATURE-VERIFICATION.md"
+    }
+  ],
+  "trials": [
+    {
+      "mode": "informationUi=settings",
+      "result": "FAIL: own information control unavailable: Today",
+      "instrumentationCode": 0,
+      "scope": "No named help checks completed; failure may be startup/window/action harness-related but cause is unestablished. No Settings defect or acceptance inferred.",
+      "next": "Inspect actual own-app window acquisition/startup and click route before retrying; retain failure instead of repeating unchanged mode."
+    }
+  ],
+  "cleanup": {
+    "state": "complete for this attempted batch; phone released to maintainer",
+    "noActiveInstrumentation": true,
+    "ownedTestRemovedAndAbsenceChecked": true,
+    "originalProductAppearanceBackupFontAccessibility": "independently match fresh baseline",
+    "deviceCaptures": "none created by failed Settings mode",
+    "resume": "Require phone availability again; create fresh ownership/preservation baseline and do not reuse removed private records",
+    "privateHostRecordsRemoved": true
+  },
+  "limits": [
+    "Help opens/closes and static visual inspection alone do not qualify feature behavior or smooth frame pacing",
+    "This phone cannot qualify every OEM/API/locale; emulator/other-device work remains deferred",
+    "History synthetic navigation acceptance retains its separate product/test evidence",
+    "No release artifact installation, upload-key signing, main merge, Console submission or rollout"
+  ]
+}

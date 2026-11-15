@@ -5,6 +5,10 @@
 **Related specifications:** [Testing](TESTING.md), [Security](SECURITY.md), [Dependencies](DEPENDENCIES.md), [Contributing](CONTRIBUTING.md), [State](STATE.md).
 **Unresolved feasibility:** F-01–F-04 and F-08 in [Decisions](DECISIONS.md); exact Console artifact/source mapping, review status and broader qualification remain to be verified separately from the publication report.
 
+## Current production-access update (2026-11-15)
+
+The maintainer reports Google Play production access is granted and requests the next version today, after resolving release failures. Earlier eligibility/application preparation below is historical. Console versions, warnings, declarations and artifact provenance still require verification; no production candidate has been submitted by this continuation. Account access does not close the release gates or authorize an unreviewed main merge. The maintainer subsequently clarifies the order: verify all implemented features and rendered UI surfaces first, then build for release/publication; only initial closed-test 1.0.0 has been published. Follow the [latest phone-release checkpoint](PUBLISHING-PHASE.md) and incomplete [surface ledger](evidence/publishing-surface-review.json).
+
 ## Production-access continuation (2026-11-12)
 
 **Active execution plan (14/11/26):** [Next Google Play publishing phase](PUBLISHING-PHASE.md) organizes verification and polish of implemented features into small checkpointed batches before the next Play release. New features follow publication; existing readiness gates and the concrete-candidate merge agreement still apply.
@@ -29,6 +33,10 @@ The [Console preparation draft](../release/PLAY-CONSOLE.md) now removes universa
 Recommended next display version is **1.1.0** for the accumulated features; **1.0.1** fits a smaller fixes-only candidate. This is a recommendation, not a version reservation or source change. [Android versioning](https://developer.android.com/studio/publish/versioning) requires a higher internal versionCode for successive releases and prohibits reusing an uploaded code; 11 is a candidate only after confirming no higher/used code in Console. Version naming does not qualify an untested binary. A concrete candidate still needs maintainer agreement before main merge, and signing/upload/rollout remain separate actions.
 
 Current develop backup exception (ADR-073/ADR-079/AS-058): `allowBackup=true` is paired with an automatic-by-default protected-transport agent that preserves saved opt-outs, and a one-file include list; live databases/keys/preferences and device transfer remain excluded. Qualify the merged manifest/resources and actual recovery before release. The default 0.1.0 `tools/release_candidate.py` profile still guards the historical all-backup-disabled candidate. A separate current profile and `tools/audit_current_release.py` now audit explicit expected versions, current package visibility/components and compiled APK/AAB backup rules. Static inspection never establishes actual framework recovery or complete release acceptance. No release upload or main merge is authorized by the current checks.
+
+## Current unsigned inspection (2026-11-15)
+
+A fresh ARM64 unsigned APK/AAB pair passes the current static audit: production identity and non-debuggable manifest, compiled cloud/transfer rules, accessibility metadata, matching assets/DEX/native libraries and 16-KiB native alignment. All 27 selected release/audit/signature/backup-policy host checks pass. Exact hashes and limitations are in [inspection evidence](evidence/publishing-release-inspection.json). This retains source version 1.0.0/code10 for inspection only; it is not an upload candidate or signed/release-runtime acceptance.
 
 ## Current public policy review (2026-11-14)
 
@@ -98,7 +106,7 @@ Select and document Play App Signing and upload-key responsibilities before publ
 
 ## Binary release gates
 
-**2026-11-15 latest assessment: HOLD.** [Publishing Appearance/Today integration](evidence/publishing-appearance-today.json) passes scoped 100%/200% actual UI, save/discard/reset and preference-preservation checks on a debug preview. This does not close original cold-history, count-only empty-copy, broader accessibility, source auto-scroll, lifecycle/data/security/resources/compatibility or distribution gates. No signed production candidate, main-merge agreement, Console submission or rollout. Continue the [latest publishing handoff](PUBLISHING-PHASE.md#latest-handoff--151126-appearance-and-today-integration).
+**2026-11-15 latest assessment: HOLD.** Isolated synthetic history navigation/calendar/races passes 123 actual RN checks plus two independent cleanup checks; fresh unsigned APK/AAB static inspection and 27 host release guards pass separately. These close only their artifact-scoped rows. Comprehensive implemented-feature/surface review remains incomplete; the first legacy Settings-help runner fails before named checks, without a diagnosed product defect. The maintainer takes the phone after state verification/test removal. Original cold-history cause, process death and broader source/auto-scroll, accessibility, lifecycle/data/recovery/security/resources/compatibility and distribution gates remain open. No release candidate or publication approval. Resume the [latest handoff](PUBLISHING-PHASE.md).
 
 **2026-11-14 assessment: HOLD.** Fresh P5 mixed-item testing passes one Facebook standalone-ad swipe followed by one numerical video-end swipe, each with native and independent arrival and actual HUD Stop. The three-arrival/180-second target remains unmet because the next reel has no usable progress; another current-item trial has no numerical signal, and a bounded numerical trial never reaches the end. Earlier zero-confirmation failures remain historical, superseded only within the scoped later passes. No timer fallback or broader continuous-source claim. [Sequential results](evidence/publication-sequence.json), [handoff](IMPLEMENTATION_LOG/2026-11-14.md). The remaining recovery, lifecycle, accessibility, resources, security, compatibility and distribution gates remain open; no merge/publication approval is inferred.
 

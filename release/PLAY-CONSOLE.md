@@ -4,6 +4,10 @@ Reviewed preparation draft for **attention.stats**, updated 12 November 2026. Th
 
 **Production hold:** resolve the [release gates](../docs/RELEASE.md#readiness-assessment-2026-11-07) on a concrete candidate before submission. The development branch adds Android-managed backup, schedules and optional auto-scroll; its listing, Data safety answers, accessibility declaration and reviewer video must describe the actual uploaded binary. Do not copy the historical no-transmission answers or claim every route is qualified. Source still declares 1.0.0 / 10; choose the next unused version code only after inspecting Console.
 
+## Production access update — 15 November 2026
+
+The maintainer reports production access is granted and Google Play awaits the next version. Resolve release failures before publishing, as explicitly requested. The maintainer clarifies that all implemented features and UI surfaces must be checked before building for release/publication; only the initial closed-test 1.0.0 has been published. The historical closed-test table and application preparation below do not describe a new submission. Verify actual Console version-code use and current warnings before selecting the next artifact; no upload, production submission or rollout is recorded here.
+
 ## App details
 
 | Field | Value |

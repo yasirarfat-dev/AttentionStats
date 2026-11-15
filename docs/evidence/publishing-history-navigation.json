@@ -5,7 +5,7 @@
     "AS-018",
     "AS-037"
   ],
-  "status": "experimental; host ordering checks pass; phone trial interrupted/unaccepted; publication HOLD",
+  "status": "experimental; 123 actual RN navigation/calendar/race checks pass; publication HOLD",
   "sourceBase": "32c49be0d4ac9c1ceb836fbea7f06ad2a9f1bd0f",
   "implementation": [
     "Three cache regressions for out-of-order range/page responses, foreground-invalidated warmup and eight-page retention",
@@ -36,16 +36,16 @@
   },
   "cleanup": {
     "responderClearedByFinally": true,
-    "isolatedStoreExecutorAndKeyCleanup": "Runner finally completed before FAIL result; independent phone reconciliation pending",
+    "isolatedStoreExecutorAndKeyCleanup": "runner finally completes; separate cleanup instrumentation passes two directory/key absence checks",
     "originalAppearanceBackupAtInstall": "hashes match fresh baseline",
-    "finalPreferencesFontProductReconciliation": "pending phone availability",
-    "ownedTestAndPhoneCaptures": "test remains installed at last observation; no capture step reached; defer cleanup until phone available",
-    "privateBaseline": "ignored fresh ownership/preservation records retained solely for safe resumption"
+    "finalPreferencesFontProductReconciliation": "pass in confirmed-availability continuation",
+    "ownedTestAndPhoneCaptures": "owned test and five fixed capture paths removed and absence checked; fresh Today reviewed",
+    "privateBaseline": "Current-batch private baseline/results/captures removed after independent phone reconciliation and reviewed aggregate evidence; require a fresh baseline on resume"
   },
   "limits": [
-    "No accepted runtime navigation/race coverage from this batch",
+    "Latest continuation accepts only its 123-check actual RN synthetic navigation/calendar/race scope; original interrupted trial remains unaccepted",
     "No real-history reset/replacement, dependency/schema/version/permission/consent expansion",
-    "Original cold-history cause, actual calendar selection, process death, density/performance and remaining release gates open",
+    "Original cold-history cause, process death, event-density/performance and remaining release gates open",
     "No emulator, main merge, workflow, signing or Play action"
   ],
   "reviewedSourceCommit": "4bbf846ecf0d65e122b0844c83cdfdbf825d5897",
@@ -56,5 +56,67 @@
     "phone": "No phone operations; availability confirmation and final cleanup still pending",
     "testBuild": "pass; 1m32s; 315 tasks, 31 executed; local only, not installed",
     "localTestSha256": "3f598833c549299f9181ca2fd236b12aa52e4e81c5062df66ceeb2c641fde8a5"
+  },
+  "continuation": {
+    "date": "2026-11-15",
+    "availability": "Maintainer explicitly confirms exclusive phone access for testing/cleanup",
+    "productSha256": "70ca95e65e01240b119009d174707a8644457d9bd11bbd0cf3e59147c97a5690",
+    "navigationTestSha256": "2af7fa1946d4320d059d1b3d083b8cafd6329efb3802a578d23c683178fb6ffd",
+    "navigation": {
+      "checks": 123,
+      "instrumentationCode": -1,
+      "scope": [
+        "oldest-page clipping and older/newer cursors",
+        "actual calendar selection and cancellation",
+        "30 Previous Day operations across a loaded-page boundary, then Next Day",
+        "late Week response cannot replace newer All Time selection",
+        "Home/foreground generation invalidation fences old completion"
+      ],
+      "visualReview": [
+        "oldest App History Dates page",
+        "selected calendar date and daily facts",
+        "cross-page selected date",
+        "All Time after late response"
+      ]
+    },
+    "retainedTrials": [
+      {
+        "result": "calendar-cancel wait22/code0",
+        "finding": "Native calendar-mode dialog omits requested title; identify DatePicker and platform controls inside owned window"
+      },
+      {
+        "result": "day-boundary wait59/code0",
+        "finding": "Date control is above navigation; bounded reverse scrolling and per-date mounted-state checks added; no product defect established"
+      },
+      {
+        "result": "startup wait3/code0",
+        "finding": "Unestablished startup/activity condition; final run starts after independently confirmed own foreground; not a repair of original cold-history regression"
+      },
+      {
+        "result": "late-range wait109/code0 after actual calendar selection",
+        "finding": "Failure capture remains on All Time; reject partially clipped controls in system chrome before touchscreen tap; final full run passes"
+      }
+    ],
+    "testBuilds": {
+      "calendar": "pass; 1m; 315 tasks, 31 executed",
+      "dayBoundary": "pass; 31s; 315 tasks, 31 executed",
+      "calendarSelection": "pass; 27s; 315 tasks, 31 executed",
+      "finalViewport": "pass; 26s; 315 tasks, 31 executed",
+      "independentCleanup": "pass; 24s; 315 tasks, 31 executed"
+    },
+    "cleanupTestSha256": "28c2df1a5e576b48d524f5a55939865a80d4db865e76bf2082c4c98d2395bd82",
+    "independentCleanup": {
+      "checks": 2,
+      "instrumentationCode": -1,
+      "scope": "Separate instrumentation invocation confirms no owned temporary directories or history-navigation Keystore aliases"
+    },
+    "preservation": "Original appearance/backup/font and installed product independently match; owned test and five fixed capture paths removed/absence checked; fresh Today rendering reviewed",
+    "hostJs": "Unchanged; earlier 151-test result retains its own scope",
+    "limits": [
+      "100 civil days with one synthetic reminder per day; not large event density or real collection",
+      "Original cold-history cause and process death unresolved",
+      "Broader UI/accessibility/source/lifecycle/recovery/security/resources/compatibility gates remain"
+    ],
+    "privateHostRecordsRemoved": true
   }
 }
