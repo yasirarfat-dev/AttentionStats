@@ -40,6 +40,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var archiveCapacity = false
     private var historicalMigrations = false
     private var databaseDurability = false
+    private var migrationRecovery = false
     private var archiveInterruption = false
     private var hudBehavior = false
     private var scheduleUi = false
@@ -125,6 +126,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         archiveCapacity = arguments?.getString("archiveCapacity") == "true"
         historicalMigrations = arguments?.getString("historicalMigrations") == "true"
         databaseDurability = arguments?.getString("databaseDurability") == "true"
+        migrationRecovery = arguments?.getString("migrationRecovery") == "true"
         archiveInterruption = arguments?.getString("archiveInterruption") == "true"
         hudBehavior = arguments?.getString("hudBehavior") == "true"
         scheduleUi = arguments?.getString("scheduleUi") == "true"
@@ -283,6 +285,10 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             if (databaseDurability) {
                 result.putString("stream", DatabaseDurabilityVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (migrationRecovery) {
+                result.putString("stream", MigrationRecoveryVerification.run(this))
                 finish(Activity.RESULT_OK, result); return
             }
             if (archiveInterruption) {

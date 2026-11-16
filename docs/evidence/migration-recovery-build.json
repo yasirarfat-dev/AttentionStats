@@ -1,0 +1,96 @@
+{
+  "date": "16/11/26",
+  "kind": "migration rejection/recovery instrumentation build only",
+  "sourceBase": "ddec1e969ed777cb2065f30dce47b3cd3034b510",
+  "runtimeStatus": "unrun; no renewed physical-phone availability supplied in this batch",
+  "phoneOperationsThisBatch": "none; no adb query, install, launch, setting change or cleanup",
+  "productionChanges": "none; no schema, collector, dependency, default, archive or version change",
+  "build": {
+    "command": "python tools/android_build.py :app:assembleDebugAndroidTest --arch arm64-v8a --reuse-daemon",
+    "result": "BUILD SUCCESSFUL",
+    "seconds": 144,
+    "tasks": 315,
+    "executed": 31,
+    "upToDate": 284,
+    "testApk": "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+    "sha256": "ff130ffb559bad5da51351221e1c4e2e3d3aaab12cb90bbe47b7e38532c402e9",
+    "bytes": 1062458,
+    "recoveryClassAndSelectorInDex": true
+  },
+  "sourceSha256LfNormalized": {
+    "android/app/src/androidTest/java/com/attentionstats/qualification/MigrationRecoveryVerification.kt": "52e694e51ad08e30d85c9dcd69e261952f3eb6dab763078b5d3a7aa928689185",
+    "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt": "648bad31448dc6c07483458681d0d4f4a574057be6cc46984c61033bac282b19",
+    "android/app/src/main/java/com/attentionstats/storage/HistoryStore.kt": "ec95b8df9aef4f4697a755c5b0752e7ce7b7e1452d5b94c074ad407982e36180",
+    "android/app/src/main/java/com/attentionstats/storage/OwnedCipherDriver.kt": "4d8d84d993ea8a87d9a30bfb083477b251decd09afe397f011b5e8ef3bca3e9b",
+    "android/app/src/main/java/com/attentionstats/storage/AttentionDatabase.kt": "8561043d0a194fb51c60f217e42d30620bc53d82f0ffd9d0d28909a68b733bc1",
+    "android/app/src/main/java/com/attentionstats/storage/LocalKeyEnvelope.kt": "32643400510adad31d7594eaacc5deb8af0823e9daa0b3fa19f19022221d38d8"
+  },
+  "exportedSchemas": [
+    {
+      "version": 1,
+      "sha256": "3712cc2c547fee43b898fe96e5f5d8bd805a083bbf36225acd82bd2f85b9333e",
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 2,
+      "sha256": "65bad14e3c0e56f5b6bab538dc6aa89901b5b2ae0b7ee7e55977c6fd5d7ad16e",
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 3,
+      "sha256": "876eb77bde5ef4f25c91047ee43c085d22213a458a86c941d5b726bdced10a49",
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 4,
+      "sha256": "a4932320e3e7eec825bdac6d69caab1e70930a22f55cf0f1cf00aea8f8d430cb",
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 5,
+      "sha256": "2dde940ec16bf55191fdc9778c1ecb3682c8743280d346ab40e4a48bcead6851",
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 6,
+      "sha256": "245f8ea7cf942f6d1f4f303973dea1c9c3ee9d70e04fece9bc1468b3dfbef9bf",
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 7,
+      "sha256": "40261c1771f4a0fb54425f0fa8cb6659df139053233909dd0c589653bee70093",
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 8,
+      "sha256": "5be0f38c135b31d2dd17fe83bae97088d2370f5593bc4ba16c48df8d1fae8219",
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 9,
+      "sha256": "28149cb4ee19bd6e1e98ce60a43b6ef930b32b6f164c9c11e6601ee8f143613b",
+      "packagedByteIdentical": true
+    }
+  ],
+  "fixtureStaticCheck": "Exported schema-8 entities/views equal schema-9 entities/views minus FactOrigin; generated 8-to-9 migration only creates FactOrigin.",
+  "preparedScope": [
+    "Unique synthetic no-backup folders and Keystore aliases; production HistoryStore.open; no live singleton",
+    "Closed parent and child exposure with unknown playback, quoted Unicode reason, disabled choices and saved breakSeconds=7",
+    "Future version 10 with retained origin and synthetic extra table; two expected production-open rejections",
+    "Schema 8 with exported identity and trigger abort during Room identity publication following generated FactOrigin DDL; two expected failed opens",
+    "Original version, every table row and sqlite_master definitions, wrapper bytes and alias preservation after each rejection; SQLite and cipher integrity",
+    "Remove only owned trigger, retry production migration, verify original application rows, saved choice, key generation and full logical reopen",
+    "Finally close owned stores, remove owned aliases/folders and assert absence"
+  ],
+  "limits": [
+    "Zero runtime assertions executed; prepared assertions and cleanup are unverified",
+    "Small synthetic fixtures; many application tables are empty, not full boundary/scale coverage",
+    "Logical snapshots do not require byte-identical encrypted database/WAL files",
+    "Future fixture is current schema plus synthetic extra table/version, not a real unknown future release",
+    "Exception during identity publication is not process kill, arbitrary cancellation, owner/UI recovery or hardware power loss",
+    "No filesystem ENOSPC, pool stress, lifetime archive, resource or Android framework recovery qualification",
+    "Existing Gradle/AGP/Kotlin/CMake deprecation warnings and missing platform-tools-package warning remain; no toolchain changes",
+    "AS-009 experimental; publication HOLD; emulator deferred"
+  ],
+  "resume": "Obtain physical-phone availability, take fresh private baseline and verify product/test pairing; run only migrationRecovery=true on explicit device; retain raw named PASS or failure, require -1 for pass, independently verify owned prefix/alias/test cleanup, original settings/product/service and no unfinished instrumentation."
+}
