@@ -45,6 +45,17 @@ def passed(raw, scope):
             and not any("FAIL:" in line or "INSTRUMENTATION_FAILED" in line for line in lines))
 
 
+def read_marker(result):
+    """An empty/not-yet-published marker is not authority to kill anything."""
+    if result.returncode != 0:
+        return None
+    try:
+        value = json.loads(result.stdout)
+    except (ValueError, UnicodeError):
+        return None
+    return value if isinstance(value, dict) else None
+
+
 class Phone:
     def __init__(self, adb, serial):
         require(bool(serial) and not serial.startswith("emulator-"), "Explicit physical target required")
@@ -125,8 +136,8 @@ def run_pair(phone, phase):
             while time.monotonic() < deadline:
                 result = subprocess.run(phone.prefix + ["exec-out", "run-as", PACKAGE, "cat", marker_path],
                                         capture_output=True, timeout=10)
-                if result.returncode == 0:
-                    marker = json.loads(result.stdout)
+                marker = read_marker(result)
+                if marker is not None:
                     break
                 require(process.poll() is None, "Preparation ended before marker; inspect private output")
                 time.sleep(0.5)

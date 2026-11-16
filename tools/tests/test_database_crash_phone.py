@@ -13,6 +13,15 @@ SPEC.loader.exec_module(runner)
 
 
 class CrashPhoneSafety(unittest.TestCase):
+    def test_marker_poll_waits_for_complete_object(self):
+        for code, raw in [(1, b'{}'), (0, b''), (0, b'{'), (0, b'null'),
+                          (0, b'[]'), (0, b'\xff')]:
+            with self.subTest(code=code, raw=raw):
+                self.assertIsNone(runner.read_marker(
+                    runner.subprocess.CompletedProcess([], code, stdout=raw)))
+        self.assertEqual(runner.read_marker(runner.subprocess.CompletedProcess(
+            [], 0, stdout=b'{"pid":123}')), {"pid": 123})
+
     def test_only_exact_single_owned_pid_authorized(self):
         marker = {"token": "synthetic", "before": True, "writerPolicyChecks": 2, "pid": 123}
         self.assertEqual(runner.kill_pid(marker, "synthetic", True, "123"), "123")
