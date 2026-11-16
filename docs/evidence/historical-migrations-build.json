@@ -1,0 +1,110 @@
+{
+  "date": "16/11/26",
+  "kind": "historical migration instrumentation build and packaged-schema inspection only",
+  "sourceBase": "83802bb45238cf35810aea4d152e5ff12ac88fa1",
+  "runtimeStatus": "unrun; phone in use by another agent",
+  "phoneOperationsThisBatch": "none; no adb queries, installs, launches or state checks",
+  "productionChanges": "none; no new schema, collection, defaults, dependencies or version",
+  "build": {
+    "command": "python tools/android_build.py :app:assembleDebugAndroidTest --arch arm64-v8a --reuse-daemon",
+    "result": "BUILD SUCCESSFUL",
+    "seconds": 35,
+    "tasks": 315,
+    "executed": 26,
+    "upToDate": 289,
+    "testApk": "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+    "sha256": "64c319c5b69a7866ef16c09e78afceeee061758a0bd5d3812627321e131bc911",
+    "bytes": 1026715
+  },
+  "sourceSha256LfNormalized": {
+    "android/app/build.gradle": "113dc824ef39e4fce4091ed366335442693e8bc27f07a5ee1f2af80f92423ba6",
+    "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt": "aabe71d282c594e0c99217675aa107fd6354e6a30f73365d803da0898515e67b",
+    "android/app/src/androidTest/java/com/attentionstats/qualification/HistoricalMigrationVerification.kt": "207e47895a009383a381ba9660d75d906ad7f461a86274e8376fa5f05bc598f5",
+    "android/app/src/main/java/com/attentionstats/storage/AttentionDatabase.kt": "8561043d0a194fb51c60f217e42d30620bc53d82f0ffd9d0d28909a68b733bc1",
+    "android/app/src/main/java/com/attentionstats/storage/HistoryStore.kt": "ec95b8df9aef4f4697a755c5b0752e7ce7b7e1452d5b94c074ad407982e36180",
+    "android/app/src/main/java/com/attentionstats/storage/LocalKeyEnvelope.kt": "32643400510adad31d7594eaacc5deb8af0823e9daa0b3fa19f19022221d38d8",
+    "android/app/src/main/java/com/attentionstats/storage/OwnedCipherDriver.kt": "046940cee0c24244844d2fb19dec62354981e1b86d210d1b70be587ac72e26ff"
+  },
+  "exportedSchemas": [
+    {
+      "version": 1,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/1.json",
+      "sha256": "3712cc2c547fee43b898fe96e5f5d8bd805a083bbf36225acd82bd2f85b9333e",
+      "tables": 7,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 2,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/2.json",
+      "sha256": "65bad14e3c0e56f5b6bab538dc6aa89901b5b2ae0b7ee7e55977c6fd5d7ad16e",
+      "tables": 7,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 3,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/3.json",
+      "sha256": "876eb77bde5ef4f25c91047ee43c085d22213a458a86c941d5b726bdced10a49",
+      "tables": 7,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 4,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/4.json",
+      "sha256": "a4932320e3e7eec825bdac6d69caab1e70930a22f55cf0f1cf00aea8f8d430cb",
+      "tables": 10,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 5,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/5.json",
+      "sha256": "2dde940ec16bf55191fdc9778c1ecb3682c8743280d346ab40e4a48bcead6851",
+      "tables": 11,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 6,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/6.json",
+      "sha256": "245f8ea7cf942f6d1f4f303973dea1c9c3ee9d70e04fece9bc1468b3dfbef9bf",
+      "tables": 12,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 7,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/7.json",
+      "sha256": "40261c1771f4a0fb54425f0fa8cb6659df139053233909dd0c589653bee70093",
+      "tables": 13,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 8,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/8.json",
+      "sha256": "5be0f38c135b31d2dd17fe83bae97088d2370f5593bc4ba16c48df8d1fae8219",
+      "tables": 13,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 9,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/9.json",
+      "sha256": "28149cb4ee19bd6e1e98ce60a43b6ef930b32b6f164c9c11e6601ee8f143613b",
+      "tables": 14,
+      "packagedByteIdentical": true
+    }
+  ],
+  "preparedScope": [
+    "Populated versions 1 through 9 each opened to current schema 9 via HistoryStore.open, plus fresh initialization",
+    "Unique synthetic no-backup directories and wrapping aliases; no live history singleton",
+    "Every original column and added SQL default; null coverage end, empty text, quoted Unicode reason, unknown playback",
+    "All original source configurations disabled and paused; blockers disabled; consent choices retained",
+    "Fresh Kotlin defaults distinct from migrated SQL defaults for photos and break duration",
+    "Retained encounter query, no fabricated measured playback, local key identity, imported FactOrigin in v9",
+    "Every-table snapshot equality after encrypted close/reopen; owned aliases/directories removed in finally"
+  ],
+  "limits": [
+    "Prepared assertions and cleanup have not executed; zero runtime migration checks claimed",
+    "No intermediate adjacent-target stop tests, future/downgrade rejection, constraint violation or representative boundary qualification",
+    "No interruption/process death, corrupt/key-loss, filesystem ENOSPC, effective pragma/durability or 1M/10M/50M scale qualification",
+    "No phone product/settings/binding/cleanup claim and no emulator substitution",
+    "AS-009 experimental; ADR-106 and release HOLD remain"
+  ],
+  "resume": "Once exclusive phone use is available, take a fresh private baseline; verify product/test pairing, run only historicalMigrations=true on an explicitly selected physical device, retain actual results and verify owned cleanup/original state."
+}

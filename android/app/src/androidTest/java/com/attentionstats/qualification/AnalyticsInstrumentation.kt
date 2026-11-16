@@ -38,6 +38,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var reminderDismissal = false
     private var keyLossRecovery = false
     private var archiveCapacity = false
+    private var historicalMigrations = false
     private var archiveInterruption = false
     private var hudBehavior = false
     private var scheduleUi = false
@@ -121,6 +122,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         reminderDismissal = arguments?.getString("reminderDismissal") == "true"
         keyLossRecovery = arguments?.getString("keyLossRecovery") == "true"
         archiveCapacity = arguments?.getString("archiveCapacity") == "true"
+        historicalMigrations = arguments?.getString("historicalMigrations") == "true"
         archiveInterruption = arguments?.getString("archiveInterruption") == "true"
         hudBehavior = arguments?.getString("hudBehavior") == "true"
         scheduleUi = arguments?.getString("scheduleUi") == "true"
@@ -272,6 +274,10 @@ class AnalyticsInstrumentation : Instrumentation() {
                 result.putString("stream", ArchiveCapacityVerification.run(this))
                 finish(Activity.RESULT_OK, result)
                 return
+            }
+            if (historicalMigrations) {
+                result.putString("stream", HistoricalMigrationVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
             }
             if (archiveInterruption) {
                 result.putString("stream", ArchiveInterruptionVerification.run(this))

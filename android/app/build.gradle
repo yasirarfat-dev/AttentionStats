@@ -104,6 +104,7 @@ android {
         coreLibraryDesugaringEnabled true
     }
     sourceSets {
+        androidTest.assets.srcDir('schemas')
         androidTest.java.srcDir('../../native/analytics-core/src/test/kotlin')
         androidTest.java.srcDir('../../native/reels-core/src/test/kotlin')
     }
