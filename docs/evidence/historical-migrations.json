@@ -1,0 +1,146 @@
+{
+  "date": "16/11/26",
+  "tasks": [
+    "AS-009"
+  ],
+  "status": "experimental",
+  "publication": "HOLD",
+  "sourceBase": "e7c9301d76b24a065360cadfb7b9d908f120afd1",
+  "product": {
+    "sha256": "ebc13d37166e3f258d7c890c87decfdefc2b4e21ab17a62540eda7e9417e3e56",
+    "physicalApi": 36,
+    "abi": "arm64-v8a",
+    "unchanged": true
+  },
+  "diagnostic": {
+    "argument": "historicalMigrations=true",
+    "sha256": "3ee04061c82eef5cdf8bc7a4158455412d589ba751d86514263eb7506440d916",
+    "bytes": 1028098,
+    "checks": 301,
+    "rawCode": -1,
+    "stream": "INSTRUMENTATION_RESULT: stream=PASS: 301 isolated historical migration checks; populated versions 1..9 to production schema 9 and fresh defaults; original columns, added defaults, queries, keys and every-table reopen; no real history changes\nINSTRUMENTATION_CODE: -1"
+  },
+  "build": {
+    "command": "python tools/android_build.py :app:assembleDebugAndroidTest --arch arm64-v8a --reuse-daemon",
+    "result": "BUILD SUCCESSFUL in 29s; 315 tasks, 31 executed, 284 up-to-date",
+    "allNineSchemaAssetsByteIdentical": true
+  },
+  "sourceSha256LfNormalized": {
+    "android/app/build.gradle": "113dc824ef39e4fce4091ed366335442693e8bc27f07a5ee1f2af80f92423ba6",
+    "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt": "aabe71d282c594e0c99217675aa107fd6354e6a30f73365d803da0898515e67b",
+    "android/app/src/androidTest/java/com/attentionstats/qualification/HistoricalMigrationVerification.kt": "4e1ec0a001d85cce3597474741b84051dbfbdcbd692e914d3c7615f1ea005396",
+    "android/app/src/main/java/com/attentionstats/storage/AttentionDatabase.kt": "8561043d0a194fb51c60f217e42d30620bc53d82f0ffd9d0d28909a68b733bc1",
+    "android/app/src/main/java/com/attentionstats/storage/HistoryStore.kt": "ec95b8df9aef4f4697a755c5b0752e7ce7b7e1452d5b94c074ad407982e36180",
+    "android/app/src/main/java/com/attentionstats/storage/LocalKeyEnvelope.kt": "32643400510adad31d7594eaacc5deb8af0823e9daa0b3fa19f19022221d38d8",
+    "android/app/src/main/java/com/attentionstats/storage/OwnedCipherDriver.kt": "046940cee0c24244844d2fb19dec62354981e1b86d210d1b70be587ac72e26ff"
+  },
+  "exportedSchemas": [
+    {
+      "version": 1,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/1.json",
+      "sha256": "3712cc2c547fee43b898fe96e5f5d8bd805a083bbf36225acd82bd2f85b9333e",
+      "tables": 7,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 2,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/2.json",
+      "sha256": "65bad14e3c0e56f5b6bab538dc6aa89901b5b2ae0b7ee7e55977c6fd5d7ad16e",
+      "tables": 7,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 3,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/3.json",
+      "sha256": "876eb77bde5ef4f25c91047ee43c085d22213a458a86c941d5b726bdced10a49",
+      "tables": 7,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 4,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/4.json",
+      "sha256": "a4932320e3e7eec825bdac6d69caab1e70930a22f55cf0f1cf00aea8f8d430cb",
+      "tables": 10,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 5,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/5.json",
+      "sha256": "2dde940ec16bf55191fdc9778c1ecb3682c8743280d346ab40e4a48bcead6851",
+      "tables": 11,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 6,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/6.json",
+      "sha256": "245f8ea7cf942f6d1f4f303973dea1c9c3ee9d70e04fece9bc1468b3dfbef9bf",
+      "tables": 12,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 7,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/7.json",
+      "sha256": "40261c1771f4a0fb54425f0fa8cb6659df139053233909dd0c589653bee70093",
+      "tables": 13,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 8,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/8.json",
+      "sha256": "5be0f38c135b31d2dd17fe83bae97088d2370f5593bc4ba16c48df8d1fae8219",
+      "tables": 13,
+      "packagedByteIdentical": true
+    },
+    {
+      "version": 9,
+      "path": "android/app/schemas/com.attentionstats.storage.AttentionDatabase/9.json",
+      "sha256": "28149cb4ee19bd6e1e98ce60a43b6ef930b32b6f164c9c11e6601ee8f143613b",
+      "tables": 14,
+      "packagedByteIdentical": true
+    }
+  ],
+  "verifiedScope": [
+    "Populated versions 1 through 9 each opened to current schema 9 via HistoryStore.open, plus fresh initialization",
+    "Unique synthetic no-backup directories and wrapping aliases; no live history singleton",
+    "Every original column and added SQL default; null coverage end, empty text, quoted Unicode reason, unknown playback",
+    "All original source configurations disabled and paused; blockers disabled; consent choices retained",
+    "Fresh Kotlin defaults distinct from migrated SQL defaults for photos and break duration",
+    "Retained encounter query, no fabricated measured playback, local key identity, imported FactOrigin in v9",
+    "Every-table snapshot equality after encrypted close/reopen; owned aliases/directories removed in finally"
+  ],
+  "retainedFailures": [
+    {
+      "sha256": "64c319c5b69a7866ef16c09e78afceeee061758a0bd5d3812627321e131bc911",
+      "rawCode": 0,
+      "result": "UnsatisfiedLinkError: libsqlcipher.so not found at test-class-loader System.loadLibrary; before historical fixtures",
+      "fix": "Run fresh-store checks first through production HistoryStore.open to load native library through product class loader."
+    },
+    {
+      "sha256": "401ca81c1a2794e27d275dbbf5370a66fe4c81043a8c4de53465b0554d5cfe69",
+      "rawCode": 0,
+      "result": "JSONException: No value for indices; fresh checks completed, historical fixture parser failed",
+      "fix": "Treat omitted empty indices arrays in exported schema entities as empty."
+    }
+  ],
+  "operatorFinding": "Old host helper queried unsupported dumpsys activity instrumentation. Corrected local helper uses full dumpsys activity and mFinished=false to detect active instrumentation; finished records do not block cleanup. This is an operator helper correction, not a production change.",
+  "cleanup": {
+    "freshAppearanceBackupFontAccessibilityHashesMatch": true,
+    "installedProductHashMatches": true,
+    "actualOwnServiceBound": true,
+    "existingAdbReverseMappingsUnchanged": true,
+    "noPortsAddedOrRemoved": true,
+    "hashOwnedTestRemoved": true,
+    "noUnfinishedInstrumentation": true,
+    "runnerAssertsOwnedAliasesAndDirectoriesAbsent": true,
+    "hostIndependentlyChecksDirectoryPrefixAbsent": true,
+    "ownAppOpened": true,
+    "realHistoryNotReadResetOrReplaced": true,
+    "noSourceActionsOrCaptures": true
+  },
+  "limits": [
+    "Small populated synthetic start-version-to-current paths, not intermediate adjacent-target stops or boundary/scale qualification.",
+    "No unsupported future/downgrade, migration interruption, process kill, key loss, corruption, effective pragma/power-loss, filesystem ENOSPC or lifetime archive qualification.",
+    "One physical API36 ARM64 device, no minimum-API/OEM breadth.",
+    "No product/schema/default/dependency/collection change, task promotion, release clearance, main merge, workflow dispatch, signing or Play action."
+  ]
+}

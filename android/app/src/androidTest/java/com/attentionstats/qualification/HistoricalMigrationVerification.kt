@@ -49,7 +49,20 @@ internal object HistoricalMigrationVerification {
             rows(store, table, entity.getJSONArray("fields").objects().map { it.getString("columnName") })
         }
         try {
-            System.loadLibrary("sqlcipher")
+            // Load SQLCipher through the product class loader, as in ordinary store opening.
+            val freshFolder = File(root, "fresh").also { check(it.mkdir()) }
+            val freshContext = object : ContextWrapper(target) { override fun getNoBackupFilesDir() = freshFolder }
+            val freshAlias = "attentionstats.historical-migrations.${UUID.randomUUID()}".also { aliases.add(it) }
+            var fresh = HistoryStore.open(freshContext, freshAlias).also { stores.add(it) }
+            val defaults = checkNotNull(fresh.database.data().diary())
+            expect(!defaults.countPhotos && !defaults.measurePlayback && !defaults.usageEnabled &&
+                !defaults.reminderEnabled && defaults.breakSeconds == 3, "fresh choices and timing defaults")
+            expect(fresh.database.data().configurations().all { !it.enabled }, "fresh sources disabled")
+            val freshCommitted = snapshot(fresh)
+            fresh.close(); stores.remove(fresh)
+            fresh = HistoryStore.open(freshContext, freshAlias).also { stores.add(it) }
+            expect(snapshot(fresh) == freshCommitted, "fresh every-table reopen")
+            fresh.close(); stores.remove(fresh)
             for (version in 1..9) {
                 val folder = File(root, "v$version").also { check(it.mkdir()) }
                 val context = object : ContextWrapper(target) { override fun getNoBackupFilesDir() = folder }
@@ -77,7 +90,7 @@ internal object HistoricalMigrationVerification {
                             for (entity in entities) {
                                 val table = entity.getString("tableName")
                                 connection.exec(entity.getString("createSql").replace("\${TABLE_NAME}", table))
-                                entity.getJSONArray("indices").objects().forEach {
+                                (entity.optJSONArray("indices") ?: JSONArray()).objects().forEach {
                                     connection.exec(it.getString("createSql").replace("\${TABLE_NAME}", table))
                                 }
                                 val singleton = table in setOf("StoreMetadata", "LiveOverlayConfiguration", "DiaryConfiguration", "ProtectionConfiguration")
@@ -172,19 +185,6 @@ internal object HistoricalMigrationVerification {
                 expect(snapshot(store) == committed, "v$version every-table reopen")
                 store.close(); stores.remove(store)
             }
-            val freshFolder = File(root, "fresh").also { check(it.mkdir()) }
-            val freshContext = object : ContextWrapper(target) { override fun getNoBackupFilesDir() = freshFolder }
-            val freshAlias = "attentionstats.historical-migrations.${UUID.randomUUID()}".also { aliases.add(it) }
-            var fresh = HistoryStore.open(freshContext, freshAlias).also { stores.add(it) }
-            val defaults = checkNotNull(fresh.database.data().diary())
-            expect(!defaults.countPhotos && !defaults.measurePlayback && !defaults.usageEnabled &&
-                !defaults.reminderEnabled && defaults.breakSeconds == 3, "fresh choices and timing defaults")
-            expect(fresh.database.data().configurations().all { !it.enabled }, "fresh sources disabled")
-            val freshCommitted = snapshot(fresh)
-            fresh.close(); stores.remove(fresh)
-            fresh = HistoryStore.open(freshContext, freshAlias).also { stores.add(it) }
-            expect(snapshot(fresh) == freshCommitted, "fresh every-table reopen")
-            fresh.close(); stores.remove(fresh)
             "PASS: $checks isolated historical migration checks; populated versions 1..9 to production schema 9 and fresh defaults; original columns, added defaults, queries, keys and every-table reopen; no real history changes"
         } finally {
             stores.asReversed().forEach { it.close() }
