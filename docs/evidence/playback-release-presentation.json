@@ -1,0 +1,85 @@
+{
+  "date": "17/11/26",
+  "decision": "ADR-109",
+  "tasks": [
+    "AS-018",
+    "AS-037",
+    "AS-055"
+  ],
+  "product": {
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10,
+    "api": 36,
+    "abi": "arm64-v8a",
+    "sha256": "2d88ca4e750662f47d7d06cf4970aa2604df709c2f8df72ca22a8426aa885758",
+    "priorSha256": "c9c843316b4eeea24dde8ecad1c6810b156fe3af48a00b4b10426a1e1237acbd"
+  },
+  "scope": "Hide unmeasured playback tiles and new activation; preserve recorded zero/history and an existing enabled user disable control. No collector/schema/dependency/permission changes.",
+  "builds": [
+    {
+      "tasks": "assemblePreview assembleDebugAndroidTest lintPreview",
+      "result": "PASS",
+      "elapsed": "3m13s",
+      "actionableTasks": 536,
+      "executed": 36
+    },
+    {
+      "tasks": "assembleDebugAndroidTest after diagnostic refresh wait",
+      "result": "PASS",
+      "elapsed": "1m23s",
+      "actionableTasks": 315,
+      "executed": 31
+    }
+  ],
+  "runs": [
+    {
+      "textScalePercent": 100,
+      "checks": 93,
+      "instrumentationCode": -1,
+      "rawSha256": "1eddb66ea6e245103d3065c8de0f737a908fe66fea9b17e460572505f23c78db",
+      "testSha256": "d61bed9a8208c3378d9963bb6fba190a4085116c757a81ca0582f513998087b1"
+    },
+    {
+      "textScalePercent": 200,
+      "checks": 110,
+      "instrumentationCode": -1,
+      "rawSha256": "2577173749488c45d98810799647dd55137963905841bb29bfeb68b2f1ad29c6",
+      "testSha256": "d61bed9a8208c3378d9963bb6fba190a4085116c757a81ca0582f513998087b1"
+    }
+  ],
+  "checks": [
+    "Off and enabled-without-readable-data omit all four playback tiles and obsolete empty-status invitations",
+    "Measured zero and one measured visit remain visible",
+    "4000ms/one three-second watch/one observed completion remain visible",
+    "Disabling retains historical facts and saved-data/off status",
+    "Malformed response retains previous facts; recovery displays correct values",
+    "Settings omits experimental activation for all fixture states",
+    "An existing enabled state retains disable-only control; off snapshots omit it after refresh",
+    "All fixture input is from a UUID-owned isolated encrypted store through the existing bridge/parser; live history is untouched by fixtures",
+    "Runner finally clears display fixture, closes/deletes isolated store and deletes unique Keystore alias"
+  ],
+  "earlierFailure": {
+    "testSha256": "4f1ccc69f49f1dd332d58337c9f925487e4aeffff596e9d88e6b1e0c40161519",
+    "rawSha256": "e5d4f50b0d91421393976263d743ce29735d03e2f2c9e81831bbdbc89f0ed25e",
+    "instrumentationCode": 0,
+    "stage": "retained; assertion70",
+    "resolution": "Diagnostic adds bounded 15-second wait for mounted Settings to refresh the off snapshot; product unchanged between failed and passing trials. Failure is retained; no production source-reliability fix claimed."
+  },
+  "hostChecks": {
+    "typecheck": "PASS",
+    "jest": "158 tests / 19 suites PASS",
+    "lint": "PASS including architecture, backup-policy and palette checks",
+    "format": "PASS",
+    "docs": "PASS",
+    "diff": "PASS"
+  },
+  "visualReview": "Private synthetic own-window 100%/200% captures reviewed for the compact hidden state, Settings without activation and retained values. Individual stat visibility is asserted against actual navigation bounds. No personal screenshots published.",
+  "preservation": "In-place preview update; real history/settings/saved focus retained. Original appearance/backup/font/selected Accessibility/master/display timeout/reverse match; own service bound, exact diagnostic and fixed captures removed, Today opened. No release/main/store/workflow action.",
+  "futureScope": "Q-027 App Activity/privacy monitoring explicitly deferred until after this release; API feasibility/design proposal only, no new tab/collector/grant or spyware claims.",
+  "limits": [
+    "Synthetic playback input verifies presentation/preservation, not live source timing",
+    "Disable control presence verified without operating the live singleton through a presentation fixture; isolated actual-owner consent behavior retains earlier evidence",
+    "Actual source playback qualification remains deferred, with no backfill or timer substitute",
+    "TalkBack/RTL and broader lifecycle/data/resource/widget/auto-scroll/candidate gates remain separate; publication HOLD"
+  ]
+}

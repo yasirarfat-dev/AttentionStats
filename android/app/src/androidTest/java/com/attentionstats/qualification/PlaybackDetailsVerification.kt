@@ -142,13 +142,36 @@ internal object PlaybackDetailsVerification {
             File(target.cacheDir, "playback-details-$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
             bitmap.recycle()
         }
-        fun render(snapshot: String, name: String, labels: List<String>) {
+        fun render(snapshot: String, name: String, labels: List<String>, hidden: Boolean = false) {
             instrumentation.sendStatus(1, Bundle().apply { putString("stream", "Playback details stage: $name") })
             DiaryPresentationFixture.playback(snapshot)
             target.startActivity(Intent(target, MainActivity::class.java).setAction(Intent.ACTION_VIEW)
                 .setData(Uri.parse("attentionstats://today")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            tab("Settings"); tab("Today")
+            tab("Settings")
+            requireLabel("Count photo encounters")
+            expect(!visit { named(it, "Measure confirmed playback (experimental)") })
+            val legacyEnabled = JSONObject(snapshot).optBoolean("measurePlayback", false)
+            if (legacyEnabled) requireLabel("Legacy playback measurement")
+            else {
+                // Existing mounted Settings retains its previous snapshot during asynchronous refresh.
+                val until = SystemClock.elapsedRealtime() + 15_000
+                while (visit { named(it, "Legacy playback measurement") } && SystemClock.elapsedRealtime() < until)
+                    SystemClock.sleep(150)
+                check(visit { it.isVisibleToUser } && !visit { named(it, "Legacy playback measurement") }) {
+                    "Legacy playback control remained after off snapshot refresh; stage=$name"
+                }
+                checks++
+            }
+            if (name == "disabled" || name == "unknown") capture("$name-settings")
+            tab("Today")
             labels.forEachIndexed { index, label -> requireLabel(label); if (index == 0) capture("$name-status") }
+            if (hidden) {
+                // Today uses a ScrollView: mounted nodes remain discoverable outside the viewport.
+                for (label in listOf("3-second watches", "Observed completions", "Confirmed playback", "Measured visits",
+                        "Playback measurement is off", "No readable playback times")) {
+                    expect(!visit { node -> listOf(node.text, node.contentDescription).any { it?.toString()?.contains(label, true) == true } })
+                }
+            }
             capture(name)
         }
         try {
@@ -167,11 +190,11 @@ internal object PlaybackDetailsVerification {
                 .let { rows -> (0 until rows.length()).map { rows.getJSONObject(it) }.first { it.optString("social") == "instagram" } }
             val off = snapshot()
             expect(row(off).isNull("watchCount") && row(off).isNull("completionCount") && row(off).isNull("playbackMs"))
-            render(off, "disabled", listOf("Playback measurement is off · enable in Settings.", "3-second watches: —", "Observed completions: —"))
+            render(off, "disabled", listOf("Photos encountered: 0", "Ads encountered: 0"), hidden = true)
             expect(diary.configure(history, "playback", true, 30, 15, checkNotNull(dao.diary()).revision))
             val unknown = snapshot()
             expect(row(unknown).isNull("measuredVideoCount"))
-            render(unknown, "unknown", listOf("No readable playback times recorded for this period.", "Confirmed playback: —"))
+            render(unknown, "unknown", listOf("Photos encountered: 0", "Ads encountered: 0"), hidden = true)
             val evidence = PlaybackEvidence()
             suspend fun persist(result: PlaybackEvidence.Result) {
                 dao.updatePlayback("synthetic-video", result.confirmedMs, result.qualified, result.completed); dao.advanceRevision()
@@ -187,10 +210,10 @@ internal object PlaybackDetailsVerification {
             expect(diary.configure(history, "playback", false, 30, 15, checkNotNull(dao.diary()).revision))
             val retained = snapshot()
             expect(row(retained).getString("completionCount") == "1")
-            render(retained, "retained", listOf("Playback measurement is off · enable in Settings.", "3-second watches: 1", "Observed completions: 1", "Confirmed playback: 4s"))
+            render(retained, "retained", listOf("Saved playback measurements · collection is off.", "3-second watches: 1", "Observed completions: 1", "Confirmed playback: 4s"))
             val malformed = JSONObject(retained).put("days", org.json.JSONArray()).toString()
             render(malformed, "read-error", listOf("Viewing details could not refresh. Saved history is preserved.", "Observed completions: 1"))
-            render(retained, "recovered", listOf("Playback measurement is off · enable in Settings.", "Observed completions: 1", "Confirmed playback: 4s"))
+            render(retained, "recovered", listOf("Saved playback measurements · collection is off.", "Observed completions: 1", "Confirmed playback: 4s"))
         } finally {
             DiaryPresentationFixture.clear()
             store?.close()

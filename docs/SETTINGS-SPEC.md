@@ -1,5 +1,7 @@
 # Settings specification
 
+> ADR-109 (17/11/26) withdraws new playback-measurement activation for this release. No normal experimental playback switch or enable invitation is shown. An already-enabled saved choice retains a Legacy playback measurement switch allowing disable only. Do not silently change the choice or delete measurements. Retained facts stay visible in Viewing Details; empty playback tiles are hidden.
+
 **Status:** Planned catalog with working narrow Reels controls and experimental settings routes; broader preferences remain unimplemented. Updated 2026-11-15.
 **Responsibility:** Defines user controls, defaults, persistence owner and change effects.
 **Related specifications:** [UX](UX-SPEC.md), [Privacy](PRIVACY.md), [Protection](PROTECTION-SPEC.md), [Backup](BACKUP-RESTORE.md), [Models](DATA-MODELS.md).

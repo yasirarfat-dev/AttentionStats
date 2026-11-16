@@ -1,5 +1,7 @@
 # Capability matrix
 
+> Release scope, ADR-109 (17/11/26): new playback-measurement activation and tiles without recorded playback facts are withdrawn from this release. Retained measurements and disable-only control for an already-enabled choice remain. Live-source playback admission is deferred, with no capability promotion. App Activity/privacy monitoring (Q-027/AS-062) is future feasibility/design work, not current collection access or a shipping monitoring capability.
+
 **Status:** Full-capability inventory and admission gates; scoped Android MVP exists, with beta continuation experimental on develop. Updated 2026-11-13.
 **Responsibility:** Maps every capability to source, access, controls, limitations, phase, evidence, and an acceptance scenario.
 **Related specifications:** [Tracking](TRACKING-SPEC.md), [Social](SOCIAL-MEDIA-SPEC.md), [Protection](PROTECTION-SPEC.md), [Tests](TESTING.md), [Tracker](FEATURE-TRACKER.md).

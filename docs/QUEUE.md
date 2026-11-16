@@ -32,6 +32,25 @@ Promotion requires a decision, domain-spec/matrix update and AS task/dependencie
 
 ## Unscheduled evaluation questions
 
+### Q-027 / 2026-11-17: App Activity and privacy review — deferred until after this release
+
+The maintainer proposes a substantial screen beside Insights/Protect for app behavior, camera/microphone use and other useful signals, then explicitly defers it to later release candidates. This is a source-feasibility/design proposal under AS-062, not a promoted implementation task. No new tab, collector, permission or telemetry transmission is authorized by this intake. Useful detail means supported, relevant evidence with progressive disclosure; it does not mean collecting everything technically reachable.
+
+Public Android API review (17/11/26):
+
+| Proposed information | Feasibility and truthful presentation |
+|---|---|
+| Foreground usage, observed entries, sessions and switches | Existing Usage Access foundation; qualify detailed sequences, coverage and time boundaries before a new timeline. Visibility is not attention or intent. |
+| Camera/microphone use by a named other app at a particular time | No admitted normal-app source. [AppOpsManager](https://developer.android.com/reference/android/app/AppOpsManager) restricts active-operation watching to the caller's UID without privileged WATCH_APPOPS access. Accessibility/Usage Access do not remove this restriction. Never attribute a global sensor signal to the foreground app by timing alone. |
+| Camera availability | [AvailabilityCallback](https://developer.android.com/reference/android/hardware/camera2/CameraManager.AvailabilityCallback) reports device availability, not the identity/purpose of another app's camera access; not an access-history substitute. |
+| Android's sensor-access history | Android 12's [Privacy Dashboard](https://developer.android.com/about/versions/12/summary) is a system settings feature. A future supported settings shortcut can help users review it; its existence is not an API grant to import its records. Do not scrape system screens to manufacture a collector. |
+| Per-app network usage | [NetworkStatsManager](https://developer.android.com/reference/android/app/usage/NetworkStatsManager) is a candidate under existing AS-036/F-10. User-authorized access and device qualification required; delayed UID buckets/shared UIDs and foreground/background accounting need explicit coverage. Bytes reveal neither conversations nor transmitted content, purpose or malicious intent. |
+| Permissions and app metadata | Future scoped package-visibility/permission-state feasibility study; distinguish declared permission, granted permission and observed access. Do not claim exhaustive installed-app inventory or request broad package visibility before policy review. |
+| Notifications, location history, CPU/battery/wakelocks and background activity | Independently qualify each source and scope. Existing access does not provide arbitrary other-app internals. Notification metadata needs separate consent/access; no messages or recorded conversations. No new grant for this proposal. |
+| Why an app used a sensor; whether it listened suspiciously | Not established by these APIs. No purpose inference, spyware verdict, safety guarantee or fear-based risk score. Show verified evidence and uncertainty, not accusations. |
+
+Candidate design after feasibility: a finite daily App Activity overview with coverage/last update; a filterable chronological timeline of admitted events; per-app detail with source provenance, exact units and gaps; an independent Permissions review with Android-settings actions. Put advanced event detail behind disclosure, support large text/TalkBack/reduced motion and neutral colors, and keep pause/exclude/delete/export controls close to the data. Add a primary navigation destination only if qualified daily value warrants it; no empty sensor panels or fabricated sample history in the product. Acceptance requires native/API/OEM/lifecycle/resource checks, consent/deletion/backup/migration coverage and actual accessibility/visual review. Local observations are not developer telemetry. Revisit after current publishing gates.
+
 Q-021 / 2026-11-03: Multiple editable time periods per app or user-defined app category/group, including evening and overnight blocks. Promoted by explicit maintainer instruction: ADR-068, AS-053 and existing AS-012/AS-015–AS-017. No hardcoded membership or schedule; activation requires a preview.
 
 Q-022 / 2026-11-03: Separate video/photo encounters, confirmed playback, 3-second watches and completions; later text-post/social-action detail by opt-in. Promoted: ADR-069/AS-055 and AS-041 qualification. Never equate paused player visibility with watching, or a click with a submitted comment.

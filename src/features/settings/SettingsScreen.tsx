@@ -295,13 +295,14 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
           disabled={!diary.snapshot}
           onChange={value => diary.configure('photos', value)}
         />
-        <ToggleRow
-          icon="play"
-          title="Measure confirmed playback (experimental)"
-          value={diary.snapshot?.measurePlayback ?? false}
-          disabled={!diary.snapshot}
-          onChange={value => diary.configure('playback', value)}
-        />
+        {diary.snapshot?.measurePlayback && (
+          <ToggleRow
+            icon="play"
+            title="Legacy playback measurement"
+            value={true}
+            onChange={() => diary.configure('playback', false)}
+          />
+        )}
         <View style={styles.subgroup}>
           <SectionTitle>Extras</SectionTitle>
           <ToggleRow

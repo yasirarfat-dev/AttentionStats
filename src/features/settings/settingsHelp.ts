@@ -47,9 +47,9 @@ export const settingsHelp = {
         'Counts recognized photos and carousels separately in enabled sources. One carousel post is one encounter.',
     },
     {
-      term: 'Confirmed Playback',
+      term: 'Legacy Playback',
       detail:
-        'Experimental and optional. Uses exposed numeric player times for 3-second watches, playback time and observed completions. Pauses and missing signals add no time; availability varies by app and layout.',
+        'If experimental playback measurement was previously enabled, its switch remains available to turn it off. New activation is unavailable while source reliability is under review. Saved measurements are preserved.',
     },
     {
       term: 'Auto-scroll',
