@@ -41,6 +41,8 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var historicalMigrations = false
     private var databaseDurability = false
     private var migrationRecovery = false
+    private var databaseCrash: String? = null
+    private var databaseCrashToken: String? = null
     private var archiveInterruption = false
     private var hudBehavior = false
     private var scheduleUi = false
@@ -127,6 +129,8 @@ class AnalyticsInstrumentation : Instrumentation() {
         historicalMigrations = arguments?.getString("historicalMigrations") == "true"
         databaseDurability = arguments?.getString("databaseDurability") == "true"
         migrationRecovery = arguments?.getString("migrationRecovery") == "true"
+        databaseCrash = arguments?.getString("databaseCrash")
+        databaseCrashToken = arguments?.getString("databaseCrashToken")
         archiveInterruption = arguments?.getString("archiveInterruption") == "true"
         hudBehavior = arguments?.getString("hudBehavior") == "true"
         scheduleUi = arguments?.getString("scheduleUi") == "true"
@@ -289,6 +293,11 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             if (migrationRecovery) {
                 result.putString("stream", MigrationRecoveryVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
+            databaseCrash?.let { mode ->
+                result.putString("stream", if (mode == "cleanup") DatabaseCrashVerification.verifyCleanup(this)
+                    else DatabaseCrashVerification.run(this, mode, checkNotNull(databaseCrashToken)))
                 finish(Activity.RESULT_OK, result); return
             }
             if (archiveInterruption) {

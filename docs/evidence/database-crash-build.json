@@ -1,0 +1,47 @@
+{
+  "date": "16/11/26",
+  "kind": "isolated database process-kill harness build only",
+  "sourceBase": "cb861a5308104b90436e96de7ad3b5d572a233f5",
+  "runtimeStatus": "unrun; fresh baseline blocked by adb timeouts before diagnostic install or process kill",
+  "productSha256Expected": "b118f856e2712f5580ee43b2d8fe29ba3f50eb53bccbddf58c528f7e1214fafa",
+  "build": {
+    "command": "python tools/android_build.py :app:assembleDebugAndroidTest --arch arm64-v8a --reuse-daemon",
+    "result": "BUILD SUCCESSFUL in 1m 25s; 315 tasks, 31 executed, 284 up-to-date",
+    "initialBuild": "BUILD SUCCESSFUL in 3m 8s; same task totals, before independent cleanup mode",
+    "testSha256": "85ffa351798722e37d608c86c6859f3173d31c80b5cead800c909d296a400985",
+    "testBytes": 1078032,
+    "allNinePackagedSchemasByteIdentical": true,
+    "classAndSelectorInDex": true
+  },
+  "sourceSha256LfNormalized": {
+    "android/app/src/androidTest/java/com/attentionstats/qualification/DatabaseCrashVerification.kt": "16ab3ae053a6aac4416ddc7e92dec29781690ab919d2964c0fa9d947b095a855",
+    "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt": "73b4d7d8341405efa98e57e89606c1009c41b301607cd9124c4a34dc0c01feda",
+    "android/app/src/main/java/com/attentionstats/storage/HistoryStore.kt": "ec95b8df9aef4f4697a755c5b0752e7ce7b7e1452d5b94c074ad407982e36180",
+    "android/app/src/main/java/com/attentionstats/storage/OwnedCipherDriver.kt": "4d8d84d993ea8a87d9a30bfb083477b251decd09afe397f011b5e8ef3bca3e9b"
+  },
+  "preparedScope": [
+    "Separate unique UUID folders and aliases; actual HistoryStore.open, no production singleton",
+    "Closed synthetic parent/exposure, disabled collection choices, breakSeconds=7; snapshot every table",
+    "Prepare-before marker written inside an unreturned transaction after inserting parent/32 children, changing breakSeconds and advancing revision; retain original snapshot",
+    "Prepare-after marker written after commit returns while encrypted database remains open and WAL is nonempty; retain committed snapshot",
+    "Host validates exact marker token/phase/PID against own app pidof before targeted run-as SIGKILL; retains intentional process-crash output",
+    "Verify requires a different PID; compare every table to expected commit boundary, wrapper hash, cipher/SQLite/FK integrity and child/configuration batch atomicity",
+    "Second encrypted reopen, successful new write/revision and another encrypted reopen; unique store/alias cleanup",
+    "Independent cleanup mode asserts both migration-recovery and database-crash directory/alias prefixes absent without opening live history"
+  ],
+  "connectionFailures": [
+    "Initial baseline APK read timed out at 60 seconds; no baseline saved or mutation",
+    "Replaced host full APK transfer with device-local sha256sum; next baseline secure-settings read timed out at 60 seconds; no baseline saved or mutation",
+    "Explicit get-state and shell true each time out at 10 seconds; no shared adb reset or emulator change; user asked to reconnect"
+  ],
+  "limits": [
+    "Zero crash runtime assertions executed; no new diagnostic installed and no process killed",
+    "Small synthetic batch; many tables empty; not pool stress or scale",
+    "Before-commit writes need not have spilled to WAL; this is transaction-boundary process recovery, not migration interruption",
+    "SIGKILL is not hardware power loss, fsync hardware compliance, real filesystem ENOSPC or kernel crash",
+    "No live coordinator/owner/UI acknowledgement, backup/framework recovery or deletion acceptance",
+    "Prepared host helper is private and not a distributed product interface",
+    "AS-009 remains experimental; publication HOLD; emulator deferred"
+  ],
+  "resume": "After phone reconnection, fresh baseline and exact test/product pairing; run prepare-before/verify-before and prepare-after/verify-after using same UUID per pair and exact marker PID kill, require named PASS plus raw -1 for each verification, run databaseCrash=cleanup with PASS/-1, independently verify prefix/test/settings/product/service cleanup."
+}

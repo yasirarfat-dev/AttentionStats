@@ -1,0 +1,53 @@
+{
+  "date": "16/11/26",
+  "kind": "physical isolated migration rejection and exception rollback/retry",
+  "sourceBase": "cb861a5308104b90436e96de7ad3b5d572a233f5",
+  "device": {
+    "api": 36,
+    "abi": "arm64-v8a",
+    "family": "Samsung physical Android phone; identifiers withheld"
+  },
+  "productSha256": "b118f856e2712f5580ee43b2d8fe29ba3f50eb53bccbddf58c528f7e1214fafa",
+  "testSha256": "ff130ffb559bad5da51351221e1c4e2e3d3aaab12cb90bbe47b7e38532c402e9",
+  "selector": "migrationRecovery=true; --no-restart -w -r",
+  "checks": 35,
+  "rawCode": -1,
+  "stream": "INSTRUMENTATION_RESULT: stream=PASS: 35 isolated migration rejection/recovery checks; repeated future-version rejection and identity-publication abort, complete logical preservation and repaired retry/reopen; no process kill or real history changes\nINSTRUMENTATION_CODE: -1",
+  "sourceSha256LfNormalized": {
+    "android/app/src/androidTest/java/com/attentionstats/qualification/MigrationRecoveryVerification.kt": "52e694e51ad08e30d85c9dcd69e261952f3eb6dab763078b5d3a7aa928689185",
+    "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt": "648bad31448dc6c07483458681d0d4f4a574057be6cc46984c61033bac282b19",
+    "android/app/src/main/java/com/attentionstats/storage/HistoryStore.kt": "ec95b8df9aef4f4697a755c5b0752e7ce7b7e1452d5b94c074ad407982e36180",
+    "android/app/src/main/java/com/attentionstats/storage/OwnedCipherDriver.kt": "4d8d84d993ea8a87d9a30bfb083477b251decd09afe397f011b5e8ef3bca3e9b",
+    "android/app/src/main/java/com/attentionstats/storage/AttentionDatabase.kt": "8561043d0a194fb51c60f217e42d30620bc53d82f0ffd9d0d28909a68b733bc1",
+    "android/app/src/main/java/com/attentionstats/storage/LocalKeyEnvelope.kt": "32643400510adad31d7594eaacc5deb8af0823e9daa0b3fa19f19022221d38d8"
+  },
+  "verifiedScope": [
+    "Unique synthetic no-backup folders and Keystore aliases; production HistoryStore.open; no live singleton",
+    "Closed parent and child exposure with unknown playback, quoted Unicode reason, disabled choices and saved breakSeconds=7",
+    "Future version 10 with retained origin and synthetic extra table; two expected production-open rejections",
+    "Schema 8 with exported identity and trigger abort during Room identity publication following generated FactOrigin DDL; two expected failed opens",
+    "Original version, every table row and sqlite_master definitions, wrapper bytes and alias preservation after each rejection; SQLite and cipher integrity",
+    "Remove only owned trigger, retry production migration, verify original application rows, saved choice, key generation and full logical reopen",
+    "Finally close owned stores, remove owned aliases/folders and assert absence"
+  ],
+  "cleanup": {
+    "runnerOwnedAliasesAndDirectoriesAbsent": true,
+    "hostDirectoryPrefixAbsent": true,
+    "hashOwnedTestRemoved": true,
+    "freshProductAppearanceBackupFontAccessibilityReverseMatch": true,
+    "actualOwnServiceBound": true,
+    "noUnfinishedInstrumentation": true,
+    "ownTodayOpened": true,
+    "noLiveHistoryOpenResetReplacementReadOrCopyByHarness": true
+  },
+  "limits": [
+    "Small synthetic fixtures; many application tables are empty, not full boundary/scale coverage",
+    "Logical snapshots do not require byte-identical encrypted database/WAL files",
+    "Future fixture is current schema plus synthetic extra table/version, not a real unknown future release",
+    "Exception during identity publication is not process kill, arbitrary cancellation, owner/UI recovery or hardware power loss",
+    "No filesystem ENOSPC, pool stress, lifetime archive, resource or Android framework recovery qualification",
+    "Existing Gradle/AGP/Kotlin/CMake deprecation warnings and missing platform-tools-package warning remain; no toolchain changes",
+    "AS-009 experimental; publication HOLD; emulator deferred"
+  ],
+  "next": "Separate actual process-kill commit-boundary qualification; owner/UI, ENOSPC, power loss, resource/scale and framework recovery remain open. AS-009 experimental; publication HOLD."
+}
