@@ -76,7 +76,7 @@ Physical candidate `b118f85`/`bb9a54a` passes 123 bounded settings/constraint/in
 
 Android documents exported schema and migration testing separately from migration declarations in [Room migration guidance](https://developer.android.com/training/data-storage/room/migrating-db-versions). The project's Room 3/SQLCipher execution remains subject to actual compatibility checks. SQLite documents [foreign-key enforcement](https://www.sqlite.org/foreignkeys.html) and [WAL/checkpoint/durability tradeoffs](https://www.sqlite.org/wal.html); reviewed 15/11/26. These references support the protocol, not a production pass.
 
-16/11/26 process-death preparation: `databaseCrash` adds test-only exact-PID precommit/postcommit kill checkpoints, every-table/choice/key comparison after a different-process reopen and a post-recovery write. [Build evidence](evidence/database-crash-build.json); no runtime assertions executed because fresh phone-baseline commands time out. It does not qualify migration-process interruption, live owner/UI delivery, hardware power loss or filesystem ENOSPC.
+16/11/26 process-death preparation: `databaseCrash` adds test-only exact-PID precommit/postcommit kill checkpoints, every-table/choice/key comparison after a different-process reopen and a post-recovery write. [Build evidence](evidence/database-crash-build.json); no runtime assertions executed because fresh phone-baseline commands time out. The checked-in [host runner](../tools/database_crash_phone.py) has six passing host safety tests; a subsequent targeted get-state still times out after 12 seconds, so neither physical phase runs. It does not qualify migration-process interruption, live owner/UI delivery, hardware power loss or filesystem ENOSPC.
 
 ## Recovery and delivery order
 
