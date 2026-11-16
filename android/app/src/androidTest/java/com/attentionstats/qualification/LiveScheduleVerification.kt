@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 /** Task-owned whole-app rule trial on an installed calculator. Does not inspect its content. */
 internal object LiveScheduleVerification {
     fun run(instrumentation: Instrumentation, focusOnly: Boolean = false, allowanceExpiry: Boolean = false,
-        recoveryAccess: Boolean = false): String {
+        recoveryAccess: Boolean = false, mutationLive: Boolean = false): String {
         val context = instrumentation.targetContext
         val owner = ReelsCoordinator.get(context)
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
@@ -76,8 +76,10 @@ internal object LiveScheduleVerification {
             isAccessible = true
         }.get(owner) as ScheduleOwner
         val savedFocus = schedules.plan.focus
-        if (allowanceExpiry || recoveryAccess) {
+        if (allowanceExpiry || recoveryAccess || mutationLive) {
             check(!focusOnly && owner.serviceConnected && !AutoScrollSession.running)
+            check(context.getSystemService(android.os.PowerManager::class.java).isInteractive &&
+                !context.getSystemService(android.app.KeyguardManager::class.java).isKeyguardLocked) { "Unlocked interactive phone required" }
             check(schedules.activeFocus() == null && schedules.decision(pkg, SystemClock.elapsedRealtime()).isEmpty()) {
                 "Existing focus/rule preserved; would mask allowance trial"
             }
@@ -93,7 +95,7 @@ internal object LiveScheduleVerification {
         val group = AppGroup(UUID.randomUUID().toString(), "Schedule verification", setOf(pkg))
         val window = BlockWindow(UUID.randomUUID().toString(), group.id, 127, 0, 0, true, allDay = true)
         val second = window.copy(id = UUID.randomUUID().toString())
-        val ownedWindows = if (allowanceExpiry || recoveryAccess) listOf(window, second) else listOf(window)
+        val ownedWindows = if (allowanceExpiry || recoveryAccess || mutationLive) listOf(window, second) else listOf(window)
         var added = false
         var primaryFailure: Throwable? = null
         fun foregroundPackage(): String? {
@@ -116,6 +118,51 @@ internal object LiveScheduleVerification {
             context.startActivity(checkNotNull(context.packageManager.getLaunchIntentForPackage(pkg)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             val deadline = SystemClock.elapsedRealtime() + 10_000
             while (!allowedButton(false) && SystemClock.elapsedRealtime() < deadline) SystemClock.sleep(250)
+            if (mutationLive) {
+                val ownedIds = ownedWindows.map { it.id }.toSet()
+                var stage = 0
+                fun assertRendered(expected: Set<String>) {
+                    instrumentation.sendStatus(1, Bundle().apply {
+                        putString("stream", "MUTATION_STAGE: ${++stage}; expected reasons=${expected.size}")
+                    })
+                    try { awaitState { calculatorForeground() && allowedButton(false) == expected.isNotEmpty() } }
+                    catch (failure: IllegalStateException) {
+                        error("Mutation stage=$stage foregroundCalculator=${calculatorForeground()} cover=${allowedButton(false)} reasons=${schedules.decision(pkg, SystemClock.elapsedRealtime()).size} bound=${owner.serviceConnected}")
+                    }
+                    // Observe the settled state, not just the first renderer callback.
+                    val until = SystemClock.elapsedRealtime() + 2_000
+                    do {
+                        check(owner.serviceConnected && owner.grantEnabled() && !AutoScrollSession.running)
+                        check(calculatorForeground() && allowedButton(false) == expected.isNotEmpty())
+                        check(schedules.plan.focus == savedFocus && schedules.plan.groups.contains(group))
+                        check(schedules.decision(pkg, SystemClock.elapsedRealtime()).map { it.id }.toSet() == expected)
+                        SystemClock.sleep(100)
+                    } while (SystemClock.elapsedRealtime() < until)
+                }
+                fun changeOwned(next: List<BlockWindow>) {
+                    val latest = state(); val current = plan(latest)
+                    check(current.groups.single { it.id == group.id } == group)
+                    check(current.windows.filter { it.id in ownedIds }.all { item ->
+                        ownedWindows.any { it == item || it.copy(enabled = false) == item }
+                    }) { "Owned rule changed unexpectedly" }
+                    val retained = current.windows.filter { it.id !in ownedIds }
+                    save(current.copy(windows = retained + next), latest.getString("revision").toLong())
+                    check(schedules.plan.windows.filter { it.id !in ownedIds } == retained)
+                    check(schedules.plan.windows.filter { it.id in ownedIds } == next)
+                }
+                assertRendered(ownedIds)
+                changeOwned(listOf(window.copy(enabled = false), second))
+                assertRendered(setOf(second.id))
+                changeOwned(ownedWindows.map { it.copy(enabled = false) })
+                assertRendered(emptySet())
+                changeOwned(ownedWindows)
+                assertRendered(ownedIds)
+                changeOwned(listOf(second))
+                assertRendered(setOf(second.id))
+                changeOwned(emptyList())
+                assertRendered(emptySet())
+                return "PASS: actual overlapping-schedule live disable/re-enable/removal; six settled Calculator cover/reason states; foreground retained without allowance; saved focus preserved; only owned rules removed"
+            }
             if (recoveryAccess) {
                 fun assertRules() {
                     check(owner.serviceConnected && owner.grantEnabled() && !AutoScrollSession.running)
@@ -200,7 +247,7 @@ internal object LiveScheduleVerification {
                     // Retain all concurrent unowned rule changes and the native saved focus.
                     val ownedIds = ownedWindows.map { it.id }.toSet()
                     check(current.groups.none { it.id == group.id && it != group } &&
-                        current.windows.none { it.id in ownedIds && it !in ownedWindows }) { "Owned rule changed; no destructive cleanup" }
+                        current.windows.none { item -> item.id in ownedIds && ownedWindows.none { it == item || (mutationLive && it.copy(enabled = false) == item) } }) { "Owned rule changed; no destructive cleanup" }
                     if (current.groups.any { it.id == group.id } || current.windows.any { it.id in ownedIds }) {
                         save(current.copy(groups = current.groups.filter { it.id != group.id }, windows = current.windows.filter { it.id !in ownedIds }),
                             latest.getString("revision").toLong())
@@ -208,7 +255,7 @@ internal object LiveScheduleVerification {
                     check(schedules.plan.groups.none { it.id == group.id } && schedules.plan.windows.none { it.id in ownedIds })
                     check(schedules.plan.focus == savedFocus)
                 }
-                if (allowanceExpiry || recoveryAccess) {
+                if (allowanceExpiry || recoveryAccess || mutationLive) {
                     context.startActivity(Intent(context, com.attentionstats.MainActivity::class.java).setAction(Intent.ACTION_VIEW)
                         .setData(android.net.Uri.parse("attentionstats://today")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 }

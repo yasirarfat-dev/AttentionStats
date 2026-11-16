@@ -7,6 +7,8 @@
 **Related specifications:** [Native contracts](NATIVE-CONTRACTS.md), [Permissions](PERMISSIONS.md), [Settings](SETTINGS-SPEC.md), [Testing](TESTING.md).
 **Unresolved feasibility:** F-01, F-02 and F-08 in [Decisions](DECISIONS.md); third-party apps cannot assume privileged system suspension.
 
+The operator-only `protectionMutationLive=true` qualification changes only temporary owned whole-app schedules through the production coordinator while a safe Calculator remains foreground. Disabling/removing one overlap must retain the other reason and cover; disabling/removing the last must release the cover without an allowance, and re-enabling must restore it. See [Testing](TESTING.md#timed-focus-qualification) for the six-state protocol, exact-owned cleanup and scope limits. This adds no production behavior.
+
 ## Rules and choices
 
 AS-060 timing qualification now has a separate encrypted-store integration mode, `breakTiming=true`: it exercises the actual diary time/count thresholds, cross-app continuity, dismissal and five-minute absence boundary with synthetic clocks. Its results belong to [Testing](TESTING.md#surface-sampling-and-hud-recovery) and dated evidence; they do not accept live time-triggered rendering or the real-duration reset gate. The separate `breakTimeLive=true` trial uses real elapsed time and the existing source renderer, repeats after dismissal without rule edits, and verifies saved preference restoration. Its narrow device/source evidence does not establish automatic pause or real five-minute absence. Product behavior is unchanged.

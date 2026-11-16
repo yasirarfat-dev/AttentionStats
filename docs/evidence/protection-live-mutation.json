@@ -1,0 +1,100 @@
+{
+  "date": "17/11/26",
+  "sourceBase": "4b2a67530190935dc0707ef5afafa01c13d98dc3",
+  "tasks": [
+    "AS-015",
+    "AS-053"
+  ],
+  "status": "PASS only within observed live-mutation scope; earlier initial-entry failures unresolved; publication HOLD",
+  "productSha256Unchanged": "c9c843316b4eeea24dde8ecad1c6810b156fe3af48a00b4b10426a1e1237acbd",
+  "testSha256": "302dfa6db79f9f220e90462c4f77b1c380b8a56395cf43a1d9e85d74f6a469b1",
+  "mode": "protectionMutationLive=true",
+  "device": {
+    "api": 36,
+    "abi": "arm64-v8a",
+    "identifiers": "withheld"
+  },
+  "acceptedRuns": [
+    {
+      "run": 1,
+      "rawCode": -1,
+      "rawSha256": "a54c1ac9bd969c0094d356c6b5eb0defed2aa67e1aa4ed69f08cb547cd029ba4"
+    },
+    {
+      "run": 2,
+      "rawCode": -1,
+      "rawSha256": "a54c1ac9bd969c0094d356c6b5eb0defed2aa67e1aa4ed69f08cb547cd029ba4"
+    }
+  ],
+  "rawNote": "Both separate final runs emit identical stage/PASS streams and therefore have identical hashes; private raw files retained separately.",
+  "earlierFailures": [
+    {
+      "testSha256": "dca15ffb73bde3c81c29d50c6c45280104e3fc574ea749336ffb78b6f2a500b3",
+      "rawCode": 0,
+      "rawSha256": "0ac2af94b3aaff35e774819c627151f5ac5bfe82751d1f6f5d2471aba4d1369b",
+      "outcome": "Initial foreground/cover wait failed; no mutation reached; cleanup completed"
+    },
+    {
+      "testSha256": "c60bc034c8be2eb467103fceb5562048081eb7e56868bc6e37a3722c0f4c2ed7",
+      "rawCode": 0,
+      "rawSha256": "b52ff4aeb3c506e0ddf31261c1eb73c92237b7eda1fea1618da9b6a62a08830f",
+      "outcome": "Explicit stage 1 failed; no mutation reached; cleanup completed"
+    }
+  ],
+  "failureAssessment": "Cause unknown; no production behavior changed. Final test adds interactive/unlocked guard and diagnostic stage/bool/reason-count reporting. Later passes do not establish an initial-entry fix or universal reliability.",
+  "preconditions": "Actual bound grant, unlocked interactive phone, no auto-scroll/active focus/masking Calculator rule; sufficient rule capacity",
+  "observedStates": [
+    {
+      "rules": "both enabled",
+      "cover": true,
+      "reasonCount": 2
+    },
+    {
+      "rules": "first disabled; second enabled",
+      "cover": true,
+      "reasonCount": 1
+    },
+    {
+      "rules": "both disabled",
+      "cover": false,
+      "reasonCount": 0
+    },
+    {
+      "rules": "both re-enabled",
+      "cover": true,
+      "reasonCount": 2
+    },
+    {
+      "rules": "first removed; second enabled",
+      "cover": true,
+      "reasonCount": 1
+    },
+    {
+      "rules": "last removed",
+      "cover": false,
+      "reasonCount": 0
+    }
+  ],
+  "protocol": "One UUID-owned group/two all-day overlapping schedules; production-coordinator current-revision saves; ten-second bounded transition poll and two-second observation each state; exact native reason IDs, foreground package, saved focus and service/grant checked throughout settled observations",
+  "acquisition": "Foreign application root package only; own overlay controls only; no Calculator content, allowance press or navigation between mutations",
+  "cleanup": {
+    "temporaryRules": "Only exact owned enabled/disabled variants removed at current revision; unowned rules and saved focus preserved",
+    "exactDiagnosticRemoved": true,
+    "originalProductAppearanceBackupFontAccessibilityDisplayAndReversePreserved": true,
+    "serviceBound": true,
+    "noUnfinishedInstrumentation": true,
+    "todayOpened": true,
+    "noFocusStartedEndedOrReplaced": true,
+    "noLiveHistoryFixtureResetOrReplacement": true,
+    "configurationRevisions": "advance normally"
+  },
+  "build": "Final PASS 34s, 315 tasks/31 executed; initial compile failed on unqualified Activity.RESULT_OK and was corrected before any phone test. Intermediate builds PASS 37s/35s. Final APK hash rechecked after completed build before trial.",
+  "changes": "Instrumentation only; no product rebuild/reinstall, production fix, schema, dependency or permission change",
+  "remaining": [
+    "Unexplained initial foreground/cover failures",
+    "Actual editor interactions for these mutations and exact transition latency",
+    "Focus deadline/renderer conflicts, selective and Allow Only behavior",
+    "Emergency/keyboard/permission recovery and process/reboot/revocation",
+    "Auto-scroll, resources and remaining release gates"
+  ]
+}
