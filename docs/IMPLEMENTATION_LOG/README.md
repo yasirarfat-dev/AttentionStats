@@ -11,6 +11,8 @@ Log entries are historical context. Current specs, decisions, State and Tracker 
 
 Entries:
 
+- [2026-11-17 — protection recovery navigation](2026-11-17.md).
+
 - [2026-10-27 — documentation foundation](2026-10-27.md).
 - [2026-10-28 — category migration, native shell and scrolling counter](2026-10-28.md).
 

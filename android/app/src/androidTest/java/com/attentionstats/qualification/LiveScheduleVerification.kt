@@ -20,7 +20,8 @@ import java.util.concurrent.TimeUnit
 
 /** Task-owned whole-app rule trial on an installed calculator. Does not inspect its content. */
 internal object LiveScheduleVerification {
-    fun run(instrumentation: Instrumentation, focusOnly: Boolean = false, allowanceExpiry: Boolean = false): String {
+    fun run(instrumentation: Instrumentation, focusOnly: Boolean = false, allowanceExpiry: Boolean = false,
+        recoveryAccess: Boolean = false): String {
         val context = instrumentation.targetContext
         val owner = ReelsCoordinator.get(context)
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
@@ -41,7 +42,7 @@ internal object LiveScheduleVerification {
                 { success = true; done.countDown() }, { done.countDown() })
             check(done.await(15, TimeUnit.SECONDS) && success) { "schedule save failed" }
         }
-        fun allowedButton(click: Boolean): Boolean {
+        fun allowedButton(click: Boolean, label: String = "Allow 5 minutes"): Boolean {
             for (window in automation.windows) {
                 if (window.type != AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY) continue
                 val root = window.root ?: continue
@@ -53,7 +54,7 @@ internal object LiveScheduleVerification {
                         while (queue.isNotEmpty() && visited++ < 120) {
                             val node = queue.removeFirst()
                             try {
-                                if (node.text?.toString() == "Allow 5 minutes" && node.isVisibleToUser) {
+                                if (node.text?.toString() == label && node.isVisibleToUser) {
                                     if (click) check(node.performAction(AccessibilityNodeInfo.ACTION_CLICK))
                                     return true
                                 }
@@ -75,13 +76,13 @@ internal object LiveScheduleVerification {
             isAccessible = true
         }.get(owner) as ScheduleOwner
         val savedFocus = schedules.plan.focus
-        if (allowanceExpiry) {
+        if (allowanceExpiry || recoveryAccess) {
             check(!focusOnly && owner.serviceConnected && !AutoScrollSession.running)
             check(schedules.activeFocus() == null && schedules.decision(pkg, SystemClock.elapsedRealtime()).isEmpty()) {
                 "Existing focus/rule preserved; would mask allowance trial"
             }
             check(initial.groups.size < 30 && initial.windows.size <= 98)
-            check(android.provider.Settings.System.getLong(context.contentResolver, "screen_off_timeout") >= 360_000)
+            if (allowanceExpiry) check(android.provider.Settings.System.getLong(context.contentResolver, "screen_off_timeout") >= 360_000)
         }
         if (focusOnly) {
             val focus = before.optJSONObject("focus")
@@ -92,14 +93,20 @@ internal object LiveScheduleVerification {
         val group = AppGroup(UUID.randomUUID().toString(), "Schedule verification", setOf(pkg))
         val window = BlockWindow(UUID.randomUUID().toString(), group.id, 127, 0, 0, true, allDay = true)
         val second = window.copy(id = UUID.randomUUID().toString())
-        val ownedWindows = if (allowanceExpiry) listOf(window, second) else listOf(window)
+        val ownedWindows = if (allowanceExpiry || recoveryAccess) listOf(window, second) else listOf(window)
         var added = false
         var primaryFailure: Throwable? = null
-        fun calculatorForeground(): Boolean {
+        fun foregroundPackage(): String? {
             val root = automation.windows.firstOrNull {
                 it.isFocused && it.type == AccessibilityWindowInfo.TYPE_APPLICATION
-            }?.root ?: return false
-            return try { root.packageName?.toString() == pkg } finally { SnapshotReader.recycle(root) }
+            }?.root ?: return null
+            return try { root.packageName?.toString() } finally { SnapshotReader.recycle(root) }
+        }
+        fun calculatorForeground() = foregroundPackage() == pkg
+        fun awaitState(condition: () -> Boolean) {
+            val until = SystemClock.elapsedRealtime() + 10_000
+            while (!condition() && SystemClock.elapsedRealtime() < until) SystemClock.sleep(100)
+            check(condition()) { "Recovery foreground/cover state not reached" }
         }
         try {
             if (!focusOnly) {
@@ -109,6 +116,41 @@ internal object LiveScheduleVerification {
             context.startActivity(checkNotNull(context.packageManager.getLaunchIntentForPackage(pkg)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             val deadline = SystemClock.elapsedRealtime() + 10_000
             while (!allowedButton(false) && SystemClock.elapsedRealtime() < deadline) SystemClock.sleep(250)
+            if (recoveryAccess) {
+                fun assertRules() {
+                    check(owner.serviceConnected && owner.grantEnabled() && !AutoScrollSession.running)
+                    check(schedules.plan.focus == savedFocus && schedules.plan.groups.contains(group) &&
+                        schedules.plan.windows.containsAll(ownedWindows))
+                    check(schedules.decision(pkg, SystemClock.elapsedRealtime()).map { it.id }.toSet() == ownedWindows.map { it.id }.toSet())
+                }
+                fun returnToBlock() {
+                    context.startActivity(checkNotNull(context.packageManager.getLaunchIntentForPackage(pkg)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                    awaitState { calculatorForeground() && allowedButton(false) }
+                    assertRules()
+                }
+                awaitState { calculatorForeground() && allowedButton(false) }
+                assertRules()
+                check(allowedButton(true, "Open Attention Stats")) { "Recovery button unavailable" }
+                awaitState { foregroundPackage() == context.packageName && !allowedButton(false) }
+                SystemClock.sleep(2_000)
+                check(foregroundPackage() == context.packageName && !allowedButton(false))
+                check(schedules.decision(context.packageName, SystemClock.elapsedRealtime()).isEmpty())
+                returnToBlock()
+                context.startActivity(Intent(android.provider.Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                awaitState { foregroundPackage() == "com.android.settings" && !allowedButton(false) }
+                SystemClock.sleep(2_000)
+                check(foregroundPackage() == "com.android.settings" && !allowedButton(false))
+                check(schedules.decision("com.android.settings", SystemClock.elapsedRealtime()).isEmpty())
+                returnToBlock()
+                // Real system Home navigation; never traverse launcher nodes or read labels.
+                check(automation.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME))
+                awaitState { foregroundPackage()?.let { it in schedules.excluded && it != context.packageName && it != "com.android.settings" } == true && !allowedButton(false) }
+                val home = checkNotNull(foregroundPackage())
+                SystemClock.sleep(2_000)
+                check(foregroundPackage() == home && !allowedButton(false) && schedules.decision(home, SystemClock.elapsedRealtime()).isEmpty())
+                returnToBlock()
+                return "PASS: actual overlapping-schedule recovery access; cover Open Attention Stats, Android Settings and system Home remain uncovered; three Calculator returns restore both rule reasons; target content unread; saved focus preserved; only owned rules removed"
+            }
             val allowanceBefore = SystemClock.elapsedRealtime()
             check(allowedButton(true)) { "whole-app cover did not appear" }
             SystemClock.sleep(2_000)
@@ -166,7 +208,7 @@ internal object LiveScheduleVerification {
                     check(schedules.plan.groups.none { it.id == group.id } && schedules.plan.windows.none { it.id in ownedIds })
                     check(schedules.plan.focus == savedFocus)
                 }
-                if (allowanceExpiry) {
+                if (allowanceExpiry || recoveryAccess) {
                     context.startActivity(Intent(context, com.attentionstats.MainActivity::class.java).setAction(Intent.ACTION_VIEW)
                         .setData(android.net.Uri.parse("attentionstats://today")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 }

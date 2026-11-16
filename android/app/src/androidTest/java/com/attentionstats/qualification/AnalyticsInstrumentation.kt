@@ -15,6 +15,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var focusExpiryLive = false
     private var focusStatus = false
     private var allowanceExpiryLive = false
+    private var protectionRecoveryLive = false
     private var focus = false
     private var beta = false
     private var source: String? = null
@@ -150,6 +151,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         focusExpiryLive = arguments?.getString("focusExpiryLive") == "true"
         focusStatus = arguments?.getString("focusStatus") == "true"
         allowanceExpiryLive = arguments?.getString("allowanceExpiryLive") == "true"
+        protectionRecoveryLive = arguments?.getString("protectionRecoveryLive") == "true"
         focus = arguments?.getString("focus") == "true"
         start()
     }
@@ -201,6 +203,11 @@ class AnalyticsInstrumentation : Instrumentation() {
             if (widgets) {
                 result.putString("stream", "PASS: ${WidgetVerification.run(this)} widget projection/configuration/attached-host checks; synthetic host only, real widgets unchanged")
                 finish(Activity.RESULT_OK, result); return
+            }
+            if (protectionRecoveryLive) {
+                result.putString("stream", LiveScheduleVerification.run(this, recoveryAccess = true))
+                finish(Activity.RESULT_OK, result)
+                return
             }
             if (allowanceExpiryLive) {
                 result.putString("stream", LiveScheduleVerification.run(this, allowanceExpiry = true))
