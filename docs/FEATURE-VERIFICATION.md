@@ -13,6 +13,8 @@
 
 Tracking connection status is repaired on installed `63069b6`: 7 real RN checks/-1 using only a synthetic volatile disconnected flag, two private visual reviews, and 158 host tests pass ([evidence](evidence/counting-health.json)). Independently, three ordinary own-process kills on prior `b118f85` automatically rebind with original settings preserved ([evidence](evidence/service-recovery.json)). Neither qualifies reboot/Doze/OEM continuity or resolves the instrumented database-test rebind failure.
 
+Auto-scroll remains unresolved on latest `c9c8433`: two actual Start/Stop ten-transition/180-second trials achieve zero arrivals. Real-service cache clearing recovers no signal on the AD/unknown item (50 missing pairs); the regular video has progress in all 50 pairs and does not reproduce the earlier missing-progress stall. Both targets fail/code0; diagnostics alone complete, with no absolute playback time recovered ([evidence](evidence/autoscroll-service-cache.json)).
+
 These groups summarize the detailed artifact-scoped rows below; they do not claim a complete final-candidate pass. The remaining release work concerns implemented behavior, not finishing every planned roadmap feature.
 
 | Feature group | What has passed | What remains |

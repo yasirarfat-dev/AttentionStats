@@ -72,6 +72,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var autoScrollTransitions = 3
     private var autoScrollSeconds = 180
     private var autoScrollCacheAudit = false
+    private var autoScrollServiceCacheAudit = false
     private var standaloneAdLive = false
     private var mixedAdsLive = false
     private var builtinScrollProbe: String? = null
@@ -98,6 +99,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         autoScrollTransitions = arguments?.getString("autoScrollTransitions")?.toIntOrNull()?.takeIf { it in 1..20 } ?: 3
         autoScrollSeconds = arguments?.getString("autoScrollSeconds")?.toIntOrNull()?.takeIf { it in 30..900 } ?: 180
         autoScrollCacheAudit = arguments?.getString("autoScrollCacheAudit") == "true"
+        autoScrollServiceCacheAudit = arguments?.getString("autoScrollServiceCacheAudit") == "true"
         standaloneAdLive = arguments?.getString("standaloneAdLive") == "true"
         mixedAdsLive = arguments?.getString("mixedAdsLive") == "true"
         autoScrollInterruption = arguments?.getString("autoScrollInterruption") == "true"
@@ -179,7 +181,7 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             autoScrollContinuous?.let { source ->
                 result.putString("stream", LiveAutoScrollContinuousVerification.run(this, source, standaloneAdLive, mixedAdsLive,
-                    autoScrollTransitions, autoScrollSeconds, autoScrollCacheAudit))
+                    autoScrollTransitions, autoScrollSeconds, autoScrollCacheAudit, autoScrollServiceCacheAudit))
                 finish(Activity.RESULT_OK, result); return
             }
             numericMediaProbe?.let { source ->

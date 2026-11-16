@@ -39,6 +39,13 @@ import java.util.concurrent.atomic.AtomicLong
  * mindful breaks and blocks. Never reads other apps, never stores screen text.
  */
 class ReelsAccessibilityService : AccessibilityService() {
+    internal data class PlaybackAcquisitionDiagnostic(val app: ReelApp, val frame: AdapterFrame,
+        val window: Int, val epoch: Long, val atMs: Long, val complete: Boolean)
+    internal companion object {
+        /** Explicit operator debug test only. No nodes/labels, bridge or persistent subscription. */
+        @Volatile var onPlaybackAcquisitionDiagnostic:
+            ((ReelsAccessibilityService, PlaybackAcquisitionDiagnostic) -> Unit)? = null
+    }
     private val main = Handler(Looper.getMainLooper())
     private val coordinator by lazy { ReelsCoordinator.get(this) }
     private val listener: () -> Unit = { main.post {
@@ -259,6 +266,9 @@ class ReelsAccessibilityService : AccessibilityService() {
             if (decision != null && decision.kind != "schedule") main.post { enforceBlock(decision) }
             feedAutoScroll(app, frame, snapshot.windowId, capturedEpoch, now)
             main.post { renderOverlays() }
+            if (com.attentionstats.BuildConfig.DEBUG) onPlaybackAcquisitionDiagnostic?.invoke(this,
+                PlaybackAcquisitionDiagnostic(app, frame, snapshot.windowId, capturedEpoch, now,
+                    snapshot.complete && !snapshot.typing))
             return when {
                 frame.surface == Surface.REELS -> 400L
                 displayEligible || decision != null -> 700L
