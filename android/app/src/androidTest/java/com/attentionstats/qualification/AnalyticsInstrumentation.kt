@@ -13,6 +13,8 @@ import org.attentionstats.reels.main as verifyReels
 class AnalyticsInstrumentation : Instrumentation() {
     private var focusLive = false
     private var focusExpiryLive = false
+    private var focusStatus = false
+    private var allowanceExpiryLive = false
     private var focus = false
     private var beta = false
     private var source: String? = null
@@ -146,6 +148,8 @@ class AnalyticsInstrumentation : Instrumentation() {
         inspect = arguments?.getString("inspect")?.takeIf { it in setOf("own", "settings") || org.attentionstats.reels.ReelApp.byKey(it) != null }
         focusLive = arguments?.getString("focusLive") == "true"
         focusExpiryLive = arguments?.getString("focusExpiryLive") == "true"
+        focusStatus = arguments?.getString("focusStatus") == "true"
+        allowanceExpiryLive = arguments?.getString("allowanceExpiryLive") == "true"
         focus = arguments?.getString("focus") == "true"
         start()
     }
@@ -196,6 +200,14 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             if (widgets) {
                 result.putString("stream", "PASS: ${WidgetVerification.run(this)} widget projection/configuration/attached-host checks; synthetic host only, real widgets unchanged")
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (allowanceExpiryLive) {
+                result.putString("stream", LiveScheduleVerification.run(this, allowanceExpiry = true))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (focusStatus) {
+                result.putString("stream", FocusExpiryLiveVerification.run(this, statusOnly = true))
                 finish(Activity.RESULT_OK, result); return
             }
             if (focusExpiryLive) {

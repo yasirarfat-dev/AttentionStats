@@ -10,6 +10,10 @@ import org.json.JSONObject
 import java.io.File
 import java.security.KeyStore
 import java.util.UUID
+import org.attentionstats.protection.AppGroup
+import org.attentionstats.protection.BlockWindow
+import org.attentionstats.protection.BlockScope
+import org.attentionstats.protection.SchedulePlan
 
 /** Real encrypted owner/persistence, isolated from the user's rules/history; no rendered blocks. */
 internal object FocusVerification {
@@ -75,6 +79,58 @@ internal object FocusVerification {
             expect(again.decision(blocked, SystemClock.elapsedRealtime()).isEmpty())
             expect(again.focus(history, null, 0, 4, allowing.id))
             expect(again.activeFocus() == null && again.targets().isEmpty())
+
+            // Persist overlapping rules in this UUID-owned store only. Decision-time
+            // arguments exercise allowance boundaries; the device clock never changes.
+            val overlap = SchedulePlan(listOf(
+                AppGroup("both", "Synthetic overlap", setOf(allowed, blocked)),
+                AppGroup("blocked", "Synthetic second rule", setOf(blocked))
+            ), listOf(
+                BlockWindow("a", "both", 127, 0, 0, true, allDay = true),
+                BlockWindow("b", "blocked", 127, 0, 0, true, allDay = true)
+            ))
+            expect(again.save(history, ScheduleOwner.encode(overlap).toString(), 5))
+            expect(again.focus(history, setOf(blocked), 1, 6, null))
+            val overlappingFocus = checkNotNull(again.activeFocus())
+            val now = SystemClock.elapsedRealtime()
+            expect(again.decision(blocked, now).map { it.id } == listOf("focus", "a", "b"))
+            expect(again.decision(allowed, now).map { it.id } == listOf("a"))
+            expect(again.decision(blocked, now, BlockScope.SHORT_VIDEOS).isEmpty())
+            expect(again.decision(target.packageName, now).isEmpty() &&
+                again.decision("com.android.settings", now).isEmpty())
+            again.allow(blocked, now)
+            expect(again.decision(blocked, now).isEmpty())
+            expect(again.decision(allowed, now).map { it.id } == listOf("a"))
+            expect(again.decision(blocked, now + 299_999).isEmpty())
+            expect(again.decision(blocked, now + 300_000).map { it.id } == listOf("focus", "a", "b"))
+            expect(again.decision(blocked, now + 300_001).size == 3)
+            expect(again.plan.groups == overlap.groups && again.plan.windows == overlap.windows &&
+                again.activeFocus()?.id == overlappingFocus.id)
+            expect(!again.focus(history, null, 0, 6, overlappingFocus.id))
+            expect(again.activeFocus()?.id == overlappingFocus.id)
+            expect(again.focus(history, null, 0, 7, overlappingFocus.id))
+            expect(again.activeFocus() == null && again.decision(blocked, now).map { it.id } == listOf("a", "b"))
+            expect(again.plan.groups == overlap.groups && again.plan.windows == overlap.windows)
+
+            // Allow Only membership must not waive an independent schedule.
+            expect(again.focus(history, setOf(allowed), 1, 8, null, true))
+            val inverseFocus = checkNotNull(again.activeFocus())
+            expect(again.decision(allowed, now).map { it.id } == listOf("a"))
+            expect(again.decision(blocked, now).map { it.id } == listOf("focus", "a", "b"))
+            again.allow(blocked, now)
+            expect(again.decision(blocked, now + 299_999).isEmpty())
+            expect(again.decision(allowed, now).map { it.id } == listOf("a"))
+            expect(again.decision(blocked, now + 300_000).size == 3)
+            val persisted = ScheduleOwner(context); persisted.load(history)
+            expect(persisted.activeFocus()?.id == inverseFocus.id && persisted.plan.groups == overlap.groups &&
+                persisted.plan.windows == overlap.windows)
+            expect(persisted.decision(blocked, now).size == 3) // Transient allowances do not survive reopening.
+            expect(persisted.decision(allowed, now).map { it.id } == listOf("a"))
+            expect(persisted.focus(history, null, 0, 9, inverseFocus.id))
+            expect(persisted.decision(blocked, now).map { it.id } == listOf("a", "b") &&
+                persisted.decision(allowed, now).map { it.id } == listOf("a"))
+            expect(persisted.plan.focus == null && persisted.plan.groups == overlap.groups &&
+                persisted.plan.windows == overlap.windows && persisted.revision == 10L)
             checks
         } finally {
             store?.close()

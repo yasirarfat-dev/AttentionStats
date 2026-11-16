@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 /** Operator-only real one-minute native deadline/renderer trial. Calculator content is never read. */
 internal object FocusExpiryLiveVerification {
-    fun run(instrumentation: Instrumentation): String {
+    fun run(instrumentation: Instrumentation, statusOnly: Boolean = false): String {
         val context = instrumentation.targetContext
         val owner = ReelsCoordinator.get(context)
         // Debug and preview mangle the internal getter differently. This exact own-app
@@ -28,6 +28,24 @@ internal object FocusExpiryLiveVerification {
         val schedules = ReelsCoordinator::class.java.getDeclaredField("schedules").apply {
             isAccessible = true
         }.get(owner) as ScheduleOwner
+        if (statusOnly) {
+            // Do not call scheduleSnapshot: that user-facing read can seed default groups.
+            // Publish only fixed state categories, never saved IDs, targets or timestamps.
+            check(owner.serviceConnected && owner.grantEnabled() && !AutoScrollSession.running)
+            val revision = schedules.revision
+            val plan = schedules.plan
+            val active = schedules.activeFocus()
+            val status = when {
+                plan.focus == null -> "absent"
+                active != null -> "active"
+                else -> "expired_or_clock_invalid"
+            }
+            val calculator = listOf("com.sec.android.app.popupcalculator", "com.google.android.calculator", "com.android.calculator2")
+                .firstOrNull { context.packageManager.getLaunchIntentForPackage(it) != null }
+            val calculatorRule = calculator?.let { schedules.decision(it, SystemClock.elapsedRealtime()).isNotEmpty() }
+            check(schedules.revision == revision && schedules.plan == plan) { "Configuration changed during status read" }
+            return "PASS: read-only saved focus status=$status; calculatorAvailable=${calculator != null}; calculatorRuleApplies=$calculatorRule; configuration unchanged; no focus mutation or UI acquisition"
+        }
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
         automation.serviceInfo = automation.serviceInfo.apply {
             flags = flags or android.accessibilityservice.AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
