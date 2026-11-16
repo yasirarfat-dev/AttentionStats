@@ -1,6 +1,6 @@
 # Documentation index
 
-**Status:** Android MVP 1.0.0 exists; the maintainer reports closed-beta publication. Development continues on `develop`; broader qualification and full-product work remain open. Updated 2026-11-03.
+**Status:** Android MVP 1.0.0 exists; the maintainer clarifies that prior builds were test-only and the next release is the first public production baseline (ADR-108). Development continues on `develop`; broader qualification and full-product work remain open. Updated 2026-11-16.
 **Responsibility:** Maps every source-of-truth document, reading order and ownership boundary.
 **Related specifications:** [Current state](STATE.md), [Shared rules](AGENT-RULES.md), [Tracker](FEATURE-TRACKER.md), [Decisions](DECISIONS.md).
 **Unresolved feasibility:** F-01–F-10 in [Decisions](DECISIONS.md); specifications do not constitute source, policy or application-build verification.

@@ -1,6 +1,6 @@
 # Storage and retention
 
-**Status:** Experimental schema-9 encrypted product store exists; broader durability, migration, lifetime-scale and retention implementation/qualification remain open. Updated 2026-11-15.
+**Status:** Experimental schema-9 encrypted product store exists; broader durability, migration, lifetime-scale and retention implementation/qualification remain open. Updated 2026-11-16.
 **Responsibility:** Owns durability, retention, deletion, deduplication, growth and recovery.
 **Related specifications:** [Models](DATA-MODELS.md), [Privacy](PRIVACY.md), [Backup](BACKUP-RESTORE.md), [Tests](TESTING.md).
 **Unresolved feasibility:** F-02 and F-04 in [Decisions](DECISIONS.md); encrypted storage performance and filesystem behavior require tests.
@@ -9,6 +9,12 @@
 
 Schema 9/logical archive version 2 now preserve per-fact random installation origins alongside original IDs through replacement and re-export. New destination facts keep their new installation origin. This is the first implemented prerequisite for the future multi-origin design below; it is not a merge/sync implementation. Origin sidecars must be removed with their facts; current full erase and replacement do so transactionally. Future selective retention/deletion must extend that invariant and add tombstone/fence reconciliation before admitting synchronization.
 
+
+## WAL commit synchronization — ADR-107
+
+Physical candidate `b118f85`/`bb9a54a` passes 123 bounded settings/constraint/integrity/reopen checks plus the 301-check historical regression, raw -1; [runtime evidence](evidence/database-durability.json). Writer probes are transactional; final sampled reader/writer synchronization is 2 and foreign keys are 1. The earlier NORMAL finding and failed reopened-reader candidate remain recorded. This is policy and bounded recovery evidence, not hardware power-loss acceptance.
+
+The owned SQLCipher adapter raises Room 3.0.3's NORMAL command to FULL on the primary writer before migration or ordinary transactions. SQLCipher's native read-only handles can retain NORMAL; inspect writer synchronization inside a write transaction, not an unpinned writer-role lease. The adapter also enables foreign keys through the native database pool configuration so later handles inherit enforcement. This policy covers the pinned framework command, with pool-wide foreign-key configuration; it is not a general SQL-configuration firewall. Keep WAL, automatic checkpointing, schema and non-destructive failure handling. Requalify effective settings when Room/driver configuration changes. FULL adds commit I/O; measure latency/energy/scale before release rather than weakening durability to pass a benchmark. Actual power-loss, process/owner recovery, filesystem ENOSPC and hardware compliance remain separate gates. [SQLite synchronization semantics](https://www.sqlite.org/pragma.html#pragma_synchronous), [Room connection configuration](https://github.com/androidx/androidx/blob/androidx-main/room3/room3-runtime/src/commonMain/kotlin/androidx/room3/RoomConnectionManager.kt).
 
 ## Authority and durability
 

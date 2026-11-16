@@ -1,6 +1,6 @@
 # Database durability and behavior-history evolution
 
-**Status:** Accepted engineering direction under ADR-106; schema-9 static review and scoped failure checks exist, broader implementation/qualification remains open. Updated 2026-11-15.
+**Status:** Accepted engineering direction under ADR-106; schema-9 static review and scoped failure checks exist, broader implementation/qualification remains open. Updated 2026-11-16.
 **Responsibility:** Turns the maintainer's continuous local behavior-history requirement into ordered database, migration and recovery work; does not replace entity or metric semantics.
 **Related specifications:** [Models](DATA-MODELS.md), [Storage](STORAGE-AND-RETENTION.md), [Analytics](ANALYTICS-SPEC.md), [Metrics](METRIC-CATALOG.md), [Backup](BACKUP-RESTORE.md), [Security](SECURITY.md), [Tracker](FEATURE-TRACKER.md).
 **Unresolved feasibility:** Reliable source identity/timing, historical migration, crash/ENOSPC durability, lifetime capacity, Android recovery and F-04/F-05 remain open. No schema can guarantee recovery from every hardware/key/storage failure or reconstruct observations that were never available.
@@ -10,6 +10,10 @@
 The database is the product's core. Preserve useful enabled digital behavior evidence for later personal pattern exploration, analytics, intelligence and predictions, even when current screens use only a subset. This includes ordered behavior and context, not just daily totals. Keep processing local and backup under the person's choices. Extend existing AS-009/AS-010/AS-014/AS-020/AS-038/AS-058/AS-062 obligations; do not open a separate history store or silently enable collection.
 
 “Every data possible” means the useful, supported, disclosed data families the person enables. Make maximum supported detail an explicit progressively disclosed choice, with measured storage/resource costs and exclusions. It never grants unrestricted screen/input/message capture. Adding schema capacity does not add source availability. New families need their own source/privacy/consent/quality/deletion/backup tests; preserve old choices and historical unknowns. Retain enabled detailed facts until explicit deletion or a separately previewed retention choice. No automatic reduction to totals, background pruning or invented historic backfill.
+
+## Production compatibility baseline — ADR-108
+
+The maintainer clarifies on 16/11/26 that earlier builds were test-only and the next release establishes the first public production baseline. Supporting those test schemas or transferring the debug package into production is optional; preserving the installed phone data during development remains required. Existing migration fixtures are useful engineering regressions, not a promise to support all pre-production versions publicly. Freeze the actual first-production schema/artifact at release. Thereafter, each new release must preserve earlier production data/choices through direct or chained migrations, including skipped app updates. Do not pre-create speculative fields or require today's binary to read unknown future schemas; reject unsupported newer/downgrade opens without deletion. Package/signing continuity and separately qualified backup recovery are independent requirements. [Decision](DECISIONS.md#first-public-production-data-baseline--adr-108--2026-11-16).
 
 ## Current review and material gaps
 
@@ -51,6 +55,12 @@ Separate immutable source observations, revisioned corrections/reductions, user 
 Use bounded native batches and one serialized write authority. Persist admitted facts, dedup/reconciliation state, query receipts/cursors, revisions and rebuild markers atomically; acknowledge only committed results. Replays need stable qualified identities, not timestamp-only guesses. Handle bounded BUSY/full/key/corrupt failures without resetting history or advancing progress. Define queue bounds and backpressure; non-replayable dropped intervals must become explicit degraded coverage rather than fabricated continuity. Preserve admitted semantic transitions/segments, not redundant high-frequency samples.
 
 Choose indexes from real bounded queries: time+stable ID, app/source+time+stable ID, episode/sequence and evidence/rebuild references. Verify query plans and write cost before adding overlapping indexes. Never infer cross-boot order solely from elapsed time or impose false uniqueness on source timestamps. Use database constraints where expressible and owner validation for cross-row temporal/non-overlap invariants; test both. Current `-1` unknown sentinels require explicit compatible decoding; any nullable-value/reason conversion is a real migration, not a Kotlin-default change.
+
+## Effective durability policy — ADR-107
+
+Physical candidate `b118f85`/`bb9a54a` passes 123 bounded settings/constraint/integrity/reopen checks plus the 301-check historical regression, raw -1; [runtime evidence](evidence/database-durability.json). Writer probes are transactional; final sampled reader/writer synchronization is 2 and foreign keys are 1. The earlier NORMAL finding and failed reopened-reader candidate remain recorded. This is policy and bounded recovery evidence, not hardware power-loss acceptance.
+
+16/11/26 physical inspection exposes NORMAL synchronization on the existing schema-9 opener. Preserve this finding separately from the strengthened candidate: WAL consistency and successful reopen alone do not establish power-loss commit durability. Raise the pinned Room configuration command to FULL on the primary writer in the owned driver, before migrations as well as ordinary writes. Configure foreign keys through the native database pool so later handles inherit enforcement. Native read-only handles may retain NORMAL; writer synchronization must be measured inside a write transaction. An open callback is insufficient because it follows migrations and does not configure every later connection. This compatibility adapter requires effective reader/writer regression checks on dependency/configuration changes; it is not a general arbitrary-SQL policy. [Decision](DECISIONS.md#sync-committed-history-to-the-wal--adr-107--2026-11-16).
 
 ## Migration and durability qualification before expansion
 
