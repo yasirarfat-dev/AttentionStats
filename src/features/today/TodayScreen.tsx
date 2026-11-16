@@ -25,7 +25,11 @@ import type { QuickFocusRequest } from '../protection';
 import { QuickActions, type QuickDestination } from './QuickActions';
 import { Screen } from '../../ui/Screen';
 import { sourceIcon, useAppIcons, useDiary, ViewingDetail } from '../diary';
-import { countingReady, useReels } from '../sources';
+import {
+  accessibilityReconnectNeeded,
+  countingReady,
+  useReels,
+} from '../sources';
 
 export type SourceDay = {
   key: ReelsSourceKey;
@@ -108,6 +112,7 @@ export function TodayScreen({
     reels.snapshot?.sources.filter(s => s.installed).map(s => s.app),
   );
   const ready = countingReady(reels.snapshot);
+  const reconnect = accessibilityReconnectNeeded(reels.snapshot);
   const date = new Date().toLocaleDateString(undefined, {
     weekday: 'long',
     month: 'long',
@@ -122,12 +127,18 @@ export function TodayScreen({
     >
       {reels.snapshot && !ready && (
         <Card tone="warn">
-          <Text style={styles.warnTitle}>Counting is not on yet</Text>
+          <Text style={styles.warnTitle}>
+            {reconnect ? 'Counting is disconnected' : 'Counting is not on yet'}
+          </Text>
           <Body muted>
-            Finish the two-step setup so Attention Stats can count your short
-            videos.
+            {reconnect
+              ? 'Turn this service off, then on in Android Settings to reconnect counting.'
+              : 'Finish the two-step setup so Attention Stats can count your short videos.'}
           </Body>
-          <Button label="Finish setup" onPress={onSetup} />
+          <Button
+            label={reconnect ? 'Reconnect Accessibility' : 'Finish setup'}
+            onPress={reconnect ? () => reels.openAccessibility() : onSetup}
+          />
         </Card>
       )}
 

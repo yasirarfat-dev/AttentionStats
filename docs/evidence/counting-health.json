@@ -1,0 +1,51 @@
+{
+  "date": "16/11/26",
+  "sourceBase": "391fc299f34ea6a78213d395ad0334e646f12ce0",
+  "kind": "counting connection status regression and physical RN rendering",
+  "productSha256": "63069b6331cdbfb905e5c763525d960461682c6cef864db0e26e86adca6f327f",
+  "testSha256": "67b24013342d80cc1a0b9782ceac47f5684d7e2ead9495d079378e4a115e915b",
+  "device": {
+    "api": 36,
+    "abi": "arm64-v8a",
+    "textScale": "original normal text",
+    "theme": "original dark; no preference change"
+  },
+  "change": [
+    "countingReady requires actual native service connection, independently of saved enabled grant and source consent",
+    "Today shows disconnected recovery guidance and Android Settings action instead of a setup tour",
+    "Settings uses saved selection plus lost connection to show Disconnected, including when Android master is off"
+  ],
+  "host": {
+    "jestSuites": 19,
+    "jestTests": 158,
+    "targetedHealthTests": 3,
+    "typecheck": "PASS",
+    "lintArchitectureBackupPalette": "PASS",
+    "changedFileFormatting": "PASS",
+    "stableArm64PreviewTestBuildAndPreviewLint": "PASS"
+  },
+  "phone": {
+    "checks": 7,
+    "rawCode": -1,
+    "scope": "actual RN Today/Settings with only volatile serviceConnected=false injected and finally restored; no actual OS revocation or source input",
+    "assertions": [
+      "Today disconnected title",
+      "Today reconnect control",
+      "No Finish setup in disconnected state",
+      "Settings Disconnected pill",
+      "Settings off/on recovery guidance",
+      "Today warning disappears after volatile restoration",
+      "appearance and system-backup preferences unchanged"
+    ],
+    "rawSha256": "b2fadf634315b8d5c47acd664a51e3b7c0b06cff4844a2bf3d25177bac15cafb",
+    "privateVisualReview": "Two own-window-bracketed normal-text captures reviewed: warning/button and settings pill/guidance readable, no clipping; copied privately and removed from phone",
+    "finalState": "original appearance/backup/font/Accessibility/reverse mappings preserved; actual own service bound; new hash-matched product installed; hash-owned test removed; no unfinished instrumentation"
+  },
+  "ordinaryProcessControl": "service-recovery.json",
+  "limits": [
+    "Synthetic disconnected rendering is separate from actual ordinary process-death recovery",
+    "No claim that production autonomously resets Android grants",
+    "No full TalkBack/RTL/large-text or reboot/Doze/OEM/source lifecycle acceptance",
+    "Auto-scroll remains unresolved; schema, collection, history and saved choices unchanged"
+  ]
+}

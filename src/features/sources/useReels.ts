@@ -97,14 +97,3 @@ export function useReels(poll = 5_000) {
     openApp: (app: ReelsSourceKey) => native?.openTarget(app),
   };
 }
-
-/** True when counting is fully working: a source on, accessibility granted and connected. */
-export function countingReady(snapshot: ReelsSnapshot | null): boolean {
-  return (
-    !!snapshot &&
-    snapshot.accessibilityEnabled &&
-    snapshot.sources.some(
-      source => source.enabled && source.consentCurrent && !source.paused,
-    )
-  );
-}

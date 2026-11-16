@@ -1,0 +1,58 @@
+{
+  "date": "16/11/26",
+  "sourceBase": "391fc299f34ea6a78213d395ad0334e646f12ce0",
+  "kind": "ordinary own-process death recovery without instrumentation",
+  "device": {
+    "api": 36,
+    "abi": "arm64-v8a",
+    "family": "Samsung physical phone; identifiers withheld"
+  },
+  "productSha256": "b118f856e2712f5580ee43b2d8fe29ba3f50eb53bccbddf58c528f7e1214fafa",
+  "protocol": [
+    "Fresh actual bound/idle baseline and no diagnostic package; explicit physical target",
+    "Validate single numeric own-app PID twice, immediately before targeted run-as SIGKILL",
+    "Poll actual bound service, different own PID and component/master state for at most 31 samples with one-second sleeps; no repair during observation",
+    "Open Today afterward and independently verify bound service, original appearance/backup/font/Accessibility/reverse hashes, no unfinished instrumentation"
+  ],
+  "trials": [
+    {
+      "samples": 3,
+      "observedRecoverySeconds": 3.03,
+      "differentProcess": true,
+      "actualServiceBound": true,
+      "masterRemainedEnabled": false,
+      "componentsUnchanged": true,
+      "observationsSha256": "0bdf33e08f91f8b6f074fbe16efd2465dff12351b5d32083136eb20db6635121"
+    },
+    {
+      "samples": 5,
+      "observedRecoverySeconds": 5.62,
+      "differentProcess": true,
+      "actualServiceBound": true,
+      "masterRemainedEnabled": false,
+      "componentsUnchanged": true,
+      "observationsSha256": "78b620a43bbac7a55c82ea5aa92a526fe248e9b52ceae4bfb10cb4fce1793604"
+    },
+    {
+      "samples": 3,
+      "observedRecoverySeconds": 2.95,
+      "differentProcess": true,
+      "actualServiceBound": true,
+      "masterRemainedEnabled": false,
+      "componentsUnchanged": true,
+      "observationsSha256": "ab7483cf316d56f68771f31261a6d4cb413ad249100b51cefabea960da71902f"
+    }
+  ],
+  "finalChecks": {
+    "originalSettingsAndReverseMappingsPreserved": true,
+    "todayOpenedAndBoundAfterEach": true,
+    "diagnosticAbsent": true,
+    "noHistoryFixtureResetOrReplacement": true
+  },
+  "limits": [
+    "Only three immediate ordinary SIGKILL/rebind observations on this phone/artifact; no reboot, force-stop, screen-off/Doze, low-memory, long-term OEM or cross-source counting accuracy acceptance",
+    "No active auto-scroll run, gesture cancellation, live-history acknowledgement or lost in-flight database-write assertion",
+    "Earlier database instrumentation SIGKILL trials still fail automatic service rebind; these different contexts do not invalidate each other",
+    "Platform root cause of instrumented failure not established; no hidden grant reset or recovery workaround added to production"
+  ]
+}

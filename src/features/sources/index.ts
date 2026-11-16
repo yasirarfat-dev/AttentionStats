@@ -1,1 +1,2 @@
-export { useReels, countingReady } from './useReels';
+export { useReels } from './useReels';
+export { countingReady, accessibilityReconnectNeeded } from './countingHealth';

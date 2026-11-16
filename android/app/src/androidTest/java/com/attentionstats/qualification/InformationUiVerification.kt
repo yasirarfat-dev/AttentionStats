@@ -161,6 +161,42 @@ internal object InformationUiVerification {
         var primaryFailure: Throwable? = null
         try {
             when (mode) {
+                "counting-health" -> {
+                    val owner = com.attentionstats.reels.ReelsCoordinator.get(context)
+                    check(owner.grantSelected()) { "Existing selected grant required; no grant added" }
+                    check(owner.serviceConnected) { "Existing bound service required" }
+                    fun capture(name: String) {
+                        val output = java.io.File(context.cacheDir, "counting-health-$name.png")
+                        check(!output.exists()) { "Unowned health capture already exists" }
+                        val beforeRoot = checkNotNull(ownRoot())
+                        SnapshotReader.recycle(beforeRoot)
+                        val bitmap = checkNotNull(automation.takeScreenshot())
+                        try {
+                            val afterRoot = checkNotNull(ownRoot())
+                            SnapshotReader.recycle(afterRoot)
+                            output.outputStream().use { check(bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)) }
+                        } finally { bitmap.recycle() }
+                    }
+                    // Inject only the volatile status field; never kill/unbind or change saved consent/history.
+                    instrumentation.runOnMainSync { owner.serviceConnected = false }
+                    try {
+                        open("today")
+                        find("Counting is disconnected") { true }; checks++
+                        find("Reconnect Accessibility") { true }; checks++
+                        check(!visit("Finish setup") { true }); checks++
+                        capture("today")
+                        open("settings")
+                        find("Disconnected") { true }; checks++
+                        find("Disconnected. Turn this service off, then on in Android Settings.") { true }; checks++
+                        capture("settings")
+                    } finally {
+                        instrumentation.runOnMainSync { owner.serviceConnected = true }
+                    }
+                    open("today")
+                    val until = SystemClock.elapsedRealtime() + 8_000
+                    while (visit("Counting is disconnected") { true } && SystemClock.elapsedRealtime() < until) SystemClock.sleep(200)
+                    check(!visit("Counting is disconnected") { true }); checks++
+                }
                 "today" -> {
                     open("today")
                     help("Today Stats", "This Session counts")

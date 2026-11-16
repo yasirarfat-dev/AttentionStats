@@ -29,7 +29,7 @@ import { ProtectionToolScreen } from '../protection';
 import { clearHistoryCache } from '../diary';
 import { sourceIcon, useAppIcons, useDiary } from '../diary';
 import { useDeleteHistory } from './DeleteHistory';
-import { useReels } from '../sources';
+import { accessibilityReconnectNeeded, useReels } from '../sources';
 import { applyAppearance, useAppearance } from '../../ui/theme';
 import { saveAppearance } from '../../platform/appearance';
 
@@ -220,14 +220,24 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
           icon="eye"
           title="Accessibility"
           detail={
-            snapshot?.accessibilityEnabled && !snapshot?.serviceConnected
+            accessibilityReconnectNeeded(snapshot)
               ? 'Disconnected. Turn this service off, then on in Android Settings.'
               : undefined
           }
           trailing={
             <Pill
-              label={snapshot?.accessibilityEnabled ? 'On' : 'Off'}
-              tone={snapshot?.accessibilityEnabled ? 'ok' : 'warn'}
+              label={
+                accessibilityReconnectNeeded(snapshot)
+                  ? 'Disconnected'
+                  : snapshot?.accessibilityEnabled
+                    ? 'On'
+                    : 'Off'
+              }
+              tone={
+                snapshot?.accessibilityEnabled && snapshot.serviceConnected
+                  ? 'ok'
+                  : 'warn'
+              }
             />
           }
           onPress={() => reels.openAccessibility()}

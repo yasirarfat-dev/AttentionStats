@@ -2,7 +2,7 @@
 
 **Maintainer clarification (15/11/26):** the four Viewing Details playback fields are empty; earlier real readings are uncertain. Current live-source playback-data acceptance remains withheld, with no downgrade/reversion or established data loss. Isolated numeric-input pipeline passes below keep their scope. Auto-scroll reliability for TikTok/YouTube Shorts is the immediate priority; final artifact results and remaining limits are recorded in State/log.
 
-**Status:** Release held; Facebook video-end auto-scroll remains unresolved. Updated 2026-11-15.
+**Status:** Release held; repeated auto-scroll reliability and other named release gates remain unresolved. Updated 2026-11-16.
 **Responsibility:** Provides a scannable implementation/verification record, known regressions and links to exact evidence. Task acceptance remains owned by the tracker.
 **Related specifications:** [Tracker](FEATURE-TRACKER.md), [State](STATE.md), [Testing](TESTING.md), [Release](RELEASE.md), [Auto-scroll](AUTOSCROLL-SPEC.md).
 **Unresolved feasibility:** Source playback signals, remaining lifecycle/accessibility/data-preservation gates and store approval are not established by a successful build.
@@ -11,11 +11,13 @@
 
 ### Maintainer-facing status — 16/11/26
 
+Tracking connection status is repaired on installed `63069b6`: 7 real RN checks/-1 using only a synthetic volatile disconnected flag, two private visual reviews, and 158 host tests pass ([evidence](evidence/counting-health.json)). Independently, three ordinary own-process kills on prior `b118f85` automatically rebind with original settings preserved ([evidence](evidence/service-recovery.json)). Neither qualifies reboot/Doze/OEM continuity or resolves the instrumented database-test rebind failure.
+
 These groups summarize the detailed artifact-scoped rows below; they do not claim a complete final-candidate pass. The remaining release work concerns implemented behavior, not finishing every planned roadmap feature.
 
 | Feature group | What has passed | What remains |
 |---|---|---|
-| Counting, app time and HUD | Scoped source encounters, app entry/time and HUD controls | Current supported-source accuracy/negative matrix and lifecycle continuity |
+| Counting, app time and HUD | Scoped source encounters, app entry/time/HUD controls; three ordinary process-kill/rebind controls; repaired connection/reconnect UI | Current supported-source accuracy/negative matrix and broader lifecycle continuity; instrumented kill context remains separate |
 | Auto-scroll and playback detail | Individual source end/arrival/Stop trials, one Facebook standalone-ad skip, isolated playback pipeline | **Unresolved:** repeated TikTok/Facebook/Instagram reliability; YouTube/Snapchat end signals; live absolute playback/watch/completion data. Missing signals must suspend actions |
 | Today, Insights and Appearance | Named normal/large-text presentation, appearance save/discard, real history navigation, isolated 100-day paging/races and error/retry | Original intermittent cold-read cause, full current-candidate reconciliation and broader accessibility |
 | Protection and breaks | Scoped limits, groups/schedules, focus Start/End and real-minute reminders | Overlap/allowance/expiry, restart/reboot/revocation/time boundaries and source pause/fallback matrix |
