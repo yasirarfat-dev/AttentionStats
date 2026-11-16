@@ -12,6 +12,7 @@ import org.attentionstats.reels.main as verifyReels
  */
 class AnalyticsInstrumentation : Instrumentation() {
     private var focusLive = false
+    private var focusExpiryLive = false
     private var focus = false
     private var beta = false
     private var source: String? = null
@@ -144,6 +145,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         source = arguments?.getString("source")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         inspect = arguments?.getString("inspect")?.takeIf { it in setOf("own", "settings") || org.attentionstats.reels.ReelApp.byKey(it) != null }
         focusLive = arguments?.getString("focusLive") == "true"
+        focusExpiryLive = arguments?.getString("focusExpiryLive") == "true"
         focus = arguments?.getString("focus") == "true"
         start()
     }
@@ -194,6 +196,10 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             if (widgets) {
                 result.putString("stream", "PASS: ${WidgetVerification.run(this)} widget projection/configuration/attached-host checks; synthetic host only, real widgets unchanged")
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (focusExpiryLive) {
+                result.putString("stream", FocusExpiryLiveVerification.run(this))
                 finish(Activity.RESULT_OK, result); return
             }
             if (focusLive) {

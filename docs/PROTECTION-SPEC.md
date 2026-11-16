@@ -85,6 +85,8 @@ End focus is immediate after durable native acknowledgement and affects only the
 
 ## Grouped focus and allow-only rules (ADR-084)
 
+Real focus expiry has a distinct operator-only one-minute native/renderer protocol in [Testing](TESTING.md). It must preserve existing groups/windows, refuse any saved focus and verify cover release plus inactive RN state on return before owned-session cleanup. It uses the existing native duration range rather than changing the five-minute UI minimum. Diagnostic configuration revisions advance normally; no production automatic session start, clock change or unrelated rule replacement is introduced. Record its exact outcome separately from early End, allowance and synthetic reboot tests.
+
 Immediate focus accepts group unions and manual app selection; recurring slots can use an existing exact group or create a named selection, saved off. By Time Slots and By App Groups provide two views of the same saved rules. Allow Only is a distinct, explicit whole-app mode: block other installed launchable apps during the slot/session, preserving existing recovery exclusions, allowances, early End and independent rules. Selected membership is retained; installed-target catalog refresh does not read app content. Unknown/nonlaunchable packages are not inverted into targets. Existing documents default allowOnly to false, and allowOnly + short_videos is invalid. No automatic activation via navigation.
 
 The unconfirmed-pause reminder's fallback placement is centered, 65% of available height, with immediate actions and no wait. It must not claim player pause. This replaces the earlier bottom reminder placement; confirmed pause and blocking retain their separate full-screen paths.

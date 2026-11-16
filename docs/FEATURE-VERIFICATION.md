@@ -15,6 +15,8 @@ Tracking connection status is repaired on installed `63069b6`: 7 real RN checks/
 
 Auto-scroll remains unresolved on latest `c9c8433`: two actual Start/Stop ten-transition/180-second trials achieve zero arrivals. Real-service cache clearing recovers no signal on the AD/unknown item (50 missing pairs); the regular video has progress in all 50 pairs and does not reproduce the earlier missing-progress stall. Both targets fail/code0; diagnostics alone complete, with no absolute playback time recovered ([evidence](evidence/autoscroll-service-cache.json)).
 
+Focus-expiry follow-up is prepared, not verified: final diagnostic `725727a` stops at its existing-saved-focus guard before creating a session. Existing focus is preserved; both failed/precondition outputs are retained and owned diagnostic removed ([evidence](evidence/focus-expiry-build.json)).
+
 These groups summarize the detailed artifact-scoped rows below; they do not claim a complete final-candidate pass. The remaining release work concerns implemented behavior, not finishing every planned roadmap feature.
 
 | Feature group | What has passed | What remains |
