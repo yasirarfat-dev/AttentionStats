@@ -1,5 +1,7 @@
 # Optional finish-and-swipe convenience
 
+**Release scope correction (17/11/26):** The maintainer explicitly excludes Facebook auto-scroll from publication blockers. Its missing-progress result remains a documented limitation and does not qualify source support. The minimum one-minute group Block/Allow Only boundary trials now pass in their [recorded scope](evidence/protection-slot-boundaries.json); continue remaining publication checks; this decision does not waive other release requirements.
+
 **Status:** AS-044/AS-059 experimental Android implementation; source-specific completion/action qualification remains open. Updated 2026-11-14.
 **Responsibility:** Owns optional session controls, playback-loop decisions and bounded scrolling actions.
 **Related specifications:** [Decisions](DECISIONS.md), [Social](SOCIAL-MEDIA-SPEC.md), [Permissions](PERMISSIONS.md), [Contracts](NATIVE-CONTRACTS.md), [Human factors](HUMAN-FACTORS.md), [Testing](TESTING.md).

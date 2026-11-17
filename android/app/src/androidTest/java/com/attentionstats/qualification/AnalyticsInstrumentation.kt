@@ -29,6 +29,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var breakLive = false
     private var breakTimeLive = false
     private var breakAbsenceLive = false
+    private var scheduleBoundary: String? = null
     private var scheduleLive = false
     private var scheduleSelective = false
     private var autoScrollSafety = false
@@ -119,6 +120,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         breakLive = arguments?.getString("breakLive") == "true"
         breakTimeLive = arguments?.getString("breakTimeLive") == "true"
         breakAbsenceLive = arguments?.getString("breakAbsenceLive") == "true"
+        scheduleBoundary = arguments?.getString("scheduleBoundary")
         scheduleLive = arguments?.getString("scheduleLive") == "true"
         scheduleSelective = arguments?.getString("scheduleSelective") == "true"
         autoScrollSafety = arguments?.getString("autoScrollSafety") == "true"
@@ -204,6 +206,10 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             if (widgets) {
                 result.putString("stream", "PASS: ${WidgetVerification.run(this)} widget projection/configuration/attached-host checks; synthetic host only, real widgets unchanged")
+                finish(Activity.RESULT_OK, result); return
+            }
+            scheduleBoundary?.let {
+                result.putString("stream", LiveScheduleVerification.run(this, boundary = it))
                 finish(Activity.RESULT_OK, result); return
             }
             if (protectionMutationLive) {

@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 /** Task-owned whole-app rule trial on an installed calculator. Does not inspect its content. */
 internal object LiveScheduleVerification {
     fun run(instrumentation: Instrumentation, focusOnly: Boolean = false, allowanceExpiry: Boolean = false,
-        recoveryAccess: Boolean = false, mutationLive: Boolean = false): String {
+        recoveryAccess: Boolean = false, mutationLive: Boolean = false, boundary: String? = null): String {
         val context = instrumentation.targetContext
         val owner = ReelsCoordinator.get(context)
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
@@ -76,7 +76,7 @@ internal object LiveScheduleVerification {
             isAccessible = true
         }.get(owner) as ScheduleOwner
         val savedFocus = schedules.plan.focus
-        if (allowanceExpiry || recoveryAccess || mutationLive) {
+        if (allowanceExpiry || recoveryAccess || mutationLive || boundary != null) {
             check(!focusOnly && owner.serviceConnected && !AutoScrollSession.running)
             check(context.getSystemService(android.os.PowerManager::class.java).isInteractive &&
                 !context.getSystemService(android.app.KeyguardManager::class.java).isKeyguardLocked) { "Unlocked interactive phone required" }
@@ -92,8 +92,24 @@ internal object LiveScheduleVerification {
             check(packages != null && packages.length() == 1 && packages.getString(0) == pkg) { "expected explicit calculator-only focus" }
             check(initial.matching(pkg, java.time.ZonedDateTime.now(), emptySet()).isEmpty()) { "other schedule would mask focus" }
         }
-        val group = AppGroup(UUID.randomUUID().toString(), "Schedule verification", setOf(pkg))
-        val window = BlockWindow(UUID.randomUUID().toString(), group.id, 127, 0, 0, true, allDay = true)
+        check(boundary == null || boundary in setOf("block", "allow-only"))
+        val clock = if (boundary == "allow-only") listOf("com.sec.android.app.clockpackage", "com.google.android.deskclock", "com.android.deskclock")
+            .firstOrNull { context.packageManager.getLaunchIntentForPackage(it) != null && it !in schedules.excluded }
+            .also { check(it != null) { "Safe allowed Clock unavailable" } } else null
+        val start = java.time.ZonedDateTime.now().plusMinutes(1).withSecond(0).withNano(0).let {
+            if (it.toInstant().toEpochMilli() - System.currentTimeMillis() < 20_000) it.plusMinutes(1) else it
+        }
+        val end = start.plusMinutes(1)
+        val wallAnchor = System.currentTimeMillis(); val elapsedAnchor = SystemClock.elapsedRealtime()
+        if (boundary != null) {
+            check(initial.windows.none { it.enabled }) { "Existing enabled schedules preserved; would mask boundary trial" }
+            check(android.provider.Settings.System.getLong(context.contentResolver, "screen_off_timeout") >= 240_000)
+            check(pkg !in schedules.excluded && (clock == null || schedules.decision(clock, elapsedAnchor).isEmpty()))
+        }
+        val group = AppGroup(UUID.randomUUID().toString(), "Schedule verification", setOf(clock ?: pkg))
+        val window = if (boundary == null) BlockWindow(UUID.randomUUID().toString(), group.id, 127, 0, 0, true, allDay = true)
+            else BlockWindow(UUID.randomUUID().toString(), group.id, 127, start.hour * 60 + start.minute,
+                end.hour * 60 + end.minute, true, allowOnly = clock != null)
         val second = window.copy(id = UUID.randomUUID().toString())
         val ownedWindows = if (allowanceExpiry || recoveryAccess || mutationLive) listOf(window, second) else listOf(window)
         var added = false
@@ -116,6 +132,58 @@ internal object LiveScheduleVerification {
                 save(initial.copy(groups = initial.groups + group, windows = initial.windows + ownedWindows), before.getString("revision").toLong())
             }
             context.startActivity(checkNotNull(context.packageManager.getLaunchIntentForPackage(pkg)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            if (boundary != null) {
+                fun invariant() {
+                    check(owner.serviceConnected && owner.grantEnabled() && !AutoScrollSession.running)
+                    check(context.getSystemService(android.os.PowerManager::class.java).isInteractive &&
+                        !context.getSystemService(android.app.KeyguardManager::class.java).isKeyguardLocked)
+                    check(java.time.ZoneId.systemDefault() == start.zone)
+                    check(kotlin.math.abs((System.currentTimeMillis() - wallAnchor) - (SystemClock.elapsedRealtime() - elapsedAnchor)) < 2_000) { "Clock changed" }
+                    check(schedules.plan.focus == savedFocus && schedules.plan.groups == initial.groups + group &&
+                        schedules.plan.windows == initial.windows + window) { "Configuration changed during boundary trial" }
+                }
+                fun waitUntil(wall: Long, covered: Boolean) {
+                    while (System.currentTimeMillis() < wall) {
+                        invariant(); check(calculatorForeground() && allowedButton(false) == covered) { "Early cover transition/foreground loss" }
+                        SystemClock.sleep(100)
+                    }
+                }
+                awaitState { calculatorForeground() && !allowedButton(false) }
+                check(System.currentTimeMillis() < start.toInstant().toEpochMilli() - 5_000)
+                instrumentation.sendStatus(1, Bundle().apply { putString("stream", "BOUNDARY_WAIT: $boundary; one-minute slot; pre-start Calculator uncovered") })
+                waitUntil(start.toInstant().toEpochMilli() - 200, false)
+                awaitState { calculatorForeground() && allowedButton(false) }
+                val startLate = System.currentTimeMillis() - start.toInstant().toEpochMilli()
+                check(startLate in 0..10_000)
+                check(schedules.decision(pkg, SystemClock.elapsedRealtime()).map { it.id } == listOf(window.id))
+                instrumentation.sendStatus(1, Bundle().apply { putString("stream", "BOUNDARY_ACTIVE: $boundary; actual cover; start lateness=${startLate}ms") })
+                if (clock != null) {
+                    context.startActivity(checkNotNull(context.packageManager.getLaunchIntentForPackage(clock)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                    awaitState { foregroundPackage() == clock && !allowedButton(false) }
+                    val settled = SystemClock.elapsedRealtime() + 2_000
+                    while (SystemClock.elapsedRealtime() < settled) {
+                        invariant(); check(foregroundPackage() == clock && !allowedButton(false))
+                        check(schedules.decision(clock, SystemClock.elapsedRealtime()).isEmpty()); SystemClock.sleep(100)
+                    }
+                    context.startActivity(Intent(android.provider.Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                    awaitState { foregroundPackage() == "com.android.settings" && !allowedButton(false) }
+                    check(schedules.decision("com.android.settings", SystemClock.elapsedRealtime()).isEmpty())
+                    context.startActivity(checkNotNull(context.packageManager.getLaunchIntentForPackage(pkg)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                    awaitState { calculatorForeground() && allowedButton(false) }
+                }
+                waitUntil(end.toInstant().toEpochMilli() - 200, true)
+                awaitState { calculatorForeground() && !allowedButton(false) }
+                val endLate = System.currentTimeMillis() - end.toInstant().toEpochMilli()
+                check(endLate in 0..10_000)
+                check(schedules.decision(pkg, SystemClock.elapsedRealtime()).isEmpty())
+                val settled = SystemClock.elapsedRealtime() + 2_000
+                while (SystemClock.elapsedRealtime() < settled) {
+                    invariant(); check(calculatorForeground() && !allowedButton(false)); SystemClock.sleep(100)
+                }
+                return "PASS: actual one-minute group slot $boundary; pre-start uncovered, automatic cover start lateness=${startLate}ms, automatic expiry lateness=${endLate}ms without allowance/navigation; " +
+                    (if (clock != null) "allowed Clock and recovery Settings uncovered; Calculator reblocked; " else "") +
+                    "saved focus/unowned plan preserved; only owned rule removed"
+            }
             val deadline = SystemClock.elapsedRealtime() + 10_000
             while (!allowedButton(false) && SystemClock.elapsedRealtime() < deadline) SystemClock.sleep(250)
             if (mutationLive) {
@@ -255,7 +323,7 @@ internal object LiveScheduleVerification {
                     check(schedules.plan.groups.none { it.id == group.id } && schedules.plan.windows.none { it.id in ownedIds })
                     check(schedules.plan.focus == savedFocus)
                 }
-                if (allowanceExpiry || recoveryAccess || mutationLive) {
+                if (allowanceExpiry || recoveryAccess || mutationLive || boundary != null) {
                     context.startActivity(Intent(context, com.attentionstats.MainActivity::class.java).setAction(Intent.ACTION_VIEW)
                         .setData(android.net.Uri.parse("attentionstats://today")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 }
