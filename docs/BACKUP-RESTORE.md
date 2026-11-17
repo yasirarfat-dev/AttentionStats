@@ -30,6 +30,8 @@ The current public package credential is reproducible on another installation an
 
 Export stages: preflight capacity → snapshot → bounded serialization → encryption → native staging → selected transport write → completion confirmation. Staging is private/no-backup and encrypted, cleaned on success/cancel and after crash. A provider accepting bytes does not necessarily mean remote durability; show the strongest confirmed state and uncertainty. Never overwrite the only known-good external archive before the new file is complete; provider-specific atomicity needs a capability check.
 
+Restore-preview cancellation invalidates the import token before cleanup. Failure to remove a staging directory must be reported; retire its temporary Keystore key even when file deletion fails. Retain local cleanup ownership so cancellation can be retried after filesystem access recovers. Abandoned-stage cleanup follows the same checked deletion/key-retirement path and must not report completion while files remain. This does not erase external provider copies.
+
 ## Optional summary-only scope
 
 Under [Retention](STORAGE-AND-RETENTION.md#user-configurable-summary-tiers), a person may choose detail or selected day/week/month/year facts independently from local pruning. A summary-only archive manifest declares metric/semantic/taxonomy revisions, units, dimensions, fixed zone/week start, covered/eligible/unknown partitions, retained sufficient statistics and omitted detail/resolution. It contains no fabricated chronology, purged content or implied source enablement. A summary export does not compact the local store.

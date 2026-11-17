@@ -44,6 +44,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var reminderDismissal = false
     private var keyLossRecovery = false
     private var archiveCapacity = false
+    private var archiveCleanup = false
     private var historicalMigrations = false
     private var databaseDurability = false
     private var migrationRecovery = false
@@ -135,6 +136,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         reminderDismissal = arguments?.getString("reminderDismissal") == "true"
         keyLossRecovery = arguments?.getString("keyLossRecovery") == "true"
         archiveCapacity = arguments?.getString("archiveCapacity") == "true"
+        archiveCleanup = arguments?.getString("archiveCleanup") == "true"
         historicalMigrations = arguments?.getString("historicalMigrations") == "true"
         databaseDurability = arguments?.getString("databaseDurability") == "true"
         migrationRecovery = arguments?.getString("migrationRecovery") == "true"
@@ -315,6 +317,10 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             if (keyLossRecovery) {
                 result.putString("stream", "PASS: ${KeyLossRecoveryVerification.run(this)} isolated key-loss recovery checks; no transport or real history changes")
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (archiveCleanup) {
+                result.putString("stream", ArchiveCleanupVerification.run(this))
                 finish(Activity.RESULT_OK, result); return
             }
             if (archiveCapacity) {

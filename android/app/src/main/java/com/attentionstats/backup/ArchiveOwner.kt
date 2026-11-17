@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import com.attentionstats.storage.HistoryStore
 import java.io.File
+import java.io.IOException
 import java.security.KeyStore
 import java.util.UUID
 
@@ -13,10 +14,12 @@ internal class ArchiveOwner(private val context: Context) {
         val summary: LogicalArchive.Summary, val historyRevision: Long, val configurationRevision: Long)
     var pending: Staged? = null
         private set
+    // A cancelled preview is no longer importable, even if file cleanup needs a retry.
+    private var retiring: Staged? = null
 
     /** Called once before opening live history, while this owner has no active job. */
     fun cleanupAbandoned() {
-        check(pending == null)
+        check(pending == null && retiring == null)
         val names = Regex("archive-stage-[0-9a-f-]{36}")
         val leftovers = context.noBackupFilesDir.listFiles()?.filter { it.isDirectory && names.matches(it.name) } ?: emptyList()
         require(leftovers.size <= 32)
@@ -49,13 +52,24 @@ internal class ArchiveOwner(private val context: Context) {
     }
 
     fun clear() {
-        val current = pending ?: return
+        val current = retiring ?: pending ?: return
         pending = null
-        try { current.history.close() } finally { cleanup(current.folder, current.alias) }
+        retiring = current
+        try { current.history.close() } finally {
+            cleanup(current.folder, current.alias)
+            retiring = null
+        }
     }
     private fun cleanup(folder: File, alias: String) {
         check(folder.parentFile?.canonicalFile == context.noBackupFilesDir.canonicalFile && folder.name.startsWith("archive-stage-"))
-        folder.deleteRecursively()
-        KeyStore.getInstance("AndroidKeyStore").apply { load(null); if (containsAlias(alias)) deleteEntry(alias) }
+        try {
+            if (!folder.deleteRecursively() || folder.exists()) throw IOException("Archive staging could not be removed")
+        } finally {
+            KeyStore.getInstance("AndroidKeyStore").apply {
+                load(null)
+                if (containsAlias(alias)) deleteEntry(alias)
+                check(!containsAlias(alias)) { "Archive staging key could not be removed" }
+            }
+        }
     }
 }
