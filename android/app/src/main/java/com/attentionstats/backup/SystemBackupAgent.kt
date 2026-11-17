@@ -20,6 +20,17 @@ open class SystemBackupAgent : BackupAgent() {
     override fun onRestore(data: BackupDataInput, appVersionCode: Int, newState: ParcelFileDescriptor) = Unit
 
     override fun onFullBackup(data: FullBackupDataOutput) {
+        try {
+            val file = File(filesDir, SystemBackupState.RELATIVE_FILE)
+            SystemBackupSnapshot.discard(file)
+            backupSnapshot(data, file)
+        } catch (failure: SystemBackupSnapshot.CleanupFailure) {
+            SystemBackupState.record(this, SystemBackupSnapshot.CLEANUP_STATUS)
+            throw failure
+        }
+    }
+
+    private fun backupSnapshot(data: FullBackupDataOutput, file: File) {
         if (SystemBackupState.hasPending(this)) {
             SystemBackupState.record(this, "Review or discard the delivered restore before backing up new history.")
             throw IOException("Pending restore requires review")
@@ -34,7 +45,6 @@ open class SystemBackupAgent : BackupAgent() {
         val result = AtomicReference<ByteArray?>()
         val exportFailure = AtomicReference<String?>()
         val done = CountDownLatch(1)
-        val file = File(filesDir, SystemBackupState.RELATIVE_FILE)
         try {
             ReelsCoordinator.get(this).exportArchive(cancelled, { bytes ->
                 synchronized(result) {
@@ -45,13 +55,15 @@ open class SystemBackupAgent : BackupAgent() {
             if (!done.await(25, TimeUnit.SECONDS)) throw IOException("Snapshot timed out")
             val bytes = result.get() ?: throw IOException("Snapshot unavailable or too large")
             if (data.quota > 0 && bytes.size.toLong() + 2048 > data.quota) throw IOException("Backup quota exceeded")
-            SystemBackupState.withBackupAdmission(this) {
+            SystemBackupSnapshot.withFile(file) { SystemBackupState.withBackupAdmission(this) {
                 check(SystemBackupState.enabled(this))
                 check(file.parentFile!!.mkdirs() || file.parentFile!!.isDirectory)
                 file.outputStream().use { it.write(bytes) }
                 fullBackupFile(file, data)
                 SystemBackupState.record(this, "Snapshot handed to Android. Cloud upload completion is not confirmed.")
-            }
+            } }
+        } catch (failure: SystemBackupSnapshot.CleanupFailure) {
+            throw failure
         } catch (_: Exception) {
             SystemBackupState.record(this, if (exportFailure.get() == "ARCHIVE_TOO_LARGE")
                 "History exceeds the current backup size or record limit. No backup was offered and no history was removed."
@@ -59,7 +71,6 @@ open class SystemBackupAgent : BackupAgent() {
             throw IOException("Backup snapshot unavailable")
         } finally {
             synchronized(result) { cancelled.set(true); result.getAndSet(null)?.fill(0) }
-            file.delete()
         }
     }
 

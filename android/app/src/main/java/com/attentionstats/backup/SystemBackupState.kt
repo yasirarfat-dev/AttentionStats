@@ -16,7 +16,14 @@ internal object SystemBackupState {
     /** Called on foreground entry, never during pre-launch framework restore. Preserve explicit off. */
     @Synchronized
     fun initialize(context: Context) {
+        try { if (!SystemBackupSnapshot.discardWhenIdle(File(context.filesDir, RELATIVE_FILE))) return }
+        catch (_: SystemBackupSnapshot.CleanupFailure) {
+            record(context, SystemBackupSnapshot.CLEANUP_STATUS)
+            return
+        }
         val prefs = preferences(context)
+        if (prefs.getString("status", null) == SystemBackupSnapshot.CLEANUP_STATUS)
+            record(context, "Temporary backup snapshot removed. Android controls any later backup attempt.")
         if (!prefs.contains("enabled")) check(prefs.edit().putBoolean("enabled", true).commit())
         if (!enabled(context)) return
         if (hasPending(context)) {

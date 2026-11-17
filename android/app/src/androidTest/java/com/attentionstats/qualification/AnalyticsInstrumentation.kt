@@ -45,6 +45,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var keyLossRecovery = false
     private var archiveCapacity = false
     private var archiveCleanup = false
+    private var backupSnapshot = false
     private var historicalMigrations = false
     private var databaseDurability = false
     private var migrationRecovery = false
@@ -137,6 +138,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         keyLossRecovery = arguments?.getString("keyLossRecovery") == "true"
         archiveCapacity = arguments?.getString("archiveCapacity") == "true"
         archiveCleanup = arguments?.getString("archiveCleanup") == "true"
+        backupSnapshot = arguments?.getString("backupSnapshot") == "true"
         historicalMigrations = arguments?.getString("historicalMigrations") == "true"
         databaseDurability = arguments?.getString("databaseDurability") == "true"
         migrationRecovery = arguments?.getString("migrationRecovery") == "true"
@@ -321,6 +323,10 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             if (archiveCleanup) {
                 result.putString("stream", ArchiveCleanupVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (backupSnapshot) {
+                result.putString("stream", BackupSnapshotVerification.run(this))
                 finish(Activity.RESULT_OK, result); return
             }
             if (archiveCapacity) {
