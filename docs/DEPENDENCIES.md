@@ -1,5 +1,7 @@
 # Dependencies and toolchain
 
+**Dependency security maintenance (17/11/26; AS-002/AS-021/AS-046):** compatible transitive updates clear the Joi high and XML-parser low advisories. Full npm audit drops from four advisories to two moderate glob/minimatch findings whose patched majors exceed current parent ranges; no forced overrides or suppressions. Production-only audit reports zero known findings. Frozen install, type/lint, 159 tests, CLI config, Metro and ARM64 preview build pass. Direct pins/app source/native catalog/versions unchanged; phone untouched. [Exact audit, compatibility blockers and inventory](evidence/publishing-dependencies.json). Native/license-distribution/security and other publication gates remain open; Facebook auto-scroll remains nonblocking.
+
 **Status:** AS-002 probes retained; AS-004 latest direct packages pinned in an experimental scaffold. Native qualification remains open. Updated 2026-10-29.
 **Responsibility:** Owns package manager, version policy, licenses, compatibility evidence and exceptions.
 **Related specifications:** [Development](DEVELOPMENT.md), [Architecture](ARCHITECTURE.md), [Security](SECURITY.md), [Decisions](DECISIONS.md).

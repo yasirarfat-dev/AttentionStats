@@ -1,6 +1,6 @@
 # Security design
 
-**Status:** Threat model, isolated qualification and bounded current-release static inspection exist; full security acceptance remains pending. Updated 2026-11-14.
+**Status:** Threat model, isolated qualification and bounded current-release static inspection exist; full security acceptance remains pending. Updated 2026-11-17.
 **Responsibility:** Owns threat boundaries, encryption requirements, credentials, supply chain and incident response.
 **Related specifications:** [Privacy](PRIVACY.md), [Backup](BACKUP-RESTORE.md), [Crypto design](CRYPTO-ARCHIVE-DESIGN.md), [Models](DATA-MODELS.md), [Release](RELEASE.md), [Reporting entrypoint](../SECURITY.md).
 **Unresolved feasibility:** F-03 and F-04 in [Decisions](DECISIONS.md); reviewed prototype candidates/parameters still need build, interoperability, device-resource and encrypted Room qualification.
@@ -39,6 +39,12 @@ If a device key is invalidated or unavailable, stop sensitive reads/writes safel
 The [isolated storage fixture](CRYPTO-ARCHIVE-DESIGN.md#isolated-encrypted-store-result) passes 55 synthetic assertions on an API-36 ARM64 phone, including encrypted DB/WAL marker scans, raw-key representation, close/reopen, wrong-key and corrupt-copy main-file preservation. It is excluded from the product build and uses neither production history nor Keystore. The SQLCipher handler was not invoked in these cases; forced callback behavior, temp/log leakage, native pool stress, minimum-API, key loss/rotation and crash/resource qualification remain open. Framework plain-SQLite negative controls also need explicit preserving handlers: read-only mode did not prevent default recovery from removing the test DB path during an earlier harness run. No product encryption or security-audit claim follows.
 
 The [isolated archive-envelope fixture](CRYPTO-ARCHIVE-DESIGN.md#isolated-archive-envelope-result) passes 1,759 synthetic API-36 ARM64 assertions, including 869 rejected inputs, exact suite/wire-keyset admission, segment boundaries and six cancellation checks. Tink and an independent Node test reader read public artificial vectors without a source Keystore; both HKDF implementations pass RFC-5869 SHA-256 cases 1–3. No production manual cryptography is introduced: the Node construction is only a bounded test oracle. This is in-memory primitive/framing evidence, not strict history parsing, secure recovery-key UX, file/staging lifecycle, resource measurement, provider recovery or an independent security audit. Passphrase support remains unavailable and the format remains unfrozen.
+
+### Dependency advisory continuation — 17/11/26
+
+**Dependency security maintenance (17/11/26; AS-002/AS-021/AS-046):** compatible transitive updates clear the Joi high and XML-parser low advisories. Full npm audit drops from four advisories to two moderate glob/minimatch findings whose patched majors exceed current parent ranges; no forced overrides or suppressions. Production-only audit reports zero known findings. Frozen install, type/lint, 159 tests, CLI config, Metro and ARM64 preview build pass. Direct pins/app source/native catalog/versions unchanged; phone untouched. [Exact audit, compatibility blockers and inventory](evidence/publishing-dependencies.json). Native/license-distribution/security and other publication gates remain open; Facebook auto-scroll remains nonblocking.
+
+The production audit is a registry graph check, not an APK reachability or independent security audit. The sanitized [production npm license inventory](evidence/production-npm-license-inventory.json) records metadata for 322 package versions across ten license expressions. It does not establish complete copyright-notice distribution or native dependency compliance. Retain the two moderate toolchain findings as open compatibility blockers; a zero production audit does not waive them or the remaining S-01–S-06 gates.
 
 ## Components, transport and builds
 
