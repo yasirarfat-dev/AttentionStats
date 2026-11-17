@@ -78,8 +78,8 @@ function ClockInput({
         disabled={disabled}
         value={value.period}
         options={[
-          { value: 'am', label: 'AM' },
-          { value: 'pm', label: 'PM' },
+          { value: 'am', label: 'AM', accessibilityLabel: `${label} AM` },
+          { value: 'pm', label: 'PM', accessibilityLabel: `${label} PM` },
         ]}
         onChange={period => onChange({ ...value, period })}
       />

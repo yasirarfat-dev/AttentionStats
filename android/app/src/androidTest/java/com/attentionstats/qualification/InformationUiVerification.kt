@@ -134,8 +134,8 @@ internal object InformationUiVerification {
                     // report only its clipped strip as the visible rectangle.
                     val clippedCreateGroup = label == "+ Create app group" &&
                         bounds.height() < (52 * context.resources.displayMetrics.density).toInt() - 2
-                    val clippedReviewAction = mode == "editor-review" &&
-                        (label in setOf("Save time slot · off", "Enable time slot", "Remove") || label.startsWith("Add time slot for ")) &&
+                    val clippedReviewAction = mode in setOf("editor-review", "editor-clock", "editor-group") &&
+                        (label in setOf("Save time slot · off", "Save app group", "Enable time slot", "Remove") || label.startsWith("Add time slot for ")) &&
                         bounds.height() < (52 * context.resources.displayMetrics.density).toInt() - 2
                     if (bounds.isEmpty || clippedInfo || clippedCreateGroup || clippedReviewAction || !viewport.contains(bounds)) false else {
                         val focused = checkNotNull(ownRoot()) { "Own app left foreground; no input sent" }
@@ -170,8 +170,12 @@ internal object InformationUiVerification {
         var primaryFailure: Throwable? = null
         try {
             when (mode) {
-                "editor-review" -> {
+                "editor-review", "editor-clock" -> {
                     checks += EditorReviewVerification.run(instrumentation, { open(it) }, { click(it) },
+                        { label, action -> find(label, contains = true, includeEditable = true, action = action) }, { viewport() }, customClock = mode == "editor-clock")
+                }
+                "editor-group" -> {
+                    checks += EditorGroupVerification.run(instrumentation, { open(it) }, { click(it) },
                         { label, action -> find(label, contains = true, includeEditable = true, action = action) }, { viewport() })
                 }
                 "counting-health" -> {
@@ -504,7 +508,7 @@ internal object InformationUiVerification {
             }
             checks++
             return "PASS: $checks actual own-app information checks; mode=$mode; appearance/backup unchanged; no source input; " +
-                if (mode == "editor-review") "owned rules removed; unowned plan/focus preserved" else "no save"
+                if (mode in setOf("editor-review", "editor-clock", "editor-group")) "owned rules removed; unowned plan/focus preserved" else "no save"
         } catch (failure: Throwable) {
             primaryFailure = failure
             throw failure

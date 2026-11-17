@@ -1,5 +1,8 @@
 # Capability matrix
 
+Custom-clock verification (17/11/26) adds scoped C-30 draft validation/configuration evidence at 100%, including disabled Allow Only saves. [Exact evidence](evidence/protection-editor-clock.json). No C-16/C-17 renderer, boundary, lifecycle or full capability promotion.
+
+
 Protect editor polish (17/11/26; AS-018/AS-045/AS-053) adds scoped C-30 evidence for real-keyboard field visibility and the uniform weekday/All draft selector at 100%/200%. [Exact scope](evidence/protection-editor-keyboard.json) separates 185 checks per scale, pre-fix obstruction and retained diagnostic failures from unverified save/enforcement, active-block keyboard recovery, full review/actions, TalkBack/RTL/motion and cold-start reliability. No capability or task is promoted.
 
 > Release scope, ADR-109 (17/11/26): new playback-measurement activation and tiles without recorded playback facts are withdrawn from this release. Retained measurements and disable-only control for an already-enabled choice remain. Live-source playback admission is deferred, with no capability promotion. App Activity/privacy monitoring (Q-027/AS-062) is future feasibility/design work, not current collection access or a shipping monitoring capability.
