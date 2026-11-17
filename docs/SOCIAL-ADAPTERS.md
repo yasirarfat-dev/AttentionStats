@@ -32,6 +32,8 @@ The Facebook candidate prioritizes its known feed list over generic viewer geome
 
 ## Turning a report into a fixture
 
+The 17/11/26 [media qualification](evidence/media-counting-autoscroll.json) separates private actual-feed classification/count deltas from synthetic fixture checks and auto-scroll arrivals. The bounded feed runner rejects unknown/private/editable contexts before capturing and keeps its counting result separate from legacy HUD assertions. No detector, collector, consent or ordinary text-post support is introduced by these test-only changes.
+
 ```powershell
 adb shell uiautomator dump /sdcard/ui.xml; adb pull /sdcard/ui.xml raw.xml
 python tools/sanitize_fixture.py raw.xml native/reels-core/src/test/resources/fixtures/<app>/<case>.xml

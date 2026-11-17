@@ -1,0 +1,46 @@
+{
+  "date": "17/11/26",
+  "tasks": [
+    "AS-018",
+    "AS-045",
+    "AS-053"
+  ],
+  "scope": "Actual app-group creation, membership editing, discard and removal; no linked schedule or focus",
+  "productSha256": "b0bef1716227d8d857765b00bb1963342c4f2fe6aea9ea8e16a435d4a80cbaa0",
+  "testSha256": "efaf084f129842b3b708435ce6f8dd777b40add2aabb1b6e3cfe7afcc9b5674a",
+  "sourceBase": "94af294cec9b781b535b045336bfdd5f3878d456",
+  "device": {
+    "api": 36,
+    "abi": "arm64-v8a",
+    "physical": true
+  },
+  "checks": 35,
+  "textScalePercent": 100,
+  "instrumentationCode": -1,
+  "rawSha256": "8f941f6b9a7417c0489711350b0d83a22c07610cd91a2f419decf0ba5f24da32",
+  "behavior": [
+    "Blank and whitespace name with a selected app, and nonempty name with empty selection, reject Save.",
+    "Save Calculator group through real UI; name trimmed and exact native membership verified.",
+    "Reopen/deselect shows Save disabled; Back discards and reopening retains saved membership.",
+    "Rename and add Clock through real UI; same group ID and exact two native members.",
+    "Remove Calculator through real UI; same native group ID retains Clock only.",
+    "Cancel removal retains group; confirm removes it and returns entire plan to original."
+  ],
+  "visualReview": "Three own-area private captures reviewed: create/edit selected counts and filtered utility checkbox, reachable Save, removal identity/Clock/consequential warning/red Remove. Long synthetic UUID names horizontally scroll in input and wrap on removal; no broad long-name/layout acceptance.",
+  "preservation": {
+    "unownedPlanAndCompleteSavedFocus": true,
+    "noWindowOrFocusCreated": true,
+    "originalAppearanceBackupFontAccessibilityDisplayReverseAndProduct": true,
+    "ownedDiagnosticAndCapturesRemoved": true,
+    "actualOwnServiceBound": true,
+    "finalScreen": "Today"
+  },
+  "dependenciesAdded": false,
+  "productChanged": false,
+  "limitations": [
+    "No active linked-rule membership or selective group qualification.",
+    "No 200% repeat; remaining functionality first under maintainer instruction.",
+    "No enforcement/lifecycle/TalkBack/RTL/resource/source or full-task acceptance."
+  ],
+  "publication": "HOLD; develop source only, no main merge/workflow/signing/store action"
+}

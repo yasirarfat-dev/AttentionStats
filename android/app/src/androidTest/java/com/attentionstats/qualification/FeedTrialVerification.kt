@@ -4,7 +4,6 @@ import android.app.Instrumentation
 import android.app.UiAutomation
 import android.graphics.Bitmap
 import android.os.SystemClock
-import android.view.MotionEvent
 import com.attentionstats.detection.SnapshotReader
 import com.attentionstats.reels.ReelsCoordinator
 import org.attentionstats.detection.AdapterRegistry
@@ -50,14 +49,16 @@ internal object FeedTrialVerification {
         val baseline = totals()
         val rows = JSONArray()
         repeat(samples) { index ->
+            SystemClock.sleep(1_500)
             val root = checkNotNull(automation.rootInActiveWindow)
             val captured = try {
                 check(app.owns(root.packageName?.toString())) { "Requested source left foreground" }
                 SnapshotReader.read(root, app.packages)
             } finally { SnapshotReader.recycle(root) }
-            check(!captured.typing) { "Editable context; trial stopped" }
+            check(captured.complete && !captured.typing) { "Incomplete/editable context; trial stopped" }
             val frame = AdapterRegistry.of(app).read(captured)
-            check(frame.surface != org.attentionstats.reels.Surface.REELS || frame.route != org.attentionstats.reels.ReelRoute.VIEWER) { "Expected feed, not viewer" }
+            check(frame.surface == org.attentionstats.reels.Surface.REELS &&
+                frame.route == org.attentionstats.reels.ReelRoute.HOME) { "Positively qualified Home media required; no unknown/private capture" }
             if (OperatorInspection.run(instrumentation, app.key).startsWith("CAPTURE")) {
                 File(context.cacheDir, "beta-layout-${app.key}.xml").copyTo(File(folder, "layout-${index + 1}.xml"))
             }
@@ -65,7 +66,7 @@ internal object FeedTrialVerification {
             try { File(folder, "sample-${index + 1}.jpg").outputStream().use {
                 check(image.compress(Bitmap.CompressFormat.JPEG, 75, it))
             } } finally { image.recycle() }
-            SystemClock.sleep(1_500)
+            SystemClock.sleep(300)
             val current = totals()
             val row = JSONObject().put("sample", index + 1).put("surface", frame.surface.name)
                 .put("route", frame.route.name).put("category", frame.category.name)
@@ -88,13 +89,12 @@ internal object FeedTrialVerification {
             val x = bounds.left + bounds.width * .4f
             val from = bounds.top + bounds.height * (if (reverse) .13f else .77f)
             val to = bounds.top + bounds.height * (if (reverse) .77f else .13f)
-            val down = SystemClock.uptimeMillis()
-            for (step in 0..12) {
-                val action = when (step) { 0 -> MotionEvent.ACTION_DOWN; 12 -> MotionEvent.ACTION_UP; else -> MotionEvent.ACTION_MOVE }
-                val event = MotionEvent.obtain(down, SystemClock.uptimeMillis(), action, x, from + (to - from) * step / 12, 0)
-                try { check(automation.injectInputEvent(event, true)) } finally { event.recycle() }
-                SystemClock.sleep(25)
-            }
+            val focused = checkNotNull(automation.rootInActiveWindow)
+            try { check(app.owns(focused.packageName?.toString())) } finally { SnapshotReader.recycle(focused) }
+            // The current phone rejects UiAutomation MotionEvents. Use the same scoped
+            // touchscreen driver as the current own-app UI harness, after ownership checks.
+            val descriptor = automation.executeShellCommand("input touchscreen swipe ${x.toInt()} ${from.toInt()} ${x.toInt()} ${to.toInt()} 450")
+            android.os.ParcelFileDescriptor.AutoCloseInputStream(descriptor).use { check(it.readBytes().isEmpty()) }
             SystemClock.sleep(1_000)
         }
         val beforeIdle = totals()
@@ -102,9 +102,6 @@ internal object FeedTrialVerification {
         val afterIdle = totals()
         File(folder, "results.json").writeText(JSONObject().put("samples", rows)
             .put("idleDelta", afterIdle.values.sum() - beforeIdle.values.sum()).toString())
-        val hudChecks = LiveHudVerification.run(instrumentation, automation)
-        File(folder, "results.json").writeText(JSONObject().put("samples", rows)
-            .put("idleDelta", afterIdle.values.sum() - beforeIdle.values.sum()).put("liveHudChecks", hudChecks).toString())
         return "$samples private feed samples captured; independent review must establish actual posts, duplicates and mismatches."
     }
 }

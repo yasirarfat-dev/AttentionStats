@@ -7,6 +7,7 @@ import android.view.accessibility.AccessibilityWindowInfo
 import com.attentionstats.autoscroll.AutoScrollSession
 import com.attentionstats.detection.SnapshotReader
 import com.attentionstats.reels.ReelsCoordinator
+import com.attentionstats.reels.ReelsAccessibilityService
 import org.attentionstats.detection.AdapterRegistry
 import org.attentionstats.detection.AdapterFrame
 import org.attentionstats.reels.ReelApp
@@ -93,6 +94,10 @@ internal object LiveAutoScrollContinuousVerification {
         val trace = java.util.Collections.synchronizedList(mutableListOf<String>())
         val traceStart = SystemClock.elapsedRealtime()
         var previousHook: ((String) -> Unit)? = null
+        // Observe actual service acquisition, without clearing caches or altering action rules.
+        // Item keys/positions stay transient; only bounded aggregate diagnostics leave the test.
+        val progressAudit = ServiceProgressAudit(app)
+        check(ReelsAccessibilityService.onPlaybackAcquisitionDiagnostic == null) { "Existing service probe preserved" }
         var samples = 0; var numeric = 0; var unknown = 0; var independent = 0
         var previous = initial
         val kinds = mutableMapOf<String, Int>()
@@ -128,6 +133,7 @@ internal object LiveAutoScrollContinuousVerification {
             LiveHudVerification.choose(instrumentation, automation, "off")
             awaitHud("started On control") { AutoScrollSession.running && it.controls.singleOrNull()?.first == "on" }
             check(AutoScrollSession.running) { "actual HUD Start failed" }
+            ReelsAccessibilityService.onPlaybackAcquisitionDiagnostic = { _, value -> progressAudit.sample(value) }
             instrumentation.sendStatus(1, android.os.Bundle().apply {
                 putString("stream", "CONTINUOUS_STARTED: actual HUD On; source=$key; setupSwipes=0; requiredTransitions=$required; standaloneAd=$adOnly")
             })
@@ -156,7 +162,7 @@ internal object LiveAutoScrollContinuousVerification {
                 check(AutoScrollSession.attempts <= required) { "more than allowed automatic attempts; attempts=${AutoScrollSession.attempts}; confirmed=${AutoScrollSession.confirmedTransitions}; stages=$stages" }
                 if (now >= nextStatus) {
                     instrumentation.sendStatus(1, android.os.Bundle().apply {
-                        putString("stream", "Continuous seconds=${(now-start)/1_000}; attempts=${AutoScrollSession.attempts}; confirmed=${AutoScrollSession.confirmedTransitions}; independent=$independent; numeric=$numeric; unavailable=$unknown; reason=${AutoScrollSession.reason}; stages=$stages")
+                        putString("stream", "Continuous seconds=${(now-start)/1_000}; attempts=${AutoScrollSession.attempts}; confirmed=${AutoScrollSession.confirmedTransitions}; independent=$independent; numeric=$numeric; unavailable=$unknown; reason=${AutoScrollSession.reason}; stages=$stages; serviceProgress=${progressAudit.result()}")
                     })
                     nextStatus = now + 5_000
                 }
@@ -164,6 +170,10 @@ internal object LiveAutoScrollContinuousVerification {
             }
             LiveHudVerification.choose(instrumentation, automation, "on")
             check(!AutoScrollSession.running) { "actual HUD Stop failed" }
+            ReelsAccessibilityService.onPlaybackAcquisitionDiagnostic = null
+            instrumentation.sendStatus(1, android.os.Bundle().apply {
+                putString("stream", "SERVICE_PROGRESS: ${progressAudit.result()}")
+            })
             val attemptsAtStop = AutoScrollSession.attempts
             SystemClock.sleep(2_000)
             check(!AutoScrollSession.running && AutoScrollSession.attempts == attemptsAtStop) { "Stop did not fence later actions" }
@@ -185,6 +195,7 @@ internal object LiveAutoScrollContinuousVerification {
             }
             return "PASS: actual HUD Start/$required independent automatic arrivals/Stop; source=$key; standaloneAd=$adOnly; sourceSetupSwipes=0; samples=$samples; numeric=$numeric; kinds=$kinds"
         } finally {
+            ReelsAccessibilityService.onPlaybackAcquisitionDiagnostic = null
             try {
                 val hud = LiveHudVerification.state(instrumentation, automation)
                 if (AutoScrollSession.running && hud.controls.singleOrNull()?.first == "on")
@@ -205,5 +216,57 @@ internal object LiveAutoScrollContinuousVerification {
                 reminders(original.getBoolean("reminderEnabled"))
             }
         }
+    }
+
+    private class ServiceProgressAudit(private val app: ReelApp) {
+        private var previous: ReelsAccessibilityService.PlaybackAcquisitionDiagnostic? = null
+        private var samples = 0; private var missing = 0; private var advances = 0
+        private var same = 0; private var backwards = 0; private var largeJumps = 0
+        private var loops = 0; private var terminal = 0; private var contextChanges = 0
+        private var gaps = 0; private var maximumGap = 0L
+        private var stableSince = 0L; private var longestStable = 0L
+        private val positions = mutableSetOf<Int>()
+
+        @Synchronized fun sample(value: ReelsAccessibilityService.PlaybackAcquisitionDiagnostic) {
+            if (!AutoScrollSession.running || value.app != app || !value.complete ||
+                value.frame.surface != Surface.REELS || value.frame.route != ReelRoute.VIEWER || value.frame.identity == null) {
+                previous = null; stableSince = 0; return
+            }
+            samples++
+            val position = value.frame.progress
+            val old = previous
+            val sameContext = old != null && old.app == value.app && old.window == value.window &&
+                old.epoch == value.epoch && old.frame.identity == value.frame.identity
+            if (old != null && !sameContext) contextChanges++
+            if (position == null) { missing++; stableSince = 0 }
+            else {
+                if (positions.size < 10_001) positions.add((position * 10_000).toInt())
+                if (position >= .999) terminal++
+                if (sameContext) {
+                    val gap = value.atMs - checkNotNull(old).atMs
+                    maximumGap = maxOf(maximumGap, gap)
+                    if (gap <= 0 || gap > 1_500) gaps++
+                    old.frame.progress?.let { prior ->
+                        when {
+                            position == prior -> {
+                                same++
+                                if (stableSince == 0L) stableSince = old.atMs
+                                longestStable = maxOf(longestStable, value.atMs - stableSince)
+                            }
+                            position > prior -> { advances++; if (position - prior > .15) largeJumps++; stableSince = 0 }
+                            else -> { backwards++; if (prior >= .98 && position <= .05) loops++; stableSince = 0 }
+                        }
+                    }
+                } else stableSince = 0
+            }
+            previous = value
+        }
+
+        @Synchronized fun result(): String = JSONObject().put("samples", samples).put("missing", missing)
+            .put("distinctPositionBuckets", positions.size).put("sameItemAdvances", advances)
+            .put("sameItemUnchanged", same).put("sameItemBackwards", backwards).put("largeJumps", largeJumps)
+            .put("nearEndLoops", loops).put("terminalSamples", terminal).put("contextChanges", contextChanges)
+            .put("gapsOver1500msOrNonmonotonic", gaps).put("maximumSameItemGapMs", maximumGap)
+            .put("longestUnchangedMs", longestStable).toString()
     }
 }
