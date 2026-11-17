@@ -112,6 +112,9 @@ internal object InformationUiVerification {
             error("Own information control unavailable: $label")
         }
         fun click(label: String) = find(label) { node ->
+            check(mode != "deletion" || !label.startsWith("Erase everything")) {
+                "Deletion review must never activate the final erase action"
+            }
             if (!node.isEnabled || !node.isClickable) false else {
                 // A discovered control can still be moving after the preceding swipe.
                 // Wait before reading its coordinates so the touch reaches the settled
@@ -165,6 +168,9 @@ internal object InformationUiVerification {
             context.startActivity(Intent(context, MainActivity::class.java).setAction(Intent.ACTION_VIEW)
                 .setData(Uri.parse("attentionstats://$path")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             SystemClock.sleep(2_000)
+            // This review starts with a direct Settings route. A selected tab's
+            // accessible node need not expose the same actionable label as an unselected tab.
+            if (mode == "deletion" && path == "settings") return
             click(when (path) { "insights" -> "Insights"; "settings" -> "Settings"; "protect" -> "Protect"; else -> "Today" })
         }
         var primaryFailure: Throwable? = null
@@ -468,6 +474,72 @@ internal object InformationUiVerification {
                     help("Installed Apps", "Choose one app or build a group")
                     click("Back to schedules")
                 }
+                "deletion" -> {
+                    // A failed earlier owned review can leave its RN modal mounted across deep links.
+                    if (visit("Keep my history") { it.isClickable }) click("Keep my history")
+                    val coordinator = com.attentionstats.reels.ReelsCoordinator.get(context)
+                    val schedules = coordinator.javaClass.getDeclaredField("schedules").apply { isAccessible = true }
+                        .get(coordinator) as com.attentionstats.protection.ScheduleOwner
+                    val plan = schedules.plan
+                    val planRevision = schedules.revision
+                    fun savedState(): String {
+                        val done = java.util.concurrent.CountDownLatch(1)
+                        val value = java.util.concurrent.atomic.AtomicReference<String>()
+                        val failure = java.util.concurrent.atomic.AtomicReference<String>()
+                        coordinator.snapshot({ value.set(it); done.countDown() }, { failure.set(it); done.countDown() })
+                        check(done.await(10, java.util.concurrent.TimeUnit.SECONDS) && failure.get() == null)
+                        val snapshot = org.json.JSONObject(checkNotNull(value.get()))
+                        return org.json.JSONArray().put(snapshot.getString("revision"))
+                            .put(snapshot.getString("generation")).put(snapshot.getJSONArray("sources"))
+                            .put(snapshot.getBoolean("overlayEnabled")).toString()
+                    }
+                    open("settings")
+                    val saved = savedState()
+                    fun expect(label: String, action: (AccessibilityNodeInfo) -> Boolean = { true }) {
+                        find(label, contains = true, includeEditable = true, action = action); checks++
+                    }
+                    fun begin() {
+                        click("Erase history, Permanent. Three confirmations.")
+                        expect("Before erasing history")
+                        expect("Copies already held by your backup provider")
+                    }
+                    fun review() {
+                        click("Review history deletion")
+                        expect("Review permanent deletion")
+                        expect("There is no local undo")
+                    }
+                    fun cancel() {
+                        click("Keep my history")
+                        check(!visit("Keep my history") { true }); checks++
+                        check(savedState() == saved); checks++
+                        check(schedules.plan == plan && schedules.revision == planRevision); checks++
+                    }
+                    begin(); cancel()
+                    begin(); review(); cancel()
+                    begin(); review(); click("Proceed to final erase confirmation")
+                    expect("Type DELETE to erase your history")
+                    expect("Erase everything") { !it.isEnabled }
+                    expect("Type DELETE to confirm") { node ->
+                        node.isEditable && node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply {
+                            putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, "WRONG")
+                        })
+                    }
+                    SystemClock.sleep(10_500)
+                    expect("Erase everything") { !it.isEnabled }
+                    expect("Type DELETE to confirm") { node ->
+                        node.isEditable && node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply {
+                            putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, "DELETE")
+                        })
+                    }
+                    expect("Erase everything") { it.isEnabled }
+                    cancel()
+                    begin(); review(); click("Proceed to final erase confirmation")
+                    expect("Type DELETE to confirm") { it.text.isNullOrEmpty() || (Build.VERSION.SDK_INT >= 26 && it.isShowingHintText) }
+                    expect("Erase everything") { !it.isEnabled }
+                    click("Keep my history")
+                    check(savedState() == saved); checks++
+                    check(schedules.plan == plan && schedules.revision == planRevision); checks++
+                }
                 "tour" -> {
                     open("settings"); click("Show the welcome tour")
                     val capturedSteps = mutableSetOf<Int>()
@@ -514,7 +586,10 @@ internal object InformationUiVerification {
             throw failure
         } finally {
             if (mode != "tour") {
-                try { open("today") } catch (cleanup: Throwable) {
+                try {
+                    if (mode == "deletion" && visit("Keep my history") { it.isClickable }) click("Keep my history")
+                    open("today")
+                } catch (cleanup: Throwable) {
                     val failure = primaryFailure
                     if (failure == null) throw cleanup else failure.addSuppressed(cleanup)
                 }

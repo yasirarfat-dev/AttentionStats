@@ -101,7 +101,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         numericAuditRefresh = arguments?.getString("numericAuditRefresh") == "true"
         numericAuditExpanded = arguments?.getString("numericAuditExpanded") == "true"
         visualProgressAudit = arguments?.getString("visualProgressAudit")?.takeIf { it in setOf("tiktok", "youtube") }
-        informationUi = arguments?.getString("informationUi")?.takeIf { it in setOf("today", "insights", "settings", "protect", "native", "editors", "editor-keyboard", "editor-review", "editor-clock", "editor-group", "tour", "today-layout", "today-count-only", "appearance-draft", "appearance-themes", "playback-details", "playback-consent", "counting-health") }
+        informationUi = arguments?.getString("informationUi")?.takeIf { it in setOf("today", "insights", "settings", "protect", "native", "editors", "editor-keyboard", "editor-review", "editor-clock", "editor-group", "deletion", "tour", "today-layout", "today-count-only", "appearance-draft", "appearance-themes", "playback-details", "playback-consent", "counting-health") }
         numericMediaProbe = arguments?.getString("numericMediaProbe")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollContinuous = arguments?.getString("autoScrollContinuous")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollTransitions = arguments?.getString("autoScrollTransitions")?.toIntOrNull()?.takeIf { it in 1..20 } ?: 3
