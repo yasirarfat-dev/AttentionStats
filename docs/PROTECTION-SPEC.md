@@ -125,3 +125,5 @@ Proposed Settings → Protection PIN screens: purpose and limitations; create/co
 
 
 The bounded whole-app recovery protocol now has [physical evidence](evidence/protection-recovery-navigation.json): cover Open Attention Stats, Android Settings and system Home stay uncovered with two overlapping Calculator schedules, and three returns restore the cover/both reasons. This does not qualify emergency calling, keyboards, permission controller, focus/selective/Allow Only recovery or process/reboot/revocation. See [Testing](TESTING.md#timed-focus-qualification) for the operator protocol.
+
+Schedule group actions expose group-specific accessible names for Add Time Slot and for each saved slot edit (group, time, weekdays and On/Off). Visible labels retain the compact presentation. Named own-UI Save Off, reopen/edit, activation and removal qualification is recorded separately from native renderer acceptance in [evidence](evidence/protection-editor-review.json).

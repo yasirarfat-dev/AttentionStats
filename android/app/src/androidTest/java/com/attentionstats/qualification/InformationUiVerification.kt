@@ -13,7 +13,7 @@ import android.view.accessibility.AccessibilityWindowInfo
 import com.attentionstats.MainActivity
 import com.attentionstats.detection.SnapshotReader
 
-/** Own-app disclosure/navigation only. No settings, rules, grants or history are written. */
+/** Own-app UI qualification; editor-review temporarily owns one group and its slots only. */
 @Suppress("DEPRECATION")
 internal object InformationUiVerification {
     fun run(instrumentation: Instrumentation, mode: String): String {
@@ -134,7 +134,10 @@ internal object InformationUiVerification {
                     // report only its clipped strip as the visible rectangle.
                     val clippedCreateGroup = label == "+ Create app group" &&
                         bounds.height() < (52 * context.resources.displayMetrics.density).toInt() - 2
-                    if (bounds.isEmpty || clippedInfo || clippedCreateGroup || !viewport.contains(bounds)) false else {
+                    val clippedReviewAction = mode == "editor-review" &&
+                        (label in setOf("Save time slot · off", "Enable time slot", "Remove") || label.startsWith("Add time slot for ")) &&
+                        bounds.height() < (52 * context.resources.displayMetrics.density).toInt() - 2
+                    if (bounds.isEmpty || clippedInfo || clippedCreateGroup || clippedReviewAction || !viewport.contains(bounds)) false else {
                         val focused = checkNotNull(ownRoot()) { "Own app left foreground; no input sent" }
                         SnapshotReader.recycle(focused)
                         instrumentation.sendStatus(1, Bundle().apply { putString("stream", "Own information tap: $label; $bounds") })
@@ -167,6 +170,10 @@ internal object InformationUiVerification {
         var primaryFailure: Throwable? = null
         try {
             when (mode) {
+                "editor-review" -> {
+                    checks += EditorReviewVerification.run(instrumentation, { open(it) }, { click(it) },
+                        { label, action -> find(label, contains = true, includeEditable = true, action = action) }, { viewport() })
+                }
                 "counting-health" -> {
                     val owner = com.attentionstats.reels.ReelsCoordinator.get(context)
                     check(owner.grantSelected()) { "Existing selected grant required; no grant added" }
@@ -496,7 +503,8 @@ internal object InformationUiVerification {
                 "Help traversal changed saved appearance/backup choices"
             }
             checks++
-            return "PASS: $checks actual own-app information checks; mode=$mode; appearance/backup unchanged; no source input or save"
+            return "PASS: $checks actual own-app information checks; mode=$mode; appearance/backup unchanged; no source input; " +
+                if (mode == "editor-review") "owned rules removed; unowned plan/focus preserved" else "no save"
         } catch (failure: Throwable) {
             primaryFailure = failure
             throw failure

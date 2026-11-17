@@ -391,6 +391,7 @@ export function SchedulesScreen({
               />
               <Button
                 label="+ Add Time Slot"
+                accessibilityLabel={`Add time slot for ${group.name}`}
                 variant="tonal"
                 disabled={busy}
                 onPress={() => addSlot(group)}
@@ -401,6 +402,7 @@ export function SchedulesScreen({
                   <Row
                     key={slot.id}
                     title={slotLabel(slot)}
+                    accessibilityLabel={`Edit time slot for ${group.name}: ${slotLabel(slot)}, ${daysLabel(slot.days)}, ${slot.enabled ? 'On' : 'Off'}`}
                     detail={`${daysLabel(slot.days)} · ${slot.enabled ? 'On' : 'Off'}`}
                     onPress={() =>
                       setDraft({ kind: 'slot', base: snapshot, slot })
