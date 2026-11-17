@@ -76,6 +76,12 @@ internal object InformationUiVerification {
                     true
                 }
             }
+            if (mode == "editor-keyboard") automation.windows.filter {
+                it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD
+            }.forEach { window ->
+                val bounds = Rect().also(window::getBoundsInScreen)
+                if (!bounds.isEmpty) result.bottom = minOf(result.bottom, bounds.top)
+            }
             return result
         }
         fun find(label: String, contains: Boolean = false, includeEditable: Boolean = false, action: (AccessibilityNodeInfo) -> Boolean) {
@@ -266,6 +272,169 @@ internal object InformationUiVerification {
                     click("Done"); automation.waitForIdle(500, 5_000)
                     click("Add a home-screen widget"); automation.waitForIdle(500, 5_000)
                     help("Example Gallery", "Choose a widget"); click("Back to Settings")
+                }
+                "editor-keyboard" -> {
+                    check(context.getSharedPreferences("focus-defaults", 0).getBoolean("seeded-v1", false)) {
+                        "Existing seeded configuration required; no default groups created"
+                    }
+                    val owner = com.attentionstats.reels.ReelsCoordinator.get(context)
+                    val schedules = owner.javaClass.getDeclaredField("schedules").apply { isAccessible = true }
+                        .get(owner) as com.attentionstats.protection.ScheduleOwner
+                    check(owner.serviceConnected && !com.attentionstats.autoscroll.AutoScrollSession.running)
+                    val savedPlan = schedules.plan
+                    val savedRevision = schedules.revision
+                    fun keyboard() = automation.windows.any { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD }
+                    fun waitKeyboard(visible: Boolean) {
+                        val until = SystemClock.elapsedRealtime() + 8_000
+                        while (keyboard() != visible && SystemClock.elapsedRealtime() < until) SystemClock.sleep(100)
+                        check(keyboard() == visible) { "Expected keyboard visible=$visible" }; checks++
+                    }
+                    fun back() {
+                        val root = checkNotNull(ownRoot()) { "Own editor left foreground; no Back" }
+                        SnapshotReader.recycle(root)
+                        android.os.ParcelFileDescriptor.AutoCloseInputStream(automation.executeShellCommand("input keyevent KEYCODE_BACK")).use {
+                            check(it.readBytes().isEmpty())
+                        }
+                        SystemClock.sleep(500)
+                    }
+                    fun field(label: String, value: String) {
+                        instrumentation.sendStatus(1, Bundle().apply { putString("stream", "Editor keyboard field: $label") })
+                        find(label, includeEditable = true) { node ->
+                            if (!node.isEditable || !node.isEnabled) false else {
+                                // Match the existing button protocol: settle the real scroll,
+                                // then reacquire geometry and reject clipped input strips.
+                                automation.waitForIdle(500, 5_000)
+                                SystemClock.sleep(250)
+                                if (!node.refresh() || !node.isVisibleToUser) return@find false
+                                val bounds = Rect().also(node::getBoundsInScreen)
+                                val minimum = if (label.endsWith("hour") || label.endsWith("minute")) 64 else 52
+                                if (bounds.isEmpty || bounds.height() < minimum * context.resources.displayMetrics.density - 2 ||
+                                    !viewport().contains(bounds)) false else {
+                                    val focused = checkNotNull(ownRoot())
+                                    SnapshotReader.recycle(focused)
+                                    android.os.ParcelFileDescriptor.AutoCloseInputStream(automation.executeShellCommand("input touchscreen tap ${bounds.centerX()} ${bounds.centerY()}")).use {
+                                        check(it.readBytes().isEmpty())
+                                    }
+                                    true
+                                }
+                            }
+                        }
+                        waitKeyboard(true)
+                        find(label, includeEditable = true) { node ->
+                            node.isEditable && node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply {
+                                putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, value)
+                            })
+                        }
+                        val until = SystemClock.elapsedRealtime() + 5_000
+                        fun readable() = visit(label, includeEditable = true) { node ->
+                            val bounds = Rect().also(node::getBoundsInScreen)
+                            node.isFocused && node.text?.toString() == value && viewport().contains(bounds)
+                        }
+                        while (!readable() && SystemClock.elapsedRealtime() < until) SystemClock.sleep(100)
+                        if (!readable()) {
+                            var focused = false; var valueMatches = false; var fieldBounds = Rect()
+                            visit(label, includeEditable = true) { node ->
+                                focused = node.isFocused; valueMatches = node.text?.toString() == value
+                                node.getBoundsInScreen(fieldBounds); true
+                            }
+                            val root = checkNotNull(ownRoot()); SnapshotReader.recycle(root)
+                            val bounds = viewport(true)
+                            val bitmap = checkNotNull(automation.takeScreenshot())
+                            try {
+                                val after = checkNotNull(ownRoot()); SnapshotReader.recycle(after)
+                                val crop = android.graphics.Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.width(), bounds.height())
+                                try {
+                                    val output = java.io.File(context.cacheDir, "editor-keyboard-field-failure.png")
+                                    check(!output.exists())
+                                    output.outputStream().use { check(crop.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)) }
+                                } finally { if (crop !== bitmap) crop.recycle() }
+                            } finally { bitmap.recycle() }
+                            error("Focused editor field: $label; focused=$focused valueMatches=$valueMatches bounds=$fieldBounds viewport=${viewport()} keyboard=${keyboard()}")
+                        }
+                        checks++
+                        waitKeyboard(true)
+                    }
+                    fun capture(name: String) {
+                        val output = java.io.File(context.cacheDir, "editor-keyboard-$name.png")
+                        check(!output.exists()) { "Unowned editor capture exists" }
+                        val root = checkNotNull(ownRoot()); SnapshotReader.recycle(root)
+                        // Persist only the own-app area above the IME; never traverse keyboard nodes.
+                        val bounds = viewport(true)
+                        val bitmap = checkNotNull(automation.takeScreenshot())
+                        try {
+                            val after = checkNotNull(ownRoot()); SnapshotReader.recycle(after)
+                            val cropped = android.graphics.Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.width(), bounds.height())
+                            try { output.outputStream().use { check(cropped.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)) } }
+                            finally { if (cropped !== bitmap) cropped.recycle() }
+                        } finally { bitmap.recycle() }
+                    }
+                    try {
+                        open("protect"); click("Scheduled Focus"); click("By App Groups"); click("+ Create app group")
+                        field("Group name", "Keyboard verification draft")
+                        capture("group-name")
+                        back(); waitKeyboard(false)
+                        find("Group name", includeEditable = true) { it.text?.toString() == "Keyboard verification draft" }; checks++
+                        field("Search apps", "attentionstats-ui-empty-catalog-8ea7")
+                        capture("group-search")
+                        // Assert keyboard Back immediately. Searching for a lower result
+                        // may drag this ScrollView, whose on-drag policy dismisses the IME.
+                        back(); waitKeyboard(false)
+                        find("No matching apps") { true }; checks++
+                        back(); find("Space for your day") { true }; checks++
+                        click("+ Create app group")
+                        find("Group name", includeEditable = true) {
+                            // Android may expose the empty TextInput's placeholder as its text.
+                            it.isShowingHintText || it.text.isNullOrEmpty() ||
+                                it.text?.toString() == "For example, Distracting apps"
+                        }; checks++
+                        click("Back to schedules"); click("By Time Slots"); click("+ Add Time Slot")
+                        field("Search Focus Apps", "attentionstats-ui-empty-catalog-8ea7")
+                        back(); waitKeyboard(false)
+                        find("No Matching Apps or Groups") { true }; checks++
+                        val dayLabels = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "All days")
+                        fun assertDays(mask: Int) {
+                            dayLabels.forEachIndexed { index, label ->
+                                find(label) { node ->
+                                    node.isCheckable && node.isChecked == if (index == 7) mask == 127 else (mask and (1 shl index)) != 0
+                                }; checks++
+                            }
+                        }
+                        assertDays(127)
+                        click("All days"); assertDays(0)
+                        find("Choose at least one day.") { true }; checks++
+                        click("Wed"); assertDays(4)
+                        click("All days"); assertDays(127)
+                        dayLabels.take(7).forEachIndexed { index, label ->
+                            click(label); assertDays(127 xor (1 shl index))
+                            click(label); assertDays(127)
+                        }
+                        val cells = dayLabels.map { label ->
+                            var bounds = Rect()
+                            find(label) { node ->
+                                node.getBoundsInScreen(bounds)
+                                viewport().contains(bounds)
+                            }
+                            bounds
+                        }
+                        check(cells.maxOf { it.width() } - cells.minOf { it.width() } <= 2)
+                        check(cells.take(4).map { it.top }.distinct().size == 1 && cells.drop(4).map { it.top }.distinct().size == 1)
+                        check(cells[4].top > cells[0].bottom && cells.all { it.height() >= 48 * context.resources.displayMetrics.density - 2 })
+                        checks += 3
+                        capture("days-grid")
+                        field("From hour", "09"); back(); waitKeyboard(false)
+                        field("From minute", "17"); back(); waitKeyboard(false)
+                        field("Until hour", "10"); back(); waitKeyboard(false)
+                        field("Until minute", "43"); capture("until-minute")
+                        back(); waitKeyboard(false)
+                        find("Review Time Slot") { true }; checks++
+                        capture("slot-review")
+                        back(); find("Space for your day") { true }; checks++
+                    } finally {
+                        check(schedules.plan == savedPlan && schedules.revision == savedRevision) {
+                            "Unsaved editor journey changed saved rules or focus"
+                        }
+                        checks++
+                    }
                 }
                 "editors" -> {
                     open("protect"); click("Scheduled Focus"); click("+ Add Time Slot")

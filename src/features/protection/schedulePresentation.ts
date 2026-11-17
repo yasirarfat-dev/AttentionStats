@@ -68,8 +68,11 @@ export const scheduleStyles = StyleSheet.create(theme => ({
     minHeight: 64,
     padding: 12,
   },
+  daysGrid: { gap: 8 },
+  daysRow: { flexDirection: 'row', gap: 8 },
   day: {
-    minWidth: 44,
+    flex: 1,
+    minWidth: 0,
     minHeight: 48,
     paddingHorizontal: 8,
     justifyContent: 'center',

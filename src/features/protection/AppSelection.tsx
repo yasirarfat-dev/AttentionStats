@@ -15,12 +15,14 @@ export function AppSelection({
   selected,
   onChange,
   disabled = false,
+  onFieldFocus,
 }: {
   groups: AppGroup[];
   apps: ProtectableApp[];
   selected: string[];
   onChange: (packages: string[]) => void;
   disabled?: boolean;
+  onFieldFocus?: () => void;
 }) {
   const { theme } = useUnistyles();
   const [query, setQuery] = useState('');
@@ -58,6 +60,7 @@ export function AppSelection({
       <SectionTitle>All Apps</SectionTitle>
       <TextInput
         accessibilityLabel="Search Focus Apps"
+        onFocus={onFieldFocus}
         placeholder="Search Apps or Groups"
         placeholderTextColor={theme.muted}
         value={query}

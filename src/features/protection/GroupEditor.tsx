@@ -11,6 +11,7 @@ import {
   type ProtectableApp,
 } from '../../platform/protectionStatus';
 import { scheduleStyles as styles } from './schedulePresentation';
+import { useEditorKeyboard } from './useEditorKeyboard';
 
 export function GroupEditor({
   apps,
@@ -30,6 +31,7 @@ export function GroupEditor({
   shortVideosOnly?: boolean;
 }) {
   const { theme } = useUnistyles();
+  const { scrollRef, onFieldFocus } = useEditorKeyboard();
   const [name, setName] = useState(initial?.name ?? '');
   const [selected, setSelected] = useState(new Set(initial?.packages ?? []));
   const [query, setQuery] = useState('');
@@ -47,6 +49,7 @@ export function GroupEditor({
     selected.size <= 100;
   return (
     <Screen
+      scrollRef={scrollRef}
       title={initial ? 'Edit app group' : 'Create app group'}
       subtitle="Apps you choose"
     >
@@ -59,6 +62,7 @@ export function GroupEditor({
       <SectionTitle>Group name</SectionTitle>
       <TextInput
         accessibilityLabel="Group name"
+        onFocus={onFieldFocus}
         placeholder="For example, Distracting apps"
         placeholderTextColor={theme.faint}
         value={name}
@@ -71,6 +75,7 @@ export function GroupEditor({
       <SectionTitle>Choose apps</SectionTitle>
       <TextInput
         accessibilityLabel="Search apps"
+        onFocus={onFieldFocus}
         placeholder="Search installed apps"
         placeholderTextColor={theme.faint}
         value={query}

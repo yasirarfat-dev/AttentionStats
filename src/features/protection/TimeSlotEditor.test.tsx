@@ -23,6 +23,12 @@ jest.mock('../../ui/Kit', () => ({
   Title: 'Title',
 }));
 jest.mock('./AppSelection', () => ({ AppSelection: 'AppSelection' }));
+jest.mock('./useEditorKeyboard', () => ({
+  useEditorKeyboard: () => ({
+    scrollRef: { current: null },
+    onFieldFocus: jest.fn(),
+  }),
+}));
 jest.mock('../../ui/Screen', () => ({ Screen: 'Screen' }));
 
 const social: AppGroup = {
@@ -83,6 +89,33 @@ function editor(initial?: TimeSlot, initialGroup: string = social.id) {
   }
   return { render, onSave, onBack };
 }
+
+test('All days clears/selects the draft, follows individual days and saves the selected mask off', () => {
+  const draft = editor();
+  const day = (label: string) =>
+    draft.render().props.find(item => item.accessibilityLabel === label)!;
+  expect(day('All days').accessibilityState.checked).toBe(true);
+  day('All days').onPress();
+  expect(draft.render().control('Save time slot · off').disabled).toBe(true);
+  day('Mon').onPress();
+  expect(day('All days').accessibilityState.checked).toBe(false);
+  draft.render().control('Save time slot · off').onPress();
+  expect(draft.onSave).toHaveBeenLastCalledWith(
+    expect.objectContaining({ days: 1, enabled: false }),
+    undefined,
+  );
+  day('All days').onPress();
+  expect(day('All days').accessibilityState.checked).toBe(true);
+  day('Sun').onPress();
+  expect(day('All days').accessibilityState.checked).toBe(false);
+  day('Sun').onPress();
+  expect(day('All days').accessibilityState.checked).toBe(true);
+  draft.render().control('Save time slot · off').onPress();
+  expect(draft.onSave).toHaveBeenLastCalledWith(
+    expect.objectContaining({ days: 127, enabled: false }),
+    undefined,
+  );
+});
 
 test('catalog loss preserves a short-video draft and prevents whole-app fallback', () => {
   const draft = editor();

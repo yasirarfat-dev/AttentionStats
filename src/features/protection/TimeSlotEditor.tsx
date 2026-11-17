@@ -26,16 +26,19 @@ import {
 
 import { AppSelection } from './AppSelection';
 import { clockDraft, toMinute, type ClockDraft } from './scheduleTime';
+import { useEditorKeyboard } from './useEditorKeyboard';
 function ClockInput({
   label,
   value,
   onChange,
   disabled,
+  onFieldFocus,
 }: {
   label: string;
   value: ClockDraft;
   onChange: (value: ClockDraft) => void;
   disabled: boolean;
+  onFieldFocus: () => void;
 }) {
   const { theme } = useUnistyles();
   return (
@@ -46,6 +49,7 @@ function ClockInput({
       <View style={styles.row}>
         <TextInput
           accessibilityLabel={`${label} hour`}
+          onFocus={onFieldFocus}
           value={value.hour}
           editable={!disabled}
           onChangeText={hour => onChange({ ...value, hour })}
@@ -58,6 +62,7 @@ function ClockInput({
         <Text style={styles.time}>:</Text>
         <TextInput
           accessibilityLabel={`${label} minute`}
+          onFocus={onFieldFocus}
           value={value.minute}
           editable={!disabled}
           onChangeText={minute => onChange({ ...value, minute })}
@@ -104,6 +109,7 @@ export function TimeSlotEditor({
   const initialSelected = groups.find(
     group => group.id === (initial?.groupId ?? initialGroup),
   );
+  const { scrollRef, onFieldFocus } = useEditorKeyboard();
   const [packages, setPackages] = useState<string[]>(
     initialSelected?.packages ?? [],
   );
@@ -170,6 +176,7 @@ export function TimeSlotEditor({
   };
   return (
     <Screen
+      scrollRef={scrollRef}
       title={initial ? 'Edit time slot' : 'A little time away'}
       subtitle="Make room for what matters"
     >
@@ -193,6 +200,7 @@ export function TimeSlotEditor({
         }}
       />
       <AppSelection
+        onFieldFocus={onFieldFocus}
         groups={groups}
         apps={apps}
         selected={packages}
@@ -204,6 +212,7 @@ export function TimeSlotEditor({
           <SectionTitle>Save Selection As</SectionTitle>
           <TextInput
             accessibilityLabel="Selection Group Name"
+            onFocus={onFieldFocus}
             value={customName}
             onChangeText={setCustomName}
             maxLength={60}
@@ -250,7 +259,7 @@ export function TimeSlotEditor({
       </Card>
       <Card
         title="When"
-        info="Times follow your phone's local clock. Choose the weekdays on which the slot starts. Always covers each chosen day; a slot that crosses midnight ends the next day."
+        info="Times follow your phone's local clock. Choose the weekdays on which the slot starts. All selects or clears every day. Always covers each chosen day; a slot that crosses midnight ends the next day."
       >
         <Segmented
           label="Slot timing"
@@ -262,26 +271,36 @@ export function TimeSlotEditor({
           ]}
           onChange={value => setAllDay(value === 'always')}
         />
-        <View style={styles.row}>
-          {weekdays.map((day, index) => (
-            <Pressable
-              key={day}
-              accessibilityRole="checkbox"
-              disabled={busy}
-              accessibilityLabel={day}
-              accessibilityState={{ checked: !!(days & (1 << index)) }}
-              onPress={() => setDays(days ^ (1 << index))}
-              style={[styles.day, !!(days & (1 << index)) && styles.dayOn]}
-            >
-              <Text
-                style={[
-                  styles.dayText,
-                  !!(days & (1 << index)) && styles.dayTextOn,
-                ]}
-              >
-                {day}
-              </Text>
-            </Pressable>
+        <View style={styles.daysGrid}>
+          {[0, 4].map(start => (
+            <View key={start} style={styles.daysRow}>
+              {[...weekdays, 'All']
+                .slice(start, start + 4)
+                .map((day, offset) => {
+                  const index = start + offset;
+                  const all = index === 7;
+                  const checked = all ? days === 127 : !!(days & (1 << index));
+                  return (
+                    <Pressable
+                      key={day}
+                      accessibilityRole="checkbox"
+                      disabled={busy}
+                      accessibilityLabel={all ? 'All days' : day}
+                      accessibilityState={{ checked }}
+                      onPress={() =>
+                        setDays(all ? (checked ? 0 : 127) : days ^ (1 << index))
+                      }
+                      style={[styles.day, checked && styles.dayOn]}
+                    >
+                      <Text
+                        style={[styles.dayText, checked && styles.dayTextOn]}
+                      >
+                        {day}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+            </View>
           ))}
         </View>
         <Body muted>{days ? daysLabel(days) : 'Choose at least one day.'}</Body>
@@ -289,12 +308,14 @@ export function TimeSlotEditor({
       {!allDay && (
         <>
           <ClockInput
+            onFieldFocus={onFieldFocus}
             label="From"
             value={start}
             onChange={setStart}
             disabled={busy}
           />
           <ClockInput
+            onFieldFocus={onFieldFocus}
             label="Until"
             value={end}
             onChange={setEnd}
