@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def review(root: Path, installed: bool = False, native_cache: bool = False) -> list[str]:
     errors: list[str] = []
     manifest = json.loads((root / "package.json").read_text(encoding="utf-8"))
-    evidence = json.loads((root / "docs/evidence/mobile-scaffold.json").read_text(encoding="utf-8"))
+    evidence = json.loads((root / "tools/mobile-scaffold.json").read_text(encoding="utf-8"))
     records = {item["package"]: item for item in evidence["packages"]}
     expected_names = {"pnpm"}
     lock = (root / "pnpm-lock.yaml").read_text(encoding="utf-8")

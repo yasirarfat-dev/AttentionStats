@@ -34,6 +34,8 @@ def token(value: str) -> str:
 
 
 def sanitize(value: str) -> str:
+    if "\n" in value:  # Multi-line descriptions ("App name\nAd\n4.3 stars"): each line on its own.
+        return "\n".join(sanitize(line) for line in value.split("\n"))
     if not value or value.strip().lower() in GENERIC:
         return value
     if re.fullmatch(r"[\d.,:KMB ]+", value):  # bare counters and timestamps

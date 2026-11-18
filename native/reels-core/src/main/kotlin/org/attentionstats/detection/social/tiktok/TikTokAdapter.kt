@@ -13,6 +13,7 @@ import org.attentionstats.detection.shared.Sponsored
 object TikTokAdapter : ShortFormAdapter {
     override val app = ReelApp.TIKTOK
     private val pagerIds = setOf("viewpager")
+    private val photoLabel = Regex("^(photo(s)?|image(s)?)( \\d+ (of|/) \\d+)?$", RegexOption.IGNORE_CASE)
 
     override fun read(snapshot: ScreenSnapshot): AdapterFrame {
         if (!snapshot.complete) return AdapterFrame(Surface.UNKNOWN)
@@ -21,11 +22,11 @@ object TikTokAdapter : ShortFormAdapter {
         return ViewerLocator.frame(snapshot, viewer, "tiktok.feed") { nodes ->
             when {
                 nodes.any(Sponsored::node) -> PageCategory.AD
-                nodes.any { it.label?.trim()?.let { label ->
-                    Regex("^(photo(s)?|image(s)?)( \\d+ (of|/) \\d+)?$", RegexOption.IGNORE_CASE).matches(label)
-                } == true && it.bounds.width > snapshot.screen.width / 2 } -> PageCategory.PHOTO
+                nodes.any { node -> node.label?.trim()?.let(photoLabel::matches) == true &&
+                    // A wide pager label, or the compact "Photo" badge TikTok 47.x shows beside the author.
+                    (node.bounds.width > snapshot.screen.width / 2 || node.id == "tv_label") } -> PageCategory.PHOTO
                 else -> PageCategory.REEL
             }
-        }
+        }.withSkippableAd(snapshot)
     }
 }

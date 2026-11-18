@@ -1,5 +1,11 @@
 package org.attentionstats.reels
 
+import org.attentionstats.detection.LayoutBounds
+import org.attentionstats.detection.PlaybackTimeParser
+import org.attentionstats.detection.ScreenNode
+import org.attentionstats.detection.ScreenSnapshot
+import org.attentionstats.detection.shared.ViewerLocator
+
 fun main() {
     var checks = 0
     fun expect(value: Boolean, message: String) { check(value) { message }; checks++ }
@@ -39,6 +45,18 @@ fun main() {
     t.observe(frame(5_000, 20, scroll = 4))
     val back = t.observe(frame(5_300, 20, scroll = 4))
     expect(back != null && back.revisit && back.ordinal == 4L, "revisit flagged, ordinal unchanged")
+
+    // Returning to an item whose controls changed while away (e.g. a Replay label) is still a revisit,
+    // while a different item that merely shares author and audio strings counts as new.
+    val changes = EncounterTracker()
+    val watched = setOf(100L, 101L, 102L, 103L, 104L)
+    changes.observe(frame(0, 100, watched)); changes.observe(frame(300, 100, watched))
+    changes.observe(frame(1_000, 200, setOf(100L, 101L, 900L, 901L, 902L), scroll = 1))
+    expect(changes.observe(frame(1_300, 200, setOf(100L, 101L, 900L, 901L, 902L), scroll = 1))?.revisit == false,
+        "same author and audio is a new item")
+    changes.observe(frame(2_000, 300, watched + 105L, scroll = 2))
+    expect(changes.observe(frame(2_300, 300, watched + 105L, scroll = 2))?.revisit == true,
+        "returning item with one changed control is a revisit")
 
     // Typing a comment excludes the surface but keeps the current item.
     expect(t.observe(frame(5_400, null, surface = Surface.EXCLUDED)) == null, "excluded")
@@ -149,6 +167,43 @@ fun main() {
     expect(playback.sample(11_000, 9_000, 12_000)?.qualified == true, "same visit can qualify after re-enabling")
     playback.sample(12_000, 10_000, 12_000); playback.sample(13_000, 11_000, 12_000)
     expect(playback.sample(14_000, 12_000, 12_000)?.completed == false, "completion cannot bridge a consent gap")
+    for ((label, expected) in listOf(
+        "0 minutes 29 seconds of 1 minute 19 seconds" to (29_000L to 79_000L),
+        "5 seconds of 42 seconds" to (5_000L to 42_000L),
+        "0 seconds of 15 seconds" to (0L to 15_000L),
+        "1 minute of 1 minute 5 seconds" to (60_000L to 65_000L),
+        "0 hours, 2 minutes and 3 seconds of 0 hours, 3 minutes, and 4 seconds" to (123_000L to 184_000L),
+        "75 SECONDS OF 2 MINUTES AND 0 SECONDS" to (75_000L to 120_000L),
+        "0 seconds of 1 hour" to (0L to 3_600_000L),
+    )) expect(PlaybackTimeParser.spoken(label) == expected, "spoken playback parses: $label")
+    for (label in listOf(
+        "29 seconds", "of 1 minute", "1 minute 75 seconds of 2 minutes", "2 minutes of 1 minute",
+        "0 seconds of 0 seconds", "2 hours of 3 hours", "abc 1 minute of 2 minutes", "x".repeat(90),
+        "1 hour 2 minutes 3 seconds of 1 hour 10 minutes", // Duration exceeds the one-hour bound.
+        "1 second 2 seconds of 1 minute", "1 second 1 minute of 2 minutes",
+        "0 hours 75 minutes of 1 hour", "1 minute  2 seconds of 2 minutes",
+        "1000 seconds of 1 hour", "١ second of 1 minute", "1 second of 2 seconds trailing",
+    )) expect(PlaybackTimeParser.spoken(label) == null, "invalid spoken playback rejected: $label")
+    expect(PlaybackTimeParser.spoken(null) == null, "null spoken playback is unknown")
+    val spokenPage = LayoutBounds(0, 64, 720, 1420)
+    fun spokenSnapshot(cls: String) = ScreenSnapshot("synthetic", 1, LayoutBounds(0, 0, 720, 1600), listOf(
+        ScreenNode(0, -1, 0, null, cls, "0 minutes 30 seconds of 1 minute 0 seconds",
+            LayoutBounds(0, 1374, 720, 1464), false, false, false, 0, null),
+    ), true, false)
+    expect(ViewerLocator.progress(spokenSnapshot("android.widget.SeekBar"), spokenPage) == .5,
+        "spoken SeekBar progress includes the bar extending below the page")
+    expect(ViewerLocator.progress(spokenSnapshot("android.widget.ProgressBar"), spokenPage) == .5,
+        "spoken ProgressBar progress is numeric evidence")
+    fun stuckRange(label: String?) = ScreenSnapshot("synthetic", 1, LayoutBounds(0, 0, 720, 1600), listOf(
+        ScreenNode(0, -1, 0, null, "android.widget.SeekBar", label,
+            LayoutBounds(0, 1374, 720, 1464), false, false, false, 0, ScreenNode.Range(0f, 100f, 0f)),
+    ), true, false)
+    expect(ViewerLocator.progress(stuckRange("0 minutes 30 seconds of 1 minute 0 seconds"), spokenPage) == .5,
+        "a range stuck at its minimum gives way to the spoken position (YouTube Shorts)")
+    expect(ViewerLocator.progress(stuckRange(null), spokenPage) == 0.0,
+        "a range at its minimum without a readable label still reports 0")
+    expect(ViewerLocator.progress(spokenSnapshot("android.widget.TextView"), spokenPage) == null,
+        "spoken TextView labels are not playback progress")
     val fixtures = java.io.File(System.getProperty("fixtures") ?: "../../native/reels-core/src/test/resources/fixtures")
     val fixtureChecks = org.attentionstats.detection.FixtureTests.run(fixtures)
     println("PASS: $checks encounter checks, $fixtureChecks fixture checks")

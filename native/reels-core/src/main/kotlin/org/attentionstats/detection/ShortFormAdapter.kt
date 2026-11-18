@@ -28,7 +28,18 @@ data class AdapterFrame(
     /** Separate full-page advertisement, positively qualified by a source-specific UI marker. */
     val standaloneAd: Boolean = false,
     val standaloneAdKeys: Set<Long> = emptySet(),
+    /** A viewer page that is itself a paid ad, shown by a small exact "Sponsored"/"Ad" badge on the page. */
+    val skippableAd: Boolean = false,
 ) {
+    /** Marks a located viewer ad page whose own badge qualifies it for an optional auto-scroll skip. */
+    fun withSkippableAd(snapshot: ScreenSnapshot): AdapterFrame {
+        val area = page ?: return this
+        if (route != ReelRoute.VIEWER || category != PageCategory.AD) return this
+        return copy(skippableAd = snapshot.within(area).any {
+            org.attentionstats.detection.shared.Sponsored.badge(it, snapshot.screen.width)
+        })
+    }
+
     companion object {
         val OUTSIDE = AdapterFrame(Surface.OUTSIDE)
         val TYPING = AdapterFrame(Surface.EXCLUDED, method = "typing")

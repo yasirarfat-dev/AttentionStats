@@ -100,13 +100,20 @@ object ViewerLocator {
             node.bounds.width >= page.width * 0.7 && node.bounds.top >= page.top + page.height * 0.6 &&
                 node.bounds.bottom <= page.bottom + page.height * 0.2
         }
-        bars.firstNotNullOfOrNull { node ->
+        val range = bars.firstNotNullOfOrNull { node ->
             node.range?.takeIf { it.max > it.min && it.current in it.min..it.max }
                 ?.let { ((it.current - it.min) / (it.max - it.min)).toDouble() }
-        }?.let { return it }
-        return bars.firstNotNullOfOrNull { node ->
-            PlaybackTimeParser.parse(node.label)?.let { (at, total) -> at.toDouble() / total }
         }
+        if (range != null && range > 0.0) return range
+        // Some players (YouTube Shorts) leave the range at its minimum while the spoken label
+        // carries the real position, so a range at 0 gives way to a readable time label.
+        val label = bars.firstNotNullOfOrNull { node ->
+            PlaybackTimeParser.parse(node.label)?.let { (at, total) -> at.toDouble() / total }
+        } ?: bars.firstNotNullOfOrNull { node ->
+            if (node.cls.endsWith("SeekBar") || node.cls.endsWith("ProgressBar"))
+                PlaybackTimeParser.spoken(node.label)?.let { (at, total) -> at.toDouble() / total } else null
+        }
+        return label ?: range
     }
 
     fun defaultCategory(nodes: List<ScreenNode>): PageCategory =

@@ -70,6 +70,8 @@ data class Encounter(val identity: Long, val route: ReelRoute, val category: Pag
  *    item's metadata is mostly different (handles auto-advance without scroll events).
  *    Otherwise it is the same item whose controls changed, and it is adopted silently.
  *  - Items already seen in this session are reported as revisits, never as new encounters.
+ *    An item whose controls changed while away (replay, expanded caption) is still recognised
+ *    when its metadata strongly matches one seen recently.
  */
 class EncounterTracker(
     private val viewerDwellMs: Long = 300,
@@ -89,13 +91,17 @@ class EncounterTracker(
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Long, Boolean>?) = size > memory
     }
 
+    private val recentKeys = object : LinkedHashMap<Long, Set<Long>>(64, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Long, Set<Long>>?) = size > RECENT
+    }
+
     val focused: Long? get() = current
 
     /** Leaving the app or surface: the next item counts as a fresh entry. Seen items persist. */
     fun leave() { current = null; currentKeys = emptySet(); candidate = null; currentRoute = null; currentSlot = null }
 
     /** New unlock session: forget everything. */
-    fun reset() { leave(); seen.clear(); ordinal = 0; lastAt = Long.MIN_VALUE }
+    fun reset() { leave(); seen.clear(); recentKeys.clear(); ordinal = 0; lastAt = Long.MIN_VALUE }
 
     fun observe(frame: ItemFrame): Encounter? {
         if (frame.atMs < lastAt) reset()
@@ -125,7 +131,7 @@ class EncounterTracker(
         val fresh = current == null
         val moved = frame.scrollSequence != currentScroll
         if (!fresh && !moved && overlap(currentKeys, frame.keys) >= 0.5) { adopt(identity, frame); return null }
-        val revisit = seen.containsKey(identity)
+        val revisit = seen.containsKey(identity) || recentKeys.values.any { returning(it, frame.keys) }
         adopt(identity, frame)
         seen[identity] = true
         if (!revisit) ordinal++
@@ -138,9 +144,18 @@ class EncounterTracker(
         currentSlot = frame.slotKey
         // Continuity aliases (for example a clipped header) must also remain revisits on return.
         seen[identity] = true
+        if (frame.keys.isNotEmpty()) recentKeys[identity] = frame.keys
     }
 
     companion object {
+        private const val RECENT = 64
+
+        /** Same item seen earlier: at least three shared strings and three quarters of the larger set. */
+        fun returning(a: Set<Long>, b: Set<Long>): Boolean {
+            val common = a.count { it in b }
+            return common >= 3 && common * 4 >= maxOf(a.size, b.size) * 3
+        }
+
         fun overlap(a: Set<Long>, b: Set<Long>): Double {
             if (a.isEmpty() || b.isEmpty()) return 0.0
             val common = a.count { it in b }

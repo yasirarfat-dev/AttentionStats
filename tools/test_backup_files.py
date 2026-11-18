@@ -2,12 +2,11 @@
 """Run synthetic pending-restore filesystem checks without Android or cloud access."""
 
 import argparse
-import json
 from pathlib import Path
 import shutil
 import subprocess
 
-from test_analytics import compiler
+from test_analytics import compiler, toolchain
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -19,8 +18,7 @@ def main() -> None:
     java = shutil.which("java")
     if not java:
         raise RuntimeError("An existing JDK 17 or newer is required")
-    record = json.loads((ROOT / "docs/evidence/analytics-toolchain.json").read_text(encoding="utf-8"))
-    home = compiler(record["kotlin"], args.offline)
+    home = compiler(toolchain()["kotlin"], args.offline)
     output = ROOT / ".cache/backup-files"
     output.mkdir(parents=True, exist_ok=True)
     jar = output / "tests.jar"

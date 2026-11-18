@@ -28,7 +28,7 @@ object InstagramAdapter : ShortFormAdapter {
         if (!snapshot.complete) return AdapterFrame(Surface.UNKNOWN)
         if (snapshot.typing) return AdapterFrame.TYPING
         ViewerLocator.locate(snapshot, pagerIds)?.let { viewer ->
-            return ViewerLocator.frame(snapshot, viewer, "instagram.viewer", ::viewerCategory)
+            return ViewerLocator.frame(snapshot, viewer, "instagram.viewer", ::viewerCategory).withSkippableAd(snapshot)
         }
         if (!snapshot.has("row_feed_profile_header") && !snapshot.has("media_group")) return AdapterFrame.OUTSIDE
         val list = snapshot.withId("list").firstOrNull { it.scrollable } ?: FeedLocator.list(snapshot)

@@ -47,6 +47,8 @@ object FixtureTests {
         "facebook/home_feed_reel.xml" to Expect(Surface.REELS, ReelRoute.HOME, PageCategory.REEL),
         "facebook/reel_opened_from_home_row.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.REEL),
         "youtube/shorts_tab.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.REEL),
+        "youtube/image_post.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.PHOTO, mediaKind = "photo"),
+        "youtube/shorts_image_ad.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.AD),
         "tiktok/for_you.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.REEL),
         "instagram/explore_grid.xml" to Expect(Surface.OUTSIDE),
                 "instagram/explore_grid_2.xml" to Expect(Surface.OUTSIDE),
@@ -68,6 +70,9 @@ object FixtureTests {
         "facebook/reels_tab_ad.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.AD),
         "facebook/reels_tab_next.xml" to Expect(Surface.REELS, ReelRoute.VIEWER),
         "tiktok/for_you_next.xml" to Expect(Surface.REELS, ReelRoute.VIEWER),
+        // TikTok 47.7.3 photo carousel: compact "Photo" badge (tv_label) in the caption row.
+        "tiktok/photo_post.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.PHOTO),
+        "tiktok/video_47_7_3.xml" to Expect(Surface.REELS, ReelRoute.VIEWER, PageCategory.REEL),
     )
 
     fun parse(file: File): ScreenSnapshot {
@@ -124,6 +129,35 @@ object FixtureTests {
         val next = snapchat.read(parse(File(root, "snapchat/spotlight_next.xml")))
         check(first.identity != next.identity && org.attentionstats.reels.EncounterTracker.overlap(first.keys, next.keys) < 0.5) {
             "Spotlight navigation must not suppress different items"
+        }
+        checks++
+        // Different captured items must never be mistaken for a return to an already seen item.
+        val framesByApp = expectations.keys.groupBy { it.substringBefore('/') }.mapValues { (key, paths) ->
+            paths.map { it to AdapterRegistry.of(ReelApp.byKey(key)!!).read(parse(File(root, it))) }.filter { it.second.identity != null } }
+        for ((_, list) in framesByApp) for (i in list.indices) for (j in i + 1 until list.size) {
+            val (pa, a) = list[i]; val (pb, b) = list[j]
+            check(a.identity == b.identity || !org.attentionstats.reels.EncounterTracker.returning(a.keys, b.keys)) {
+                "$pa and $pb must stay distinct items"
+            }
+            checks++
+        }
+        // Auto-scroll ad skipping outside Facebook needs the page's own exact ad attribution (ADR-114).
+        val youtube = AdapterRegistry.of(ReelApp.YOUTUBE)
+        val shortsAd = parse(File(root, "youtube/shorts_image_ad.xml"))
+        check(youtube.read(shortsAd).skippableAd) { "A Shorts page attributed \"Ad\" qualifies for skipping" }
+        val attribution = shortsAd.nodes.first { it.label?.split('\n')?.contains("Ad") == true }
+        fun relabel(label: String) = youtube.read(ScreenSnapshot(shortsAd.packageName, shortsAd.windowId, shortsAd.screen,
+            shortsAd.nodes.map { node -> if (node.label == attribution.label) ScreenNode(node.index, node.parent, node.depth,
+                node.id, node.cls, label, node.bounds, node.scrollable, node.clickable, node.selected, node.key, node.range)
+                else node }, true, false))
+        for (label in listOf("synthetic\nPaid partnership\nsynthetic", "synthetic\nAd campaign tips\nsynthetic", "synthetic caption")) {
+            check(!relabel(label).skippableAd) { "Partnership, caption or non-exact text must not authorize a skip: $label" }
+            checks++
+        }
+        for (path in expectations.keys.filter { !it.startsWith("facebook/") }) {
+            val frame = AdapterRegistry.of(ReelApp.byKey(path.substringBefore('/'))!!).read(parse(File(root, path)))
+            check(!frame.skippableAd || frame.category == PageCategory.AD) { "$path: only ad pages can be skippable" }
+            checks++
         }
         checks++
         // Synthetic aspect-ratio/album variations of an observed photo; not live format qualification.

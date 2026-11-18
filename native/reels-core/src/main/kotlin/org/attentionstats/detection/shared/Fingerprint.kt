@@ -57,11 +57,27 @@ object Sponsored {
     private val idHints = listOf("sponsored", "_ad_", "ad_cta", "ads_", "_ads", "cta_container", "promoted")
 
     fun label(label: String?): Boolean {
-        if (label == null || label.length > 40) return false
+        if (label == null) return false
+        // Structured attributions merge lines ("App name\nAd\n4.3 stars"); one line must be the marker itself.
+        if ('\n' in label) return label.length <= 400 && label.split('\n').let { lines -> lines.size <= 8 && lines.any(::label) }
+        if (label.length > 40) return false
         val value = label.trim().lowercase()
         return value in exact || value.startsWith("sponsored") || value.startsWith("ad ·") ||
             value.startsWith("ad•") || value.startsWith("ad •") || value == "hide ad"
     }
 
     fun node(node: ScreenNode): Boolean = label(node.label) || node.id?.let { id -> idHints.any { id.contains(it) } } == true
+
+    /** Paid ads only (no partnership/creator posts, captions or ID hints): authorizes an auto-scroll skip. */
+    private val strictExact = exact - "paid partnership"
+    fun badge(node: ScreenNode, screenWidth: Int): Boolean {
+        val label = node.label ?: return false
+        // A multi-line attribution block qualifies only through a line that is exactly the marker.
+        if ('\n' in label) return label.length <= 400 && label.split('\n').let { lines ->
+            lines.size <= 8 && lines.any { it.trim().lowercase() in strictExact }
+        }
+        val value = label.trim().lowercase()
+        return value.length <= 24 && node.bounds.width in 1..(screenWidth / 2) &&
+            (value in strictExact || value.startsWith("sponsored ·") || value.startsWith("ad ·") || value.startsWith("ad •"))
+    }
 }

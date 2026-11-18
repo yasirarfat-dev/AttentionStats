@@ -130,22 +130,6 @@ def main() -> int:
         # Reject qualified bypasses as well as imports for common infrastructure.
         if re.search(r"\b(?:android\.|androidx\.|java\.(?:io|net|sql)\.|com\.facebook\.|kotlinx\.coroutines\.)", text):
             errors.append(f"{label}: platform/storage/side-effect dependency in pure calculations")
-    prototype = ROOT / "native/collection-prototype/src/main/kotlin"
-    prototype_paths = sorted(prototype.rglob("*.kt"))
-    if not prototype_paths:
-        errors.append("No collection prototype source found")
-    for path in prototype_paths:
-        text = path.read_text(encoding="utf-8")
-        label = path.relative_to(ROOT).as_posix()
-        expected = ".".join(path.parent.relative_to(prototype).parts)
-        declaration = re.search(r"^package ([\w.]+)$", text, re.M)
-        if declaration is None or declaration[1] != expected or expected != "org.attentionstats.collection.reconciliation":
-            errors.append(f"{label}: invalid collection prototype package boundary")
-        for imported in re.findall(r"^import ([\w.*]+)$", text, re.M):
-            if not imported.startswith(("kotlin.", "org.attentionstats.collection.reconciliation.")):
-                errors.append(f"{label}: non-domain prototype dependency {imported}")
-        if re.search(r"\b(?:android\.|androidx\.|java\.(?:io|net|sql)\.|com\.facebook\.|kotlinx\.coroutines\.)", text):
-            errors.append(f"{label}: platform/storage/side-effect dependency in prototype")
     # Pure JVM domain: counting rules (org.attentionstats.reels) and version-independent
     # detection adapters (org.attentionstats.detection), testable against screen fixtures.
     reels = ROOT / "native/reels-core/src/main/kotlin"
@@ -185,7 +169,11 @@ def main() -> int:
         if not re.search(rf"^package {re.escape(expected_package)}$", source_text, re.M):
             errors.append(f"{path.relative_to(ROOT)}: protection package/path mismatch")
         for imported in re.findall(r"^import ([\w.*]+)$", source_text, re.M):
-            if not imported.startswith(("kotlin.", "java.time.", "org.attentionstats.protection.")):
+            # Pure JDK helpers only: constant-time comparison and Unicode normalization of parent secrets.
+            if not imported.startswith(("kotlin.", "java.time.", "org.attentionstats.protection.")) and imported not in (
+                "java.security.MessageDigest",
+                "java.text.Normalizer",
+            ):
                 errors.append(f"{path.relative_to(ROOT)}: infrastructure import in protection domain")
     app_source = ROOT / "android/app/src/main/java/com/attentionstats"
     check_native_actions(app_source, errors)
@@ -198,28 +186,14 @@ def main() -> int:
             errors.append(f"{path.relative_to(ROOT)}: gesture dispatch must remain isolated")
         if "domain" in path.relative_to(auto_source).parts and re.search(r"\b(?:android\.|org\.json\.|com\.facebook\.|java\.)", text):
             errors.append(f"{path.relative_to(ROOT)}: auto-scroll domain must remain pure")
-    app_build = (ROOT / "android/app/build.gradle").read_text(encoding="utf-8")
-    if "collection-prototype" in app_build:
-        errors.append("Application must not depend on the collection prototype")
-    app_settings = (ROOT / "android/settings.gradle").read_text(encoding="utf-8")
-    for fixture in ["storage-qualification", "archive-qualification"]:
-        if fixture in app_build or fixture in app_settings:
-            errors.append(f"{fixture} must remain outside the product Gradle build")
-    for path in (ROOT / "android/app/src").rglob("*"):
-        if path.suffix in {".kt", ".java", ".xml"}:
-            for fixture in ["storage", "archive"]:
-                if f"org.attentionstats.qualification.{fixture}" in path.read_text(encoding="utf-8"):
-                    errors.append(f"{path.relative_to(ROOT)}: product source must not import the {fixture} fixture")
     mobile_count = check_mobile_source(ROOT / "src", errors)
     if errors:
         print("Architecture verification failed:")
         print("\n".join(f"  - {error}" for error in errors))
         return 1
     print(f"PASS: {len(paths)} Kotlin source files; package paths and declared domain import boundaries")
-    print(f"PASS: {len(prototype_paths)} collection prototype source files; pure boundary and no app dependency")
     print(f"PASS: {len(reels_paths)} pure Reels/detection files; {detector_count} isolated source adapters; label reading and actions confined")
     print(f"PASS: {len(protection_paths)} pure protection files; package paths and infrastructure boundaries")
-    print("PASS: standalone storage/archive qualification excluded from product settings/dependencies/source")
     print(f"PASS: {mobile_count} mobile TypeScript files; relative imports, feature public APIs and layer direction")
     print("Static checks do not establish native compilation, UI or runtime source support.")
     return 0

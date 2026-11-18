@@ -7,13 +7,12 @@ Bootstrap the existing reviewed compiler with tools/test_analytics.py if absent.
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 import shutil
 import subprocess
 import sys
 
-from test_analytics import compiler
+from test_analytics import compiler, toolchain
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -22,8 +21,7 @@ def main() -> int:
     java = shutil.which("java")
     if not java:
         raise RuntimeError("A local JDK 17 or newer is required")
-    evidence = json.loads((ROOT / "docs/evidence/analytics-toolchain.json").read_text(encoding="utf-8"))
-    home = compiler(evidence["kotlin"], offline=True)
+    home = compiler(toolchain()["kotlin"], offline=True)
     output = ROOT / ".cache" / "autoscroll-build"
     output.mkdir(parents=True, exist_ok=True)
     jar = output / "completion-tests.jar"

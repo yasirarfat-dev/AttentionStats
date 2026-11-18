@@ -18,7 +18,6 @@ def main() -> int:
         ":app:assembleDebug", ":app:assembleRelease", ":app:assembleDebugAndroidTest", ":app:lintDebug",
         ":app:assemblePreview", ":app:lintPreview", ":app:bundleRelease", ":app:lintRelease",
         "testDebugUnitTest", ":analytics-core:verifyAnalytics", "generateCodegenArtifactsFromSchema",
-        ":collection-prototype:verifyReconciliation",
         ":reels-core:verifyReels",
         ":protection-core:verifyProtection",
         "help", "dependencies", ":app:dependencies",

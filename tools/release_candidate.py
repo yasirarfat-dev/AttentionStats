@@ -152,7 +152,7 @@ def native_alignment(archive, prefix):
 
 
 def listing_blocks():
-    text = (ROOT / "release/PLAY-CONSOLE.md").read_text(encoding="utf-8")
+    text = (ROOT / "docs/RELEASE.md").read_text(encoding="utf-8")
     blocks = re.findall(r"```text\n(.*?)\n```", text, re.S)
     if len(blocks) != 4:
         raise ValueError("Expected title, short/full descriptions and release notes")
@@ -166,8 +166,8 @@ def prepare(dest):
     if dest.resolve().is_relative_to(ROOT.resolve()):
         raise ValueError("Release archive must stay outside source workspace")
     dest.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(ROOT / "release/PLAY-CONSOLE.md", dest / "PLAY-CONSOLE.md")
-    shutil.copyfile(ROOT / "release/PERMISSION-PLAN.md", dest / "PERMISSION-PLAN.md")
+    shutil.copyfile(ROOT / "docs/RELEASE.md", dest / "RELEASE.md")
+    shutil.copyfile(ROOT / "docs/PRIVACY.md", dest / "PRIVACY-TECHNICAL.md")
     for directory in ["store/en-US/graphics", "store/en-US/screenshots", "policies", "testing", "private/signing"]:
         (dest / directory).mkdir(parents=True, exist_ok=True)
     for source in (ROOT / "policies").glob("*.md"):
@@ -176,14 +176,14 @@ def prepare(dest):
         (dest / "store/en-US" / name).write_text(value + "\n", encoding="utf-8")
     (dest / "README.md").write_text(
         "# Attention Stats releases\n\nPermanent Android package: **attention.stats**. "
-        "Source/build workspace: `C:\\home\\biobot\\projects\\AttentionStats`.\n\n"
-        "Start with [PLAY-CONSOLE.md](PLAY-CONSOLE.md). Store text/policy copies can be refreshed; "
+        "Source/build workspace: the AttentionStats source repository checkout.\n\n"
+        "Start with [RELEASE.md](RELEASE.md). Store text/policy copies can be refreshed; "
         "each `releases/<version>+<code>` archive is immutable. Gradle output stays in the source project. "
         "Unsigned candidates are not uploadable. No Console rollout or test-period start is implied.\n\n"
         "`private/signing` is reserved for private upload-key material and its recovery plan; never publish "
         "it or mix it with artifacts. See the local recovery instructions for provisioning status. `testing` is for private feedback and "
         "actual Console dates, never fabricated engagement.\n", encoding="utf-8")
-    print("Prepared release folders, root PLAY-CONSOLE.md, policy copies and bounded store text")
+    print("Prepared release folders, root RELEASE.md, policy copies and bounded store text")
 
 
 def archive(dest):
@@ -255,7 +255,7 @@ def archive(dest):
     (target / "metadata/BundleConfig.json").write_text(config, encoding="utf-8")
     (target / "metadata/SHA256SUMS.txt").write_text(
         "".join(f'{x["sha256"]}  {x["file"]}\n' for x in entries), encoding="utf-8")
-    shutil.copyfile(ROOT / "release/PLAY-CONSOLE.md", target / "notes/PLAY-CONSOLE-at-archive.md")
+    shutil.copyfile(ROOT / "docs/RELEASE.md", target / "notes/RELEASE-at-archive.md")
     (target / "notes/STATUS.md").write_text(
         "# Unsigned investigation candidate\n\nPackage: **attention.stats**; version 0.1.0 (1); ARM64 only. "
         "Not signed, not uploadable, not submitted and no testing period started. "

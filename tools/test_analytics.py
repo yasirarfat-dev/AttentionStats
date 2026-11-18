@@ -22,6 +22,12 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 MODULE = ROOT / "native" / "analytics-core"
+TOOLCHAIN = ROOT / "tools" / "kotlin-toolchain.json"
+
+
+def toolchain() -> dict:
+    """Return the reviewed, pinned Kotlin/R8 toolchain record (versions, URLs, sizes, SHA-256)."""
+    return json.loads(TOOLCHAIN.read_text(encoding="utf-8"))
 
 
 def digest(path: Path) -> str:
@@ -138,8 +144,8 @@ def main() -> int:
     java = shutil.which("java")
     if not java:
         raise RuntimeError("A local JDK 17 or newer is required; no global installation is performed")
-    evidence = json.loads((ROOT / "docs/evidence/analytics-toolchain.json").read_text(encoding="utf-8"))
-    home = compiler(evidence["kotlin"], args.offline)
+    record = toolchain()
+    home = compiler(record["kotlin"], args.offline)
     output = ROOT / ".cache" / "analytics-build"
     output.mkdir(parents=True, exist_ok=True)
     jar = output / "analytics-tests.jar"
@@ -156,7 +162,7 @@ def main() -> int:
                    cwd=MODULE, env=environment, check=True, timeout=120)
     if args.device:
         sdk = args.sdk or Path(os.environ.get("ANDROID_HOME", os.environ.get("ANDROID_SDK_ROOT", "")))
-        run_on_device(java, sdk, jar, output, evidence["r8"], args.offline)
+        run_on_device(java, sdk, jar, output, record["r8"], args.offline)
     return 0
 
 

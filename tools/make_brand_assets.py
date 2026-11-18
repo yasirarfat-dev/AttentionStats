@@ -212,6 +212,20 @@ def from_source(size, shape="rounded", content=1.0):
     return tile_img
 
 
+def monochrome(size, content=0.86):
+    """Themed-icon layer (Android 13+): the artwork's bright mark as white on transparency."""
+    art = Image.open(SOURCE).convert("RGB")
+    bg = edge_color(art)
+    inner = max(1, int(size * content))
+    art = art.resize((inner, inner), Image.LANCZOS)
+    alpha = Image.new("L", art.size, 0)
+    alpha.putdata([min(255, max(0, (max(abs(c - b) for c, b in zip(px, bg)) - 40) * 3)) for px in art.getdata()])
+    layer = Image.new("RGBA", (size, size), (255, 255, 255, 0))
+    white = Image.new("RGBA", art.size, (255, 255, 255, 255))
+    layer.paste(white, ((size - inner) // 2, (size - inner) // 2), alpha)
+    return layer
+
+
 def feature_from_source(path):
     from PIL import ImageFilter
     art = Image.open(SOURCE).convert("RGB")
@@ -246,6 +260,7 @@ def main():
             from_source(int(48 * factor), "circle", 1.12).save(folder / "ic_launcher_round.png")
             # Adaptive layers show the centre 72 of 108 dp; keep the shield well inside it.
             from_source(int(108 * factor), "square", 0.86).save(folder / "ic_launcher_foreground.png")
+            monochrome(int(108 * factor)).save(folder / "ic_launcher_monochrome.png")
         else:
             tile(int(48 * factor)).save(folder / "ic_launcher.png")
             tile(int(48 * factor), circle=True).save(folder / "ic_launcher_round.png")
@@ -256,6 +271,7 @@ def main():
                 '<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n'
                 '    <background android:drawable="@color/ic_launcher_background" />\n'
                 '    <foreground android:drawable="@mipmap/ic_launcher_foreground" />\n'
+                + ('    <monochrome android:drawable="@mipmap/ic_launcher_monochrome" />\n' if use_source else '') +
                 '</adaptive-icon>\n')
     for name in ("ic_launcher.xml", "ic_launcher_round.xml"):
         (anydpi / name).write_text(adaptive, encoding="utf-8")
