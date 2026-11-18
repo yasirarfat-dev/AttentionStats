@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-18",
+  "tasks": [
+    "AS-063",
+    "AS-015",
+    "AS-017",
+    "AS-018",
+    "AS-021",
+    "AS-046"
+  ],
+  "sourceBase": "a25ebd4cc2778fee45f4ca5ccef36b115db178cb",
+  "status": "Scoped physical lifecycle and external-component checks pass; broader publication gates remain open",
+  "productSha256": "6a75b08093e18ecc7c9d196f3d8974cd0a93d59d5690ccb73cb26787e85ed746",
+  "diagnosticSha256": "027336cb5353e0c83046f38bf81886e0cf511f25a2d7958c009fd9c69f4ffa92",
+  "rawSha256": "18babbaa226ec6cb183da5958b242c9405d1a3637aec4ca32962437e1eb9d071",
+  "instrumentationCode": -1,
+  "physicalApi": 36,
+  "abi": "arm64-v8a",
+  "versionName": "1.0.0-reels-preview",
+  "versionCode": 10,
+  "checks": 37,
+  "sourceCanonicalLfSha256": {
+    "android/app/src/androidTest/java/com/attentionstats/qualification/ProtectionLifecycleVerification.kt": "6414cc400905c520f5d1bfd1151b4317d3db1ae4c34d10bde5de68bf211438dd",
+    "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt": "b01c3c8a8a1b3aed06e7242343da1704e1cd3c0cf727daf95e60b66a5c31a9c5"
+  },
+  "build": {
+    "command": "python tools/android_build.py :app:assembleDebugAndroidTest --sdk C:/opt/Android/SDK",
+    "result": "PASS; 1m 4s; 315 tasks, 31 executed",
+    "productRebuilt": false,
+    "productionBuilt": false
+  },
+  "verified": [
+    "Real framework Back and Home departures, Activity.recreate, and Home while PIN verification waits behind a latch on the real native worker",
+    "Each departure cancels once, clears the filled PIN control, destroys the old activity, retires token and credential access, and rejects completion replay without executing a harmless action",
+    "After each departure the isolated authority revision and correct PIN remain valid and live credential state matches its original value",
+    "Queued verification drains after departure without authorizing the action; owned credential directory and key are removed in finally"
+  ],
+  "externalEntryChecks": [
+    {
+      "component": "com.attentionstats.protection.ProtectionLockActivity",
+      "result": "actual external shell launch denied as not exported"
+    },
+    {
+      "component": "com.attentionstats.backup.BackupActivity",
+      "result": "actual external shell launch denied as not exported"
+    }
+  ],
+  "preservation": {
+    "liveHistoryOpenedErasedOrReplaced": false,
+    "liveRulesModified": false,
+    "liveLockEnabledByTest": false,
+    "settingsDisplayReverseMatchFreshBaseline": true,
+    "actualAccessibilityServiceBound": true,
+    "ownedDiagnosticRemoved": true,
+    "unfinishedInstrumentation": false,
+    "finalScreen": "Today"
+  },
+  "limits": [
+    "Activity recreation is not process death, reboot, screen lock or biometric enrollment change; those remain separate",
+    "The isolated harmless action does not qualify live cover rendering or allowances with Protection Lock enabled",
+    "PIN setup/recovery, fingerprint and route suites retain their prior exact artifacts; no new fingerprint touch or production acceptance claimed"
+  ]
+}

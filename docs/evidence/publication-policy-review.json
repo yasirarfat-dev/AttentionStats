@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-18",
+  "tasks": [
+    "AS-021",
+    "AS-022",
+    "AS-046"
+  ],
+  "status": "Official-guidance recheck and candidate preparation only; no Console inspection, declaration submission or policy approval",
+  "sources": [
+    {
+      "url": "https://support.google.com/googleplay/android-developer/answer/11926878?hl=en-en",
+      "finding": "New mobile app/update submissions require target API36+ from 31 August 2026; the project and decoded installed preview target37. Final signed artifact must be checked separately."
+    },
+    {
+      "url": "https://support.google.com/googleplay/android-developer/answer/10964491?hl=en",
+      "finding": "Non-accessibility-tool use requires prominent in-app disclosure, affirmative consent and declaration review. Deterministic narrow automation is permitted within stated constraints; autonomous decision/action functionality is prohibited. Reviewer video must show launch, complete disclosure, consent/grant, refusal/re-entry, and the core accessibility feature."
+    },
+    {
+      "url": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en",
+      "finding": "Data safety must cover app and third-party behavior. Collection means off-device transmission; external-backup exception requires the app never access the data. Because this app constructs history backups, that exception is not assumed. Match actual transport, final implementation and privacy notice."
+    }
+  ],
+  "candidateReviewItems": [
+    "Demonstrate the complete prominent accessibility disclosure and both consent/refusal routes in a synthetic reviewer video; do not record private feed/history or parent secrets",
+    "Describe Protection Lock as optional local parent PIN with optional enrolled-parent strong biometrics; Android Settings, emergency access and uninstall remain available",
+    "State that installation-local PIN/recovery/biometric authority is excluded from backups; restored restrictions must not claim restored parent authority",
+    "Keep Facebook auto-scroll unavailable limitations truthful and nonblocking under ADR-110; no universal source or playback claim",
+    "Before an authorized production build choose an unused code above uploaded10 based on actual Console state; no code reserved here"
+  ],
+  "limits": [
+    "No new official-policy approval or app-specific eligibility inferred",
+    "No production build, signing, version change, main merge, workflow dispatch, form submission, upload or rollout",
+    "Current preview audit is debuggable and cannot substitute for signed-candidate inspection"
+  ]
+}

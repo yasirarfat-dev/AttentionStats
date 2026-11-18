@@ -1,0 +1,165 @@
+{
+  "date": "2026-11-18",
+  "sourceBase": "a25ebd4cc2778fee45f4ca5ccef36b115db178cb",
+  "scope": "Read-only installed-preview APK audit; production binary has not been built or qualified",
+  "productSha256": "6a75b08093e18ecc7c9d196f3d8974cd0a93d59d5690ccb73cb26787e85ed746",
+  "package": "com.attentionstats.debug",
+  "debuggable": true,
+  "targetApi": 37,
+  "instrumentationPackaged": false,
+  "permissions": [
+    "android.permission.PACKAGE_USAGE_STATS",
+    "android.permission.USE_BIOMETRIC",
+    "android.permission.USE_FINGERPRINT",
+    "com.attentionstats.debug.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+  ],
+  "exportedComponents": {
+    "com.attentionstats.reels.ReelsAccessibilityService": "android.permission.BIND_ACCESSIBILITY_SERVICE",
+    "com.attentionstats.widget.WidgetConfigureActivity": null,
+    "com.attentionstats.MainActivity": null,
+    "androidx.profileinstaller.ProfileInstallReceiver": "android.permission.DUMP"
+  },
+  "sensitiveNativePagesNonexported": true,
+  "cleartextTrafficAllowed": false,
+  "internetPermission": false,
+  "compiledBackupPolicy": {
+    "oneLogicalFileOnly": true,
+    "protectedCloudTransportRequired": true,
+    "deviceTransferExcluded": true
+  },
+  "protectionCredentialsOutsideBackupAllowlist": true,
+  "accessibility": {
+    "canPerformGestures": true,
+    "isAccessibilityTool": false
+  },
+  "nativeLibraryCount": 23,
+  "minimumElfLoadAlignment": 16384,
+  "zip16KiBAlignment": "pass",
+  "nativeLibraries": [
+    {
+      "name": "lib/arm64-v8a/libNitroMmkv.so",
+      "minLoadAlignment": 16384,
+      "sha256": "5ff8dc830f2b7ca74f69da95a60109945cb0ccf32e2372d800d61bca42fe41dd"
+    },
+    {
+      "name": "lib/arm64-v8a/libNitroModules.so",
+      "minLoadAlignment": 16384,
+      "sha256": "0e004658f93d30de179985c998f0ec23cc7845c170903cb7088d30a2d75e9a2e"
+    },
+    {
+      "name": "lib/arm64-v8a/libappmodules.so",
+      "minLoadAlignment": 16384,
+      "sha256": "5989ea7868b95d2b393f49a9702db9dd30c8e70f9c5cf4f444a52792b020b736"
+    },
+    {
+      "name": "lib/arm64-v8a/libc++_shared.so",
+      "minLoadAlignment": 16384,
+      "sha256": "b5d97c38a728afe28d341cda3369f512d35eaf9c680c1b0563cd6a63e395230f"
+    },
+    {
+      "name": "lib/arm64-v8a/libfbjni.so",
+      "minLoadAlignment": 16384,
+      "sha256": "a9e35ba55d3f956920281f519385f8a72475ee24819799cb08375fdd4cce2b22"
+    },
+    {
+      "name": "lib/arm64-v8a/libgesturehandler.so",
+      "minLoadAlignment": 16384,
+      "sha256": "accebd7397a5b7507c79d4883af33aab93adbc31ece3f07629fa74e64b234f4a"
+    },
+    {
+      "name": "lib/arm64-v8a/libhermestooling.so",
+      "minLoadAlignment": 16384,
+      "sha256": "a095ca75cfaf3013b8c0fdac938eddb8bc3951563433712cdce4bd8b1caede2c"
+    },
+    {
+      "name": "lib/arm64-v8a/libhermesvm.so",
+      "minLoadAlignment": 16384,
+      "sha256": "4e172e4ba39c46d2ceb49f94c0cb134fc9460eea6ea9c15efc763b38bfd796c7"
+    },
+    {
+      "name": "lib/arm64-v8a/libimagepipeline.so",
+      "minLoadAlignment": 16384,
+      "sha256": "1b377992e4256fa9398ec057722f84a359c7d588e570c8a41f51d930c19ece7d"
+    },
+    {
+      "name": "lib/arm64-v8a/libjsi.so",
+      "minLoadAlignment": 16384,
+      "sha256": "4cff42e33182418a50c05350e248384344a69b010b5a74114f0a7781ea8c2f79"
+    },
+    {
+      "name": "lib/arm64-v8a/libmmkv.so",
+      "minLoadAlignment": 16384,
+      "sha256": "7f28a33197c8e296e3457e3d3a016b83367d91b4662e9a0035c92eddeef6aab7"
+    },
+    {
+      "name": "lib/arm64-v8a/libnative-filters.so",
+      "minLoadAlignment": 16384,
+      "sha256": "bb82aec5ab2a8ac4e1968f41c6477824f1f3fff90c0eeb2c90cdeb1923d69833"
+    },
+    {
+      "name": "lib/arm64-v8a/libnative-imagetranscoder.so",
+      "minLoadAlignment": 16384,
+      "sha256": "2aed28298a25afd52ac670cf9682398c6c7ba42a57195c01efd565e7ddfe17ca"
+    },
+    {
+      "name": "lib/arm64-v8a/libreact_codegen_rngesturehandler_codegen.so",
+      "minLoadAlignment": 16384,
+      "sha256": "6efcced9c51151626c39a107969f4ae25ff1c27716ed3082c48458975c0a6030"
+    },
+    {
+      "name": "lib/arm64-v8a/libreact_codegen_rnscreens.so",
+      "minLoadAlignment": 16384,
+      "sha256": "436dc9341c0cbd63ae09885ab9b80a34bcc7a041a2d97d9bacbc34ca57fc8eb7"
+    },
+    {
+      "name": "lib/arm64-v8a/libreact_codegen_rnsvg.so",
+      "minLoadAlignment": 16384,
+      "sha256": "2db44d66d87a90d8077722dfc176f9e2d9109a3de66d279f56851f9f67e63fd7"
+    },
+    {
+      "name": "lib/arm64-v8a/libreact_codegen_safeareacontext.so",
+      "minLoadAlignment": 16384,
+      "sha256": "fa7c209ca445bf43d5c744c1883622364229f984ada64a429b012d44a177fd85"
+    },
+    {
+      "name": "lib/arm64-v8a/libreactnative.so",
+      "minLoadAlignment": 16384,
+      "sha256": "1473aaa2720ac903a0a63be849fffe407534498d7ee85ce2640a0e15f7072c68"
+    },
+    {
+      "name": "lib/arm64-v8a/libreanimated.so",
+      "minLoadAlignment": 16384,
+      "sha256": "0b299a34142ba55ffe8b81b6febbccf0087eb4535a967b6a64d04e1cacc67015"
+    },
+    {
+      "name": "lib/arm64-v8a/librnscreens.so",
+      "minLoadAlignment": 16384,
+      "sha256": "ec95d8eb5446d34c7e6a08feaa3bb368c81949a58fa19674fa211497d7aaac88"
+    },
+    {
+      "name": "lib/arm64-v8a/libsqlcipher.so",
+      "minLoadAlignment": 16384,
+      "sha256": "46a06f81da976f690c18c79e58f7742a2b1aa144301a35a0bb81ffa32da73756"
+    },
+    {
+      "name": "lib/arm64-v8a/libunistyles.so",
+      "minLoadAlignment": 16384,
+      "sha256": "c8889f9abc5b215a994819c00e30ce9d65dd5d6deeca6c14dc091f12991fed03"
+    },
+    {
+      "name": "lib/arm64-v8a/libworklets.so",
+      "minLoadAlignment": 16384,
+      "sha256": "1dcbb7b10ccfbcdf27e385cfc912f39f07158a9095905a68f24acedfe3dcbc77"
+    }
+  ],
+  "compiledXmlSha256": {
+    "backup": "d42ad5f30de46962f8e133401152cb50eebc2d1e50c735c748d2da48d116efb0",
+    "extraction": "c79fe7e0303378899e90b07b4f3043b662ea933c96c13c0fd687aa52add2bedb"
+  },
+  "limits": [
+    "APK is debuggable preview; signed release manifests, artifact/signature/provenance and APK/AAB equivalence remain unrun until authorized production build",
+    "16-KiB ELF/ZIP checks are static; 16-KiB device runtime and older/OEM compatibility remain unverified",
+    "Backup allowlist excludes installation-local PIN/recovery records; actual framework fresh-install recovery is unverified",
+    "Permission/component inspection is not a runtime log, egress or full security audit"
+  ]
+}

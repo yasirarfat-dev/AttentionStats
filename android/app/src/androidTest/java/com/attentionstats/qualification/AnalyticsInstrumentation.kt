@@ -48,6 +48,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var backupSnapshot = false
     private var protectionCredentials = false
     private var protectionRoutes = false
+    private var protectionLifecycle = false
     private var protectionBiometric = false
     private var protectionLockUi = false
     private var protectionAuthorization = false
@@ -147,6 +148,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         backupSnapshot = arguments?.getString("backupSnapshot") == "true"
         protectionCredentials = arguments?.getString("protectionCredentials") == "true"
         protectionRoutes = arguments?.getString("protectionRoutes") == "true"
+        protectionLifecycle = arguments?.getString("protectionLifecycle") == "true"
         protectionBiometric = arguments?.getString("protectionBiometric") == "true"
         protectionLockUi = arguments?.getString("protectionLockUi") == "true"
         protectionAuthorization = arguments?.getString("protectionAuthorization") == "true"
@@ -343,6 +345,10 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             if (protectionRoutes) {
                 result.putString("stream", ProtectionRoutesVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (protectionLifecycle) {
+                result.putString("stream", ProtectionLifecycleVerification.run(this))
                 finish(Activity.RESULT_OK, result); return
             }
             if (protectionAuthorization) {
