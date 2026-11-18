@@ -15,6 +15,7 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
         try {
             val result = com.attentionstats.appearance.AppearanceOwner.configure(context, document)
             runCatching { com.attentionstats.widget.TodayWidget.render(context) }
+            repaintWindow()
             promise.resolve(result)
         } catch (_: Exception) { promise.reject("APPEARANCE_UNSAVED", "Could not save appearance") }
     }
@@ -25,9 +26,26 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
         try {
             val result = com.attentionstats.appearance.AppearanceOwner.save(context, mode, accent, motion)
             runCatching { com.attentionstats.widget.TodayWidget.render(context) }
+            repaintWindow()
             promise.resolve(result)
         }
         catch (_: Exception) { promise.reject("APPEARANCE_UNSAVED", "Could not save appearance") }
+    }
+    /** A live theme change keeps the activity: repaint what shows behind the edge-to-edge system bars. */
+    private fun repaintWindow() {
+        val activity = context.currentActivity ?: return
+        activity.runOnUiThread {
+            runCatching {
+                val canvas = com.attentionstats.appearance.AppearanceOwner.palette(activity).canvas
+                activity.window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(canvas))
+                if (android.os.Build.VERSION.SDK_INT >= 30) {
+                    val flags = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or
+                        android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
+                    activity.window.insetsController?.setSystemBarsAppearance(
+                        if (androidx.core.graphics.ColorUtils.calculateLuminance(canvas) < .179) 0 else flags, flags)
+                }
+            }
+        }
     }
     private val coordinator get() = ReelsCoordinator.get(context)
     private fun failure(promise: Promise, code: String) = promise.reject(code, "Diary operation unavailable; saved history preserved")

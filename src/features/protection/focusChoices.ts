@@ -31,7 +31,7 @@ export function focusChoices(
           {
             kind: 'suggested' as const,
             id: 'reels-apps',
-            name: 'Reels Apps',
+            name: 'Reels apps',
             packages: reels.slice(0, 100),
           },
         ]

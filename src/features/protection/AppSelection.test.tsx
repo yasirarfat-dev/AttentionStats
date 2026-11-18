@@ -63,7 +63,7 @@ test('individual exclusion after bulk group selection updates the shared package
   nodes = elements(AppSelection({ groups, apps, selected, onChange }));
   expect(
     nodes.find(
-      node => node.props.accessibilityLabel === 'Select All in My group',
+      node => node.props.accessibilityLabel === 'Select all in My group',
     )!.props.value,
   ).toBe(false);
   expect(

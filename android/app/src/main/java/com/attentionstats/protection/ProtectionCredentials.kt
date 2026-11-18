@@ -11,7 +11,6 @@ import java.io.File
 import java.security.KeyStore
 import java.security.MessageDigest
 import java.security.SecureRandom
-import java.text.Normalizer
 import java.util.UUID
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -19,15 +18,34 @@ import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.PBEKeySpec
+import org.attentionstats.protection.ParentAuthority
+import org.attentionstats.protection.ParentSecretRules
+import org.attentionstats.protection.UnlockMethods
 import org.json.JSONArray
 import org.json.JSONObject
 
-/** Installation-local verifiers only. Never part of the logical archive or JS bridge. */
+/**
+ * Installation-local verifiers only. Never part of the logical archive or JS bridge.
+ *
+ * Format 1 record (all fields additive; older records stay readable): `enabled`, `biometric` (strong
+ * key-bound biometrics allowed), optional `weak`/`device` method choices, optional `pin` and `pattern`
+ * PBKDF2 verifiers (at least one while enabled), three `phrases` verifiers while enabled, `revision` and the
+ * shared retry state. A disabled record keeps only revision/retry state; verifiers are deleted on disable.
+ */
 internal class ProtectionCredentials(private val context: Context,
     private val alias: String = "attentionstats.protection.credentials.v1") {
     val biometricAlias get() = "$alias.biometric"
     class Denied(val reason: String) : RuntimeException(reason)
-    data class State(val enabled: Boolean, val biometric: Boolean, val revision: String)
+    data class State(val enabled: Boolean, val biometric: Boolean, val revision: String,
+        val pin: Boolean = false, val pattern: Boolean = false, val weak: Boolean = false, val device: Boolean = false) {
+        val methods get() = UnlockMethods(biometric, weak, device).normalized()
+    }
+    /** One security change. Arrays are owned and cleared by the caller. */
+    class Change(val action: String, val proof: CharArray, val proofKind: ParentAuthority,
+        val oldPhrase: CharArray = CharArray(0), val replacement: CharArray = CharArray(0), val confirm: CharArray = CharArray(0),
+        val replacementKind: ParentAuthority = ParentAuthority.PIN,
+        val phrases: List<CharArray> = emptyList(), val confirmations: List<CharArray> = emptyList(),
+        val methods: UnlockMethods? = null)
     private val file = AtomicFile(File(context.noBackupFilesDir, "protection-credentials-v1"))
     private val keys get() = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
     private fun b64(bytes: ByteArray) = Base64.encodeToString(bytes, Base64.NO_WRAP)
@@ -35,6 +53,7 @@ internal class ProtectionCredentials(private val context: Context,
     private fun key() = keys.getKey(alias, null) as? SecretKey ?: throw Denied("KEY_UNAVAILABLE")
     private fun aad() = ("AttentionStats/ProtectionCredentials/v1/" + context.packageName + "/" + alias).toByteArray()
     private fun exists() = listOf("", ".bak", ".new").any { File(file.baseFile.path + it).exists() }
+    private val verifierFields = listOf("pin", "pattern", "phrases")
 
     private fun read(): JSONObject? {
         if (!exists()) {
@@ -54,9 +73,13 @@ internal class ProtectionCredentials(private val context: Context,
         val plain = cipher.doFinal(encrypted, 12, encrypted.size - 12)
         return try {
             JSONObject(plain.toString(Charsets.UTF_8)).also {
-                require(it.getInt("version") == 1 && it.getJSONArray("phrases").length() == 3)
+                require(it.getInt("version") == 1)
                 require(UUID.fromString(it.getString("revision")).toString() == it.getString("revision"))
                 require(it.getInt("attempts") in 0..30)
+                if (it.getBoolean("enabled")) {
+                    require(it.getJSONArray("phrases").length() == ParentSecretRules.PHRASE_COUNT)
+                    require(it.has("pin") || it.has("pattern"))
+                }
             }
         } finally { plain.fill(0) }
     }
@@ -70,9 +93,21 @@ internal class ProtectionCredentials(private val context: Context,
         try { stream.write(cipher.iv); stream.write(encrypted); file.finishWrite(stream) }
         catch (failure: Exception) { file.failWrite(stream); throw failure }
     }
-    private fun status(value: JSONObject?) = State(value?.getBoolean("enabled") ?: false,
-        value?.getBoolean("biometric") ?: false, value?.getString("revision") ?: "unset")
-    fun state(): State = synchronized(lock) { status(read()) }
+    private fun status(value: JSONObject?): State {
+        if (value == null) return State(enabled = false, biometric = false, revision = "unset")
+        val enabled = value.getBoolean("enabled")
+        val biometric = value.getBoolean("biometric")
+        return State(enabled, biometric, value.getString("revision"),
+            pin = enabled && value.has("pin"), pattern = enabled && value.has("pattern"),
+            weak = biometric && value.optBoolean("weak"), device = value.optBoolean("device"))
+    }
+    fun state(): State = synchronized(lock) {
+        val value = read()
+        // Records disabled before verifier deletion existed are purged on first read; authority is unchanged.
+        if (value != null && !value.getBoolean("enabled") && verifierFields.any(value::has))
+            runCatching { write(disabled(value, value.getString("revision"))); deleteBiometricKey() }
+        status(value)
+    }
 
     private fun derive(secret: CharArray, salt: ByteArray): ByteArray {
         val spec = PBEKeySpec(secret, salt, 600_000, 256)
@@ -89,37 +124,60 @@ internal class ProtectionCredentials(private val context: Context,
         val actual = derive(secret, bytes(verifier.getString("salt"), 16))
         return try { MessageDigest.isEqual(actual, expected) } finally { actual.fill(0); expected.fill(0) }
     }
-    private fun phrase(value: CharArray): CharArray {
-        require(value.size in 12..128)
-        return Normalizer.normalize(String(value), Normalizer.Form.NFC).trim().replace(Regex("\\s+"), " ")
-            .also { require(it.length in 12..128) }.toCharArray()
+    private fun phrase(value: CharArray): CharArray = requireNotNull(ParentSecretRules.normalizePhrase(value))
+    private fun validatePin(value: CharArray) { require(ParentSecretRules.validPin(value)) }
+    private fun validatePattern(value: CharArray) { require(ParentSecretRules.decodePattern(value) != null) }
+    private fun validateNew(kind: ParentAuthority, value: CharArray, confirm: CharArray) {
+        when (kind) {
+            ParentAuthority.PIN -> validatePin(value)
+            ParentAuthority.PATTERN -> validatePattern(value)
+            else -> throw IllegalArgumentException()
+        }
+        require(value.contentEquals(confirm))
     }
-    private fun validatePin(value: CharArray) { require(value.size in 6..12 && value.all { it in '0'..'9' }) }
+    private fun field(kind: ParentAuthority) = if (kind == ParentAuthority.PIN) "pin" else "pattern"
+    /** Validates three distinct confirmed phrases and returns their verifiers. */
+    private fun phraseVerifiers(phrases: List<CharArray>, confirmations: List<CharArray>): JSONArray {
+        require(phrases.size == ParentSecretRules.PHRASE_COUNT && confirmations.size == ParentSecretRules.PHRASE_COUNT)
+        require(ParentSecretRules.phraseProblems(phrases, confirmations).all { it == null })
+        val normalized = phrases.map(::phrase)
+        try { return JSONArray(normalized.map(::verifier)) } finally { normalized.forEach { it.fill('\u0000') } }
+    }
 
-    fun setup(pin: CharArray, confirm: CharArray, phrases: List<CharArray>, confirmations: List<CharArray>, beforeCommit: () -> Unit = {}) = synchronized(lock) {
+    /** Legacy PIN-only setup with no convenience methods; kept for existing callers and qualification. */
+    fun setup(pin: CharArray, confirm: CharArray, phrases: List<CharArray>, confirmations: List<CharArray>, beforeCommit: () -> Unit = {}) =
+        create(pin, confirm, null, null, phrases, confirmations, UnlockMethods.NONE, beforeCommit)
+
+    /**
+     * New lock with exactly one app secret, a PIN or an app pattern (encoded by [ParentSecretRules.encodePattern]),
+     * three phrases and the chosen methods (ADR-117: one secret is easier to remember). The caller provisions the strong biometric key in [beforeCommit] when methods.strong.
+     */
+    fun create(pin: CharArray?, pinConfirm: CharArray?, pattern: CharArray?, patternConfirm: CharArray?,
+        phrases: List<CharArray>, confirmations: List<CharArray>, methods: UnlockMethods, beforeCommit: () -> Unit = {}) = synchronized(lock) {
         require(android.os.Build.VERSION.SDK_INT >= 26)
         require(read()?.getBoolean("enabled") != true)
-        validatePin(pin); require(pin.contentEquals(confirm) && phrases.size == 3 && confirmations.size == 3)
-        val normalized = phrases.map(::phrase)
-        val repeated = confirmations.map(::phrase)
-        try {
-            require(normalized.indices.all { normalized[it].contentEquals(repeated[it]) })
-            require(normalized.indices.all { i -> (0 until i).none { normalized[i].contentEquals(normalized[it]) } })
-            val next = JSONObject().put("version", 1).put("enabled", true).put("biometric", false)
-                .put("revision", UUID.randomUUID().toString()).put("pin", verifier(pin))
-                .put("phrases", JSONArray(normalized.map(::verifier))).put("attempts", 0)
-                .put("deadline", 0).put("boot", boot())
-            val generated = !keys.containsAlias(alias)
-            if (generated) KeyGenerator.getInstance("AES", "AndroidKeyStore").apply {
-                init(KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
-                    .setKeySize(256).setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE).build())
-            }.generateKey()
-            try { beforeCommit(); write(next) } catch (failure: Exception) {
-                if (generated && !exists()) keys.deleteEntry(alias)
-                throw failure
-            }
-        } finally { normalized.forEach { it.fill('\u0000') }; repeated.forEach { it.fill('\u0000') } }
+        require((pin == null) != (pattern == null))
+        if (pin != null) validateNew(ParentAuthority.PIN, pin, requireNotNull(pinConfirm))
+        if (pattern != null) validateNew(ParentAuthority.PATTERN, pattern, requireNotNull(patternConfirm))
+        val chosen = methods.normalized()
+        require(!chosen.device || android.os.Build.VERSION.SDK_INT >= ParentSecretRules.DEVICE_CREDENTIAL_MIN_SDK)
+        val next = JSONObject().put("version", 1).put("enabled", true).put("biometric", chosen.strong)
+            .put("weak", chosen.weak).put("device", chosen.device)
+            .put("revision", UUID.randomUUID().toString())
+            .put("phrases", phraseVerifiers(phrases, confirmations)).put("attempts", 0)
+            .put("deadline", 0).put("boot", boot())
+        if (pin != null) next.put("pin", verifier(pin))
+        if (pattern != null) next.put("pattern", verifier(pattern))
+        val generated = !keys.containsAlias(alias)
+        if (generated) KeyGenerator.getInstance("AES", "AndroidKeyStore").apply {
+            init(KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+                .setKeySize(256).setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE).build())
+        }.generateKey()
+        try { beforeCommit(); write(next) } catch (failure: Exception) {
+            if (generated && !exists()) keys.deleteEntry(alias)
+            throw failure
+        }
     }
     private fun boot() = Settings.Global.getInt(context.contentResolver, Settings.Global.BOOT_COUNT, -1)
     private fun delay(attempts: Int): Long = if (attempts < 5) 1000L else (30_000L shl (attempts - 5).coerceAtMost(5)).coerceAtMost(900_000L)
@@ -135,49 +193,97 @@ internal class ProtectionCredentials(private val context: Context,
         value.put("attempts", attempts).put("deadline", now + delay(attempts)).put("boot", boot())
         write(value) // Charge before expensive verification, including a killed attempt.
     }
-    private fun authenticate(value: JSONObject, secret: CharArray, recovery: Boolean, clearAttempts: Boolean = true) {
+    /** PIN, pattern and phrase attempts share one persistent charge-before-verify throttle. */
+    private fun authenticate(value: JSONObject, secret: CharArray, kind: ParentAuthority, clearAttempts: Boolean = true) {
+        if (!value.getBoolean("enabled")) throw Denied("NOT_CONFIGURED")
         charge(value)
-        val correct = if (recovery) {
-            val normalized = phrase(secret)
-            try {
-                var result = false
-                repeat(3) { result = matches(normalized, value.getJSONArray("phrases").getJSONObject(it)) or result }
-                result
-            } finally { normalized.fill('\u0000') }
-        } else { validatePin(secret); matches(secret, value.getJSONObject("pin")) }
+        val correct = when (kind) {
+            ParentAuthority.PHRASE -> anyPhrase(value, secret)
+            ParentAuthority.PIN -> value.has("pin") && ParentSecretRules.validPin(secret) && matches(secret, value.getJSONObject("pin"))
+            ParentAuthority.PATTERN -> value.has("pattern") && ParentSecretRules.decodePattern(secret) != null &&
+                matches(secret, value.getJSONObject("pattern"))
+            else -> false
+        }
         if (!correct) throw Denied("INCORRECT_SECRET")
         if (clearAttempts) { value.put("attempts", 0).put("deadline", 0); write(value) }
     }
-    fun verify(secret: CharArray, recovery: Boolean = false): String = synchronized(lock) {
-        val value = read() ?: throw Denied("NOT_CONFIGURED")
-        authenticate(value, secret, recovery); value.getString("revision")
+    /** Checks all three verifiers without short-circuiting. Malformed input simply does not match. */
+    private fun anyPhrase(value: JSONObject, secret: CharArray): Boolean {
+        val normalized = ParentSecretRules.normalizePhrase(secret) ?: return false
+        try {
+            var result = false
+            repeat(ParentSecretRules.PHRASE_COUNT) { result = matches(normalized, value.getJSONArray("phrases").getJSONObject(it)) or result }
+            return result
+        } finally { normalized.fill('\u0000') }
     }
-    /** Each security change verifies its own credentials; no reusable unlocked state. */
-    fun change(action: String, currentPin: CharArray, oldPhrase: CharArray,
-        replacement: CharArray, confirm: CharArray, phrases: List<CharArray> = emptyList(), confirmations: List<CharArray> = emptyList(), beforeCommit: () -> Unit = {}) = synchronized(lock) {
+    fun verify(secret: CharArray, recovery: Boolean = false): String =
+        verify(secret, if (recovery) ParentAuthority.PHRASE else ParentAuthority.PIN)
+    fun verify(secret: CharArray, kind: ParentAuthority): String = synchronized(lock) {
+        require(kind.knowledge)
         val value = read() ?: throw Denied("NOT_CONFIGURED")
-        if (action == "reset") authenticate(value, oldPhrase, true) else authenticate(value, currentPin, false, clearAttempts = action != "phrases")
+        authenticate(value, secret, kind); value.getString("revision")
+    }
+    private fun disabled(value: JSONObject, revision: String) = JSONObject().put("version", 1).put("enabled", false)
+        .put("biometric", false).put("weak", false).put("device", false).put("revision", revision)
+        .put("attempts", value.getInt("attempts")).put("deadline", value.getLong("deadline")).put("boot", value.getInt("boot"))
+    private fun deleteBiometricKey() { val store = keys; if (store.containsAlias(biometricAlias)) store.deleteEntry(biometricAlias) }
+
+    /** Legacy positional API: PIN proof, or a phrase proof for "reset". */
+    fun change(action: String, currentPin: CharArray, oldPhrase: CharArray,
+        replacement: CharArray, confirm: CharArray, phrases: List<CharArray> = emptyList(), confirmations: List<CharArray> = emptyList(), beforeCommit: () -> Unit = {}) =
+        commit(if (action == "reset") Change(action, oldPhrase, ParentAuthority.PHRASE, replacement = replacement, confirm = confirm)
+            else Change(action, currentPin, ParentAuthority.PIN, oldPhrase, replacement, confirm, phrases = phrases, confirmations = confirmations), beforeCommit)
+
+    /** Each security change verifies its own knowledge proof; no reusable unlocked state. */
+    fun commit(change: Change, beforeCommit: () -> Unit = {}) = synchronized(lock) {
+        val action = change.action
+        require(ParentSecretRules.acceptsForChange(action, change.proofKind))
+        // Shape checks on new values happen before charging an attempt; they reveal nothing about stored secrets.
         when (action) {
-            "reset", "pin" -> { validatePin(replacement); require(replacement.contentEquals(confirm)); value.put("pin", verifier(replacement)); value.put("biometric", false) }
-            "disable" -> value.put("enabled", false).put("biometric", false)
-            "biometric-on" -> { require(value.getBoolean("enabled")); value.put("biometric", true) }
-            "biometric-off" -> value.put("biometric", false)
+            "reset", "pin", "pattern" -> validateNew(if (action == "reset") change.replacementKind else
+                if (action == "pin") ParentAuthority.PIN else ParentAuthority.PATTERN, change.replacement, change.confirm)
+            "phrases" -> require(ParentSecretRules.phraseProblems(change.phrases, change.confirmations).all { it == null })
+            "methods" -> requireNotNull(change.methods)
+        }
+        val value = read() ?: throw Denied("NOT_CONFIGURED")
+        authenticate(value, change.proof, change.proofKind, clearAttempts = action != "phrases")
+        var next = value
+        when (action) {
+            "reset", "pin", "pattern" -> {
+                val kind = if (action == "reset") change.replacementKind else if (action == "pin") ParentAuthority.PIN else ParentAuthority.PATTERN
+                // One app secret (ADR-117): saving a PIN replaces a pattern and vice versa. Records from
+                // earlier builds that hold both collapse to the new one.
+                val replaced = value.has("pin") || value.has("pattern")
+                value.put(field(kind), verifier(change.replacement))
+                value.remove(field(if (kind == ParentAuthority.PIN) ParentAuthority.PATTERN else ParentAuthority.PIN))
+                if (ParentSecretRules.clearsMethods(action, replaced)) value.put("biometric", false).put("weak", false).put("device", false)
+            }
+            "remove-pin" -> { require(value.has("pattern")); value.remove("pin") }
+            "remove-pattern" -> { require(value.has("pin")); value.remove("pattern") }
+            "disable" -> next = disabled(value, value.getString("revision")) // Verifiers are deleted, not retained.
+            "biometric-on" -> {
+                // Only after a verified strong prompt on a freshly provisioned key (see ProtectionLockActivity).
+                val chosen = (change.methods ?: UnlockMethods(true, value.optBoolean("weak"), value.optBoolean("device"))).copy(strong = true)
+                require(!chosen.device || android.os.Build.VERSION.SDK_INT >= ParentSecretRules.DEVICE_CREDENTIAL_MIN_SDK)
+                value.put("biometric", true).put("weak", chosen.weak).put("device", chosen.device)
+            }
+            "biometric-off" -> value.put("biometric", false).put("weak", false)
+            "methods" -> {
+                val chosen = requireNotNull(change.methods).normalized()
+                // Turning strong biometrics on needs a new key and a verified touch: use biometric-on.
+                require(!chosen.strong || value.getBoolean("biometric"))
+                require(!chosen.device || android.os.Build.VERSION.SDK_INT >= ParentSecretRules.DEVICE_CREDENTIAL_MIN_SDK)
+                value.put("biometric", chosen.strong).put("weak", chosen.weak).put("device", chosen.device)
+            }
             "phrases" -> {
-                // PIN plus one existing phrase, checked in the same bounded operation.
-                val normalized = phrase(oldPhrase)
-                val next = phrases.map(::phrase); val repeated = confirmations.map(::phrase)
-                try {
-                    var correct = false
-                    repeat(3) { correct = matches(normalized, value.getJSONArray("phrases").getJSONObject(it)) or correct }
-                    if (!correct) throw Denied("INCORRECT_SECRET")
-                    require(next.size == 3 && repeated.size == 3 && next.indices.all { next[it].contentEquals(repeated[it]) })
-                    require(next.indices.all { i -> (0 until i).none { next[i].contentEquals(next[it]) } })
-                    value.put("phrases", JSONArray(next.map(::verifier)))
-                } finally { normalized.fill('\u0000'); next.forEach { it.fill('\u0000') }; repeated.forEach { it.fill('\u0000') } }
+                // PIN or pattern plus one existing phrase, checked in the same bounded operation.
+                if (!anyPhrase(value, change.oldPhrase)) throw Denied("INCORRECT_SECRET")
+                value.put("phrases", phraseVerifiers(change.phrases, change.confirmations))
             }
             else -> throw IllegalArgumentException()
         }
-        beforeCommit(); value.put("revision", UUID.randomUUID().toString()).put("attempts", 0).put("deadline", 0); write(value)
+        beforeCommit(); next.put("revision", UUID.randomUUID().toString()).put("attempts", 0).put("deadline", 0); write(next)
+        if (action == "disable") runCatching { deleteBiometricKey() }
     }
     companion object { private val lock = Any() }
 }

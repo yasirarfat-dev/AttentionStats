@@ -24,6 +24,7 @@ import {
 import { Screen } from '../../ui/Screen';
 import { AppearanceEditor } from './AppearanceEditor';
 import { SettingsGroup } from './SettingsGroup';
+import { LicensesScreen } from './LicensesScreen';
 import { settingsHelp } from './settingsHelp';
 import { ProtectionToolScreen } from '../protection';
 import { clearHistoryCache } from '../diary';
@@ -34,22 +35,26 @@ import { applyAppearance, useAppearance } from '../../ui/theme';
 import { saveAppearance } from '../../platform/appearance';
 
 const REPO = 'https://github.com/yasirarfat-dev/AttentionStats';
-const PRIVACY = `${REPO}/blob/develop/policies/PRIVACY.md`;
+const PRIVACY = `${REPO}/blob/main/policies/PRIVACY.md`;
 const EMAIL = 'consciousbiobot@gmail.com';
+const IDEAS =
+  'https://vibedprojects.com/builders/yasir/projects/attentionstats';
 const STORE = 'https://play.google.com/store/apps/details?id=attention.stats';
 
 export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
   const [counter, setCounter] = useState(false);
+  const [licenses, setLicenses] = useState(false);
   const [colorDragging, setColorDragging] = useState(false);
   const focused = useIsFocused();
   useEffect(() => {
-    if (!focused || !counter) return;
+    if (!focused || (!counter && !licenses)) return;
     const back = BackHandler.addEventListener('hardwareBackPress', () => {
       setCounter(false);
+      setLicenses(false);
       return true;
     });
     return () => back.remove();
-  }, [focused, counter]);
+  }, [focused, counter, licenses]);
   const reels = useReels();
   const diary = useDiary(1);
   const snapshot = reels.snapshot;
@@ -60,11 +65,21 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
   const [skipAds, setSkipAds] = useState(false);
   const appearance = useAppearance();
   const appearancePending = useRef(false);
+  const appearanceQueued = useRef<typeof appearance | null>(null);
+  // Template taps apply at once, so quick taps queue: the latest choice always wins.
   async function chooseAppearance(next: typeof appearance) {
-    if (appearancePending.current) return;
+    if (appearancePending.current) {
+      appearanceQueued.current = next;
+      return;
+    }
     appearancePending.current = true;
+    let current: typeof appearance | null = next;
     try {
-      applyAppearance(await saveAppearance(next));
+      while (current) {
+        appearanceQueued.current = null;
+        applyAppearance(await saveAppearance(current));
+        current = appearanceQueued.current;
+      }
     } catch {
       Alert.alert(
         'Could not save appearance',
@@ -92,8 +107,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
     const apps = snapshot?.sources
       .map(
         source =>
-          `- ${source.app}: ${source.installed ? source.version : 'not installed'}${source.enabled ? '' : ' (off)'}` +
-          `${source.lastRecognizedMs ? `, last recognized ${ago(Number(source.lastRecognizedMs))}` : ''}`,
+          `- ${source.app}: ${source.installed ? source.version : 'not installed'}${source.enabled ? '' : ' (off)'}`,
       )
       .join('\n');
     return [
@@ -114,7 +128,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
     );
     Alert.alert(
       'Report a problem',
-      'Your report includes your phone model and app versions, never your history or what you watched.',
+      'Your report includes your phone model, Android and app versions and which supported apps are installed or turned off, never your history or what you watched.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -135,6 +149,32 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
     );
   }
 
+  /** Ideas go wherever people are comfortable: the app's listing, GitHub or email. */
+  function suggestIdea() {
+    Alert.alert(
+      'Suggest an idea',
+      'What would make Attention Stats more useful for you?\n\nShare your idea on VibeCodedProjects (vibedprojects.com), a friendly home for vibe-coded apps and the people who use them. You can also open a GitHub issue or send an email.',
+      [
+        { text: 'Project page', onPress: () => Linking.openURL(IDEAS) },
+        {
+          text: 'GitHub',
+          onPress: () =>
+            Linking.openURL(
+              `${REPO}/issues/new?title=${encodeURIComponent('Idea: ')}`,
+            ),
+        },
+        {
+          text: 'Email',
+          onPress: () =>
+            Linking.openURL(
+              `mailto:${EMAIL}?subject=${encodeURIComponent('Attention Stats idea')}`,
+            ),
+        },
+      ],
+      { cancelable: true },
+    );
+  }
+
   const deleter = useDeleteHistory({
     onPause: () => reels.setPaused(true),
     onDelete: async () => {
@@ -143,6 +183,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
     storageBytes: Number(snapshot?.storageBytes ?? 0),
   });
 
+  if (licenses) return <LicensesScreen onBack={() => setLicenses(false)} />;
   if (counter)
     return (
       <ProtectionToolScreen
@@ -152,7 +193,11 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
       />
     );
   return (
-    <Screen title="Settings" scrollEnabled={!colorDragging}>
+    <Screen
+      title="Settings"
+      subtitle="Yours to shape"
+      scrollEnabled={!colorDragging}
+    >
       <SettingsGroup title="Counting" entries={settingsHelp.counting}>
         {reelsSourceKeys.map((key, index) => {
           const source = snapshot?.sources.find(item => item.app === key);
@@ -286,7 +331,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         title="Display & experience"
         entries={settingsHelp.measurement}
       >
-        <Row icon="eye" title="Live counter" onPress={() => setCounter(true)} />
+        <Row icon="eye" title="Live Counter" onPress={() => setCounter(true)} />
         <Divider />
         <ToggleRow
           icon="layers"
@@ -330,7 +375,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
               }
               Alert.alert(
                 'Allow auto-scroll for this session?',
-                'After you press Start on the floating counter, Attention Stats swipes past finished videos when readable playback confirms the end. Unknown video progress waits. You can separately choose to skip recognized standalone ads. Use the same counter control to stop. Permission clears when the tracking service restarts.',
+                'After you press Start on the floating counter, Attention Stats swipes past finished videos when readable playback confirms the end. Unknown video progress waits. You can separately choose to skip recognized ads. Use the same counter control to stop. Permission clears when the tracking service restarts.',
                 [
                   { text: 'Cancel', style: 'cancel' },
                   { text: 'Allow', onPress: () => void configure() },
@@ -340,7 +385,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
           />
           <ToggleRow
             icon="play"
-            title="Skip standalone ads (experimental)"
+            title="Skip ads (experimental)"
             value={skipAds}
             disabled={!autoScroll}
             onChange={value => {
@@ -362,8 +407,8 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
                 return;
               }
               Alert.alert(
-                'Skip recognized standalone ads?',
-                'During a started auto-scroll session, immediately swipe past positively recognized standalone Facebook Reels ads. No ad links are opened. Ads playing in front of another video and provider Skip Ad buttons are not included. This choice is temporary and starts off.',
+                'Skip recognized ads?',
+                'During a started auto-scroll session, immediately swipe past ads recognized by their own Sponsored or Ad label in TikTok, Instagram Reels and YouTube Shorts, and standalone Facebook Reels ads. Paid partnerships are not skipped. No ad links are opened. Ads playing in front of another video and provider Skip Ad buttons are not included. This choice is temporary and starts off.',
                 [
                   { text: 'Cancel', style: 'cancel' },
                   { text: 'Allow', onPress: () => void configure() },
@@ -398,7 +443,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         />
       </SettingsGroup>
 
-      <SettingsGroup title="Data & Privacy" entries={settingsHelp.privacy}>
+      <SettingsGroup title="Data & privacy" entries={settingsHelp.privacy}>
         <Row
           icon="lock"
           title="Backup & restore"
@@ -420,8 +465,14 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         <Row
           icon="code"
           title="Source code"
-          detail="Apache-2.0 on GitHub"
+          detail="GPL-3.0 on GitHub"
           onPress={() => Linking.openURL(REPO)}
+        />
+        <Divider />
+        <Row
+          icon="code"
+          title="Open-source licenses"
+          onPress={() => setLicenses(true)}
         />
         <Divider />
         <Row
@@ -444,8 +495,10 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
         />
       </SettingsGroup>
 
-      <SettingsGroup title="Help & Feedback" entries={settingsHelp.help}>
+      <SettingsGroup title="Help & feedback" entries={settingsHelp.help}>
         <Row icon="bug" title="Report a problem" onPress={reportProblem} />
+        <Divider />
+        <Row icon="idea" title="Suggest an idea" onPress={suggestIdea} />
         <Divider />
         <Row
           icon="heart"
@@ -467,14 +520,15 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
       </SettingsGroup>
 
       <View style={styles.footer}>
-        <Text style={styles.brand}>
-          Digital Wellbeing:Attention Stats{' '}
-          {snapshot?.device.appVersion.replace(/-.*/, '') ?? '1.0.0'}
+        <Text textBreakStrategy="balanced" style={styles.brand}>
+          Attention Stats{' '}
+          {snapshot?.device.appVersion.replace(/-.*/, '') ?? '1.1.0'}
         </Text>
-        <Caption>No Developer Telemetry, No Ads Ever, Open Source</Caption>
-        <Text style={styles.maker}>
-          Made with Care by{' '}
+        <Caption>No developer telemetry, no ads ever, open source</Caption>
+        <Text textBreakStrategy="balanced" style={styles.maker}>
+          Made with care by{' '}
           <Text
+            textBreakStrategy="balanced"
             accessibilityRole="link"
             onPress={() => Linking.openURL('https://yasirarfat.com')}
             style={styles.link}
@@ -482,9 +536,10 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
             Yasir Arfat
           </Text>
         </Text>
-        <Text style={styles.publisher}>
-          Published By{' '}
+        <Text textBreakStrategy="balanced" style={styles.publisher}>
+          Published by{' '}
           <Text
+            textBreakStrategy="balanced"
             accessibilityRole="link"
             onPress={() =>
               Linking.openURL(
@@ -500,7 +555,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
       {reels.error ? <Body muted>{reels.error}</Body> : null}
       {snapshot && !snapshot.accessibilityEnabled && (
         <Button
-          label="Turn on Accessibility"
+          label="Turn on accessibility"
           onPress={() => reels.openAccessibility()}
         />
       )}

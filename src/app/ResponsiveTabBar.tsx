@@ -79,7 +79,10 @@ export function ResponsiveTabBar(props: BottomTabBarProps) {
             })}
           >
             {options.tabBarIcon?.({ focused, color, size: 24 })}
-            <Text style={{ color, fontSize: 12, fontWeight: '700' }}>
+            <Text
+              textBreakStrategy="balanced"
+              style={{ color, fontSize: 12, fontWeight: '700' }}
+            >
               {route.name}
             </Text>
           </Pressable>

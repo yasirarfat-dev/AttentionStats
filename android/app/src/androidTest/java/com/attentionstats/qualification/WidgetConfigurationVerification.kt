@@ -73,7 +73,7 @@ internal object WidgetConfigurationVerification {
                 activity = instrumentation.startActivitySync(Intent(context, WidgetConfigureActivity::class.java)
                     .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 instrumentation.waitForIdleSync()
-                action("Style ·"); action("Screen Time")
+                action("Style ·"); action("Screen time")
                 action("Stats ·")
                 ui {
                     val options = children(activity.window.decorView).filterIsInstance<Switch>()

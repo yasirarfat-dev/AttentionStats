@@ -22,6 +22,7 @@ import {
   StatDivider,
 } from '../../ui/Kit';
 import type { QuickFocusRequest } from '../protection';
+import { PerspectiveCard } from '../perspective';
 import { QuickActions, type QuickDestination } from './QuickActions';
 import { Screen } from '../../ui/Screen';
 import { sourceIcon, useAppIcons, useDiary, ViewingDetail } from '../diary';
@@ -127,7 +128,7 @@ export function TodayScreen({
     >
       {reels.snapshot && !ready && (
         <Card tone="warn">
-          <Text style={styles.warnTitle}>
+          <Text textBreakStrategy="balanced" style={styles.warnTitle}>
             {reconnect ? 'Counting is disconnected' : 'Counting is not on yet'}
           </Text>
           <Body muted>
@@ -136,7 +137,7 @@ export function TodayScreen({
               : 'Finish the two-step setup so Attention Stats can count your short videos.'}
           </Body>
           <Button
-            label={reconnect ? 'Reconnect Accessibility' : 'Finish setup'}
+            label={reconnect ? 'Reconnect accessibility' : 'Finish setup'}
             onPress={reconnect ? () => reels.openAccessibility() : onSetup}
           />
         </Card>
@@ -144,15 +145,18 @@ export function TodayScreen({
 
       <Card tone="hero">
         <View style={styles.heroHeading}>
-          <Text style={styles.heroLabel}>Short Videos Today</Text>
+          <Text textBreakStrategy="balanced" style={styles.heroLabel}>
+            Short videos today
+          </Text>
           <InfoButton
             inverse
-            label="Today Stats"
+            label="Today stats"
             expanded={explainHero}
             onPress={() => setExplainHero(!explainHero)}
           />
         </View>
         <Text
+          textBreakStrategy="balanced"
           style={styles.heroValue}
           numberOfLines={1}
           adjustsFontSizeToFit
@@ -187,7 +191,7 @@ export function TodayScreen({
         </View>
         <View style={styles.deviceSection}>
           <View style={[styles.heroStats, stackedStats && styles.stackedStats]}>
-            <Stat inverse value={duration(videoAppMs)} label="Reels Apps" />
+            <Stat inverse value={duration(videoAppMs)} label="Reels apps" />
             {!stackedStats && <StatDivider inverse />}
             <Stat
               inverse
@@ -196,7 +200,7 @@ export function TodayScreen({
                   ? totalApp
                   : null,
               )}
-              label="Screen Time"
+              label="Screen time"
             />
             {!stackedStats && <StatDivider inverse />}
             <Stat
@@ -213,24 +217,33 @@ export function TodayScreen({
                     )
                   : '—'
               }
-              accessibilityLabel={`App Launches: ${day?.apps.some(app => app.appOpens !== null) ? exactCount(String(day.apps.reduce((sum, app) => sum + Number(app.appOpens ?? 0), 0))) : 'unavailable'}`}
-              label="App Launches"
+              accessibilityLabel={`App launches: ${day?.apps.some(app => app.appOpens !== null) ? exactCount(String(day.apps.reduce((sum, app) => sum + Number(app.appOpens ?? 0), 0))) : 'unavailable'}`}
+              label="App launches"
             />
           </View>
         </View>
         {explainHero && (
-          <Text style={styles.heroNote}>
-            This Session counts short-video encounters since the current
-            observed unlock session. On Screen is today's recorded short-video
-            screen time. Reels Apps totals recorded whole-app time for supported
-            video apps, including their non-video screens. Screen Time covers
-            all recorded apps. App Launches counts observed entries and returns,
+          <Text textBreakStrategy="balanced" style={styles.heroNote}>
+            This session counts short-video encounters since the current
+            observed unlock session. On screen is today's recorded short-video
+            screen time. Reels apps totals recorded whole-app time for supported
+            video apps, including their non-video screens. Screen time covers
+            all recorded apps. App launches counts observed entries and returns,
             not just cold starts. Missing time is unknown; these are known
             subtotals, not proof of watched playback.
           </Text>
         )}
       </Card>
 
+      <PerspectiveCard
+        ms={reelsMs}
+        videos={videos}
+        seed={Math.floor(
+          day
+            ? Date.parse(`${day.day}T00:00:00Z`) / 86_400_000
+            : Date.now() / 86_400_000,
+        )}
+      />
       <ViewingDetail
         days={diary.snapshot?.days ?? []}
         measurementEnabled={diary.snapshot?.measurePlayback}
@@ -238,7 +251,7 @@ export function TodayScreen({
         unavailable={Boolean(diary.error)}
       />
       <Card
-        title="Reels by Apps"
+        title="Reels by apps"
         info="Today's recognized video encounters by source. On-screen time, whole-app time, photos and ads are separate scopes and may overlap. Encounters do not prove watching."
         padded={false}
       >
@@ -264,6 +277,7 @@ export function TodayScreen({
                     color={reelsSources[item.key].color}
                   />
                   <Text
+                    textBreakStrategy="balanced"
                     style={[
                       styles.sourceName,
                       stackedStats && styles.sourceNameStacked,
@@ -278,37 +292,52 @@ export function TodayScreen({
                     ]}
                   >
                     <Text
+                      textBreakStrategy="balanced"
                       style={styles.sourceCount}
                       numberOfLines={1}
                       adjustsFontSizeToFit
                     >
                       {compactCount(String(item.videos))}
                     </Text>
-                    <Text style={styles.sourceUnit}>videos</Text>
+                    <Text
+                      textBreakStrategy="balanced"
+                      style={styles.sourceUnit}
+                    >
+                      Videos
+                    </Text>
                   </View>
                 </View>
                 <View style={styles.sourceDetails}>
                   {[
                     item.reelsMs > 0
-                      ? `${duration(item.reelsMs)} in ${reelsSources[item.key].observation.split(' ').slice(1).join(' ') || 'videos'} .`
+                      ? `${duration(item.reelsMs)} in ${reelsSources[item.key].observation.split(' ').slice(1).join(' ') || 'videos'}`
                       : null,
                     item.ads > 0
-                      ? `${compactCount(String(item.ads))} ${item.ads === 1 ? 'ad' : 'ads'} .`
+                      ? `${compactCount(String(item.ads))} ${item.ads === 1 ? 'ad' : 'ads'}`
                       : null,
                     item.photos > 0
-                      ? `${compactCount(String(item.photos))} ${item.photos === 1 ? 'photo' : 'photos'} .`
+                      ? `${compactCount(String(item.photos))} ${item.photos === 1 ? 'photo' : 'photos'}`
                       : null,
                   ]
                     .filter(Boolean)
-                    .map(detail => (
-                      <Text key={detail} style={styles.sourceDetail}>
+                    .map((detail, index, all) => (
+                      <Text
+                        textBreakStrategy="balanced"
+                        key={detail}
+                        style={styles.sourceDetail}
+                      >
                         {detail!.replace(/ /g, '\u00a0')}
+                        {index < all.length - 1 ? '\u00a0\u00b7' : ''}
                       </Text>
                     ))}
                 </View>
                 {item.appMs > 0 && (
-                  <Text style={styles.sourceAppTime}>
+                  <Text
+                    textBreakStrategy="balanced"
+                    style={styles.sourceAppTime}
+                  >
                     {duration(item.appMs).replace(/ /g, '\u00a0')} in app time
+                    {item.reelsMs > item.appMs ? ' (incomplete)' : ''}
                   </Text>
                 )}
                 {item.videos === 0 &&
@@ -316,7 +345,12 @@ export function TodayScreen({
                   item.appMs === 0 &&
                   item.ads === 0 &&
                   item.photos === 0 && (
-                    <Text style={styles.sourceAppTime}>Nothing yet today</Text>
+                    <Text
+                      textBreakStrategy="balanced"
+                      style={styles.sourceAppTime}
+                    >
+                      Nothing yet today
+                    </Text>
                   )}
               </View>
             </View>
@@ -324,7 +358,7 @@ export function TodayScreen({
       </Card>
 
       <Card
-        title="Your Day"
+        title="Your day"
         info="Recognized short-video encounters by hour today. Bars describe observed activity, not attention or completed viewing."
       >
         <BarChart
@@ -336,7 +370,7 @@ export function TodayScreen({
       </Card>
 
       <Card
-        title="Screen Time"
+        title="Screen time"
         info="Recorded whole-app time from Android usage events. Opens are observed entries and returns, not exact cold launches. Missing intervals are unknown; video-surface time overlaps these values. Android-managed backup follows your saved backup choice."
         padded={false}
       >
@@ -355,8 +389,12 @@ export function TodayScreen({
         ) : (
           <>
             <View style={styles.padded}>
-              <Text style={styles.totalLabel}>Total</Text>
-              <Text style={styles.totalValue}>{duration(totalApp)}</Text>
+              <Text textBreakStrategy="balanced" style={styles.totalLabel}>
+                Total
+              </Text>
+              <Text textBreakStrategy="balanced" style={styles.totalValue}>
+                {duration(totalApp)}
+              </Text>
             </View>
             {visibleApps.map(app => (
               <View key={app.packageName}>
@@ -371,10 +409,14 @@ export function TodayScreen({
                     />
                   }
                   title={app.name}
-                  detail={app.appOpens ? `${app.appOpens} opens` : undefined}
+                  detail={
+                    app.appOpens
+                      ? `${app.appOpens} ${Number(app.appOpens) === 1 ? 'open' : 'opens'}`
+                      : undefined
+                  }
                   trailing={
                     <View style={styles.meterBox}>
-                      <Text style={styles.time}>
+                      <Text textBreakStrategy="balanced" style={styles.time}>
                         {duration(Number(app.appMs))}
                       </Text>
                       <Meter

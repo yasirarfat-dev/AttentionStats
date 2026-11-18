@@ -19,8 +19,8 @@ class WidgetGalleryActivity : ComponentActivity() {
     }
     private fun show() {
         val page = NativePage(this)
-        page.text("Home Screen Widgets", 32f)
-        page.section("Example Gallery", "Choose a widget, then confirm on your launcher. Examples use illustrative values, not your history. Long-press a placed widget to change its style, stats, order and appearance.")
+        page.text("Home screen widgets", 32f)
+        page.section("Example gallery", "Choose a widget, then confirm on your launcher. Examples use illustrative values, not your history. Long-press a placed widget to change its style, stats, order and appearance.")
         page.button("Back to Settings") { finish() }
         val width = minOf(330, (resources.displayMetrics.widthPixels / resources.displayMetrics.density).toInt() - 76).coerceAtLeast(110)
         TodayWidget.providers.forEach { provider ->
@@ -28,7 +28,7 @@ class WidgetGalleryActivity : ComponentActivity() {
             page.text(style.title, 21f)
             val frame = FrameLayout(this)
             val views = WidgetRenderer.views(this, WidgetConfiguration.defaults(style), WidgetData.example(), width, 230, interactive = false)
-            views.setTextViewText(com.attentionstats.R.id.widget_detail, "Example Data · Attention Stats")
+            views.setTextViewText(com.attentionstats.R.id.widget_detail, "Example data · Attention Stats")
             frame.addView(views.apply(this, frame), FrameLayout.LayoutParams((width * resources.displayMetrics.density).toInt(), FrameLayout.LayoutParams.MATCH_PARENT, Gravity.CENTER))
             page.custom(frame, 230)
             page.button("Add ${style.title}", filled = true) {

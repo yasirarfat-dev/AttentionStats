@@ -232,7 +232,9 @@ internal class DiaryEngine(private val context: Context, private val installatio
                     else ReelsTimer(UUID.randomUUID().toString(), app.key, next.route, previous.wall, wall, elapsed)
                 history.database.withWriteTransaction {
                     if (!permitted()) throw DiaryInterrupted()
-                    history.database.data().putTimer(checkNotNull(timer))
+                    val stretch = checkNotNull(timer)
+                    if (history.database.data().extendTimer(stretch.id, stretch.endMs, stretch.durationMs) == 0)
+                        history.database.data().insertTimer(stretch)
                     history.database.data().advanceRevision()
                     if (!permitted()) throw DiaryInterrupted()
                 }
@@ -319,7 +321,8 @@ internal class DiaryEngine(private val context: Context, private val installatio
                     .put("revisitCount", (revisits[social?.key] ?: 0).toString()))
             }
             val hours = JSONArray(LongArray(24).also { buckets ->
-                dao.hourly(from, until).forEach { if (it.category in 0..23) buckets[it.category] = it.count }
+                // Hour index from the local day start; a 25-hour DST day folds its last hour into 23.
+                dao.hourly(from, until).forEach { buckets[it.category.coerceIn(0, 23)] += it.count }
             }.map { it.toString() })
             val interventions = JSONObject()
             dao.interventionTotals(from, until).forEach { total ->

@@ -41,16 +41,16 @@ export function ProtectScreen({
       >
         <Row
           icon="clock"
-          title="Focus Sessions"
-          detail={active ? 'Session Active' : 'On the Fly or On a Schedule'}
-          value={quick ? '−' : '+'}
+          title="Focus sessions"
+          detail={active ? 'Session active' : 'On the fly or on a schedule'}
+          expanded={quick}
           onPress={() => setQuick(!quick)}
         />
         {quick && (
           <>
-            <Button label="Focus Now" onPress={() => setChooser(true)} />
+            <Button label="Focus now" onPress={() => setChooser(true)} />
             <Button
-              label="Scheduled Focus"
+              label="Scheduled focus"
               variant="tonal"
               onPress={() => onSchedules('slots')}
             />
@@ -70,7 +70,7 @@ export function ProtectScreen({
       {active && (
         <Card
           tone="soft"
-          title="Active Focus"
+          title="Active focus"
           info="The timer is native-authoritative. Blocking is best effort; system navigation and emergency recovery remain available. Ending early requires parent authorization when Protection Lock is on."
         >
           <FocusClock
@@ -95,7 +95,7 @@ export function ProtectScreen({
         </Card>
       )}
       <Card
-        title="Your Groups & Time Slots"
+        title="Your groups & time slots"
         info="Groups organize selected apps. Time slots apply recurring rules to those groups. Editing a group can affect its saved slots; changes require their existing review and Save flow."
         padded={false}
       >
@@ -122,36 +122,39 @@ export function ProtectScreen({
         ))}
         <Row
           icon="layers"
-          title="Customize focus lists & schedules"
-          detail="Edit groups or recurring time slots"
+          title="Edit groups & time slots"
+          detail="App lists and recurring schedules"
           onPress={() => onSchedules('groups')}
         />
       </Card>
       <Card
-        title="Short-video Boundaries"
-        info="Mindful Breaks offers a gentle pause after your chosen video count or minutes. Short-video Blocks sets daily video limits or blocks supported players; other app screens remain available."
+        title="Short-video boundaries"
+        info="Mindful Breaks offers a gentle pause after your chosen video count or minutes. Short-video blocks sets daily video limits or blocks supported players; other app screens remain available."
         padded={false}
       >
         <Row
           icon="heart"
-          title="Mindful breaks"
+          title="Mindful Breaks"
+          detail="A gentle pause at your limit"
           onPress={() => onTool('Breaks')}
         />
         <Divider />
         <Row
           icon="block"
           title="Short-video blocks"
+          detail="Daily limits or a full block"
           onPress={() => onTool('Blocks')}
         />
       </Card>
       <Card
         title="Protection Lock"
-        info="Optional parental authorization for ordinary unlocks and protection changes. Set a separate PIN and recovery phrases, then optionally enable biometric convenience. System recovery remains available."
+        info="Optional. A parent approves extra time and protection changes with a parent key (a PIN or pattern that only works in this app), and optionally a fingerprint if a child's is not saved on this phone. Backup phrases reset a forgotten key. Android Settings stay available."
         padded={false}
       >
         <Row
           icon="lock"
-          title="Parental PIN & biometrics"
+          title="Parent approval"
+          detail="Parent key, fingerprint and backup phrases"
           onPress={async () => {
             if (!(await NativeDiary?.openProtectionLock()))
               Alert.alert('Protection Lock unavailable', 'Please try again.');

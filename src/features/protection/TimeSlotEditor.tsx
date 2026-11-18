@@ -59,7 +59,9 @@ function ClockInput({
           style={styles.timeField}
           selectionColor={theme.accent}
         />
-        <Text style={styles.time}>:</Text>
+        <Text textBreakStrategy="balanced" style={styles.time}>
+          :
+        </Text>
         <TextInput
           accessibilityLabel={`${label} minute`}
           onFocus={onFieldFocus}
@@ -114,7 +116,7 @@ export function TimeSlotEditor({
     initialSelected?.packages ?? [],
   );
   const [customId] = useState(newProtectionId);
-  const [customName, setCustomName] = useState('Selected Apps');
+  const [customName, setCustomName] = useState('Selected apps');
   const existingGroup = [...groups]
     .sort(
       (a, b) =>
@@ -179,20 +181,15 @@ export function TimeSlotEditor({
       scrollRef={scrollRef}
       title={initial ? 'Edit time slot' : 'A little time away'}
       subtitle="Make room for what matters"
+      back={{ label: 'Back to schedules', onPress: onBack, disabled: busy }}
     >
-      <Button
-        label="Back to schedules"
-        variant="text"
-        onPress={onBack}
-        disabled={busy}
-      />
       <Segmented
-        label="Time Slot App Rule"
+        label="Time slot app rule"
         value={allowOnly ? 'allow' : 'block'}
         disabled={busy}
         options={[
-          { value: 'block', label: 'Block Apps' },
-          { value: 'allow', label: 'Allow Only' },
+          { value: 'block', label: 'Block apps' },
+          { value: 'allow', label: 'Allow only' },
         ]}
         onChange={value => {
           setAllowOnly(value === 'allow');
@@ -209,9 +206,9 @@ export function TimeSlotEditor({
       />
       {!existingGroup && packages.length > 0 && (
         <>
-          <SectionTitle>Save Selection As</SectionTitle>
+          <SectionTitle>Save selection as</SectionTitle>
           <TextInput
-            accessibilityLabel="Selection Group Name"
+            accessibilityLabel="Selection group name"
             onFocus={onFieldFocus}
             value={customName}
             onChangeText={setCustomName}
@@ -227,7 +224,7 @@ export function TimeSlotEditor({
         </>
       )}
       <Card
-        title="What to Block"
+        title="What to block"
         info={
           slot.allowOnly
             ? 'Other installed launchable apps are blocked. The selected apps and essential recovery controls remain available; other rules still apply.'
@@ -293,6 +290,7 @@ export function TimeSlotEditor({
                       style={[styles.day, checked && styles.dayOn]}
                     >
                       <Text
+                        textBreakStrategy="balanced"
                         style={[styles.dayText, checked && styles.dayTextOn]}
                       >
                         {day}
@@ -325,7 +323,7 @@ export function TimeSlotEditor({
       )}
       <Card
         tone="soft"
-        title="Review Time Slot"
+        title="Review time slot"
         info="New slots save Off so you can review them before enabling. A five-minute allowance and essential recovery controls remain available. Overnight days refer to the date the slot starts."
       >
         <Title>{valid ? slotLabel(slot) : 'Check your time slot'}</Title>
@@ -334,11 +332,11 @@ export function TimeSlotEditor({
         </Body>
         <Body muted>
           {valid
-            ? `${daysLabel(days)} · Saves Off`
+            ? `${daysLabel(days)} · Saves off`
             : 'Use hours 1–12 and minutes 00–59, choose days, and use different start and end times.'}
         </Body>
         {!allDay && from !== null && to !== null && from > to && (
-          <Body muted>Ends Next Day</Body>
+          <Body muted>Ends next day</Body>
         )}
       </Card>
       {error && <Body>{error}</Body>}

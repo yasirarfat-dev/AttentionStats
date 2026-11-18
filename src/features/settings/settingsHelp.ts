@@ -3,17 +3,17 @@ import type { SettingExplanation } from './SettingsGroup';
 export const settingsHelp = {
   counting: [
     {
-      term: 'Counting Sources',
+      term: 'Counting sources',
       detail:
-        'Choose the apps whose short-video encounters you want to record. Turning a source on still asks for your agreement. Ready, Off and Last Seen describe its current state.',
+        'Choose the apps whose short-video encounters you want to record. Turning a source on still asks for your agreement. Ready, off and last seen describe its current state.',
     },
     {
-      term: 'Pause All Counting',
+      term: 'Pause all counting',
       detail:
         'Stops recording until you resume. Your saved history stays in place.',
     },
     {
-      term: 'Count Ads as Videos',
+      term: 'Count ads as videos',
       detail:
         'Includes recognized video ads in the video total. Ads remain a separate tally and can overlap media counts.',
     },
@@ -25,7 +25,7 @@ export const settingsHelp = {
         'Recognizes supported short-video screens and provides chosen protection controls. A permission grant and your source choices are separate. A disconnected service warning stays visible in its row.',
     },
     {
-      term: 'Usage Access',
+      term: 'Usage access',
       detail:
         'Provides recorded whole-app time and observed app entries. It does not prove playback or attention. The badge shows whether usage measurement and Android access are both on.',
     },
@@ -42,12 +42,12 @@ export const settingsHelp = {
         'Choose whether the floating counter appears and which numbers and icons it shows. This is a display choice; source counting has separate controls.',
     },
     {
-      term: 'Photo Encounters',
+      term: 'Photo encounters',
       detail:
         'Counts recognized photos and carousels separately in enabled sources. One carousel post is one encounter.',
     },
     {
-      term: 'Legacy Playback',
+      term: 'Legacy playback',
       detail:
         'If experimental playback measurement was previously enabled, its switch remains available to turn it off. New activation is unavailable while source reliability is under review. Saved measurements are preserved.',
     },
@@ -57,49 +57,49 @@ export const settingsHelp = {
         'Experimental and optional for this session. Start on the floating counter to move past finished videos with readable progress. Missing video progress waits. Use the same control to stop. This works independently of built-in scrolling. YouTube and Snapchat video-end scrolling are not yet qualified.',
     },
     {
-      term: 'Built-in Reels Auto-scroll',
+      term: 'Built-in Reels auto-scroll',
       detail:
         'Facebook or Instagram may offer Auto-scroll in a Reel’s playback or options menu. Availability varies. The guidance row explains how to check. Stop our scrolling before enabling theirs; our Stop control cannot stop scrolling enabled inside another app.',
     },
     {
-      term: 'Skip Standalone Ads',
+      term: 'Skip ads',
       detail:
-        'Separate, off-by-default permission for a started auto-scroll session. Immediately swipes past positively recognized standalone Facebook Reels ads. No ad links are opened. Pre-roll ads and provider Skip Ad buttons are not included. Turning auto-scroll off clears this choice.',
+        'Separate, off-by-default permission for a started auto-scroll session. Immediately swipes past ads recognized by their own Sponsored or Ad label in TikTok, Instagram Reels and YouTube Shorts, and standalone Facebook Reels ads. Paid partnerships are not skipped. No ad links are opened. Pre-roll ads and provider Skip Ad buttons are not included. Turning auto-scroll off clears this choice.',
     },
     {
-      term: 'Home-screen Widgets',
+      term: 'Home-screen widgets',
       detail:
         'Preview five widgets, then choose one to add through your launcher. Long-press a placed widget to customize its layout, stats, order, colors, transparency and appearance.',
     },
     {
-      term: 'Not Measured',
+      term: 'Not measured',
       detail:
         'Text posts, likes, reactions and submitted comments are not measured.',
     },
   ],
   privacy: [
     {
-      term: 'Local History',
+      term: 'Local history',
       detail:
         'History stays encrypted on this phone. No data is sent to the developer.',
     },
     {
-      term: 'Android Backup',
+      term: 'Android backup',
       detail:
-        'Android-managed backup starts enabled, while saved off choices stay off. Android can transfer history to your device backup account. Open Backup & Restore for its current controls and recovery.',
+        'Android-managed backup starts enabled, while saved off choices stay off. Android can transfer history to your device backup account. Open backup & restore for its current controls and recovery.',
     },
     {
-      term: 'Manual Files',
+      term: 'Manual files',
       detail:
         'Manual archives use a public app key. Anyone holding a file and the app key can open it; it is not a personal password.',
     },
     {
-      term: 'Erase History',
+      term: 'Erase history',
       detail:
         'Permanent local deletion requires three confirmations and turns automatic backup off. Copies already outside the app may remain.',
     },
     {
-      term: 'Privacy & Source',
+      term: 'Privacy & source',
       detail:
         'Read the privacy policy or inspect the Apache-2.0 source on GitHub. These links open outside the app.',
     },
@@ -116,24 +116,29 @@ export const settingsHelp = {
         'Drag across the full color canvas and hue strip. Text changes text and numbers, Background changes pages and cards, and Accent changes buttons and highlights. Hex and RGB controls provide precision. Preview before saving; text tones adapt for readability. Layout controls adjust card corners, spacing and statistic size.',
     },
     {
-      term: 'Gentle Animations',
+      term: 'Gentle animations',
       detail:
         'Adds soft tab transitions. The phone’s reduced-motion setting takes priority.',
     },
   ],
   help: [
     {
-      term: 'Report a Problem',
+      term: 'Report a problem',
       detail:
         'Choose Email or a GitHub issue after review. The draft includes phone model and app versions, never your history or what you watched.',
     },
     {
-      term: 'Share & Rate',
+      term: 'Suggest an idea',
+      detail:
+        'Share your idea for the app on VibeCodedProjects (vibedprojects.com), as a GitHub issue or by email. Nothing is attached automatically.',
+    },
+    {
+      term: 'Share & rate',
       detail:
         'Sharing opens your phone’s share sheet. Rating opens Google Play. Both are optional.',
     },
     {
-      term: 'Welcome Tour',
+      term: 'Welcome tour',
       detail:
         'Reopens the introduction. Source and permission choices stay under your control.',
     },

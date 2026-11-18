@@ -66,13 +66,17 @@ internal object ProtectionLockUiVerification {
                 expect(activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
                 expect(views().filterIsInstance<EditText>().isEmpty())
             }
-            click("Set up parental PIN")
-            waitText("Enable Protection Lock")
+            click("Set up Protection Lock")
+            waitText("Turn on Protection Lock")
             instrumentation.waitForIdleSync()
             main {
                 val fields = views().filterIsInstance<EditText>()
                 expect(fields.size == 8)
-                expect(fields.all { it.text.isEmpty() && it.transformationMethod is android.text.method.PasswordTransformationMethod })
+                expect(fields.all { it.text.isEmpty() })
+                // PIN and its confirmation are masked by default; recovery phrases are visible text.
+                expect(fields.take(2).all { it.transformationMethod is android.text.method.PasswordTransformationMethod })
+                expect(fields.drop(2).none { it.transformationMethod is android.text.method.PasswordTransformationMethod })
+                expect(fields.drop(2).all { it.inputType and android.text.InputType.TYPE_MASK_VARIATION == android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD })
                 expect(fields.map { it.contentDescription.toString() }.distinct().size == 8)
                 expect(fields.all { it.height >= (48 * context.resources.displayMetrics.density).toInt() })
             }

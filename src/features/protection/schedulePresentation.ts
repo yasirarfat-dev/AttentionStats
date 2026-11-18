@@ -18,10 +18,10 @@ export const slotLabel = (slot: TimeSlot) =>
     : `${timeLabel(slot.startMinute)} – ${timeLabel(slot.endMinute)}${slot.startMinute > slot.endMinute ? ' · next day' : ''}`;
 export const scopeLabel = (slot: TimeSlot) =>
   slot.allowOnly
-    ? 'Allow Only · Other Apps Blocked'
+    ? 'Allow only · other apps blocked'
     : slot.scope === 'app'
-      ? 'Whole App'
-      : 'Short Videos Only';
+      ? 'Whole app'
+      : 'Short videos only';
 
 export const scheduleStyles = StyleSheet.create(theme => ({
   row: {
@@ -85,5 +85,14 @@ export const scheduleStyles = StyleSheet.create(theme => ({
   dayOn: { backgroundColor: theme.accentSoft, borderColor: theme.accent },
   dayText: { color: theme.muted, fontSize: 13, fontWeight: '600' },
   dayTextOn: { color: theme.text },
-  empty: { paddingVertical: 12, gap: 14 },
+  empty: { paddingVertical: 16, gap: 8, alignItems: 'center' },
+  emptyIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    marginBottom: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.accentSoft,
+  },
 }));

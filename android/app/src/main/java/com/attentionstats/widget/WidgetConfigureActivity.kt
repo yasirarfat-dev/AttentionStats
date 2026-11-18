@@ -51,16 +51,16 @@ class WidgetConfigureActivity : ComponentActivity() {
     private fun navigate(next: String) { section = next; show() }
     private fun show() {
         preview = null; page = NativePage(this)
-        page.text(if (section == "main") "Your Widget" else when (section) { "style" -> "Widget Style"; "stats" -> "Choose Stats"; "order" -> "Arrange Stats"; "theme" -> "Widget Theme"; "accent" -> "Accent Color"; "corners" -> "Corner Shape"; "numbers" -> "Stat Number Size"; else -> "Widget Appearance" }, 32f)
+        page.text(if (section == "main") "Your widget" else when (section) { "style" -> "Widget style"; "stats" -> "Choose stats"; "order" -> "Arrange stats"; "theme" -> "Widget theme"; "accent" -> "Accent color"; "corners" -> "Corner shape"; "numbers" -> "Stat number size"; else -> "Widget appearance" }, 32f)
         if (section != "main") page.button(if (parentSection() == "appearance") "Back to Appearance" else "Back to Widget") { navigate(parentSection()) }
         when (section) {
             "style" -> {
                 val choices = WidgetStyle.offered + if (moreLayouts) listOf(WidgetStyle.TILES, WidgetStyle.LIST) else emptyList()
                 choices.forEach { style -> page.choice(style.title, style.detail, draft.style == style) { draft = draft.copy(style = style); navigate("main") } }
-                page.button(if (moreLayouts) "Fewer Layouts" else "More Layouts") { moreLayouts = !moreLayouts; show() }
+                page.button(if (moreLayouts) "Fewer layouts" else "More layouts") { moreLayouts = !moreLayouts; show() }
             }
             "stats" -> {
-                page.section("Choose Stats", "Select one to nine. The first stat is featured at small sizes.\n\n" + WidgetStat.entries.joinToString("\n\n") { "${it.title}: ${it.description}" })
+                page.section("Choose stats", "Select one to nine. The first stat is featured at small sizes.\n\n" + WidgetStat.entries.joinToString("\n\n") { "${it.title}: ${it.description}" })
                 WidgetStat.entries.forEach { stat ->
                     var resetting = false
                     val toggle = Switch(this).apply {
@@ -78,7 +78,7 @@ class WidgetConfigureActivity : ComponentActivity() {
                 page.button("Done") { navigate("main") }
             }
             "order" -> {
-                page.section("Stat Order", "The first stat stays visible at the smallest size. Move stats up or down; Save applies the draft.")
+                page.section("Stat order", "The first stat stays visible at the smallest size. Move stats up or down; Save applies the draft.")
                 draft.stats.forEachIndexed { index, stat ->
                     page.text("${index + 1}. ${stat.title}", 21f)
                     if (index > 0) page.button("Move ${stat.title} Up") { move(index, index - 1) }
@@ -86,13 +86,13 @@ class WidgetConfigureActivity : ComponentActivity() {
                 }
             }
             "appearance" -> {
-                page.section(if (livePreview) "Your Stats Preview" else "Example Preview", if (livePreview) "A dash means unavailable. Resizing reveals more selected stats." else "Illustrative values only. Saved widgets show your recorded stats.")
+                page.section(if (livePreview) "Your stats preview" else "Example preview", if (livePreview) "A dash means unavailable. Resizing reveals more selected stats." else "Illustrative values only. Saved widgets show your recorded stats.")
                 val frame = FrameLayout(this); preview = frame
                 page.custom(frame, previewDimensions().second); updatePreview()
-                page.section("Background Opacity", "0% removes panel and tile backgrounds; text stays opaque. Choose a theme readable on your wallpaper. Save applies the draft.")
+                page.section("Background opacity", "0% removes panel and tile backgrounds; text stays opaque. Choose a theme readable on your wallpaper. Save applies the draft.")
                 val opacityLabel = page.text("${draft.opacity}%")
                 val slider = SeekBar(this).apply {
-                    max = 100; progress = draft.opacity; contentDescription = "Widget Background Opacity"
+                    max = 100; progress = draft.opacity; contentDescription = "Widget background opacity"
                     setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                         override fun onProgressChanged(view: SeekBar?, value: Int, user: Boolean) { if (user) { draft = draft.copy(opacity = value); opacityLabel.text = "$value%"; updatePreview() } }
                         override fun onStartTrackingTouch(view: SeekBar?) {}
@@ -100,41 +100,41 @@ class WidgetConfigureActivity : ComponentActivity() {
                     })
                 }
                 page.custom(slider, 56)
-                page.button("Theme · ${if (draft.theme == "app") "Match App" else draft.theme}") { navigate("theme") }
-                page.button("Accent · ${if (draft.accent == "app") "Match App" else draft.accent}") { navigate("accent") }
-                page.button(if (moreAppearance) "Fewer Options" else "More Options") { moreAppearance = !moreAppearance; show() }
+                page.button("Theme · ${if (draft.theme == "app") "Match app" else draft.theme}") { navigate("theme") }
+                page.button("Accent · ${if (draft.accent == "app") "Match app" else draft.accent}") { navigate("accent") }
+                page.button(if (moreAppearance) "Fewer options" else "More options") { moreAppearance = !moreAppearance; show() }
                 if (moreAppearance) {
-                    page.section("Display Options", "Show Update Time adds freshness. Show App Names identifies actual sources; turn it off to hide labels. Each widget keeps its own draft until Save.")
-                    page.button("Corner Shape · ${draft.corners}") { navigate("corners") }
-                    page.button("Number Size · ${draft.numberSize}") { navigate("numbers") }
-                    page.toggle(Switch(this).apply { text = "Show Update Time"; isChecked = draft.timestamp; setOnCheckedChangeListener { _, value -> draft = draft.copy(timestamp = value) } })
-                    val names = Switch(this).apply { text = "Show App Names"; isChecked = draft.names; setOnCheckedChangeListener { _, value -> draft = draft.copy(names = value) } }
+                    page.section("Display options", "Show Update Time adds freshness. Show App Names identifies actual sources; turn it off to hide labels. Each widget keeps its own draft until Save.")
+                    page.button("Corner shape · ${draft.corners}") { navigate("corners") }
+                    page.button("Number size · ${draft.numberSize}") { navigate("numbers") }
+                    page.toggle(Switch(this).apply { text = "Show update time"; isChecked = draft.timestamp; setOnCheckedChangeListener { _, value -> draft = draft.copy(timestamp = value) } })
+                    val names = Switch(this).apply { text = "Show app names"; isChecked = draft.names; setOnCheckedChangeListener { _, value -> draft = draft.copy(names = value) } }
                     page.toggle(names)
                 }
             }
-            "theme" -> listOf("app" to "Match App", "light" to "Light", "dark" to "Dark").forEach { (key, label) ->
+            "theme" -> listOf("app" to "Match app", "light" to "Light", "dark" to "Dark").forEach { (key, label) ->
                 page.choice(label, if (key == "app") "Follow the app appearance" else "Keep this widget ${label.lowercase()}", draft.theme == key) { draft = draft.copy(theme = key); navigate("appearance") }
             }
             "accent" -> listOf("app", "graphite", "blue", "teal", "violet").forEach { key ->
-                page.choice(if (key == "app") "Match App" else key.replaceFirstChar { it.uppercase() }, "Widget accent color", draft.accent == key) { draft = draft.copy(accent = key); navigate("appearance") }
+                page.choice(if (key == "app") "Match app" else key.replaceFirstChar { it.uppercase() }, "Widget accent color", draft.accent == key) { draft = draft.copy(accent = key); navigate("appearance") }
             }
-            "corners" -> listOf("rounded" to "Rounded", "soft" to "Soft Corners", "square" to "Square").forEach { (key, label) ->
+            "corners" -> listOf("rounded" to "Rounded", "soft" to "Soft corners", "square" to "Square").forEach { (key, label) ->
                 page.choice(label, "Panel shape", draft.corners == key) { draft = draft.copy(corners = key); navigate("appearance") }
             }
-            "numbers" -> listOf("small" to "Small Numbers", "normal" to "Standard Numbers", "large" to "Large Numbers").forEach { (key, label) ->
+            "numbers" -> listOf("small" to "Small numbers", "normal" to "Standard numbers", "large" to "Large numbers").forEach { (key, label) ->
                 page.choice(label, "Numbers fit the available space", draft.numberSize == key) { draft = draft.copy(numberSize = key); navigate("appearance") }
             }
             else -> {
-                page.section(if (livePreview) "Your Stats Preview" else "Example Preview", if (livePreview) "A dash means unavailable. Resizing reveals more selected stats." else "Illustrative values only. Saved widgets show your recorded stats.")
+                page.section(if (livePreview) "Your stats preview" else "Example preview", if (livePreview) "A dash means unavailable. Resizing reveals more selected stats." else "Illustrative values only. Saved widgets show your recorded stats.")
                 val frame = FrameLayout(this); preview = frame
                 page.custom(frame, previewDimensions().second); updatePreview()
-                page.button(if (livePreview) "Show Example Stats" else "Preview My Stats") { livePreview = !livePreview; show() }
-                page.button("Preview Size · ${listOf("Small", "Medium", "Large")[previewSize]}") { previewSize = (previewSize + 1) % 3; show() }
+                page.button(if (livePreview) "Show example stats" else "Preview my stats") { livePreview = !livePreview; show() }
+                page.button("Preview size · ${listOf("Small", "Medium", "Large")[previewSize]}") { previewSize = (previewSize + 1) % 3; show() }
                 page.button("Style · ${draft.style.title}") { navigate("style") }
                 page.button("Stats · ${draft.stats.size} Selected") { navigate("stats") }
-                if (draft.stats.size > 1) page.button("Arrange Stats") { navigate("order") }
-                page.button("Appearance · ${if (draft.theme == "app") "Match App" else draft.theme}") { navigate("appearance") }
-                page.button("Save Widget", filled = true) { save() }
+                if (draft.stats.size > 1) page.button("Arrange stats") { navigate("order") }
+                page.button("Appearance · ${if (draft.theme == "app") "Match app" else draft.theme}") { navigate("appearance") }
+                page.button("Save widget", filled = true) { save() }
                 page.button("Cancel") { finish() }
             }
         }
@@ -149,7 +149,7 @@ class WidgetConfigureActivity : ComponentActivity() {
         val frame = preview ?: return
         val (width, height) = previewDimensions()
         val views = WidgetRenderer.views(this, draft, if (livePreview) TodayWidget.latest else WidgetData.example(), width, height, interactive = false)
-        if (!livePreview) views.setTextViewText(com.attentionstats.R.id.widget_detail, "Example Data · Attention Stats")
+        if (!livePreview) views.setTextViewText(com.attentionstats.R.id.widget_detail, "Example data · Attention Stats")
         val content = views.apply(this, frame)
         frame.removeAllViews()
         frame.addView(content, FrameLayout.LayoutParams((width * resources.displayMetrics.density).toInt(), ViewGroup.LayoutParams.MATCH_PARENT, android.view.Gravity.CENTER))

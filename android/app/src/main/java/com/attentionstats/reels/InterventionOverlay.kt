@@ -3,6 +3,7 @@ package com.attentionstats.reels
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.RadialGradient
@@ -15,18 +16,19 @@ import android.os.SystemClock
 import android.view.Gravity
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.graphics.ColorUtils
+import com.attentionstats.appearance.AppearanceOwner
+import java.text.NumberFormat
 
 /**
- * Full-app pause screen for mindful breaks and short-video blocks. It never closes the
- * underlying app or touches its controls; the person always has an immediate way out, and
- * the system navigation bar stays uncovered.
- *
- * Human-factors choices: a slow breathing orb invites one calm breath (about 6 per minute),
- * numbers are factual and non-judgemental, leaving is the primary button, and
- * "keep watching" unlocks after a short countdown instead of being hidden.
+ * A warm invitation out of short videos. Touches stay inside this window; the caller
+ * leaves system navigation reachable. Every primary exit is immediate, including
+ * during the optional celebration. Only the secondary action waits for the session.
  */
 internal class InterventionOverlay(
     context: Context,
@@ -40,139 +42,393 @@ internal class InterventionOverlay(
     private val onSecondary: () -> Unit,
     private val elapsedRealtime: () -> Long = SystemClock::elapsedRealtime,
     private val compact: Boolean = false,
+    private val stats: Stats? = null,
+    /** A "Do something real" choice: leaves for Home. Defaults to the primary action. */
+    private val onChoice: () -> Unit = onPrimary,
 ) : FrameLayout(context) {
     enum class Mode { BREAK, BLOCK }
+    data class Stats(val sessionVideos: Long, val todayVideos: Long, val sessionMinutes: Int)
 
-    private val palette = com.attentionstats.appearance.AppearanceOwner.palette(context)
+    /**
+     * A deep, calm scene in the hue of the person's own accent (or custom colour), so it always matches
+     * the theme they chose. Neutral accents use a quiet night blue. Lightness stays at or below 22%, so
+     * white text keeps well over 4.5:1 on every gradient stop; each break turns the hue a few degrees.
+     */
+    private data class Scene(val top: Int, val bottom: Int, val glow: Int)
+    private fun themedScene(visual: Int): Scene {
+        val hsl = FloatArray(3)
+        ColorUtils.colorToHSL(AppearanceOwner.palette(context).accent, hsl)
+        val neutral = hsl[1] < .18f
+        val hue = ((if (neutral) 222f else hsl[0]) + listOf(0f, 12f, -10f, 22f)[visual.mod(4)] + 360f) % 360f
+        val saturation = if (neutral) .38f else hsl[1].coerceIn(.35f, .7f)
+        return Scene(ColorUtils.HSLToColor(floatArrayOf(hue, saturation * .7f, .08f)),
+            ColorUtils.HSLToColor(floatArrayOf((hue + 18f) % 360f, saturation, .21f)),
+            ColorUtils.HSLToColor(floatArrayOf(hue, saturation.coerceAtLeast(.5f), .76f)))
+    }
+    private val ink = Color.WHITE
+    private val inkSoft = ColorUtils.setAlphaComponent(Color.WHITE, 214)
     private val density = resources.displayMetrics.density
     private fun dp(value: Int) = (value * density).toInt()
+    private fun motion() = AppearanceOwner.motion(context)
     private val handler = Handler(Looper.getMainLooper())
+    private val animators = mutableListOf<ValueAnimator>()
     private val template = run {
         val prefs = context.getSharedPreferences("break-presentations", Context.MODE_PRIVATE)
         val next = prefs.getInt("next", 0).coerceAtLeast(0)
         prefs.edit().putInt("next", (next + 1) % BreakTemplates.all.size).apply()
         BreakTemplates.all[next % BreakTemplates.all.size]
     }
-    private val orb = BreathingOrb(context, template.visual)
-    private val secondary: TextView
-    private val prompt: TextView
+    private val choices = context.getSharedPreferences("real-life-choices", Context.MODE_PRIVATE)
+    private val scene = themedScene(template.visual)
+    // The count sits on the glowing orb; outline variants only appear without a count.
+    private val orb = BreathingOrb(context, if (stats != null) 0 else template.visual, scene.glow)
+    private val column = LinearLayout(context)
+    private val scroll = ScrollView(context)
+    private val drift = DriftingBackground(context)
+    private val secondary: Button
+    private var hero: TextView? = null
     private val session = org.attentionstats.protection.InterventionSession(if (compact) 0 else waitSeconds * 1000L)
     private var finished = false
-    init {
-        isClickable = true // Touches stop here; they never reach the paused app.
-        isFocusable = true
-        background = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-            if (mode == Mode.BREAK) intArrayOf(palette.surface, palette.canvas)
-            else intArrayOf(palette.surfaceAlt, palette.canvas))
-        if (!compact) addView(orb, LayoutParams(dp(260), dp(260), Gravity.CENTER_HORIZONTAL or Gravity.TOP).apply { topMargin = dp(96) })
-        else orb.stop()
+    private var celebrating = false
 
-        val column = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER_HORIZONTAL
-            setPadding(dp(28), if (compact) dp(20) else 0, dp(28), dp(if (compact) 20 else 40))
+    init {
+        isClickable = true // Consume empty space as well as controls.
+        isFocusable = true
+        column.orientation = LinearLayout.VERTICAL
+        column.gravity = Gravity.CENTER
+        column.setPadding(dp(20), dp(if (compact) 20 else 22), dp(20), dp(if (compact) 20 else 24))
+        scroll.isFillViewport = true
+        scroll.isClickable = true
+        scroll.addView(column, FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+        if (mode == Mode.BREAK) {
+            // A calm card floating over the paused video, with even margins on every side.
+            setBackgroundColor(ColorUtils.setAlphaComponent(Color.BLACK, 150))
+            val card = FrameLayout(context).apply {
+                background = GradientDrawable().apply { cornerRadius = dp(28).toFloat(); setColor(scene.top) }
+                outlineProvider = android.view.ViewOutlineProvider.BACKGROUND
+                clipToOutline = true
+            }
+            card.addView(drift, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+            card.addView(scroll, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER))
+            addView(card, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER).apply {
+                val side = dp(18); marginStart = side; marginEnd = side; topMargin = dp(16); bottomMargin = dp(16)
+            })
+        } else {
+            setBackgroundColor(scene.top)
+            addView(drift, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+            addView(scroll, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER))
         }
-        if (!compact) column.addView(text("ATTENTION STATS", 12f, palette.muted, bold = true, spacing = 0.18f))
-        column.addView(text(headline, if (compact) 23f else 30f, palette.text, bold = true).apply {
+
+        if (mode == Mode.BREAK) {
+            // A smaller orb on shorter screens keeps both actions in view without scrolling.
+            val heightDp = resources.displayMetrics.heightPixels / resources.displayMetrics.density
+            val size = if (compact) 132 else (heightDp * 0.14f).toInt().coerceIn(120, 196)
+            val orbFrame = FrameLayout(context).apply { minimumHeight = dp(size) }
+            orbFrame.addView(orb, LayoutParams(dp(size), dp(size), Gravity.CENTER))
+            val guide = text(if (motion()) "Breathe in" else "Breathe in 4 · hold 2 · out 6", if (compact) 18f else 22f, ink, bold = true)
+            guide.importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+            orb.onPhase = { value -> guide.animate().cancel(); guide.text = value; guide.alpha = .4f; guide.animate().alpha(1f).setDuration(400).start() }
+            orbFrame.addView(guide, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER))
+            orbFrame.contentDescription = "Breathing guide: breathe in for 4 seconds, hold for 2, breathe out for 6."
+            column.addView(orbFrame, wrap(0))
+            column.addView(text("Follow the circle for three slow breaths", 14f, inkSoft), wrap(4))
+        } else if (!compact) {
+            val orbFrame = FrameLayout(context).apply { minimumHeight = dp(180) }
+            orbFrame.addView(orb, LayoutParams(dp(180), dp(180), Gravity.CENTER))
+            stats?.let {
+                hero = text(formatCount(it.sessionVideos), 60f, ink, bold = true).apply {
+                    // Announce the final value, never every frame of the animation.
+                    contentDescription = formatCount(it.sessionVideos)
+                }
+                orbFrame.addView(hero, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER))
+            }
+            column.addView(orbFrame, wrap(0))
+            stats?.let {
+                val minutes = if (it.sessionMinutes > 0) " · ${it.sessionMinutes} min" else ""
+                column.addView(text("short videos since you unlocked$minutes", 14f, inkSoft), wrap(0))
+            }
+        }
+        column.addView(text(headline, if (compact) 23f else 30f, ink, bold = true).apply {
+            contentDescription = headline
             accessibilityLiveRegion = ACCESSIBILITY_LIVE_REGION_POLITE
-        }, wrap(top = 14))
-        column.addView(text(detail, 17f, palette.muted), wrap(top = 10))
-        prompt = text(template.prompt, 15f, palette.muted).apply { alpha = 0.9f }
-        column.addView(prompt, wrap(top = if (compact) 12 else 22))
-        val primary = button(primaryLabel, primary = true) {
-            if (session.choose(elapsedRealtime(), waitRequired = false)) { finish(); onPrimary() }
+        }, wrap(14))
+        column.addView(text(detail, 17f, inkSoft), wrap(10))
+        if (!compact) stats?.let { value ->
+            Perspective.distance(value.todayVideos)?.let {
+                pill(it.text.replace("thumb scrolling · ", "thumb scrolling today," + System.lineSeparator()))
+            }
+            if (value.sessionMinutes >= 5) {
+                Perspective.achievements(value.sessionMinutes * 60_000L, 1, System.currentTimeMillis() / 86_400_000L)
+                    .firstOrNull()?.let { pill("In those ${value.sessionMinutes} minutes you could have ${it.text}.") }
+            }
         }
+        if (!compact) addChoices()
+        if (!compact) column.addView(text(template.prompt, 15f, inkSoft), wrap(16))
+        column.addView(button(primaryLabel, primary = true, action = ::choosePrimary), wrap(if (compact) 16 else 24))
         secondary = button(secondaryLabel, primary = false) {
             if (session.choose(elapsedRealtime(), waitRequired = true)) { finish(); onSecondary() }
         }
-        if (compact) {
-            val actions = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
-            actions.addView(primary, LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = dp(8) })
-            actions.addView(secondary, LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f))
-            column.addView(actions, wrap(top = 16))
-        } else {
-            column.addView(primary, wrap(top = 32))
-            column.addView(secondary, wrap(top = 12))
-        }
-        addView(column, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, if (compact) Gravity.CENTER else Gravity.BOTTOM))
+        column.addView(secondary, wrap(12))
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
-        contentDescription = "$headline. $detail"
+    }
+
+    private fun formatCount(value: Long) = NumberFormat.getIntegerInstance().format(value)
+
+    private fun rounded(color: Int) = GradientDrawable().apply {
+        cornerRadius = dp(24).toFloat()
+        setColor(color)
+    }
+
+    private fun pill(value: String) {
+        column.addView(text(value, 15f, ink).apply {
+            background = rounded(ColorUtils.setAlphaComponent(Color.WHITE, 40))
+            setPadding(dp(16), dp(12), dp(16), dp(12))
+        }, wrap(14))
+    }
+
+    private fun addChoices() {
+        column.addView(text("Do something real", 18f, ink, bold = true), wrap(16))
+        val count = choices.getLong("count", 0)
+        if (count >= 1) column.addView(text("You've chosen real life ${formatCount(count)} times", 13f, inkSoft), wrap(6))
+        val labels = listOf("Walk", "Read", "Drink water", "Stretch", "Call someone", "Step outside")
+        val names = listOf("walk", "read", "drink water", "stretch", "call someone", "step outside")
+        val icons = listOf(com.attentionstats.R.drawable.ic_real_walk, com.attentionstats.R.drawable.ic_real_read,
+            com.attentionstats.R.drawable.ic_real_water, com.attentionstats.R.drawable.ic_real_stretch,
+            com.attentionstats.R.drawable.ic_real_call, com.attentionstats.R.drawable.ic_real_outside)
+        val responses = listOf("Ten minutes outside clears the head.", "One chapter. Your mind will thank you.",
+            "Water first. Then the next good thing.", "Loosen the shoulders, straighten the back.",
+            "A real voice beats a hundred videos.", "Fresh air and daylight reset your focus.")
+        for (rowIndex in 0..1) {
+            val row = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
+            for (col in 0..2) {
+                val index = rowIndex * 3 + col
+                row.addView(button(labels[index], primary = false) { celebrate(responses[index]) }.apply {
+                    textSize = 14f
+                    contentDescription = "Choose ${names[index]}, leaves short videos"
+                    // A Lucide line icon above the label, tinted like the text.
+                    val icon = context.getDrawable(icons[index])?.mutate()?.apply {
+                        setTint(ink); setBounds(0, 0, dp(22), dp(22))
+                    }
+                    setCompoundDrawablesRelative(null, icon, null, null)
+                    compoundDrawablePadding = dp(6)
+                    setPadding(dp(6), dp(14), dp(6), dp(12))
+                    (background as? GradientDrawable)?.cornerRadius = dp(18).toFloat()
+                }, LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f).apply {
+                    if (col > 0) marginStart = dp(6)
+                })
+            }
+            column.addView(row, wrap(8))
+        }
+    }
+
+    private fun choosePrimary() {
+        if (finished) return
+        if (celebrating || session.choose(elapsedRealtime(), waitRequired = false)) {
+            finish()
+            if (celebrating) onChoice() else onPrimary()
+        }
+    }
+
+    private fun celebrate(response: String) {
+        if (finished || celebrating || !session.choose(elapsedRealtime(), waitRequired = false)) return
+        celebrating = true
+        val count = choices.getLong("count", 0).coerceAtLeast(0)
+        choices.edit().putLong("count", if (count == Long.MAX_VALUE) count else count + 1).apply()
+        if (!motion()) { choosePrimary(); return }
+        // The choice has already passed the immediate session gate. Keep an immediate exit
+        // visible throughout the celebration rather than making the animation a new gate.
+        cancelContentAnimations()
+        column.removeAllViews()
+        column.addView(text("Go for it.", 36f, ink, bold = true).apply {
+            accessibilityLiveRegion = ACCESSIBILITY_LIVE_REGION_POLITE
+            contentDescription = "Go for it. $response"
+        }, wrap(0))
+        column.addView(text(response, 20f, ink), wrap(14))
+        column.addView(button(primaryLabel, primary = true, action = ::choosePrimary), wrap(28))
+        scroll.scrollTo(0, 0)
+        animateValue(240) {
+            column.alpha = it
+            column.scaleX = .94f + .06f * it
+            column.scaleY = .94f + .06f * it
+        }
+        handler.postDelayed({ if (!finished) choosePrimary() }, 1_200)
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        handler.removeCallbacksAndMessages(null)
+        if (finished) return
         session.start(elapsedRealtime())
+        scroll.post { scroll.scrollTo(0, 0) } // Start at the breathing guide, not a focused button.
         tick()
+        orb.start()
+        drift.start()
+        animateValue(300) {
+            column.alpha = it
+            column.translationY = dp(18) * (1f - it)
+        }
+        val value = stats
+        if (hero != null && value != null) animateValue(900) {
+            hero?.text = formatCount(if (it >= 1f) value.sessionVideos else (value.sessionVideos * it.toDouble()).toLong())
+        }
+    }
+
+    /** All finite animations reach their final state immediately when motion is disabled. */
+    private fun animateValue(durationMs: Long, frame: (Float) -> Unit) {
+        if (!motion()) { frame(1f); return }
+        frame(0f)
+        val animator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = durationMs
+            addUpdateListener {
+                if (!motion()) { cancel(); frame(1f) }
+                else frame(it.animatedValue as Float)
+            }
+        }
+        animators.add(animator)
+        animator.start()
+    }
+
+    private fun cancelContentAnimations() {
+        animators.forEach { it.cancel() }
+        animators.clear()
+        column.animate().cancel()
+        column.alpha = 1f
+        column.translationY = 0f
+        column.scaleX = 1f
+        column.scaleY = 1f
     }
 
     private fun wrap(top: Int) = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
         LinearLayout.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(top) }
 
-    private fun text(value: String, size: Float, color: Int, bold: Boolean = false, spacing: Float = 0f) = TextView(context).apply {
-        text = value; textSize = size; setTextColor(color); gravity = Gravity.CENTER
-        letterSpacing = spacing
-        if (bold) typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+    /**
+     * Centred copy: balanced line breaks (no single orphaned word) and, for short multi-sentence text,
+     * one sentence per line so the block reads evenly.
+     */
+    private fun text(value: String, size: Float, color: Int, bold: Boolean = false) = TextView(context).apply {
+        text = if (value.length <= 160) value.replace(Regex("([.?!]) (?=[A-Z0-9])"), "$1\n") else value
+        textSize = size; setTextColor(color); gravity = Gravity.CENTER
+        breakStrategy = android.graphics.text.LineBreaker.BREAK_STRATEGY_BALANCED
+        hyphenationFrequency = android.text.Layout.HYPHENATION_FREQUENCY_NONE
+        if (bold) typeface = Typeface.create("sans-serif", Typeface.BOLD)
         setLineSpacing(0f, 1.15f)
     }
 
-    private fun button(label: String, primary: Boolean, action: () -> Unit) = TextView(context).apply {
+    private fun button(label: String, primary: Boolean, action: () -> Unit) = Button(context).apply {
         text = label; textSize = 16f; gravity = Gravity.CENTER
+        breakStrategy = android.graphics.text.LineBreaker.BREAK_STRATEGY_BALANCED
+        isAllCaps = false
         minHeight = dp(54)
+        minimumHeight = dp(54)
+        minWidth = 0
+        minimumWidth = 0
+        setPadding(dp(10), dp(12), dp(10), dp(12))
         typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
-        setTextColor(if (primary) palette.onAccent else palette.text)
-        background = GradientDrawable().apply {
-            cornerRadius = dp(27).toFloat()
-            if (primary) setColor(palette.accentFill) else { setColor(palette.surfaceAlt); setStroke(dp(1), palette.border) }
+        setTextColor(if (primary) scene.top else ink)
+        backgroundTintList = null
+        background = rounded(if (primary) Color.WHITE else ColorUtils.setAlphaComponent(Color.WHITE, 34)).apply {
+            if (!primary) setStroke(dp(1), ColorUtils.setAlphaComponent(Color.WHITE, 96))
         }
-        isClickable = true; isFocusable = true
         setOnClickListener { action() }
-        accessibilityDelegate = object : AccessibilityDelegate() {
-            override fun onInitializeAccessibilityNodeInfo(host: View, info: android.view.accessibility.AccessibilityNodeInfo) {
-                super.onInitializeAccessibilityNodeInfo(host, info); info.className = "android.widget.Button"
-            }
-        }
     }
 
     private fun tick() {
         if (finished) return
-        val now = elapsedRealtime()
-        val remaining = session.remainingSeconds(now)
-        if (remaining > 0) {
-            secondary.text = "$secondaryLabel · $remaining"
-            secondary.alpha = 0.45f
-            secondary.isEnabled = false
-        } else {
-            secondary.text = secondaryLabel
-            secondary.alpha = 1f
-            secondary.isEnabled = true
+        val remaining = session.remainingSeconds(elapsedRealtime())
+        secondary.text = if (remaining > 0) "$secondaryLabel · $remaining" else secondaryLabel
+        secondary.alpha = if (remaining > 0) .45f else 1f
+        secondary.isEnabled = remaining <= 0
+        // Also stop a caller's entrance animator if reduced motion changes while visible.
+        if (!motion()) {
+            animate().cancel()
+            alpha = 1f
+            if (celebrating) { choosePrimary(); return }
         }
         handler.postDelayed({ tick() }, 250)
     }
 
     fun finish() {
-        finished = true; session.finish()
+        finished = true
+        session.finish()
         handler.removeCallbacksAndMessages(null)
-        prompt.animate().cancel(); animate().cancel(); orb.stop()
+        cancelContentAnimations()
+        animate().cancel()
+        orb.stop()
+        drift.stop()
     }
 
     override fun onDetachedFromWindow() { finish(); super.onDetachedFromWindow() }
 
+    /** A slow diagonal wash through the scene's colours with a drifting light. */
+    private inner class DriftingBackground(context: Context) : View(context) {
+        private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private val glow = Paint(Paint.ANTI_ALIAS_FLAG)
+        private var progress = 0f
+        private val animator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 10_000
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+            addUpdateListener {
+                if (!motion()) { stop(); progress = 0f }
+                else progress = it.animatedValue as Float
+                invalidate()
+            }
+        }
+        init { importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO }
+        // Never size a wrapping card; fill only the space its content (or the window) defines.
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) =
+            setMeasuredDimension(resolveSize(0, widthMeasureSpec), resolveSize(0, heightMeasureSpec))
+        fun start() { if (motion()) animator.start() }
+        fun stop() { animator.cancel() }
+        override fun onDraw(canvas: Canvas) {
+            if (width == 0 || height == 0) return
+            val w = width.toFloat(); val h = height.toFloat()
+            val shift = w * progress * .35f
+            val middle = ColorUtils.blendARGB(scene.top, scene.bottom, .35f + .3f * progress)
+            paint.shader = LinearGradient(-shift, 0f, w + shift, h,
+                intArrayOf(scene.top, middle, scene.bottom), null, Shader.TileMode.CLAMP)
+            canvas.drawRect(0f, 0f, w, h, paint)
+            // A soft light drifting across the scene.
+            val cx = w * (.2f + .6f * progress); val cy = h * (.28f + .1f * progress)
+            glow.shader = RadialGradient(cx, cy, w * .75f, intArrayOf(ColorUtils.setAlphaComponent(scene.glow, 70),
+                ColorUtils.setAlphaComponent(scene.glow, 0)), null, Shader.TileMode.CLAMP)
+            canvas.drawRect(0f, 0f, w, h, glow)
+        }
+    }
+
     /** A soft glowing circle that grows over 5 s (breathe in) and shrinks over 5 s (breathe out). */
-    private class BreathingOrb(context: Context, private val visual: Int) : View(context) {
-        private val palette = com.attentionstats.appearance.AppearanceOwner.palette(context)
+    private class BreathingOrb(context: Context, private val visual: Int, private val light: Int) : View(context) {
         private fun alpha(color: Int, value: Int) = (color and 0x00FFFFFF) or (value shl 24)
         private val glow = Paint(Paint.ANTI_ALIAS_FLAG)
         private val core = Paint(Paint.ANTI_ALIAS_FLAG)
-        private val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; color = alpha(palette.accent, 70) }
+        private val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; color = alpha(Color.WHITE, 110) }
         private var scale = 0.7f
-        private val animator = ValueAnimator.ofFloat(0.62f, 1f).apply {
-            duration = 5_000; repeatMode = ValueAnimator.REVERSE; repeatCount = ValueAnimator.INFINITE
-            interpolator = AccelerateDecelerateInterpolator()
-            addUpdateListener { scale = it.animatedValue as Float; invalidate() }
+        /** Guided breathing: in 4 s, hold 2 s, out 6 s (five calm breaths a minute). */
+        var onPhase: ((String) -> Unit)? = null
+        private var phase = ""
+        private val animator = ValueAnimator.ofFloat(0f, 12f).apply {
+            duration = 12_000; repeatCount = ValueAnimator.INFINITE
+            interpolator = android.view.animation.LinearInterpolator()
+            addUpdateListener {
+                if (!com.attentionstats.appearance.AppearanceOwner.motion(context)) {
+                    stop(); scale = .85f
+                } else {
+                    val t = it.animatedValue as Float
+                    fun ease(x: Float) = (1 - kotlin.math.cos(Math.PI * x).toFloat()) / 2
+                    scale = when {
+                        t < 4f -> .62f + .38f * ease(t / 4f)
+                        t < 6f -> 1f
+                        else -> 1f - .38f * ease((t - 6f) / 6f)
+                    }
+                    val next = if (t < 4f) "Breathe in" else if (t < 6f) "Hold" else "Breathe out"
+                    if (next != phase) { phase = next; onPhase?.invoke(next) }
+                }
+                invalidate()
+            }
         }
-        init { importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO; if (visual == 0 && com.attentionstats.appearance.AppearanceOwner.motion(context)) animator.start() }
-        fun stop() = animator.cancel()
+        init { importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO }
+        fun start() { if (visual == 0 && com.attentionstats.appearance.AppearanceOwner.motion(context)) animator.start() }
+        fun stop() { animator.cancel() }
         override fun onDraw(canvas: Canvas) {
             val cx = width / 2f; val cy = height / 2f; val max = minOf(width, height) / 2f
             val radius = max * scale
@@ -190,11 +446,11 @@ internal class InterventionOverlay(
                 }
                 return
             }
-            glow.shader = RadialGradient(cx, cy, radius, intArrayOf(alpha(palette.accent, 90), alpha(palette.accent, 0)),
+            glow.shader = RadialGradient(cx, cy, radius, intArrayOf(alpha(light, 120), alpha(light, 0)),
                 null, Shader.TileMode.CLAMP)
             canvas.drawCircle(cx, cy, radius, glow)
             core.shader = LinearGradient(cx - radius, cy - radius, cx + radius, cy + radius,
-                alpha(palette.accent, 180), alpha(palette.accentFill, 230), Shader.TileMode.CLAMP)
+                alpha(Color.WHITE, 150), alpha(light, 200), Shader.TileMode.CLAMP)
             canvas.drawCircle(cx, cy, radius * 0.48f, core)
             ring.strokeWidth = max * 0.01f + 1
             canvas.drawCircle(cx, cy, radius * 0.72f, ring)

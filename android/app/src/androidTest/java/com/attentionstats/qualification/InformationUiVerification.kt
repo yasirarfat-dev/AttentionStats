@@ -226,7 +226,7 @@ internal object InformationUiVerification {
                     help("Viewing Details", "Encounters mean on screen")
                     help("Reels by Apps", "Today's recognized video")
                     help("Your Day", "Recognized short-video encounters")
-                    help("Screen Time", "Recorded whole-app time")
+                    help("Screen time", "Recorded whole-app time")
                     click("Quick Actions"); help("Quick Actions", "Open a focus review")
                     click("Focus Now"); help("Focus Now", "Review apps, mode and duration")
                     click("Close focus chooser")
@@ -275,8 +275,8 @@ internal object InformationUiVerification {
                     help("Focus", "Start a voluntary timed")
                     help("Your Groups & Time Slots", "Groups organize selected")
                     help("Short-video Boundaries", "Mindful Breaks offers")
-                    click("Mindful Breaks"); help("Mindful Breaks", "A gentle pause after")
-                    click("Back to Protect"); click("Short-video Blocks"); help("Short-video Blocks", "Daily limits count")
+                    click("Mindful Breaks, A gentle pause at your limit"); help("Mindful Breaks", "A gentle pause after")
+                    click("Back to Protect"); click("Short-video Blocks, Daily limits or a full block"); help("Short-video Blocks", "Daily limits count")
                     click("Back to Protect"); open("settings"); click("Live Counter")
                     help("Live Counter", "shows recognized encounters"); click("Back to Settings")
                 }
@@ -477,7 +477,7 @@ internal object InformationUiVerification {
                 "protection-entry" -> {
                     open("protect")
                     help("Protection Lock", "Optional parental authorization")
-                    find("Parental PIN & biometrics") { true }; checks++
+                    find("Parent approval") { true }; checks++
                     val capture = java.io.File(context.cacheDir, "protection-lock-entry.png")
                     check(!capture.exists())
                     val beforeCapture = checkNotNull(ownRoot()); SnapshotReader.recycle(beforeCapture)
@@ -486,10 +486,10 @@ internal object InformationUiVerification {
                         val afterCapture = checkNotNull(ownRoot()); SnapshotReader.recycle(afterCapture)
                         capture.outputStream().use { check(bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)) }
                     } finally { bitmap.recycle() }
-                    click("Parental PIN & biometrics")
+                    click("Parent approval")
                     find("Protection Lock is off", true) { true }; checks++
                     click("Done")
-                    find("Parental PIN & biometrics") { true }; checks++
+                    find("Parent approval") { true }; checks++
                 }
                 "deletion" -> {
                     // A failed earlier owned review can leave its RN modal mounted across deep links.

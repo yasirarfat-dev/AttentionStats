@@ -402,6 +402,21 @@ internal class ReelsCoordinator private constructor(private val context: Context
     fun stopDiaryLive() = enqueue { diary.resetLive(); publish() }
     fun pauseDiarySurface() = enqueue { diary.pauseSurface() }
 
+    /**
+     * The service was unbound or rebound with the screen still on (user toggle, system rebind,
+     * accessibility inspection). Close open items but keep this unlock session's seen items, so
+     * the item still on screen after reconnecting is a revisit rather than a second encounter.
+     */
+    fun suspendObservation() {
+        invalidate()
+        enqueue {
+            store?.let { history -> ReelApp.entries.forEach { closeOpen(history, it) } }
+            diary.resetLive()
+            trackers.values.forEach { it.leave() }
+            publish()
+        }
+    }
+
     /** Screen off/on: a new unlock session starts with fresh session counts and reminders. */
     fun resetUnlockSession() {
         invalidate() // Reject observations queued across the screen/lock boundary.

@@ -32,7 +32,9 @@ export function AppIdentityList({
               color={theme.accentFill}
               size={32}
             />
-            <Text style={styles.name}>{name}</Text>
+            <Text textBreakStrategy="balanced" style={styles.name}>
+              {name}
+            </Text>
           </View>
         );
       })}

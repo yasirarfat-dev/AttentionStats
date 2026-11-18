@@ -24,6 +24,7 @@ export type IconName =
   | 'trash'
   | 'info'
   | 'spark'
+  | 'idea'
   | 'layers';
 
 /** Simple 24px line icons; colour comes from the caller so they follow the theme. */
@@ -153,6 +154,13 @@ export function Icon({
       {name === 'spark' && (
         <Path
           d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18"
+          {...stroke}
+        />
+      )}
+      {name === 'idea' && (
+        // Adapted from Lucide "lightbulb" (ISC License; see NOTICE).
+        <Path
+          d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5M9 18h6M10 22h4"
           {...stroke}
         />
       )}

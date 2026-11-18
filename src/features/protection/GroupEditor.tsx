@@ -52,13 +52,8 @@ export function GroupEditor({
       scrollRef={scrollRef}
       title={initial ? 'Edit app group' : 'Create app group'}
       subtitle="Apps you choose"
+      back={{ label: 'Back to schedules', onPress: onBack, disabled: busy }}
     >
-      <Button
-        label="Back to schedules"
-        variant="text"
-        onPress={onBack}
-        disabled={busy}
-      />
       <SectionTitle>Group name</SectionTitle>
       <TextInput
         accessibilityLabel="Group name"
@@ -90,7 +85,7 @@ export function GroupEditor({
         {selected.size} selected · {choices.length} available
       </Body>
       <Card
-        title="Installed Apps"
+        title="Installed apps"
         info={
           shortVideosOnly
             ? 'This group has short-video slots, so only supported apps can be added. Remove those slots first to include other apps. Up to 100 selected apps; Save applies the draft.'

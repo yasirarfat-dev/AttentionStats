@@ -43,14 +43,18 @@ export function SettingsGroup({
           {entries.map((entry, index) => (
             <View key={entry.term} style={styles.entry}>
               {index > 0 && <Divider />}
-              <Text accessibilityRole="header" style={styles.term}>
+              <Text
+                textBreakStrategy="balanced"
+                accessibilityRole="header"
+                style={styles.term}
+              >
                 {entry.term}
               </Text>
               <Body muted>{entry.detail}</Body>
             </View>
           ))}
           <Button
-            label="Hide Explanations"
+            label="Hide explanations"
             variant="text"
             onPress={() => setExpanded(false)}
           />

@@ -8,12 +8,12 @@ import {
   Card,
   Row,
   Explanation,
-  SectionTitle,
   Segmented,
   Title,
   ToggleRow,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
+import { Icon } from '../../ui/Icon';
 import { AppIcon } from '../../ui/Charts';
 import { AppIdentityList, useAppIcons } from '../diary';
 import {
@@ -144,19 +144,20 @@ export function SchedulesScreen({
             : 'Remove this rule?'
         }
         subtitle="Your choice, always"
+        back={{
+          label: 'Back to schedules',
+          onPress: () => setDraft(null),
+          disabled: busy,
+        }}
       >
-        <Button
-          label="Back to schedules"
-          variant="text"
-          onPress={() => setDraft(null)}
-          disabled={busy}
-        />
         <Card tone="soft">
           <Title>{group?.name ?? 'Selected apps'}</Title>
           <AppIdentityList packages={group?.packages ?? []} apps={apps} />
           {slot && (
             <>
-              <Text style={styles.time}>{slotLabel(slot)}</Text>
+              <Text textBreakStrategy="balanced" style={styles.time}>
+                {slotLabel(slot)}
+              </Text>
               <Body>
                 {daysLabel(slot.days)} · {scopeLabel(slot)}
               </Body>
@@ -239,22 +240,22 @@ export function SchedulesScreen({
     <Screen
       title={packageName ? app?.name || 'App time slots' : 'Space for your day'}
       subtitle="App schedules"
+      back={{ label: 'Back to Protect', onPress: onBack }}
     >
-      <Button label="Back to Protect" variant="text" onPress={onBack} />
       {!packageName && (
         <Segmented
-          label="Organize Focus"
+          label="Organize focus"
           value={view}
           onChange={setView}
           options={[
-            { value: 'slots', label: 'By Time Slots' },
-            { value: 'groups', label: 'By App Groups' },
+            { value: 'slots', label: 'By time slots' },
+            { value: 'groups', label: 'By app groups' },
           ]}
         />
       )}
       {(view === 'slots' || packageName) && (
         <Button
-          label="+ Add Time Slot"
+          label="+ Add time slot"
           variant="tonal"
           disabled={!snapshot || busy}
           onPress={() => addSlot()}
@@ -282,19 +283,24 @@ export function SchedulesScreen({
       {!snapshot && !error && <Body muted>Loading your schedules…</Body>}
       {(view === 'slots' || packageName) && (
         <>
-          <Explanation title="Your Time Slots">
+          <Explanation title="Your time slots">
             Times follow your phone's local clock. Slots act during the selected
             periods, independently of daily video limits. Essential recovery
             apps remain available; Android may interrupt enforcement. New slots
-            stay off until you review and enable them.
+            stay off until you review and enable them. The switch turns a slot
+            on or off; turning it on first shows a review.
           </Explanation>
           {windows.length === 0 && snapshot && (
-            <Card
-              title="No Time Slots Yet"
-              info="Choose apps or groups, then add a morning, evening or overnight slot. A new slot saves Off until you enable it."
-            >
+            <Card>
               <View style={styles.empty}>
-                <Title>A quieter routine starts here</Title>
+                <View style={styles.emptyIcon}>
+                  <Icon name="clock" size={24} color={theme.accent} />
+                </View>
+                <Title>No time slots yet</Title>
+                <Body muted center>
+                  Add a morning, evening or overnight slot.{'\n'}New slots stay
+                  off until you turn them on.
+                </Body>
               </View>
             </Card>
           )}
@@ -303,11 +309,7 @@ export function SchedulesScreen({
               item => item.id === slot.groupId,
             );
             return (
-              <Card
-                key={slot.id}
-                title="Time Slot"
-                info="The switch enables or disables this slot. Enabling first opens its review. Edit changes its draft; Remove asks for confirmation. Other schedules and video limits remain independent."
-              >
+              <Card key={slot.id}>
                 <ToggleRow
                   icon="clock"
                   title={group?.name ?? 'App group'}
@@ -329,7 +331,9 @@ export function SchedulesScreen({
                       });
                   }}
                 />
-                <Text style={styles.time}>{slotLabel(slot)}</Text>
+                <Text textBreakStrategy="balanced" style={styles.time}>
+                  {slotLabel(slot)}
+                </Text>
                 <View style={styles.row}>
                   <View style={styles.grow}>
                     <Button
@@ -366,14 +370,13 @@ export function SchedulesScreen({
       )}
       {!packageName && view === 'groups' && (
         <>
-          <SectionTitle>App groups</SectionTitle>
+          <Explanation title="Your app groups">
+            Tap a group to change its apps, or add a time slot for it. Removing
+            a group also removes its slots after you confirm; recorded history
+            stays.
+          </Explanation>
           {snapshot?.groups.map(group => (
-            <Card
-              key={group.id}
-              title="App Group"
-              info="Tap the group to change its members. Add Time Slot creates a new draft for this group. Removing a group also removes its slots after confirmation, preserving recorded history."
-              padded={false}
-            >
+            <Card key={group.id} padded={false}>
               <Row
                 leading={
                   <AppIcon
@@ -390,7 +393,7 @@ export function SchedulesScreen({
                 }
               />
               <Button
-                label="+ Add Time Slot"
+                label="+ Add time slot"
                 accessibilityLabel={`Add time slot for ${group.name}`}
                 variant="tonal"
                 disabled={busy}

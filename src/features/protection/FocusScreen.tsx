@@ -85,8 +85,11 @@ export function FocusScreen({
   }, [focused, refresh]);
 
   return (
-    <Screen title="Focus session" subtitle="A little space for what you choose">
-      <Button label="Back to Protect" variant="text" onPress={onBack} />
+    <Screen
+      title="Focus session"
+      subtitle="A little space for what you choose"
+      back={{ label: 'Back to Protect', onPress: onBack }}
+    >
       {shortcutNotice && <Body muted>{shortcutNotice}</Body>}
       {error && (
         <Card tone="warn">
@@ -108,14 +111,14 @@ export function FocusScreen({
         <>
           <Card
             tone="soft"
-            title="Active Focus"
+            title="Active focus"
             info="The selected app rule lasts until this session ends. You can end early or allow a five-minute visit from the cover. Ending focus leaves other schedules and video limits unchanged. Closing this screen does not end the session."
           >
             <FocusClock
               remainingMs={active.remainingMs}
               durationMs={active.durationMs}
             />
-            <Body>{active.allowOnly ? 'Allow Only' : 'Block Apps'}</Body>
+            <Body>{active.allowOnly ? 'Allow only' : 'Block apps'}</Body>
             <AppIdentityList packages={active.packages} apps={apps} />
             <Body muted>
               {snapshot.accessibility
@@ -133,21 +136,21 @@ export function FocusScreen({
         <>
           <Card
             tone="soft"
-            title="Review Focus"
+            title="Review focus"
             info="Existing schedules and limits still apply. Settings, emergency access and system navigation remain available. You can end at any time or allow a five-minute visit. Blocking depends on Accessibility; closing this screen does not end the session."
           >
             <Title>{review.minutes} minutes for yourself</Title>
-            <Body>{review.allowOnly ? 'Allow Only' : 'Block Apps'}</Body>
+            <Body>{review.allowOnly ? 'Allow only' : 'Block apps'}</Body>
             <AppIdentityList packages={review.packages} apps={apps} />
             <Body>
               {review.allowOnly
-                ? 'Other Apps Blocked'
-                : 'Selected Apps Blocked'}
+                ? 'Other apps blocked'
+                : 'Selected apps blocked'}
             </Body>
           </Card>
           {!snapshot.accessibility && (
             <Body>
-              Connect Accessibility in Settings before starting focus.
+              Connect accessibility in Settings before starting focus.
             </Body>
           )}
           <Button
@@ -176,21 +179,21 @@ export function FocusScreen({
       ) : (
         <>
           <Segmented
-            label="Focus Timing"
+            label="Focus timing"
             value="now"
             options={[
-              { value: 'now', label: 'Focus Now' },
-              { value: 'slots', label: 'By Time Slots' },
+              { value: 'now', label: 'Focus now' },
+              { value: 'slots', label: 'By time slots' },
             ]}
             onChange={value => {
               if (value === 'slots') onSchedules();
             }}
           />
-          <Explanation title="Focus Session">
+          <Explanation title="Focus session">
             Choose app groups or individual apps, then review before starting.
             Selected apps are frozen for this session; later group edits do not
-            change it. End whenever you need. Block Apps targets the selected
-            apps. Allow Only blocks other installed launchable apps; essential
+            change it. End whenever you need. Block apps targets the selected
+            apps. Allow only blocks other installed launchable apps; essential
             recovery, Settings and system navigation remain available. Other
             rules still apply.
           </Explanation>
@@ -205,12 +208,12 @@ export function FocusScreen({
             onChange={setMinutes}
           />
           <Segmented
-            label="Focus App Rule"
+            label="Focus app rule"
             value={allowOnly ? 'allow' : 'block'}
             onChange={value => setAllowOnly(value === 'allow')}
             options={[
-              { value: 'block', label: 'Block Apps' },
-              { value: 'allow', label: 'Allow Only' },
+              { value: 'block', label: 'Block apps' },
+              { value: 'allow', label: 'Allow only' },
             ]}
           />
 

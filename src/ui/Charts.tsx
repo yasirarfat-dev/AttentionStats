@@ -56,7 +56,12 @@ export function BarChart({
       </Svg>
       <View style={styles.axis}>
         {labels.map((label, index) => (
-          <Text key={index} style={styles.axisLabel} numberOfLines={1}>
+          <Text
+            textBreakStrategy="balanced"
+            key={index}
+            style={styles.axisLabel}
+            numberOfLines={1}
+          >
             {label}
           </Text>
         ))}
@@ -128,6 +133,7 @@ export function AppIcon({
       ]}
     >
       <Text
+        textBreakStrategy="balanced"
         style={[
           styles.markText,
           {

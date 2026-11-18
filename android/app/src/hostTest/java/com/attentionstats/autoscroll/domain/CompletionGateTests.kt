@@ -29,6 +29,23 @@ fun main() {
     test("terminal 999 of 1000 qualifies without a full 1.0") {
         check(feed(CompletionGate(), terminal).last())
     }
+    test("15 second playback predicts a sampled-over wrap exactly once") {
+        val positions = (0..36).map { it * 400.0 / 15_000 }
+        val results = feed(CompletionGate(), positions + listOf(.01, .03, .06), step = 400)
+        check(results.count { it } == 1 && results[positions.size])
+    }
+    test("30 second playback predicts a wrap across a missed sample") {
+        val gate = CompletionGate()
+        val positions = (0..71).map { it * 400.0 / 30_000 } + .95
+        check(feed(gate, positions, step = 400).none { it })
+        check(gate.sample(key, 1_000 + positions.lastIndex * 400L + 800, .02, true))
+    }
+    test("paused at 0.90 then manually seeking to zero does not predict completion") {
+        check(feed(CompletionGate(), (0..45).map { it * .02 } + List(10) { .90 } + 0.0, step = 400).none { it })
+    }
+    test("steady advancement to 0.86 cannot predict completion across a short gap") {
+        check(feed(CompletionGate(), (0..43).map { it * .02 } + .05, step = 400).none { it })
+    }
     test("fresh end-only values never qualify") {
         check(feed(CompletionGate(), List(30) { .999 }).none { it })
     }
@@ -57,6 +74,17 @@ fun main() {
     }
     test("early reset is not a completion loop") {
         check(feed(CompletionGate(), advancing + listOf(.02)).none { it })
+    }
+    // YouTube's spoken seek bar moves in whole seconds; the sampler runs every 400 ms.
+    fun secondLabels(durationMs: Long, plays: Int = 2): List<Double> =
+        (0 until (durationMs * plays / 400).toInt()).map { (it * 400L % durationMs) / 1_000 * 1_000.0 / durationMs }
+    for (seconds in listOf(10L, 15L, 31L, 59L)) test("second-quantized $seconds s loop fires once") {
+        val results = feed(CompletionGate(), secondLabels(seconds * 1_000), step = 400)
+        check(results.count { it } == 1) { "fired ${results.count { it }} times" }
+    }
+    test("second-quantized pause mid-video never fires") {
+        val labels = secondLabels(30_000, 1).take(40) + List(20) { 13.0 / 30 }
+        check(feed(CompletionGate(), labels, step = 400).none { it })
     }
     test("one terminal sample is insufficient") {
         check(feed(CompletionGate(), advancing + listOf(.999)).none { it })

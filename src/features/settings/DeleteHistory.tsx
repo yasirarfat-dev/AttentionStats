@@ -59,7 +59,11 @@ export function useDeleteHistory({
             contentContainerStyle={{ gap: 14, paddingBottom: 22 }}
             accessibilityViewIsModal
           >
-            <Text accessibilityRole="header" style={styles.title}>
+            <Text
+              textBreakStrategy="balanced"
+              accessibilityRole="header"
+              style={styles.title}
+            >
               {step === 1
                 ? 'Before erasing history'
                 : 'Review permanent deletion'}
@@ -141,7 +145,11 @@ function TypeToConfirm({
           <View style={styles.icon}>
             <Icon name="trash" color={theme.danger} size={26} />
           </View>
-          <Text accessibilityRole="header" style={styles.title}>
+          <Text
+            textBreakStrategy="balanced"
+            accessibilityRole="header"
+            style={styles.title}
+          >
             Type {WORD} to erase your history
           </Text>
           <Body muted>This is the last step. It cannot be undone.</Body>

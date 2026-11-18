@@ -112,16 +112,16 @@ export function AppHistoryExplorer({
           info={`Recorded app time and observed opens on this date page. Time is available on ${app.timeDays} of ${days.length} dates; opens on ${app.opensDays}. These are known subtotals, not complete coverage. Android usage events estimate foreground time and entries/returns, not exact cold launches or attention. Missing values are unknown. App identifier: ${app.packageName}. Other editions are separate.`}
         >
           <View style={styles.stats}>
-            <Stat value={time(app.appMs)} label="Recorded App Time" />
+            <Stat value={time(app.appMs)} label="Recorded app time" />
             <StatDivider />
             <Stat
               value={app.appOpens === null ? '—' : exactCount(app.appOpens)}
-              label="Observed Opens"
+              label="Observed opens"
             />
           </View>
         </Card>
         <Card
-          title="Daily App History"
+          title="Daily app history"
           info={`Dates use ${zone}. Select a date to open its full-day overview. Bars compare recorded app time within the current window; missing values have no bar. Only up to 30 dates are loaded, and changing the date window replaces these rows.`}
           padded={false}
         >
@@ -159,7 +159,7 @@ export function AppHistoryExplorer({
   return (
     <>
       <Card
-        title="Explore an App"
+        title="Explore an app"
         info={`Search and sort recorded app time and observed opens for the current ${days.length}-day window. Missing values sort after recorded values. These are page subtotals, not all-time app totals.`}
       >
         {usageStatus && usageStatus !== 'partial' && (
@@ -167,11 +167,11 @@ export function AppHistoryExplorer({
             {
               (
                 {
-                  disabled: 'Screen Time Off',
-                  permission_needed: 'Usage Access Needed',
-                  unavailable: 'App Time Unavailable',
-                  dense_history: 'App Time Unavailable',
-                  interrupted: 'App Time Interrupted',
+                  disabled: 'Screen time off',
+                  permission_needed: 'Usage access needed',
+                  unavailable: 'App time unavailable',
+                  dense_history: 'App time unavailable',
+                  interrupted: 'App time interrupted',
                 } as Record<string, string>
               )[usageStatus]
             }
@@ -222,8 +222,8 @@ export function AppHistoryExplorer({
         </Body>
       </Card>
       <Card
-        title="Apps in This Window"
-        info="Select an app for daily values. Missing time or opens are shown as unavailable, not zero. More Apps adds ten rows at a time; date windows stay bounded separately."
+        title="Apps in this window"
+        info="Select an app for daily values. Missing time or opens are shown as unavailable, not zero. More apps adds ten rows at a time; date windows stay bounded separately."
         padded={false}
       >
         {visible.map((item, index) => (
@@ -260,7 +260,7 @@ export function AppHistoryExplorer({
         )}
         {matches.length > limit && (
           <Button
-            label="More Apps"
+            label="More apps"
             variant="text"
             onPress={() =>
               setLimit(current => Math.min(matches.length, current + 10))
@@ -269,7 +269,7 @@ export function AppHistoryExplorer({
         )}
         {limit > 10 && matches.length > 10 && (
           <Button
-            label="Show Fewer Apps"
+            label="Show fewer apps"
             variant="text"
             onPress={() => setLimit(10)}
           />

@@ -5,13 +5,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 internal enum class WidgetStyle(val key: String, val title: String, val detail: String) {
-    ADAPTIVE("adaptive", "Today Overview", "A balanced summary with a screen-time comparison when expanded"),
-    SPOTLIGHT("spotlight", "One Stat", "One prominent number with optional supporting values"),
+    ADAPTIVE("adaptive", "Today overview", "A balanced summary with a screen-time comparison when expanded"),
+    SPOTLIGHT("spotlight", "One stat", "One prominent number with optional supporting values"),
     TILES("tiles", "Tiles", "An evenly spaced dashboard of your selected stats"),
     LIST("list", "List", "Clear labels and values in compact rows"),
-    APPS("apps", "Reels By Apps", "Reels source counts with selected stats"),
-    RHYTHM("rhythm", "Hourly Rhythm", "Recorded media encounters by hour with selected stats"),
-    SCREEN("screen_time", "Screen Time", "Recorded app time and the portion spent in Reels apps");
+    APPS("apps", "Reels by apps", "Reels source counts with selected stats"),
+    RHYTHM("rhythm", "Hourly rhythm", "Recorded media encounters by hour with selected stats"),
+    SCREEN("screen_time", "Screen time", "Recorded app time and the portion spent in Reels apps");
     companion object {
         val offered = listOf(ADAPTIVE, SPOTLIGHT, SCREEN, APPS, RHYTHM)
         val layouts = offered + listOf(TILES, LIST)
@@ -20,18 +20,18 @@ internal enum class WidgetStyle(val key: String, val title: String, val detail: 
 }
 
 internal enum class WidgetStat(val key: String, val title: String, val description: String) {
-    VIDEOS("videos", "Short Videos", "Recorded video encounters today"),
-    SESSION("session", "This Session", "Short-video encounters in the current observed unlock session"),
-    WATCHING("watching", "On Screen", "Today's recorded short-video surface time; not confirmed playback"),
-    SCREEN("screen", "Screen Time", "Known whole-app time across recorded apps today"),
-    REELS_APPS("reels_apps", "Reels Apps", "Whole-app time in supported Reels apps, including non-video screens"),
-    LAUNCHES("launches", "App Launches", "Observed app entries and returns, not just cold starts"),
+    VIDEOS("videos", "Short videos", "Recorded video encounters today"),
+    SESSION("session", "This session", "Short-video encounters in the current observed unlock session"),
+    WATCHING("watching", "On screen", "Today's recorded short-video surface time; not confirmed playback"),
+    SCREEN("screen", "Screen time", "Known whole-app time across recorded apps today"),
+    REELS_APPS("reels_apps", "Reels apps", "Whole-app time in supported Reels apps, including non-video screens"),
+    LAUNCHES("launches", "App launches", "Observed app entries and returns, not just cold starts"),
     BREAKS("breaks", "Mindful Breaks", "Breaks offered today"),
     PHOTOS("photos", "Photos", "Recorded photo encounters today"),
     ADS("ads", "Ads", "Ad encounters; can overlap media counts"),
     PLAYBACK("playback", "Playback", "Confirmed numeric playback only; unavailable signals stay unknown"),
-    FOCUS("focus", "Focus Remaining", "Remaining active focus time; taps open the focus screen"),
-    APPS("apps", "Observed Apps", "Apps with recorded time or entries today");
+    FOCUS("focus", "Focus remaining", "Remaining active focus time; taps open the focus screen"),
+    APPS("apps", "Observed apps", "Apps with recorded time or entries today");
     companion object { fun byKey(key: String) = entries.firstOrNull { it.key == key } }
 }
 

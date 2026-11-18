@@ -104,7 +104,7 @@ internal object ProtectionRoutesVerification {
                     val token = checkNotNull(activity).intent.getStringExtra("request")!!
                     if (authorize) {
                         main { views().filterIsInstance<EditText>().single().setText("583194") }
-                        click("Authorize this action")
+                        click("Approve")
                     } else click("Cancel")
                     val deadline = SystemClock.elapsedRealtime() + 15_000
                     var retired = false

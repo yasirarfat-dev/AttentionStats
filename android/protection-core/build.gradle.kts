@@ -7,8 +7,13 @@ sourceSets {
     main { kotlin.srcDir("../../native/protection-core/src/main/kotlin") }
     test { kotlin.srcDir("../../native/protection-core/src/test/kotlin") }
 }
-tasks.register<JavaExec>("verifyProtection") {
+tasks.register<JavaExec>("verifyParentSecrets") {
     dependsOn(tasks.testClasses)
+    classpath = sourceSets.test.get().runtimeClasspath
+    mainClass.set("org.attentionstats.protection.ParentSecretTestsKt")
+}
+tasks.register<JavaExec>("verifyProtection") {
+    dependsOn(tasks.testClasses, "verifyParentSecrets")
     classpath = sourceSets.test.get().runtimeClasspath
     mainClass.set("org.attentionstats.protection.ScheduleTestsKt")
 }

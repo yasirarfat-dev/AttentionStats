@@ -1,0 +1,1166 @@
+[
+  {
+    "name": "@babel/runtime",
+    "version": "8.0.8",
+    "license": "MIT",
+    "url": "https://babel.dev/docs/en/next/babel-runtime"
+  },
+  {
+    "name": "@react-native/asset-utils",
+    "version": "0.88.0",
+    "license": "MIT",
+    "url": "https://github.com/react/react-native/tree/HEAD/packages/asset-utils#readme"
+  },
+  {
+    "name": "@react-native/js-polyfills",
+    "version": "0.88.0",
+    "license": "MIT",
+    "url": "https://github.com/react/react-native/tree/HEAD/packages/polyfills#readme"
+  },
+  {
+    "name": "@react-native/normalize-colors",
+    "version": "0.88.0",
+    "license": "MIT",
+    "url": "https://github.com/react/react-native/tree/HEAD/packages/normalize-color#readme"
+  },
+  {
+    "name": "@react-native/virtualized-lists",
+    "version": "0.88.0",
+    "license": "MIT",
+    "url": "https://github.com/react/react-native/tree/HEAD/packages/virtualized-lists#readme"
+  },
+  {
+    "name": "@react-navigation/bottom-tabs",
+    "version": "7.21.0",
+    "license": "MIT",
+    "url": "https://github.com/react-navigation/react-navigation"
+  },
+  {
+    "name": "@react-navigation/core",
+    "version": "7.24.0",
+    "license": "MIT",
+    "url": "https://reactnavigation.org"
+  },
+  {
+    "name": "@react-navigation/elements",
+    "version": "2.9.45",
+    "license": "MIT",
+    "url": "https://reactnavigation.org"
+  },
+  {
+    "name": "@react-navigation/native",
+    "version": "7.5.1",
+    "license": "MIT",
+    "url": "https://reactnavigation.org"
+  },
+  {
+    "name": "@react-navigation/native-stack",
+    "version": "7.21.0",
+    "license": "MIT",
+    "url": "https://github.com/software-mansion/react-native-screens#readme"
+  },
+  {
+    "name": "@react-navigation/routers",
+    "version": "7.6.5",
+    "license": "MIT",
+    "url": "https://reactnavigation.org/docs/custom-routers/"
+  },
+  {
+    "name": "@shopify/flash-list",
+    "version": "2.3.3",
+    "license": "MIT",
+    "url": "https://shopify.github.io/flash-list/"
+  },
+  {
+    "name": "Android SQLite bindings (SQLCipher)",
+    "version": "4.20.0",
+    "license": "Apache-2.0",
+    "url": "https://github.com/sqlcipher/sqlcipher-android"
+  },
+  {
+    "name": "androidx.activity:activity",
+    "version": "1.8.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/activity#1.8.1"
+  },
+  {
+    "name": "androidx.activity:activity-ktx",
+    "version": "1.8.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/activity#1.8.1"
+  },
+  {
+    "name": "androidx.annotation:annotation",
+    "version": "1.9.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/annotation#1.9.1"
+  },
+  {
+    "name": "androidx.annotation:annotation-experimental",
+    "version": "1.5.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/annotation#1.5.0"
+  },
+  {
+    "name": "androidx.annotation:annotation-jvm",
+    "version": "1.9.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/annotation#1.9.1"
+  },
+  {
+    "name": "androidx.appcompat:appcompat",
+    "version": "1.7.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/appcompat#1.7.1"
+  },
+  {
+    "name": "androidx.appcompat:appcompat-resources",
+    "version": "1.7.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/appcompat#1.7.1"
+  },
+  {
+    "name": "androidx.arch.core:core-common",
+    "version": "2.2.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/arch-core#2.2.0"
+  },
+  {
+    "name": "androidx.arch.core:core-runtime",
+    "version": "2.2.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/arch-core#2.2.0"
+  },
+  {
+    "name": "androidx.autofill:autofill",
+    "version": "1.3.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/autofill#1.3.0"
+  },
+  {
+    "name": "androidx.biometric:biometric",
+    "version": "1.1.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/biometric#1.1.0"
+  },
+  {
+    "name": "androidx.cardview:cardview",
+    "version": "1.0.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/tools/extras/support-library.html"
+  },
+  {
+    "name": "androidx.collection:collection",
+    "version": "1.5.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/collection#1.5.0"
+  },
+  {
+    "name": "androidx.collection:collection-jvm",
+    "version": "1.5.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/collection#1.5.0"
+  },
+  {
+    "name": "androidx.collection:collection-ktx",
+    "version": "1.5.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/collection#1.5.0"
+  },
+  {
+    "name": "androidx.concurrent:concurrent-futures",
+    "version": "1.1.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/topic/libraries/architecture/index.html"
+  },
+  {
+    "name": "androidx.constraintlayout:constraintlayout",
+    "version": "2.1.0",
+    "license": "Apache-2.0",
+    "url": "https://tools.android.com"
+  },
+  {
+    "name": "androidx.constraintlayout:constraintlayout-core",
+    "version": "1.0.0",
+    "license": "Apache-2.0",
+    "url": "https://tools.android.com"
+  },
+  {
+    "name": "androidx.coordinatorlayout:coordinatorlayout",
+    "version": "1.2.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/coordinatorlayout#1.2.0"
+  },
+  {
+    "name": "androidx.core:core",
+    "version": "1.18.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/core#1.18.0"
+  },
+  {
+    "name": "androidx.core:core-ktx",
+    "version": "1.18.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/core#1.18.0"
+  },
+  {
+    "name": "androidx.core:core-viewtree",
+    "version": "1.0.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/core#1.0.0"
+  },
+  {
+    "name": "androidx.cursoradapter:cursoradapter",
+    "version": "1.0.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/tools/extras/support-library.html"
+  },
+  {
+    "name": "androidx.customview:customview",
+    "version": "1.1.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx"
+  },
+  {
+    "name": "androidx.drawerlayout:drawerlayout",
+    "version": "1.1.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx"
+  },
+  {
+    "name": "androidx.dynamicanimation:dynamicanimation",
+    "version": "1.1.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/dynamicanimation#1.1.0"
+  },
+  {
+    "name": "androidx.emoji2:emoji2",
+    "version": "1.3.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/emoji2#1.3.0"
+  },
+  {
+    "name": "androidx.emoji2:emoji2-views-helper",
+    "version": "1.3.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/emoji2#1.3.0"
+  },
+  {
+    "name": "androidx.fragment:fragment",
+    "version": "1.8.9",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/fragment#1.8.9"
+  },
+  {
+    "name": "androidx.fragment:fragment-ktx",
+    "version": "1.8.9",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/fragment#1.8.9"
+  },
+  {
+    "name": "androidx.graphics:graphics-shapes",
+    "version": "1.0.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/graphics#1.0.1"
+  },
+  {
+    "name": "androidx.graphics:graphics-shapes-android",
+    "version": "1.0.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/graphics#1.0.1"
+  },
+  {
+    "name": "androidx.interpolator:interpolator",
+    "version": "1.0.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/tools/extras/support-library.html"
+  },
+  {
+    "name": "androidx.lifecycle:lifecycle-common",
+    "version": "2.6.2",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2"
+  },
+  {
+    "name": "androidx.lifecycle:lifecycle-livedata",
+    "version": "2.6.2",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2"
+  },
+  {
+    "name": "androidx.lifecycle:lifecycle-livedata-core",
+    "version": "2.6.2",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2"
+  },
+  {
+    "name": "androidx.lifecycle:lifecycle-livedata-core-ktx",
+    "version": "2.6.2",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2"
+  },
+  {
+    "name": "androidx.lifecycle:lifecycle-process",
+    "version": "2.6.2",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2"
+  },
+  {
+    "name": "androidx.lifecycle:lifecycle-runtime",
+    "version": "2.6.2",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2"
+  },
+  {
+    "name": "androidx.lifecycle:lifecycle-runtime-ktx",
+    "version": "2.6.2",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2"
+  },
+  {
+    "name": "androidx.lifecycle:lifecycle-viewmodel",
+    "version": "2.6.2",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2"
+  },
+  {
+    "name": "androidx.lifecycle:lifecycle-viewmodel-ktx",
+    "version": "2.6.2",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2"
+  },
+  {
+    "name": "androidx.lifecycle:lifecycle-viewmodel-savedstate",
+    "version": "2.6.2",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2"
+  },
+  {
+    "name": "androidx.loader:loader",
+    "version": "1.0.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/tools/extras/support-library.html"
+  },
+  {
+    "name": "androidx.profileinstaller:profileinstaller",
+    "version": "1.3.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/profileinstaller#1.3.1"
+  },
+  {
+    "name": "androidx.recyclerview:recyclerview",
+    "version": "1.2.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/recyclerview#1.2.1"
+  },
+  {
+    "name": "androidx.resourceinspection:resourceinspection-annotation",
+    "version": "1.0.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/resourceinspection#1.0.1"
+  },
+  {
+    "name": "androidx.room3:room3-common",
+    "version": "3.0.3",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/room3#3.0.3"
+  },
+  {
+    "name": "androidx.room3:room3-common-jvm",
+    "version": "3.0.3",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/room3#3.0.3"
+  },
+  {
+    "name": "androidx.room3:room3-runtime",
+    "version": "3.0.3",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/room3#3.0.3"
+  },
+  {
+    "name": "androidx.room3:room3-runtime-android",
+    "version": "3.0.3",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/room3#3.0.3"
+  },
+  {
+    "name": "androidx.savedstate:savedstate",
+    "version": "1.2.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/savedstate#1.2.1"
+  },
+  {
+    "name": "androidx.savedstate:savedstate-ktx",
+    "version": "1.2.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/savedstate#1.2.1"
+  },
+  {
+    "name": "androidx.sqlite:sqlite",
+    "version": "2.7.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/sqlite#2.7.1"
+  },
+  {
+    "name": "androidx.sqlite:sqlite-android",
+    "version": "2.7.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/sqlite#2.7.1"
+  },
+  {
+    "name": "androidx.sqlite:sqlite-async",
+    "version": "2.7.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/sqlite#2.7.1"
+  },
+  {
+    "name": "androidx.sqlite:sqlite-async-android",
+    "version": "2.7.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/sqlite#2.7.1"
+  },
+  {
+    "name": "androidx.sqlite:sqlite-framework",
+    "version": "2.7.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/sqlite#2.7.1"
+  },
+  {
+    "name": "androidx.sqlite:sqlite-framework-android",
+    "version": "2.7.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/sqlite#2.7.1"
+  },
+  {
+    "name": "androidx.startup:startup-runtime",
+    "version": "1.1.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/startup#1.1.1"
+  },
+  {
+    "name": "androidx.swiperefreshlayout:swiperefreshlayout",
+    "version": "1.1.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx"
+  },
+  {
+    "name": "androidx.tracing:tracing",
+    "version": "1.2.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/tracing#1.2.0"
+  },
+  {
+    "name": "androidx.transition:transition",
+    "version": "1.7.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/transition#1.7.0"
+  },
+  {
+    "name": "androidx.transition:transition-ktx",
+    "version": "1.7.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/transition#1.7.0"
+  },
+  {
+    "name": "androidx.vectordrawable:vectordrawable",
+    "version": "1.1.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx"
+  },
+  {
+    "name": "androidx.vectordrawable:vectordrawable-animated",
+    "version": "1.1.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx"
+  },
+  {
+    "name": "androidx.versionedparcelable:versionedparcelable",
+    "version": "1.1.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/tools/extras/support-library.html"
+  },
+  {
+    "name": "androidx.viewpager2:viewpager2",
+    "version": "1.0.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx"
+  },
+  {
+    "name": "androidx.viewpager:viewpager",
+    "version": "1.0.0",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/tools/extras/support-library.html"
+  },
+  {
+    "name": "androidx.window:window",
+    "version": "1.5.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/window#1.5.1"
+  },
+  {
+    "name": "androidx.window:window-core",
+    "version": "1.5.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/window#1.5.1"
+  },
+  {
+    "name": "androidx.window:window-core-android",
+    "version": "1.5.1",
+    "license": "Apache-2.0",
+    "url": "https://developer.android.com/jetpack/androidx/releases/window#1.5.1"
+  },
+  {
+    "name": "base64-js",
+    "version": "1.5.1",
+    "license": "MIT",
+    "url": "https://github.com/beatgammit/base64-js"
+  },
+  {
+    "name": "Boost",
+    "version": "1.83.0",
+    "license": "BSL-1.0",
+    "url": "https://www.boost.org"
+  },
+  {
+    "name": "color",
+    "version": "4.2.3",
+    "license": "MIT",
+    "url": "https://github.com/Qix-/color"
+  },
+  {
+    "name": "color-convert",
+    "version": "2.0.1",
+    "license": "MIT",
+    "url": "https://github.com/Qix-/color-convert"
+  },
+  {
+    "name": "color-name",
+    "version": "1.1.4",
+    "license": "MIT",
+    "url": "https://github.com/colorjs/color-name"
+  },
+  {
+    "name": "color-string",
+    "version": "1.9.1",
+    "license": "MIT",
+    "url": "https://github.com/Qix-/color-string"
+  },
+  {
+    "name": "com.android.tools:desugar_jdk_libs",
+    "version": "2.1.5",
+    "license": "GPL-2.0-only WITH Classpath-exception-2.0",
+    "url": "https://github.com/google/desugar_jdk_libs"
+  },
+  {
+    "name": "com.facebook.fbjni:fbjni",
+    "version": "0.7.0",
+    "license": "Apache-2.0",
+    "url": "https://github.com/facebookincubator/fbjni"
+  },
+  {
+    "name": "com.facebook.fresco:drawee",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:fbcore",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:fresco",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:imagepipeline",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:imagepipeline-base",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:imagepipeline-native",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:imagepipeline-okhttp3",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:memory-type-ashmem",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:memory-type-java",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:memory-type-native",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:middleware",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:nativeimagefilters",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:nativeimagetranscoder",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:soloader",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:ui-common",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:ui-core",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:urimod",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.fresco:vito-source",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/fresco"
+  },
+  {
+    "name": "com.facebook.hermes:hermes-android",
+    "version": "260318099.0.4",
+    "license": "MIT",
+    "url": "https://github.com/facebook/hermes/tree/static_h"
+  },
+  {
+    "name": "com.facebook.infer.annotation:infer-annotation",
+    "version": "0.18.0",
+    "license": "MIT",
+    "url": "https://fbinfer.com/"
+  },
+  {
+    "name": "com.facebook.react:react-android",
+    "version": "0.88.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/react-native"
+  },
+  {
+    "name": "com.facebook.soloader:annotation",
+    "version": "0.12.1",
+    "license": "Apache-2.0",
+    "url": "https://github.com/facebook/soloader"
+  },
+  {
+    "name": "com.facebook.soloader:nativeloader",
+    "version": "0.12.1",
+    "license": "Apache-2.0",
+    "url": "https://github.com/facebook/soloader"
+  },
+  {
+    "name": "com.facebook.soloader:soloader",
+    "version": "0.12.1",
+    "license": "Apache-2.0",
+    "url": "https://github.com/facebook/soloader"
+  },
+  {
+    "name": "com.facebook.yoga:proguard-annotations",
+    "version": "1.19.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/yoga"
+  },
+  {
+    "name": "com.google.android.material:material",
+    "version": "1.13.0",
+    "license": "Apache-2.0",
+    "url": "https://github.com/material-components/material-components-android"
+  },
+  {
+    "name": "com.google.code.findbugs:jsr305",
+    "version": "3.0.2",
+    "license": "Apache-2.0",
+    "url": "https://findbugs.sourceforge.net/"
+  },
+  {
+    "name": "com.google.code.gson:gson",
+    "version": "2.13.2",
+    "license": "Apache-2.0",
+    "url": "https://github.com/google/gson"
+  },
+  {
+    "name": "com.google.crypto.tink:tink-android",
+    "version": "1.24.0",
+    "license": "Apache-2.0",
+    "url": "https://github.com/tink-crypto/tink-java"
+  },
+  {
+    "name": "com.google.errorprone:error_prone_annotations",
+    "version": "2.41.0",
+    "license": "Apache-2.0",
+    "url": "https://github.com/google/error-prone"
+  },
+  {
+    "name": "com.google.guava:listenablefuture",
+    "version": "1.0",
+    "license": "Apache-2.0",
+    "url": "https://github.com/google/guava"
+  },
+  {
+    "name": "com.parse.bolts:bolts-tasks",
+    "version": "1.4.0",
+    "license": "BSD-3-Clause",
+    "url": "https://github.com/BoltsFramework/Bolts-Android"
+  },
+  {
+    "name": "com.squareup.okhttp3:okhttp",
+    "version": "4.9.2",
+    "license": "Apache-2.0",
+    "url": "https://square.github.io/okhttp/"
+  },
+  {
+    "name": "com.squareup.okhttp3:okhttp-urlconnection",
+    "version": "4.9.2",
+    "license": "Apache-2.0",
+    "url": "https://square.github.io/okhttp/"
+  },
+  {
+    "name": "com.squareup.okio:okio",
+    "version": "2.9.0",
+    "license": "Apache-2.0",
+    "url": "https://github.com/square/okio/"
+  },
+  {
+    "name": "double-conversion",
+    "version": "1.1.6",
+    "license": "BSD-3-Clause",
+    "url": "https://github.com/google/double-conversion"
+  },
+  {
+    "name": "Dragonbox (Hermes)",
+    "version": "bundled with Hermes 260318099.0.4",
+    "license": "BSL-1.0",
+    "url": "https://github.com/jk-jeon/dragonbox"
+  },
+  {
+    "name": "dtoa (Hermes)",
+    "version": "bundled with Hermes 260318099.0.4",
+    "license": "dtoa",
+    "url": "https://netlib.org/fp/"
+  },
+  {
+    "name": "escape-string-regexp",
+    "version": "4.0.0",
+    "license": "MIT",
+    "url": "https://github.com/sindresorhus/escape-string-regexp"
+  },
+  {
+    "name": "fast-deep-equal",
+    "version": "3.1.3",
+    "license": "MIT",
+    "url": "https://github.com/epoberezkin/fast-deep-equal#readme"
+  },
+  {
+    "name": "fast_float",
+    "version": "8.0.0",
+    "license": "MIT",
+    "url": "https://github.com/fastfloat/fast_float"
+  },
+  {
+    "name": "fdlibm (Hermes)",
+    "version": "bundled with Hermes 260318099.0.4",
+    "license": "SunPro",
+    "url": "https://netlib.org/fdlibm/"
+  },
+  {
+    "name": "fmt",
+    "version": "12.1.0",
+    "license": "MIT",
+    "url": "https://github.com/fmtlib/fmt"
+  },
+  {
+    "name": "Folly",
+    "version": "2024.11.18.00",
+    "license": "Apache-2.0",
+    "url": "https://github.com/facebook/folly"
+  },
+  {
+    "name": "glog",
+    "version": "0.3.5",
+    "license": "BSD-3-Clause",
+    "url": "https://github.com/google/glog"
+  },
+  {
+    "name": "invariant",
+    "version": "2.2.4",
+    "license": "MIT",
+    "url": "https://github.com/zertosh/invariant"
+  },
+  {
+    "name": "io.github.zhongwuzw:annotation",
+    "version": "2.4.1",
+    "license": "BSD-3-Clause",
+    "url": "https://github.com/zhongwuzw/MMKV"
+  },
+  {
+    "name": "io.github.zhongwuzw:mmkv",
+    "version": "2.4.1",
+    "license": "BSD-3-Clause",
+    "url": "https://github.com/zhongwuzw/MMKV"
+  },
+  {
+    "name": "is-arrayish",
+    "version": "0.3.4",
+    "license": "MIT",
+    "url": "https://github.com/qix-/node-is-arrayish"
+  },
+  {
+    "name": "javax.inject:javax.inject",
+    "version": "1",
+    "license": "Apache-2.0",
+    "url": "https://github.com/javax-inject/javax-inject"
+  },
+  {
+    "name": "libjpeg-turbo",
+    "version": "2.1.5.1",
+    "license": "BSD-3-Clause AND IJG AND Zlib",
+    "url": "https://libjpeg-turbo.org"
+  },
+  {
+    "name": "LibTomCrypt",
+    "version": "1.18.2",
+    "license": "LicenseRef-Public-Domain",
+    "url": "https://www.libtom.net/LibTomCrypt/"
+  },
+  {
+    "name": "LLVM libc++ and compiler runtime",
+    "version": "NDK 30.0.16248370",
+    "license": "Apache-2.0 WITH LLVM-exception",
+    "url": "https://libcxx.llvm.org"
+  },
+  {
+    "name": "LLVM support (Hermes LLVH)",
+    "version": "bundled with Hermes 260318099.0.4",
+    "license": "Apache-2.0 WITH LLVM-exception AND NCSA",
+    "url": "https://github.com/facebook/hermes/tree/static_h/external/llvh"
+  },
+  {
+    "name": "Lucide icons (7 adapted: footprints, book-open, glass-water, person-standing, phone, sun, lightbulb)",
+    "version": "adapted 2026-11",
+    "license": "ISC",
+    "url": "https://lucide.dev"
+  },
+  {
+    "name": "memoize-one",
+    "version": "5.2.1",
+    "license": "MIT",
+    "url": "https://github.com/alexreardon/memoize-one"
+  },
+  {
+    "name": "metro-runtime",
+    "version": "0.87.2",
+    "license": "MIT",
+    "url": "https://github.com/react/metro"
+  },
+  {
+    "name": "MultiprocessSharedPreferences (MMKV)",
+    "version": "1.0",
+    "license": "Apache-2.0",
+    "url": "https://github.com/seven456/MultiprocessSharedPreferences"
+  },
+  {
+    "name": "nanoid",
+    "version": "3.3.20",
+    "license": "MIT",
+    "url": "https://github.com/ai/nanoid"
+  },
+  {
+    "name": "net.zetetic:sqlcipher-android",
+    "version": "4.20.0",
+    "license": "BSD-3-Clause",
+    "url": "https://www.zetetic.net/sqlcipher"
+  },
+  {
+    "name": "nullthrows",
+    "version": "1.1.1",
+    "license": "MIT",
+    "url": "https://github.com/zertosh/nullthrows"
+  },
+  {
+    "name": "OpenSSL AES (MMKV)",
+    "version": "1.1.0i",
+    "license": "OpenSSL",
+    "url": "https://www.openssl.org"
+  },
+  {
+    "name": "org.jetbrains.kotlin:kotlin-annotations-jvm",
+    "version": "1.3.72",
+    "license": "Apache-2.0",
+    "url": "https://kotlinlang.org/"
+  },
+  {
+    "name": "org.jetbrains.kotlin:kotlin-stdlib",
+    "version": "2.4.21",
+    "license": "Apache-2.0",
+    "url": "https://kotlinlang.org/"
+  },
+  {
+    "name": "org.jetbrains.kotlin:kotlin-stdlib-common",
+    "version": "2.4.21",
+    "license": "Apache-2.0",
+    "url": "https://kotlinlang.org/"
+  },
+  {
+    "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
+    "version": "1.8.22",
+    "license": "Apache-2.0",
+    "url": "https://kotlinlang.org/"
+  },
+  {
+    "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+    "version": "1.8.22",
+    "license": "Apache-2.0",
+    "url": "https://kotlinlang.org/"
+  },
+  {
+    "name": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
+    "version": "1.11.0",
+    "license": "Apache-2.0",
+    "url": "https://github.com/Kotlin/kotlinx.coroutines"
+  },
+  {
+    "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+    "version": "1.11.0",
+    "license": "Apache-2.0",
+    "url": "https://github.com/Kotlin/kotlinx.coroutines"
+  },
+  {
+    "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm",
+    "version": "1.11.0",
+    "license": "Apache-2.0",
+    "url": "https://github.com/Kotlin/kotlinx.coroutines"
+  },
+  {
+    "name": "org.jetbrains:annotations",
+    "version": "23.0.0",
+    "license": "Apache-2.0",
+    "url": "https://github.com/JetBrains/java-annotations"
+  },
+  {
+    "name": "org.jspecify:jspecify",
+    "version": "1.0.0",
+    "license": "Apache-2.0",
+    "url": "https://jspecify.org/"
+  },
+  {
+    "name": "promise",
+    "version": "8.3.0",
+    "license": "MIT",
+    "url": "https://github.com/then/promise"
+  },
+  {
+    "name": "Protocol Buffers (shaded in Tink)",
+    "version": "4.33.6",
+    "license": "BSD-3-Clause",
+    "url": "https://github.com/protocolbuffers/protobuf"
+  },
+  {
+    "name": "Public Suffix List (OkHttp)",
+    "version": "bundled with OkHttp 4.9.2",
+    "license": "MPL-2.0",
+    "url": "https://publicsuffix.org"
+  },
+  {
+    "name": "react",
+    "version": "19.3.1",
+    "license": "MIT",
+    "url": "https://react.dev/"
+  },
+  {
+    "name": "react-freeze",
+    "version": "1.0.4",
+    "license": "MIT",
+    "url": "https://github.com/software-mansion/react-freeze"
+  },
+  {
+    "name": "react-is",
+    "version": "19.3.1",
+    "license": "MIT",
+    "url": "https://react.dev/"
+  },
+  {
+    "name": "react-native",
+    "version": "0.88.0",
+    "license": "MIT",
+    "url": "https://reactnative.dev/"
+  },
+  {
+    "name": "react-native-gesture-handler",
+    "version": "3.4.0",
+    "license": "MIT",
+    "url": "https://docs.swmansion.com/react-native-gesture-handler/"
+  },
+  {
+    "name": "react-native-mmkv",
+    "version": "4.3.2",
+    "license": "MIT",
+    "url": "https://github.com/mrousavy/react-native-mmkv#readme"
+  },
+  {
+    "name": "react-native-nitro-modules",
+    "version": "0.37.1",
+    "license": "MIT",
+    "url": "https://nitro.margelo.com"
+  },
+  {
+    "name": "react-native-reanimated",
+    "version": "4.7.1",
+    "license": "MIT",
+    "url": "https://docs.swmansion.com/react-native-reanimated"
+  },
+  {
+    "name": "react-native-safe-area-context",
+    "version": "5.10.1",
+    "license": "MIT",
+    "url": "https://github.com/AppAndFlow/react-native-safe-area-context#readme"
+  },
+  {
+    "name": "react-native-screens",
+    "version": "4.30.0",
+    "license": "MIT",
+    "url": "https://github.com/software-mansion/react-native-screens#readme"
+  },
+  {
+    "name": "react-native-svg",
+    "version": "15.16.0",
+    "license": "MIT",
+    "url": "https://github.com/software-mansion/react-native-svg"
+  },
+  {
+    "name": "react-native-unistyles",
+    "version": "3.6.0",
+    "license": "MIT",
+    "url": "https://github.com/jpudysz/react-native-unistyles#readme"
+  },
+  {
+    "name": "react-native-worklets",
+    "version": "0.13.1",
+    "license": "MIT",
+    "url": "https://docs.swmansion.com/react-native-worklets"
+  },
+  {
+    "name": "regenerator-runtime",
+    "version": "0.13.11",
+    "license": "MIT",
+    "url": "https://github.com/facebook/regenerator/tree/main/packages/runtime"
+  },
+  {
+    "name": "scheduler",
+    "version": "0.28.0",
+    "license": "MIT",
+    "url": "https://react.dev/"
+  },
+  {
+    "name": "simple-swizzle",
+    "version": "0.2.4",
+    "license": "MIT",
+    "url": "https://github.com/qix-/node-simple-swizzle"
+  },
+  {
+    "name": "SQLCipher core",
+    "version": "4.20.0",
+    "license": "BSD-3-Clause",
+    "url": "https://github.com/sqlcipher/sqlcipher"
+  },
+  {
+    "name": "SQLite (SQLCipher baseline)",
+    "version": "3.54.1",
+    "license": "LicenseRef-Public-Domain",
+    "url": "https://www.sqlite.org"
+  },
+  {
+    "name": "stacktrace-parser",
+    "version": "0.1.11",
+    "license": "MIT",
+    "url": "https://github.com/errwischt/stacktrace-parser"
+  },
+  {
+    "name": "use-latest-callback",
+    "version": "0.2.6",
+    "license": "MIT",
+    "url": "https://github.com/satya164/use-latest-callback"
+  },
+  {
+    "name": "use-sync-external-store",
+    "version": "1.7.0",
+    "license": "MIT",
+    "url": "https://github.com/react/react"
+  },
+  {
+    "name": "warn-once",
+    "version": "0.1.1",
+    "license": "MIT",
+    "url": "https://github.com/satya164/warn-once"
+  },
+  {
+    "name": "whatwg-fetch",
+    "version": "3.6.20",
+    "license": "MIT",
+    "url": "https://github.com/github/fetch"
+  },
+  {
+    "name": "Yoga",
+    "version": "0.88.0",
+    "license": "MIT",
+    "url": "https://github.com/facebook/yoga"
+  },
+  {
+    "name": "zlib (MMKV)",
+    "version": "1.2.11",
+    "license": "Zlib",
+    "url": "https://zlib.net"
+  },
+  {
+    "name": "zod",
+    "version": "4.6.7",
+    "license": "MIT",
+    "url": "https://zod.dev"
+  }
+]

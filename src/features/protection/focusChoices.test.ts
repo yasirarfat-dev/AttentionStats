@@ -9,7 +9,7 @@ test('suggested focus includes only installed native-approved Reels targets with
     {
       kind: 'suggested',
       id: 'reels-apps',
-      name: 'Reels Apps',
+      name: 'Reels apps',
       packages: ['com.example.reels'],
     },
   ]);

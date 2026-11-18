@@ -42,6 +42,7 @@ export function Card({
         <View style={[styles.cardHeading, !padded && styles.cardHeadingInset]}>
           {leading}
           <Text
+            textBreakStrategy="balanced"
             accessibilityRole="header"
             style={[styles.cardTitle, tone === 'hero' && styles.inverseText]}
           >
@@ -58,15 +59,19 @@ export function Card({
         </View>
       )}
       {scope && (
-        <View style={!padded && styles.cardHeadingInset}>
-          <Text style={[styles.caption, tone === 'hero' && styles.inverseText]}>
+        <View style={!padded && styles.cardTextInset}>
+          <Text
+            textBreakStrategy="balanced"
+            style={[styles.caption, tone === 'hero' && styles.inverseText]}
+          >
             {scope}
           </Text>
         </View>
       )}
       {info && expanded && (
-        <View style={[styles.cardInfo, !padded && styles.cardHeadingInset]}>
+        <View style={[styles.cardInfo, !padded && styles.cardTextInset]}>
           <Text
+            textBreakStrategy="balanced"
             style={[
               styles.body,
               styles.muted,
@@ -104,7 +109,11 @@ export function SectionTitle({
         },
       ]}
     >
-      <Text accessibilityRole="header" style={styles.section}>
+      <Text
+        textBreakStrategy="balanced"
+        accessibilityRole="header"
+        style={styles.section}
+      >
         {children}
       </Text>
       {action}
@@ -114,7 +123,11 @@ export function SectionTitle({
 
 export function Title({ children }: { children: ReactNode }) {
   return (
-    <Text accessibilityRole="header" style={styles.title}>
+    <Text
+      textBreakStrategy="balanced"
+      accessibilityRole="header"
+      style={styles.title}
+    >
       {children}
     </Text>
   );
@@ -130,14 +143,21 @@ export function Body({
   center?: boolean;
 }) {
   return (
-    <Text style={[styles.body, muted && styles.muted, center && styles.center]}>
+    <Text
+      textBreakStrategy="balanced"
+      style={[styles.body, muted && styles.muted, center && styles.center]}
+    >
       {children}
     </Text>
   );
 }
 
 export function Caption({ children }: { children: ReactNode }) {
-  return <Text style={styles.caption}>{children}</Text>;
+  return (
+    <Text textBreakStrategy="balanced" style={styles.caption}>
+      {children}
+    </Text>
+  );
 }
 
 /** Optional explanations stay discoverable without occupying the default view. */
@@ -159,6 +179,7 @@ export function InfoButton({
       accessibilityLabel={`About ${label}`}
       accessibilityState={{ expanded }}
       onPress={onPress}
+      hitSlop={6}
       style={styles.infoButton}
     >
       <Icon
@@ -209,6 +230,7 @@ export function Row({
   trailing,
   onPress,
   accessibilityLabel,
+  expanded,
 }: {
   leading?: ReactNode;
   icon?: IconName;
@@ -218,6 +240,8 @@ export function Row({
   trailing?: ReactNode;
   onPress?: () => void;
   accessibilityLabel?: string;
+  /** Disclosure rows: the chevron points down when closed and up when open. */
+  expanded?: boolean;
 }) {
   const { theme } = useUnistyles();
   const content = (
@@ -229,19 +253,39 @@ export function Row({
           </View>
         ))}
       <View style={styles.rowText}>
-        <Text style={styles.rowTitle} numberOfLines={2}>
+        <Text
+          textBreakStrategy="balanced"
+          style={styles.rowTitle}
+          numberOfLines={2}
+        >
           {title}
         </Text>
-        {detail ? <Text style={styles.rowDetail}>{detail}</Text> : null}
+        {detail ? (
+          <Text textBreakStrategy="balanced" style={styles.rowDetail}>
+            {detail}
+          </Text>
+        ) : null}
       </View>
       {value ? (
-        <Text style={styles.rowValue} numberOfLines={1}>
+        <Text
+          textBreakStrategy="balanced"
+          style={styles.rowValue}
+          numberOfLines={1}
+        >
           {value}
         </Text>
       ) : null}
       {trailing}
       {onPress && !trailing ? (
-        <Icon name="chevron" color={theme.faint} size={18} />
+        <View
+          style={
+            expanded === undefined
+              ? undefined
+              : { transform: [{ rotate: expanded ? '-90deg' : '90deg' }] }
+          }
+        >
+          <Icon name="chevron" color={theme.faint} size={18} />
+        </View>
       ) : null}
     </>
   );
@@ -264,6 +308,7 @@ export function Row({
       accessibilityLabel={
         accessibilityLabel ?? [title, value, detail].filter(Boolean).join(', ')
       }
+      accessibilityState={expanded === undefined ? undefined : { expanded }}
       onPress={onPress}
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
     >
@@ -308,7 +353,7 @@ export function ToggleRow({
           disabled={disabled}
           onValueChange={onChange}
           trackColor={{ true: theme.accentFill, false: theme.track }}
-          thumbColor={value ? theme.onAccent : theme.surface}
+          thumbColor={value ? theme.onAccent : theme.muted}
         />
       }
     />
@@ -339,7 +384,7 @@ export function ToggleRow({
             disabled={disabled}
             onValueChange={onChange}
             trackColor={{ true: theme.accentFill, false: theme.track }}
-            thumbColor={value ? theme.onAccent : theme.surface}
+            thumbColor={value ? theme.onAccent : theme.muted}
           />
         </View>
       </View>
@@ -371,8 +416,12 @@ export function MetricLine({ label, value }: { label: string; value: string }) {
         },
       ]}
     >
-      <Text style={styles.metricLabel}>{label}</Text>
-      <Text style={styles.metricValue}>{value}</Text>
+      <Text textBreakStrategy="balanced" style={styles.metricLabel}>
+        {label}
+      </Text>
+      <Text textBreakStrategy="balanced" style={styles.metricValue}>
+        {value}
+      </Text>
     </View>
   );
 }
@@ -407,7 +456,9 @@ export function CheckRow({
       ]}
     >
       {leading}
-      <Text style={[styles.rowTitle, { flex: 1 }]}>{title}</Text>
+      <Text textBreakStrategy="balanced" style={[styles.rowTitle, { flex: 1 }]}>
+        {title}
+      </Text>
       <View
         style={{
           width: 24,
@@ -464,13 +515,17 @@ export function Stat({
       accessibilityLabel={accessibilityLabel ?? `${label}: ${value}`}
     >
       <Text
+        textBreakStrategy="balanced"
         style={[styles.statValue, inverse && styles.inverse]}
         numberOfLines={1}
         adjustsFontSizeToFit
       >
         {value}
       </Text>
-      <Text style={[styles.statLabel, inverse && styles.inverseMuted]}>
+      <Text
+        textBreakStrategy="balanced"
+        style={[styles.statLabel, inverse && styles.inverseMuted]}
+      >
         {label}
       </Text>
     </View>
@@ -493,6 +548,7 @@ export function Pill({
       ]}
     >
       <Text
+        textBreakStrategy="balanced"
         style={[
           styles.pillText,
           tone === 'warn' && styles.pillWarnText,
@@ -550,7 +606,12 @@ export function Button({
       ]}
     >
       {icon ? <Icon name={icon} color={color} size={20} /> : null}
-      <Text style={[styles.buttonLabel, { color }]}>{label}</Text>
+      <Text
+        textBreakStrategy="balanced"
+        style={[styles.buttonLabel, { color }]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -597,18 +658,26 @@ export function Stepper({
         onPress={() => onChange(Math.max(min, value - step))}
         style={({ pressed }) => [styles.stepButton, pressed && styles.pressed]}
       >
-        <Text style={styles.stepSign}>−</Text>
+        <Text textBreakStrategy="balanced" style={styles.stepSign}>
+          −
+        </Text>
       </Pressable>
       <View style={styles.stepValueBox}>
-        <Text style={styles.stepValue}>{value}</Text>
-        <Text style={styles.stepSuffix}>{suffix}</Text>
+        <Text textBreakStrategy="balanced" style={styles.stepValue}>
+          {value}
+        </Text>
+        <Text textBreakStrategy="balanced" style={styles.stepSuffix}>
+          {suffix}
+        </Text>
       </View>
       <Pressable
         accessibilityLabel={`Increase ${label}`}
         onPress={() => onChange(Math.min(max, value + step))}
         style={({ pressed }) => [styles.stepButton, pressed && styles.pressed]}
       >
-        <Text style={styles.stepSign}>+</Text>
+        <Text textBreakStrategy="balanced" style={styles.stepSign}>
+          +
+        </Text>
       </Pressable>
     </View>
   );
@@ -668,6 +737,7 @@ export function Segmented<T extends string>({
                 />
               )}
               <Text
+                textBreakStrategy="balanced"
                 numberOfLines={singleLine ? 1 : undefined}
                 adjustsFontSizeToFit={singleLine}
                 minimumFontScale={0.9}
@@ -707,14 +777,15 @@ const styles = StyleSheet.create(theme => ({
     justifyContent: 'space-between',
     gap: 12,
   },
-  cardHeadingInset: { paddingHorizontal: 12, paddingVertical: 4 },
+  // Unpadded (list) cards: 8dp card inset + 12dp = the same 20dp title inset as padded cards.
+  cardHeadingInset: { paddingHorizontal: 12, paddingTop: 12, paddingBottom: 6 },
+  cardTextInset: { paddingHorizontal: 12, paddingVertical: 4 },
   cardTitle: {
     flex: 1,
     color: theme.text,
     fontSize: 16,
     lineHeight: 22,
     fontWeight: '700',
-    textTransform: 'capitalize',
   },
   cardInfo: {
     paddingVertical: 10,
@@ -742,9 +813,13 @@ const styles = StyleSheet.create(theme => ({
     fontWeight: '700',
     fontVariant: ['tabular-nums'],
   },
+  // 36dp visual box + 6dp hit slop = 48dp target, without making headings taller;
+  // the negative margin lines the icon up with the card's content edge.
   infoButton: {
-    minWidth: 48,
-    minHeight: 48,
+    width: 36,
+    height: 36,
+    marginVertical: -6,
+    marginRight: -6,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -769,14 +844,12 @@ const styles = StyleSheet.create(theme => ({
   },
   section: {
     flexShrink: 1,
-    textTransform: 'capitalize',
     color: theme.muted,
     fontSize: 13,
     fontWeight: '700',
     letterSpacing: 0.8,
   },
   title: {
-    textTransform: 'capitalize',
     color: theme.text,
     fontSize: 22,
     lineHeight: 28,
@@ -806,7 +879,6 @@ const styles = StyleSheet.create(theme => ({
   },
   rowText: { flex: 1, gap: 2 },
   rowTitle: {
-    textTransform: 'capitalize',
     color: theme.text,
     fontSize: 16,
     fontWeight: '600',
@@ -827,7 +899,6 @@ const styles = StyleSheet.create(theme => ({
     fontVariant: ['tabular-nums'],
   },
   statLabel: {
-    textTransform: 'capitalize',
     color: theme.muted,
     fontSize: 13,
     fontWeight: '500',
@@ -861,7 +932,7 @@ const styles = StyleSheet.create(theme => ({
   dangerButton: { backgroundColor: theme.dangerSoft },
   buttonPressed: { opacity: 0.8 },
   disabled: { opacity: 0.45 },
-  buttonLabel: { textTransform: 'capitalize', fontSize: 16, fontWeight: '700' },
+  buttonLabel: { fontSize: 16, fontWeight: '700' },
   stepper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -913,7 +984,6 @@ const styles = StyleSheet.create(theme => ({
   },
   segmentOn: { backgroundColor: theme.accentSoft, borderColor: theme.accent },
   segmentText: {
-    textTransform: 'capitalize',
     color: theme.muted,
     fontSize: 14,
     fontWeight: '600',

@@ -53,9 +53,9 @@ export function FocusQuickActions({
   }, [active?.id, schedules.refresh]);
   return (
     <View style={{ gap: 8, flexShrink: 1 }}>
-      <Explanation title={active ? 'Active Focus' : 'Focus Now'}>
-        Review apps, mode and duration before Start. Allow Only blocks other
-        apps; Block Apps blocks your selection. Other rules and emergency
+      <Explanation title={active ? 'Active focus' : 'Focus now'}>
+        Review apps, mode and duration before Start. Allow only blocks other
+        apps; Block apps blocks your selection. Other rules and emergency
         recovery remain. End early or allow a five-minute visit.
       </Explanation>
       {error && <Body>{error}</Body>}
@@ -136,7 +136,7 @@ export function FocusQuickActions({
           )}
           {!busy && visibleChoices.length === 0 && choices.length > 0 && (
             <Body muted>
-              Open All groups or customize a list for this mode.
+              Open all groups or customize a list for this mode.
             </Body>
           )}
           {!busy && choices.length === 0 && (
@@ -164,7 +164,7 @@ export function FocusQuickActions({
             <Body>Choose up to 100 apps for this session.</Body>
           )}
           {snapshot && !snapshot.accessibility && (
-            <Body>Connect Accessibility in Settings to start focus.</Body>
+            <Body>Connect accessibility in Settings to start focus.</Body>
           )}
           <Button
             label={busy ? 'Starting…' : `Start ${minutes}-minute focus`}

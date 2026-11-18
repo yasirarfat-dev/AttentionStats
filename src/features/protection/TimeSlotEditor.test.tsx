@@ -221,7 +221,10 @@ test('an existing selective slot stays selective when its app is unavailable', (
 test('leaving an edited draft does not save a schedule', () => {
   const draft = editor();
   draft.render().control('Blocking scope').onChange('short_videos');
-  draft.render().control('Back to schedules').onPress();
+  draft
+    .render()
+    .props.find(item => item.back?.label === 'Back to schedules')!
+    .back.onPress();
   expect(draft.onBack).toHaveBeenCalledTimes(1);
   expect(draft.onSave).not.toHaveBeenCalled();
 });

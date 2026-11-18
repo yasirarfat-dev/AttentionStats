@@ -89,7 +89,7 @@ internal object ProtectionAuthorizationVerification {
             request(authorized, failures)
             val token = checkNotNull(activity).intent.getStringExtra("request")!!
             if (biometric) {
-                click("Use parent biometrics")
+                click("Use fingerprint")
                 instrumentation.sendStatus(1, android.os.Bundle().apply {
                     putString("stream", "READY: fingerprint for the full one-use authorization path; isolated harmless action only")
                 })
@@ -99,12 +99,12 @@ internal object ProtectionAuthorizationVerification {
                 return "PASS: $checks isolated actual native biometric authorization checks; real touch authorizes one harmless action, replay rejected; live protection unchanged"
             }
             main { views().filterIsInstance<EditText>().single().setText("111111") }
-            click("Authorize this action")
+            click("Approve")
             waitFor { views().filterIsInstance<TextView>().any { it.text.toString().contains("did not match") } }
             expect(actions.get() == 0 && failures.get() == 0 && authorized.count == 1L)
             SystemClock.sleep(1100)
             main { views().filterIsInstance<EditText>().single().setText("583194") }
-            click("Authorize this action")
+            click("Approve")
             expect(authorized.await(15, TimeUnit.SECONDS) && actions.get() == 1 && failures.get() == 0)
             main {
                 ProtectionLock.finish(token, owner.state().revision)

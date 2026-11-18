@@ -129,6 +129,11 @@ class ReelsAccessibilityService : AccessibilityService() {
 
     override fun onServiceConnected() {
         AutoScrollSession.onChanged = { main.post { renderOverlays() } }
+        // A parent approval opened from a block screen must not stay hidden under it; the service gets
+        // no events from its own app, so it re-checks the screen itself once approval ends.
+        com.attentionstats.protection.ProtectionLock.approvalListener = { approving ->
+            if (!destroyed) { renderOverlays(); if (!approving) schedule(0) }
+        }
         coordinator.serviceConnected = true
         coordinator.addListener(listener)
         val filter = IntentFilter().apply { addAction(Intent.ACTION_SCREEN_OFF); addAction(Intent.ACTION_USER_PRESENT) }
@@ -309,10 +314,14 @@ class ReelsAccessibilityService : AccessibilityService() {
 
     private fun renderOverlays() {
         if (destroyed) return
+        if (com.attentionstats.protection.ProtectionLock.approving) { removeSchedule(); removeIntervention(); removeHud(); return }
         renderSchedule()
-        if (scheduleOverlay != null) { removeIntervention(); removeHud(); return }
+        // Watchdog: while any cover is up, keep re-checking the screen even if no app sends events,
+        // so a cover that is no longer wanted can never linger until the screen is locked.
+        if (scheduleOverlay != null) { removeIntervention(); removeHud(); schedule(1_500); return }
         renderIntervention()
         renderHud()
+        if (intervention != null) schedule(1_500)
     }
 
     private fun renderSchedule() {
@@ -324,13 +333,12 @@ class ReelsAccessibilityService : AccessibilityService() {
             "This app is covered by your focus session or a blocking period. End focus or change schedules in Attention Stats, or allow a short visit.",
             0, "Open Attention Stats", "Allow 5 minutes",
             { scheduledPackage = null; removeSchedule(); open("attentionstats://protect") },
-            { coordinator.allowScheduled(target) { scheduledPackage = null; removeSchedule(); schedule(0) } })
+            { coordinator.allowScheduled(target) { scheduledPackage = null; removeSchedule(); schedule(0) } },
+            stats = coordinator.liveOverlay?.let { InterventionOverlay.Stats(it.visit, it.today, 0) },
+            onChoice = { performGlobalAction(GLOBAL_ACTION_HOME) })
         val params = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
-        if (Build.VERSION.SDK_INT >= 30) {
-            params.height = getSystemService(WindowManager::class.java).currentWindowMetrics.bounds.height() - navigationBarHeight()
-            params.gravity = Gravity.TOP
-        }
+        fitBetweenBars(params)
         try {
             getSystemService(WindowManager::class.java).addView(view, params)
             scheduleOverlay = view; scheduleOverlayPackage = target
@@ -370,15 +378,16 @@ class ReelsAccessibilityService : AccessibilityService() {
         val session = coordinator.liveOverlay?.visit ?: reminder?.count?.toLong() ?: 0
         val minutes = ((reminder?.durationMs ?: 0) / 60_000).toInt()
         val view = when (wanted) {
-            "break" -> InterventionOverlay(this, InterventionOverlay.Mode.BREAK, "Time for a breather?",
+            "break" -> InterventionOverlay(this, InterventionOverlay.Mode.BREAK, "Time for something real?",
                 buildString {
                     append("$session short videos")
                     if (minutes > 0) append(" · $minutes min")
-                    append(" since you unlocked your phone.")
+                    append(" since you unlocked.")
                     if (compactBreak) append("\nPause the video when you're ready for a quiet moment.")
                 }, coordinator.breakSeconds, "I'm done for now", "Keep watching",
                 { dismissBreak("left"); performGlobalAction(GLOBAL_ACTION_HOME) },
-                { dismissBreak("continued") }, compact = compactBreak)
+                { dismissBreak("continued") }, compact = compactBreak,
+                stats = InterventionOverlay.Stats(session, coordinator.liveOverlay?.today ?: 0, minutes))
             else -> InterventionOverlay(this, InterventionOverlay.Mode.BLOCK,
                 if (wanted == "limit") "Daily limit reached" else if (wanted == "schedule") "Short videos are on a pause" else "${current.observationLabel} are off",
                 if (wanted == "schedule") "A time slot you chose is active. Everything else in ${current.displayName} still works."
@@ -390,7 +399,9 @@ class ReelsAccessibilityService : AccessibilityService() {
                     decide("left"); blockActedAt = 0; removeIntervention()
                     if (wanted == "schedule") performGlobalAction(GLOBAL_ACTION_BACK)
                 },
-                { coordinator.allowFor(current, 5) { decide("allowed"); removeIntervention(); schedule(0) } })
+                { coordinator.allowFor(current, 5) { decide("allowed"); removeIntervention(); schedule(0) } },
+                stats = InterventionOverlay.Stats(coordinator.liveOverlay?.visit ?: 0, coordinator.liveOverlay?.today ?: 0, 0),
+                onChoice = { decide("left"); blockActedAt = 0; removeIntervention(); performGlobalAction(GLOBAL_ACTION_HOME) })
         }
         // Not focusable: system Back/Home/Recents always reach Android, so the screen never traps anyone.
         val params = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
@@ -400,17 +411,11 @@ class ReelsAccessibilityService : AccessibilityService() {
         val navigation = navigationBarHeight()
         if (compactBreak) {
             params.height = ((if (Build.VERSION.SDK_INT >= 30) getSystemService(WindowManager::class.java).currentWindowMetrics.bounds.height()
-                else resources.displayMetrics.heightPixels) - navigation).let { (it * 0.65f).toInt() }
+                else resources.displayMetrics.heightPixels) - navigation).let { (it * 0.8f).toInt() }
             params.gravity = Gravity.CENTER
             params.y = -navigation / 2
             params.flags = params.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-        } else if (navigation > 0) {
-            params.height = resources.displayMetrics.heightPixels.let { visible ->
-                if (Build.VERSION.SDK_INT >= 30) getSystemService(WindowManager::class.java).currentWindowMetrics.bounds.height() - navigation
-                else visible
-            }
-            params.gravity = Gravity.TOP
-        }
+        } else fitBetweenBars(params)
         try {
             getSystemService(WindowManager::class.java).addView(view, params)
             intervention = view; interventionKind = wanted; interventionApp = current
@@ -450,6 +455,8 @@ class ReelsAccessibilityService : AccessibilityService() {
                     }
                     valid = current()
                     if (valid) confirmed = com.attentionstats.protection.PlaybackPauseDispatcher.prepare(app, root, ::current)
+                    if (valid && !confirmed) confirmed = com.attentionstats.protection.PlaybackPauseDispatcher.prepareByTap(app, ::current,
+                        { breakSample(app, window) }, ::tapOnce)
                     valid = current()
                 } finally { SnapshotReader.recycle(root) }
             } catch (_: Exception) { valid = false }
@@ -462,6 +469,29 @@ class ReelsAccessibilityService : AccessibilityService() {
                 } else schedule(0)
             }
         }
+    }
+
+    /**
+     * Full covers sit exactly between the status and navigation bars. Android keeps accessibility
+     * overlays below the status bar, so a top-anchored window sized "screen minus navigation bar"
+     * slid its bottom behind the navigation bar; anchor to the bottom above the bar instead.
+     */
+    private fun fitBetweenBars(params: WindowManager.LayoutParams) {
+        val navigation = navigationBarHeight()
+        val screen = if (Build.VERSION.SDK_INT >= 30) getSystemService(WindowManager::class.java).currentWindowMetrics.bounds.height()
+            else resources.displayMetrics.heightPixels + navigation
+        params.gravity = Gravity.BOTTOM
+        params.y = navigation
+        params.height = screen - navigation - statusBarHeight()
+    }
+
+    @android.annotation.SuppressLint("InternalInsetResource", "DiscouragedApi")
+    private fun statusBarHeight(): Int {
+        val fromInsets = if (Build.VERSION.SDK_INT >= 30) getSystemService(WindowManager::class.java).currentWindowMetrics
+            .windowInsets.getInsetsIgnoringVisibility(android.view.WindowInsets.Type.statusBars()).top else 0
+        if (fromInsets > 0) return fromInsets
+        val id = resources.getIdentifier("status_bar_height", "dimen", "android")
+        return if (id > 0) resources.getDimensionPixelSize(id) else 0
     }
 
     /** Service contexts often report empty window insets, so fall back to the system dimension. */
@@ -520,6 +550,36 @@ class ReelsAccessibilityService : AccessibilityService() {
     }
 
     /** Holding transient audio focus makes video players pause while a break or block is shown. */
+    /** Worker thread: a fresh frame of the same source window, or null. */
+    private fun breakSample(app: ReelApp, window: Int): AdapterFrame? {
+        val active = providerRoot() ?: return null
+        return try {
+            if (active.windowId != window || !app.owns(active.packageName?.toString())) return null
+            val snapshot = SnapshotReader.read(active, app.packages)
+            if (!snapshot.complete || snapshot.typing) return null
+            AdapterRegistry.of(app).read(snapshot).takeIf { it.surface == Surface.REELS && it.route == ReelRoute.VIEWER }
+        } finally { SnapshotReader.recycle(active) }
+    }
+
+    /** Worker thread: one short tap for a user-enabled break's pause; waits for the gesture result. */
+    private fun tapOnce(x: Float, y: Float): Boolean {
+        val done = java.util.concurrent.CountDownLatch(1)
+        val completed = java.util.concurrent.atomic.AtomicBoolean(false)
+        main.post {
+            val path = android.graphics.Path().apply { moveTo(x, y) }
+            val gesture = android.accessibilityservice.GestureDescription.Builder()
+                .addStroke(android.accessibilityservice.GestureDescription.StrokeDescription(path, 0, 50)).build()
+            val accepted = try {
+                dispatchGesture(gesture, object : GestureResultCallback() {
+                    override fun onCompleted(g: android.accessibilityservice.GestureDescription?) { completed.set(true); done.countDown() }
+                    override fun onCancelled(g: android.accessibilityservice.GestureDescription?) { done.countDown() }
+                }, main)
+            } catch (_: RuntimeException) { false }
+            if (!accepted) done.countDown()
+        }
+        return done.await(1_500, java.util.concurrent.TimeUnit.MILLISECONDS) && completed.get()
+    }
+
     private fun pausePlayback(pause: Boolean) {
         val audio = getSystemService(AudioManager::class.java) ?: return
         if (Build.VERSION.SDK_INT < 26) return
@@ -636,10 +696,13 @@ class ReelsAccessibilityService : AccessibilityService() {
             return
         }
         val value = AutoScrollSession.Frame(app, window, frame.identity, epoch, now, frame.progress,
-            coordinator.overlayEnabled && !visitHudVisibility.hiddenFor(app), frame.mediaKind, frame.standaloneAd,
+            coordinator.overlayEnabled && !visitHudVisibility.hiddenFor(app), frame.mediaKind, skippableAd(app, frame),
             if (frame.standaloneAd) frame.standaloneAdKeys else frame.keys)
         main.post { AutoScrollSession.frame(value) { expected, token -> advance(token, expected) } }
     }
+
+    private fun skippableAd(app: ReelApp, frame: AdapterFrame): Boolean =
+        if (app == ReelApp.FACEBOOK) frame.standaloneAd else frame.skippableAd
 
     private fun advance(token: Long, expected: AutoScrollSession.Frame) {
         fun reject(stage: String, reason: String = "context_changed") {
@@ -665,9 +728,11 @@ class ReelsAccessibilityService : AccessibilityService() {
             val current = AdapterRegistry.of(expected.app).read(snapshot)
             if (!snapshot.complete || snapshot.typing) return reject("snapshot_rejected")
             if (current.surface != Surface.REELS || current.route != ReelRoute.VIEWER) return reject("viewer_rejected")
-            if (current.identity != expected.page) return reject("identity_rejected")
+            if (current.identity != expected.page && !AutoScrollSession.sameItem(
+                    if (current.standaloneAd) current.standaloneAdKeys else current.keys, expected.itemKeys))
+                return reject("identity_rejected")
             if (expected.standaloneAd && AutoScrollSession.skipStandaloneAds) {
-                if (expected.app != ReelApp.FACEBOOK || !current.standaloneAd)
+                if (!skippableAd(expected.app, current))
                     return reject("standalone_ad_rejected", "playback_unavailable")
             } else if (expected.position == null) {
                 if (expected.mediaKind != "photo" || current.mediaKind != "photo" || current.progress != null)
@@ -748,11 +813,11 @@ class ReelsAccessibilityService : AccessibilityService() {
         destroyed = true
         removeIntervention()
         removeHud()
-        coordinator.stopDiaryLive()
-        coordinator.resetUnlockSession()
+        coordinator.suspendObservation()
         if (receiverRegistered) { unregisterReceiver(screenReceiver); receiverRegistered = false }
         if (packageReceiverRegistered) { unregisterReceiver(packageReceiver); packageReceiverRegistered = false }
         AutoScrollSession.onChanged = {}
+        com.attentionstats.protection.ProtectionLock.approvalListener = null
         AutoScrollSession.clear()
         sampling.close()
         main.removeCallbacksAndMessages(null)

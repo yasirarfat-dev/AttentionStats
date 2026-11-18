@@ -28,6 +28,7 @@ import {
   Title,
 } from '../../ui/Kit';
 import { Screen } from '../../ui/Screen';
+import { PerspectiveCard } from '../perspective';
 import {
   sourceIcon,
   useAppIcons,
@@ -108,7 +109,7 @@ export function InsightsScreen() {
     const end = history.rangeEnd!;
     try {
       const chosen = await NativeDiary?.pickDate(
-        field === 'start' ? 'Start Date' : 'End Date',
+        field === 'start' ? 'Start date' : 'End date',
         field === 'start' ? start : end,
         field === 'start' ? history.earliestDay! : start,
         field === 'end' ? today : range === 'all' ? end : today,
@@ -209,7 +210,7 @@ export function InsightsScreen() {
     setPickingDay(true);
     try {
       const chosen = await NativeDiary.pickDate(
-        'Explore a Day',
+        'Explore a day',
         day.day,
         history.rangeStart!,
         history.rangeEnd!,
@@ -244,13 +245,13 @@ export function InsightsScreen() {
         options={[
           { value: '7', label: 'Week' },
           { value: '30', label: 'Month' },
-          { value: 'all', label: 'All Time' },
+          { value: 'all', label: 'All time' },
         ]}
       />
       {history && (
         <Card
-          title="Date Range"
-          info={`Week and Month cover 7 or 30 civil days from the start date; the end follows automatically. All Time lets you choose both bounds. Available from ${calendarDate(history.installDay!)}. Dates use ${history.zone}; empty dates do not prove complete coverage.`}
+          title="Date range"
+          info={`Week and month cover 7 or 30 civil days from the start date; the end follows automatically. All time lets you choose both bounds. Available from ${calendarDate(history.installDay!)}. Dates use ${history.zone}; empty dates do not prove complete coverage.`}
         >
           <View style={styles.rangeDates}>
             {(['start', 'end'] as const).map(field => (
@@ -267,11 +268,17 @@ export function InsightsScreen() {
               >
                 <View style={styles.dateHeading}>
                   <Icon name="clock" size={16} color={theme.muted} />
-                  <Text style={styles.dateFieldLabel}>
+                  <Text
+                    textBreakStrategy="balanced"
+                    style={styles.dateFieldLabel}
+                  >
                     {field === 'start' ? 'Start date' : 'End date'}
                   </Text>
                 </View>
-                <Text style={styles.dateFieldValue}>
+                <Text
+                  textBreakStrategy="balanced"
+                  style={styles.dateFieldValue}
+                >
                   {calendarDate(
                     field === 'start' ? history.rangeStart! : history.rangeEnd!,
                   )}
@@ -323,8 +330,8 @@ export function InsightsScreen() {
         <>
           <Card
             tone="hero"
-            title="Video Encounters"
-            info={`Totals cover the selected range, not only the day below. An encounter is a recognized visible item, not proof of watching. On Screen is recorded video-surface time, which can overlap whole-app time. Missing time is unknown; calendar dates are not coverage. Dates use ${diary.snapshot.zone}.`}
+            title="Video encounters"
+            info={`Totals cover the selected range, not only the day below. An encounter is a recognized visible item, not proof of watching. On screen is recorded video-surface time, which can overlap whole-app time. Missing time is unknown; calendar dates are not coverage. Dates use ${diary.snapshot.zone}.`}
           >
             <View style={styles.stats}>
               <Stat
@@ -336,28 +343,42 @@ export function InsightsScreen() {
               <Stat
                 inverse
                 value={time(history ? allTimeMs : summary.reelsMs)}
-                label="On Screen"
+                label="On screen"
               />
             </View>
             <View style={styles.heroLine} />
-            <Text style={styles.heroNote}>
+            <Text textBreakStrategy="balanced" style={styles.heroNote}>
               {history?.rangeStart && history.rangeEnd
                 ? `${calendarDate(history.rangeStart)} – ${calendarDate(history.rangeEnd)}`
                 : `${days.length} days`}
             </Text>
           </Card>
+          <PerspectiveCard
+            ms={Number((history ? allTimeMs : summary.reelsMs) ?? 0)}
+            videos={Number(allTimeVideos ?? summary.videos)}
+            seed={Math.floor(
+              Date.parse(
+                `${history?.rangeEnd ?? days[days.length - 1]?.day}T00:00:00Z`,
+              ) / 86_400_000,
+            )}
+            rangeLabel={
+              history?.rangeStart && history.rangeEnd
+                ? `${calendarDate(history.rangeStart)} – ${calendarDate(history.rangeEnd)}`
+                : undefined
+            }
+          />
           {history && (
             <>
               <Button
                 label={
-                  showSources ? 'Hide App Breakdown' : 'Show App Breakdown'
+                  showSources ? 'Hide app breakdown' : 'Show app breakdown'
                 }
                 variant="text"
                 onPress={() => setShowSources(value => !value)}
               />
               {showSources && (
                 <Card
-                  title="Range by Video App"
+                  title="Range by video app"
                   info="These counts and recorded surface times cover the full selected range. Source totals can combine supported app editions; they are separate from whole-app usage. Missing time remains unknown."
                   padded={false}
                 >
@@ -403,15 +424,15 @@ export function InsightsScreen() {
             <>
               {history && range === 'all' && (
                 <Card
-                  title="App History Dates"
-                  info={`App totals and daily rows cover only these ${days.length} dates, not the entire range above. Dates use ${history.zone}. Older and Newer replace this window with at most 30 dates; Choose End Date replaces the window with up to 30 days ending on that date. Pages are never appended into a years-long list.`}
+                  title="App history dates"
+                  info={`App totals and daily rows cover only these ${days.length} dates, not the entire range above. Dates use ${history.zone}. Older and newer replace this window with at most 30 dates; choose end date replaces the window with up to 30 days ending on that date. Pages are never appended into a years-long list.`}
                 >
                   <Title>
                     {calendarDate(history.pageStart!)} –{' '}
                     {calendarDate(history.pageEnd!)}
                   </Title>
                   <Button
-                    label="Choose End Date"
+                    label="Choose end date"
                     variant="tonal"
                     disabled={diary.busy || pickingDay}
                     onPress={() => void pickExploreDay()}
@@ -420,7 +441,7 @@ export function InsightsScreen() {
                     <View style={styles.stats}>
                       <View style={styles.grow}>
                         <Button
-                          label="Older Dates"
+                          label="Older dates"
                           variant="tonal"
                           disabled={diary.busy || history.olderEnd === null}
                           onPress={() => {
@@ -434,7 +455,7 @@ export function InsightsScreen() {
                       </View>
                       <View style={styles.grow}>
                         <Button
-                          label="Newer Dates"
+                          label="Newer dates"
                           variant="tonal"
                           disabled={diary.busy || history.newerEnd === null}
                           onPress={() => {
@@ -465,8 +486,8 @@ export function InsightsScreen() {
           ) : (
             <View style={styles.dayGroup}>
               <Card
-                title="Explore a Day"
-                info={`Choose a day for every detail in this outlined group. Screen time sums recorded whole-app time; Video App Time is its supported video-app subset, including non-video screens. Neither should be added to video-surface time. App opens are observed entries and returns, not unlock sessions. The chart covers the current page of up to 30 days, never the full years-long range. The All Time calendar can jump across that range; Previous and Next replace the page when needed. Dates and hours use ${diary.snapshot.zone}. Today is still in progress; no saved encounters does not establish complete coverage.`}
+                title="Explore a day"
+                info={`Choose a day for every detail in this outlined group. Screen time sums recorded whole-app time; video app time is its supported video-app subset, including non-video screens. Neither should be added to video-surface time. App opens are observed entries and returns, not unlock sessions. The chart covers the current page of up to 30 days, never the full years-long range. The all time calendar can jump across that range; previous and next replace the page when needed. Dates and hours use ${diary.snapshot.zone}. Today is still in progress; no saved encounters does not establish complete coverage.`}
               >
                 <BarChart
                   values={daily.map(item => Number(item.videos))}
@@ -489,8 +510,8 @@ export function InsightsScreen() {
                     <Button
                       label={
                         day
-                          ? `Choose Day · ${calendarDate(day.day)}`
-                          : 'Choose Day'
+                          ? `Choose day · ${calendarDate(day.day)}`
+                          : 'Choose day'
                       }
                       variant="tonal"
                       disabled={!day || diary.busy || pickingDay}
@@ -518,7 +539,10 @@ export function InsightsScreen() {
                             item.day === day?.day && styles.selectedDate,
                           ]}
                         >
-                          <Text style={styles.dateText}>
+                          <Text
+                            textBreakStrategy="balanced"
+                            style={styles.dateText}
+                          >
                             {dateLabel(item.day, true)}
                           </Text>
                         </Pressable>
@@ -580,7 +604,7 @@ export function InsightsScreen() {
                     <View style={styles.stats}>
                       <View style={styles.grow}>
                         <Button
-                          label="Previous Day"
+                          label="Previous day"
                           compact
                           accessibilityLabel="Previous day"
                           variant="tonal"
@@ -602,7 +626,7 @@ export function InsightsScreen() {
                       </View>
                       <View style={styles.grow}>
                         <Button
-                          label="Next Day"
+                          label="Next day"
                           compact
                           accessibilityLabel="Next day"
                           variant="tonal"
@@ -627,7 +651,7 @@ export function InsightsScreen() {
                 )}
               </Card>
               <Card
-                title="Day by Video App"
+                title="Day by video app"
                 scope={dayScope}
                 info="Video encounters and recorded surface time for the selected day. Supported app editions may be combined here. These are not whole-app time or confirmed playback."
                 padded={false}
@@ -667,9 +691,9 @@ export function InsightsScreen() {
                 )}
               </Card>
               <Card
-                title="Hourly Encounters"
+                title="Hourly encounters"
                 scope={dayScope}
-                info={`Counts include recognized videos, photos and ads, grouped in ${diary.snapshot.zone}. They do not measure attention or completed viewing. Open Hourly Values for exact bins.`}
+                info={`Counts include recognized videos, photos and ads, grouped in ${diary.snapshot.zone}. They do not measure attention or completed viewing. Open hourly values for exact bins.`}
               >
                 {peak === null ? (
                   <Body muted>No saved hourly encounters for this day.</Body>
@@ -704,7 +728,7 @@ export function InsightsScreen() {
                   ))}
               </Card>
               <Card
-                title="Day App Time & Opens"
+                title="Day app time & opens"
                 scope={dayScope}
                 info={`${usageExplanation(diary.snapshot.usageStatus)} Whole-app time overlaps video-surface time; do not add them. Opens are observed entries and returns, not exact cold starts.`}
                 padded={false}
@@ -715,11 +739,11 @@ export function InsightsScreen() {
                     <Body muted>
                       {
                         {
-                          disabled: 'Screen Time Off',
-                          permission_needed: 'Usage Access Needed',
-                          unavailable: 'App Time Unavailable',
-                          dense_history: 'App Time Unavailable',
-                          interrupted: 'App Time Interrupted',
+                          disabled: 'Screen time off',
+                          permission_needed: 'Usage access needed',
+                          unavailable: 'App time unavailable',
+                          dense_history: 'App time unavailable',
+                          interrupted: 'App time interrupted',
                         }[diary.snapshot.usageStatus]
                       }
                     </Body>
@@ -778,7 +802,7 @@ export function InsightsScreen() {
                   <Card
                     title="Mindful Breaks"
                     scope={dayScope}
-                    info="Recorded reminder choices for the selected day. Reminders recorded counts appearances; Chose to Leave counts the recorded leave action. Adjust reminders in Protect."
+                    info="Recorded reminder choices for the selected day. Reminders recorded counts appearances; chose to leave counts the recorded leave action. Adjust reminders in Protect."
                   >
                     <View style={styles.stats}>
                       <Stat

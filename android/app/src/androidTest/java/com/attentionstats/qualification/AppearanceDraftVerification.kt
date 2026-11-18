@@ -144,6 +144,13 @@ internal object AppearanceDraftVerification {
             .put("foregroundColor", "#E5E7EB").put("backgroundColor", "#15191F").put("customColor", "#4477AA")
             .put("corners", 24).put("spacing", 20).put("numberSize", 30)
         fun unchanged() = expect(AppearanceOwner.snapshot(context).toString() == fixture.toString())
+        // Templates save as soon as they are tapped (ADR-119): wait for the saved record to match.
+        fun applied(vararg values: Pair<String, String>) {
+            values.forEach { (key, value) -> fixture.put(key, value) }
+            val until = SystemClock.elapsedRealtime() + 5_000
+            while (AppearanceOwner.snapshot(context).toString() != fixture.toString() && SystemClock.elapsedRealtime() < until) SystemClock.sleep(150)
+            unchanged()
+        }
         try {
             AppearanceOwner.configure(context, fixture.toString())
             context.startActivity(Intent(context, MainActivity::class.java).setAction(Intent.ACTION_VIEW)
@@ -159,7 +166,7 @@ internal object AppearanceDraftVerification {
             })
             click("About Templates"); unchanged(); capture("templates-help")
             click("About Templates", false)
-            click("Light"); unchanged()
+            click("Light"); applied("mode" to "light", "foregroundColor" to "", "backgroundColor" to "")
             click("Background"); field("#F5F7FC"); preview(false); capture("light-preview")
             click("Save appearance")
             fixture.put("mode", "light").put("foregroundColor", "").put("backgroundColor", "")
@@ -167,9 +174,9 @@ internal object AppearanceDraftVerification {
             expect(AppearanceOwner.palette(context).canvas == android.graphics.Color.parseColor("#F5F7FC"))
             // System must follow the OS even while a different app theme is forced.
             val systemDark = context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
-            click("System", false); unchanged()
+            click("System", false); applied("mode" to "system")
             click("Background"); field(if (systemDark) "#08090B" else "#F5F7FC"); preview(systemDark); capture("system-from-light")
-            click("Dark", false); unchanged()
+            click("Dark", false); applied("mode" to "dark")
             click("Background"); field("#08090B"); preview(true); capture("dark-preview")
             click("Save appearance")
             val themed = AppearanceOwner.snapshot(context)
@@ -177,12 +184,12 @@ internal object AppearanceDraftVerification {
             expect(themed.getString("customColor") == "#4477AA" && themed.getInt("spacing") == 20)
             fixture.put("mode", "dark")
             expect(AppearanceOwner.palette(context).canvas == android.graphics.Color.parseColor("#08090B"))
-            click("System"); unchanged()
+            click("System"); applied("mode" to "system")
             expect(visit { named(it, "System") && it.isSelected })
             click("Background"); field(if (systemDark) "#08090B" else "#F5F7FC"); preview(systemDark); capture("system-preview")
             if (themesOnly) return "PASS: $checks actual Light/Dark/System preview/save/native palette checks; original preferences restored in finally"
-            click("Dark", false); capture("theme")
-            click("Blue"); unchanged(); capture("templates")
+            click("Dark", false); applied("mode" to "dark"); capture("theme")
+            click("Blue"); applied("accent" to "blue", "customColor" to ""); capture("templates")
             click("About Customization"); unchanged(); capture("customization-help")
             click("About Customization", false)
             click("Background"); field("#08090B"); typeColor("#15191F")

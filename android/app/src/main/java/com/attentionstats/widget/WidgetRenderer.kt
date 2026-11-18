@@ -70,7 +70,7 @@ internal object WidgetRenderer {
         }
         root.setImageViewResource(R.id.widget_background, panel)
         root.setInt(R.id.widget_background, "setImageAlpha", config.opacity * 255 / 100)
-        root.setTextViewText(R.id.widget_title, when (style) { WidgetStyle.APPS -> "Reels By Apps"; WidgetStyle.RHYTHM -> "Hourly Encounters"; WidgetStyle.SCREEN -> "Screen Time · Today"; else -> "Attention Stats · Today" })
+        root.setTextViewText(R.id.widget_title, when (style) { WidgetStyle.APPS -> "Reels by apps"; WidgetStyle.RHYTHM -> "Hourly encounters"; WidgetStyle.SCREEN -> "Screen time · Today"; else -> "Attention Stats · Today" })
         root.setTextColor(R.id.widget_title, palette.accent)
         root.setTextColor(R.id.widget_detail, palette.muted)
         root.setViewVisibility(R.id.widget_header, if (compact) View.GONE else View.VISIBLE)
@@ -105,7 +105,7 @@ internal object WidgetRenderer {
         fun screenBand(featured: Boolean = false) {
             val band = RemoteViews(context.packageName, if (featured) R.layout.widget_screen_focus else R.layout.widget_screen_band)
             band.setTextViewText(R.id.w_screen_value, if (featured) duration(current?.screenMs) else "Screen Time  ${duration(current?.screenMs)}")
-            band.setTextViewText(R.id.w_screen_caption, "Reels Apps  ${duration(current?.reelsAppsMs)} · Whole-App Time")
+            band.setTextViewText(R.id.w_screen_caption, "Reels apps  ${duration(current?.reelsAppsMs)} · whole-app time")
             band.setTextColor(R.id.w_screen_value, palette.text)
             band.setTextColor(R.id.w_screen_caption, palette.muted)
             val total = current?.screenMs
@@ -160,7 +160,7 @@ internal object WidgetRenderer {
                 val chartViews = RemoteViews(context.packageName, R.layout.widget_flex_chart)
                 chartViews.setImageViewBitmap(R.id.w_chart, chart(current, palette.accent, width.coerceIn(110, 400)))
                 listOf(R.id.w_axis_0, R.id.w_axis_1, R.id.w_axis_2, R.id.w_axis_3).forEach { chartViews.setTextColor(it, palette.muted) }
-                chartViews.setContentDescription(R.id.w_chart, if (current == null) "No Current Observations" else
+                chartViews.setContentDescription(R.id.w_chart, if (current == null) "No current observations" else
                     "Recorded media encounters by hour, including photos and ads. " + current.hours.mapIndexed { hour, count -> "$hour:00 $count" }.joinToString(", "))
                 root.addView(R.id.widget_body, chartViews)
             }

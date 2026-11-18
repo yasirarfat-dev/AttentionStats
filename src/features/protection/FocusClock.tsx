@@ -76,10 +76,12 @@ export function FocusClock({
         ))}
       </Svg>
       <View style={styles.face}>
-        <Text style={styles.time}>
+        <Text textBreakStrategy="balanced" style={styles.time}>
           {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, '0')}
         </Text>
-        <Text style={styles.label}>remaining</Text>
+        <Text textBreakStrategy="balanced" style={styles.label}>
+          Remaining
+        </Text>
       </View>
     </View>
   );

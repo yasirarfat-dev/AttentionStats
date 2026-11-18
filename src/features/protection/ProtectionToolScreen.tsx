@@ -10,7 +10,6 @@ import {
 import { AppIcon } from '../../ui/Charts';
 import {
   Body,
-  Button,
   Card,
   Divider,
   Segmented,
@@ -27,9 +26,9 @@ const ALWAYS = 1000;
 
 export type ProtectionTool = 'Breaks' | 'Blocks' | 'Counter';
 const titles: Record<ProtectionTool, string> = {
-  Breaks: 'Mindful breaks',
+  Breaks: 'Mindful Breaks',
   Blocks: 'Short-video blocks',
-  Counter: 'Live counter',
+  Counter: 'Live Counter',
 };
 
 export function ProtectionToolScreen({
@@ -104,16 +103,17 @@ export function ProtectionToolScreen({
   );
 
   return (
-    <Screen title={titles[tool]}>
-      <Button
-        label={tool === 'Counter' ? 'Back to Settings' : 'Back to Protect'}
-        variant="text"
-        onPress={onBack}
-      />
+    <Screen
+      title={titles[tool]}
+      back={{
+        label: tool === 'Counter' ? 'Back to Settings' : 'Back to Protect',
+        onPress: onBack,
+      }}
+    >
       {tool === 'Breaks' && (
         <>
           <Card
-            title="Mindful Breaks"
+            title="When to offer a break"
             info="A gentle pause after the video count or minutes you choose; you can always keep watching. A run resets on lock or after five minutes away. After a break, the next run begins. If playback cannot be safely paused, a compact reminder keeps player controls available and skips the wait."
           >
             <ToggleRow
@@ -129,7 +129,9 @@ export function ProtectionToolScreen({
             />
             {snapshot?.reminderEnabled && (
               <View style={styles.controls}>
-                <Text style={styles.label}>After this many videos</Text>
+                <Text textBreakStrategy="balanced" style={styles.label}>
+                  After this many videos
+                </Text>
                 <Stepper
                   label="Videos before a break"
                   value={count}
@@ -142,7 +144,9 @@ export function ProtectionToolScreen({
                     later(() => saveReminder(true, value, minutes));
                   }}
                 />
-                <Text style={styles.label}>Or after this much watching</Text>
+                <Text textBreakStrategy="balanced" style={styles.label}>
+                  Or after this much watching
+                </Text>
                 <Stepper
                   label="Minutes before a break"
                   value={minutes}
@@ -155,7 +159,7 @@ export function ProtectionToolScreen({
                     later(() => saveReminder(true, count, value));
                   }}
                 />
-                <Text style={styles.label}>
+                <Text textBreakStrategy="balanced" style={styles.label}>
                   Pause before “Keep watching” unlocks
                 </Text>
                 <Stepper
@@ -178,7 +182,7 @@ export function ProtectionToolScreen({
       {tool === 'Blocks' && (
         <>
           <Card
-            title="Short-video Blocks"
+            title="Short-video blocks"
             info="Daily limits count videos. Blocking leaves the player; other app screens stay available. A five-minute allowance remains available. Saved time slots apply separately, targeting whole apps or short videos independently of Off / Limit / Always."
           >
             {reelsSourceKeys
@@ -195,7 +199,7 @@ export function ProtectionToolScreen({
                         color={reelsSources[key].color}
                         size={36}
                       />
-                      <Text style={styles.appName}>
+                      <Text textBreakStrategy="balanced" style={styles.appName}>
                         {reelsSources[key].observation}
                       </Text>
                     </View>
@@ -214,14 +218,14 @@ export function ProtectionToolScreen({
                           value: 'limit',
                           label: 'Limit',
                           icon: 'sun',
-                          accessibilityLabel: 'Daily Limit',
+                          accessibilityLabel: 'Daily limit',
                         },
                         { value: 'always', label: 'Always' },
                         {
                           value: 'slot',
                           label: 'Slot',
                           icon: 'clock',
-                          accessibilityLabel: 'Time Slots',
+                          accessibilityLabel: 'Time slots',
                         },
                       ]}
                     />
@@ -249,7 +253,7 @@ export function ProtectionToolScreen({
         <>
           <Card
             title="Live Counter"
-            info="The floating counter shows recognized encounters for this unlock session and today. Tap to expand, move or pause it. Today’s Total Across All Apps combines supported sources; Off shows only the current app. Hiding the counter affects display; separate source and counting choices remain authoritative."
+            info="The floating counter shows recognized encounters for this unlock session and today. Tap to expand, move or pause it. Today’s total across all apps combines supported sources; Off shows only the current app. Hiding the counter affects display; separate source and counting choices remain authoritative."
           >
             <ToggleRow
               icon="eye"

@@ -42,7 +42,7 @@ export function ViewingDetail({
   return (
     <>
       <Card
-        title="Viewing Details"
+        title="Viewing details"
         scope={scope}
         info={
           hasPlayback

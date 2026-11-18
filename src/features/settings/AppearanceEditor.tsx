@@ -61,6 +61,12 @@ export function AppearanceEditor({
           : colors.accent)
     );
   }
+  /** Templates are always readable presets, so they apply (and save) at once. */
+  function applyTemplate(next: Appearance) {
+    setDraft(next);
+    setHex(selectedColor(next, scope));
+    void onSave(next);
+  }
   const updateChannel = (index: number, next: number) => {
     const base = valid ? hex : '#5676A6';
     const color =
@@ -74,10 +80,9 @@ export function AppearanceEditor({
     <View style={styles.editor}>
       <View style={styles.colorGroup}>
         <Explanation compact title="Templates">
-          Choose Light, Dark or System to restore that theme's text and
-          background colors. Your accent and layout stay the same. Choosing an
-          accent preset replaces only the custom accent. Save Appearance applies
-          this draft.
+          Templates apply as soon as you tap them. Light, Dark and System
+          restore that theme's text and background colors; an accent preset
+          replaces only the custom accent. Your layout stays the same.
         </Explanation>
         <SectionTitle compact>Theme mode</SectionTitle>
         <AppearanceChoices
@@ -95,8 +100,7 @@ export function AppearanceEditor({
               foregroundColor: '',
               backgroundColor: '',
             };
-            setDraft(next);
-            setHex(selectedColor(next, scope));
+            applyTemplate(next);
           }}
         />
         <SectionTitle compact>Accent presets</SectionTitle>
@@ -116,8 +120,7 @@ export function AppearanceEditor({
               accent,
               customColor: '',
             };
-            setDraft(next);
-            setHex(selectedColor(next, scope));
+            applyTemplate(next);
           }}
         />
       </View>
@@ -127,8 +130,8 @@ export function AppearanceEditor({
           backgrounds; Accent changes buttons and highlights. Choose a scope,
           drag the hue strip and color canvas, or enter hex/RGB. Your selected
           background is preserved; text and accent tones adjust for readability.
-          Status and deletion colors retain their meaning. Changes stay in the
-          draft until Save Appearance.
+          Status and deletion colors retain their meaning. Custom colors stay a
+          preview until you tap Save appearance.
         </Explanation>
         <AppearanceChoices
           label="Color scope"
@@ -176,11 +179,13 @@ export function AppearanceEditor({
           accessibilityLabel="Appearance preview. Video encounters 965. Recorded surface time 6 hours 51 minutes."
         >
           <Text
+            textBreakStrategy="balanced"
             style={{ color: preview.text, fontWeight: '600', fontSize: 14 }}
           >
             Video encounters
           </Text>
           <Text
+            textBreakStrategy="balanced"
             style={{
               color: preview.text,
               fontWeight: '700',
@@ -190,10 +195,14 @@ export function AppearanceEditor({
           >
             965
           </Text>
-          <Text style={{ color: preview.muted, fontSize: 14 }}>
+          <Text
+            textBreakStrategy="balanced"
+            style={{ color: preview.muted, fontSize: 14 }}
+          >
             Recorded surface time · 6h 51m
           </Text>
           <Text
+            textBreakStrategy="balanced"
             style={{ color: preview.accent, fontSize: 16, fontWeight: '600' }}
           >
             Accent preview · View details
@@ -246,7 +255,7 @@ export function AppearanceEditor({
       {advanced && (
         <>
           <Divider />
-          <Explanation compact title="Layout & Numbers">
+          <Explanation compact title="Layout & numbers">
             Adjust app-card corners, spacing and statistic size. System text
             scaling still applies. Native tools and launcher widgets retain
             their own layout controls.
@@ -368,6 +377,7 @@ function AppearanceChoices<T extends string>({
           ]}
         >
           <Text
+            textBreakStrategy="balanced"
             numberOfLines={1}
             adjustsFontSizeToFit={!large}
             minimumFontScale={0.9}
@@ -395,7 +405,7 @@ function ColorChannel({
   const [width, setWidth] = useState(1);
   return (
     <View style={styles.channel}>
-      <Text style={styles.channelLabel}>
+      <Text textBreakStrategy="balanced" style={styles.channelLabel}>
         {label} · {value}
       </Text>
       <View

@@ -29,11 +29,17 @@ internal class NativePage(private val activity: Activity) {
     private var group: LinearLayout? = null
 
     init {
+        // The top inset pads the scroll view itself (clipped), so content never scrolls under the status bar.
+        root.clipToPadding = true
         root.setOnApplyWindowInsetsListener { _, insets ->
             if (Build.VERSION.SDK_INT >= 30) {
                 val bars = insets.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout())
-                content.setPadding(dp(18) + bars.left, dp(16) + bars.top, dp(18) + bars.right, dp(32) + bars.bottom)
-            } else content.setPadding(dp(18), dp(16) + insets.systemWindowInsetTop, dp(18), dp(32) + insets.systemWindowInsetBottom)
+                root.setPadding(0, bars.top, 0, 0)
+                content.setPadding(dp(18) + bars.left, dp(16), dp(18) + bars.right, dp(32) + bars.bottom)
+            } else {
+                root.setPadding(0, insets.systemWindowInsetTop, 0, 0)
+                content.setPadding(dp(18), dp(16), dp(18), dp(32) + insets.systemWindowInsetBottom)
+            }
             insets
         }
         activity.setContentView(root)
@@ -55,11 +61,13 @@ internal class NativePage(private val activity: Activity) {
             group = this
         }
     }
-    private fun titleCase(value: String) = value.split(" ").joinToString(" ") { word -> word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } }
+    /** Sentence case, matching the JS UI: strings are authored that way; only the first letter is ensured. */
+    private fun titleCase(value: String) = value.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
     fun text(value: String, size: Float = 15f): TextView {
         if (size >= 24) {
             group = null
             return TextView(activity).apply {
+            breakStrategy = android.graphics.text.LineBreaker.BREAK_STRATEGY_BALANCED; hyphenationFrequency = android.text.Layout.HYPHENATION_FREQUENCY_NONE;
                 text = titleCase(value); textSize = 32f; typeface = Typeface.create("sans-serif", Typeface.BOLD)
                 if (Build.VERSION.SDK_INT >= 28) isAccessibilityHeading = true
                 add(this, content, 22); bind { setTextColor(it.text) }
@@ -68,6 +76,7 @@ internal class NativePage(private val activity: Activity) {
         if (size >= 20) {
             group = null
             val heading = TextView(activity).apply {
+            breakStrategy = android.graphics.text.LineBreaker.BREAK_STRATEGY_BALANCED; hyphenationFrequency = android.text.Layout.HYPHENATION_FREQUENCY_NONE;
                 text = titleCase(value); textSize = 13f; letterSpacing = .06f
                 typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL); setPadding(dp(4), dp(10), 0, dp(2))
                 if (Build.VERSION.SDK_INT >= 28) isAccessibilityHeading = true
@@ -76,12 +85,14 @@ internal class NativePage(private val activity: Activity) {
             return heading
         }
         return TextView(activity).apply {
+            breakStrategy = android.graphics.text.LineBreaker.BREAK_STRATEGY_BALANCED; hyphenationFrequency = android.text.Layout.HYPHENATION_FREQUENCY_NONE;
             text = value; textSize = size; setLineSpacing(dp(3).toFloat(), 1.05f)
             add(this, ensureGroup()); bind { setTextColor(it.muted) }
         }
     }
     fun button(label: String, filled: Boolean = false, action: () -> Unit) {
         val button = TextView(activity).apply {
+            breakStrategy = android.graphics.text.LineBreaker.BREAK_STRATEGY_BALANCED; hyphenationFrequency = android.text.Layout.HYPHENATION_FREQUENCY_NONE;
             text = titleCase(label); textSize = 16f; gravity = Gravity.CENTER; minHeight = dp(52)
             setPadding(dp(18), dp(12), dp(18), dp(12)); typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
             isClickable = true; isFocusable = true; setOnClickListener { action() }
@@ -111,15 +122,18 @@ internal class NativePage(private val activity: Activity) {
     private fun help(parent: LinearLayout, title: String, detail: String) {
         val row = LinearLayout(activity).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
         val heading = TextView(activity).apply {
+            breakStrategy = android.graphics.text.LineBreaker.BREAK_STRATEGY_BALANCED; hyphenationFrequency = android.text.Layout.HYPHENATION_FREQUENCY_NONE;
             text = titleCase(title); textSize = 16f; typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
             if (Build.VERSION.SDK_INT >= 28) isAccessibilityHeading = true
         }
         row.addView(heading, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         val body = TextView(activity).apply {
+            breakStrategy = android.graphics.text.LineBreaker.BREAK_STRATEGY_BALANCED; hyphenationFrequency = android.text.Layout.HYPHENATION_FREQUENCY_NONE;
             text = detail; textSize = 14f; setLineSpacing(dp(3).toFloat(), 1.05f)
             setPadding(0, dp(8), 0, dp(8)); visibility = View.GONE
         }
         val info = TextView(activity).apply {
+            breakStrategy = android.graphics.text.LineBreaker.BREAK_STRATEGY_BALANCED; hyphenationFrequency = android.text.Layout.HYPHENATION_FREQUENCY_NONE;
             text = "ⓘ"; textSize = 24f; gravity = Gravity.CENTER; minWidth = dp(48); minHeight = dp(48)
             contentDescription = "About $title"; isClickable = true; isFocusable = true
             setOnClickListener {

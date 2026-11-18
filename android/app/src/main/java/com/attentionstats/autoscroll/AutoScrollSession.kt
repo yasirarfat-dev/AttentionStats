@@ -29,6 +29,8 @@ internal object AutoScrollSession {
     private var latest: Frame? = null
     private var lastAdProposal: Frame? = null
     private var target: CompletionGate.Context? = null
+    /** Fingerprint keys of the target item; live captions change the raw identity but not most keys. */
+    private var targetKeys: Set<Long> = emptySet()
     private var waitingUntil = 0L
     private var scrollSettlingUntil = 0L
     /** Arrival of an explicitly classified photo without playback progress. Never a video timer. */
@@ -41,6 +43,7 @@ internal object AutoScrollSession {
     var onChanged: () -> Unit = {}
     /** Operator test hook: fixed stage codes only, never item identity or source content. */
     var onDispatchDiagnostic: ((String) -> Unit)? = null
+        set(value) { if (com.attentionstats.BuildConfig.DEBUG) field = value }
 
     /** Source support is evidence-dependent; numeric playback or an explicit photo is required. */
     @Suppress("UNUSED_PARAMETER")
@@ -70,7 +73,7 @@ internal object AutoScrollSession {
         attempts = 0; confirmedTransitions = 0
         lastAdProposal = null
         latest?.takeIf(::ready)?.let {
-            target = it.key()
+            target = it.key(); targetKeys = it.itemKeys
             if (still(it)) stillSince = it.atMs
         }
         reason = if (target == null) "waiting_for_playback" else if (stillSince > 0) "still_item" else "waiting_for_cycle"
@@ -111,7 +114,8 @@ internal object AutoScrollSession {
     private fun still(frame: Frame): Boolean = frame.mediaKind == "photo" && frame.position == null
     private fun sameAd(a: Frame, b: Frame): Boolean = a.app == b.app && a.window == b.window && a.epoch == b.epoch &&
         (a.page == b.page || org.attentionstats.reels.EncounterTracker.overlap(a.itemKeys, b.itemKeys) >= .25)
-    private fun advert(frame: Frame): Boolean = skipStandaloneAds && frame.app == ReelApp.FACEBOOK && frame.standaloneAd &&
+    /** Facebook qualifies standalone Reels ads; other viewers qualify a page by its own exact ad badge. */
+    private fun advert(frame: Frame): Boolean = skipStandaloneAds && frame.standaloneAd &&
         lastAdProposal?.let { sameAd(it, frame) } != true
     private fun ready(frame: Frame): Boolean = usable(frame) || (frame.eligible && (still(frame) || advert(frame)) && fresh(frame))
     fun manualInteraction(reason: String) {
@@ -127,11 +131,16 @@ internal object AutoScrollSession {
     fun frame(value: Frame, next: (Frame, Long) -> Unit) {
         latest = value
         if (!running) return
-        val key = value.key()
         val previous = target
+        val raw = value.key()
+        // A changing caption or subtitle is the same item; only a mostly different item is a new page.
+        val continued = raw != null && previous != null && raw != previous && raw.app == previous.app &&
+            raw.window == previous.window && raw.epoch == previous.epoch && sameItem(value.itemKeys, targetKeys)
+        if (continued) targetKeys = value.itemKeys
+        val key = if (continued) previous else raw
         if (previous == null) {
             if (!enabled || key == null || !ready(value)) { suspendActions("waiting_for_playback"); return }
-            target = key; gate.reset(); stillSince = if (still(value)) value.atMs else 0
+            target = key; targetKeys = value.itemKeys; gate.reset(); stillSince = if (still(value)) value.atMs else 0
             reason = if (still(value)) "still_item" else "waiting_for_cycle"; revision++; onChanged()
             value.position?.let { gate.sample(key, value.atMs, it, true) }
             return
@@ -172,7 +181,7 @@ internal object AutoScrollSession {
                 confirmedTransitions++
                 onDispatchDiagnostic?.invoke("arrival_confirmed")
                 if (!ready(value)) { suspendActions("playback_unavailable"); return }
-                target = key; waitingUntil = 0; scrollSettlingUntil = value.atMs + 750
+                target = key; targetKeys = value.itemKeys; waitingUntil = 0; scrollSettlingUntil = value.atMs + 750
                 // The page transition and readiness to scroll again are separate facts.
                 // A photo or image ad has no progress: show it briefly, then move on.
                 gate.reset()
@@ -212,6 +221,9 @@ internal object AutoScrollSession {
             next(value, revision)
         }
     }
+    /** Same item across label churn: at least two shared keys covering half of the smaller set. */
+    fun sameItem(a: Set<Long>, b: Set<Long>): Boolean =
+        a.count { it in b } >= 2 && org.attentionstats.reels.EncounterTracker.overlap(a, b) >= .5
     fun current(token: Long): Boolean = enabled && running && target != null && revision == token
     fun canStart(): Boolean = enabled && latest?.let {
         it.page != null && ready(it)

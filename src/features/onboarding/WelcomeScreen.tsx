@@ -138,7 +138,11 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
                 accessibilityIgnoresInvertColors
                 accessibilityLabel="Attention Stats"
               />
-              <Text accessibilityRole="header" style={styles.headline}>
+              <Text
+                textBreakStrategy="balanced"
+                accessibilityRole="header"
+                style={styles.headline}
+              >
                 Your attention,{'\n'}in your hands.
               </Text>
               <Body muted center>
@@ -153,8 +157,18 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
                     <Icon name={item.icon} color={theme.accent} size={22} />
                   </View>
                   <View style={styles.flex}>
-                    <Text style={styles.promiseTitle}>{item.title}</Text>
-                    <Text style={styles.promiseDetail}>{item.detail}</Text>
+                    <Text
+                      textBreakStrategy="balanced"
+                      style={styles.promiseTitle}
+                    >
+                      {item.title}
+                    </Text>
+                    <Text
+                      textBreakStrategy="balanced"
+                      style={styles.promiseDetail}
+                    >
+                      {item.detail}
+                    </Text>
                   </View>
                 </View>
               ))}
@@ -185,7 +199,11 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
                   />
                 ))}
               </View>
-              <Text accessibilityRole="header" style={styles.headline}>
+              <Text
+                textBreakStrategy="balanced"
+                accessibilityRole="header"
+                style={styles.headline}
+              >
                 Understand your scrolling,{'\n'}without judgement.
               </Text>
             </View>
@@ -196,14 +214,24 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
                     <Icon name={item.icon} color={theme.accent} size={22} />
                   </View>
                   <View style={styles.flex}>
-                    <Text style={styles.promiseTitle}>{item.title}</Text>
-                    <Text style={styles.promiseDetail}>{item.detail}</Text>
+                    <Text
+                      textBreakStrategy="balanced"
+                      style={styles.promiseTitle}
+                    >
+                      {item.title}
+                    </Text>
+                    <Text
+                      textBreakStrategy="balanced"
+                      style={styles.promiseDetail}
+                    >
+                      {item.detail}
+                    </Text>
                   </View>
                 </View>
               ))}
             </Card>
             <Card
-              title="A Little Help, When You Need It"
+              title="A little help, when you need it"
               info="Card information stays collapsed by default. Tap the same information button again to hide it; opening explanations does not change your choices."
             >
               <Body muted>
@@ -220,11 +248,17 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
 
         {step === 2 && (
           <View style={styles.body}>
-            <Text accessibilityRole="header" style={styles.headlineSmall}>
+            <Text
+              textBreakStrategy="balanced"
+              accessibilityRole="header"
+              style={styles.headlineSmall}
+            >
               Two quick steps
             </Text>
             <Card tone="soft">
-              <Text style={styles.disclosureTitle}>How counting works</Text>
+              <Text textBreakStrategy="balanced" style={styles.disclosureTitle}>
+                How counting works
+              </Text>
               <Body muted>
                 Attention Stats uses Android’s Accessibility service to notice
                 when a short-video player or a feed video is on screen in
@@ -235,8 +269,9 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
               <Body muted>
                 It never records, saves or sends what you watch, type or
                 message. Counts are stored encrypted on this phone and are
-                eligible for Android backup. It only presses Back or swipes for
-                you when you turn on blocking or auto-scroll.
+                eligible for Android backup. It only presses Back, swipes or
+                taps once to pause a video for you when you turn on blocking,
+                auto-scroll or mindful breaks.
               </Body>
             </Card>
 
@@ -257,7 +292,7 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
             <SetupStep
               number={2}
               done={accessibility}
-              title="Turn on Accessibility"
+              title="Turn on accessibility"
               detail={
                 'In the next screen: Installed apps (or Downloaded apps) → Attention Stats → turn it on → Allow. Then come back here.'
               }
@@ -265,7 +300,7 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
                 accessibility
                   ? undefined
                   : {
-                      label: 'Open Accessibility settings',
+                      label: 'Open accessibility settings',
                       run: () => reels.openAccessibility(),
                     }
               }
@@ -333,10 +368,17 @@ function SetupStep({
           {done ? (
             <Icon name="check" color={theme.onAccent} size={18} />
           ) : (
-            <Text style={styles.stepNumberText}>{number}</Text>
+            <Text textBreakStrategy="balanced" style={styles.stepNumberText}>
+              {number}
+            </Text>
           )}
         </View>
-        <Text style={[styles.promiseTitle, styles.flex]}>{title}</Text>
+        <Text
+          textBreakStrategy="balanced"
+          style={[styles.promiseTitle, styles.flex]}
+        >
+          {title}
+        </Text>
         {done ? (
           <Pill label="Done" />
         ) : optional ? (

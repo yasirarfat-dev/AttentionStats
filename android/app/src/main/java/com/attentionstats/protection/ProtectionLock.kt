@@ -18,6 +18,14 @@ internal object ProtectionLock {
     private data class Request(val credentials: ProtectionCredentials, val label: String, val revision: String, val expires: Long,
         val success: (String, Long) -> Unit, val failure: (String) -> Unit)
     private val pending = mutableMapOf<String, Request>()
+
+    /**
+     * Main thread. The accessibility service's overlays draw above every activity, so a parent
+     * approval opened from a block screen would sit hidden underneath it. The service listens here,
+     * steps its overlays aside while [approving], and re-checks the screen when approval ends.
+     */
+    var approvalListener: ((Boolean) -> Unit)? = null
+    val approving: Boolean get() = pending.isNotEmpty()
     fun request(context: Context, label: String, failure: (String) -> Unit, credentials: ProtectionCredentials = ProtectionCredentials(context), success: (String, Long) -> Unit) {
         worker.execute {
             try {
@@ -27,6 +35,7 @@ internal object ProtectionLock {
                 main.post {
                     if (pending.isNotEmpty()) { failure("AUTH_BUSY"); return@post }
                     pending[token] = Request(credentials, label, state.revision, SystemClock.elapsedRealtime() + 120_000, success, failure)
+                    approvalListener?.invoke(true)
                     try { context.startActivity(Intent(context, ProtectionLockActivity::class.java)
                         .putExtra("request", token).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
                     catch (_: Exception) { finish(token, null) }
@@ -40,6 +49,7 @@ internal object ProtectionLock {
     fun finish(token: String, verifiedRevision: String?) {
         check(Looper.myLooper() == Looper.getMainLooper())
         val request = pending.remove(token) ?: return
+        approvalListener?.invoke(false)
         if (verifiedRevision == request.revision && SystemClock.elapsedRealtime() < request.expires) request.success(verifiedRevision, request.expires)
         else request.failure("AUTH_CANCELLED")
     }

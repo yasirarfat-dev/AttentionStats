@@ -57,11 +57,11 @@ export function AppSelection({
   };
   return (
     <>
-      <SectionTitle>All Apps</SectionTitle>
+      <SectionTitle>All apps</SectionTitle>
       <TextInput
-        accessibilityLabel="Search Focus Apps"
+        accessibilityLabel="Search focus apps"
         onFocus={onFieldFocus}
-        placeholder="Search Apps or Groups"
+        placeholder="Search apps or groups"
         placeholderTextColor={theme.muted}
         value={query}
         onChangeText={value => {
@@ -72,7 +72,7 @@ export function AppSelection({
       />
       <Body muted>{selected.length} selected</Body>
       <Card
-        title="Apps & Groups"
+        title="Apps & groups"
         info="Group and individual choices stay in sync. Expand a group to inspect its members; its switch selects all members. Apps remain alphabetical and may appear in more than one group. Up to 100 apps can be selected."
         padded={false}
       >
@@ -110,21 +110,26 @@ export function AppSelection({
                     <Icon name="chevron" color={theme.muted} size={18} />
                   </View>
                   <View style={styles.groupText}>
-                    <Text style={styles.groupName}>{group.name}</Text>
-                    <Text style={styles.groupCount}>
-                      {selectedCount}/{group.packages.length} Selected
-                      {atLimit ? ' · Selection Limit' : ''}
+                    <Text textBreakStrategy="balanced" style={styles.groupName}>
+                      {group.name}
+                    </Text>
+                    <Text
+                      textBreakStrategy="balanced"
+                      style={styles.groupCount}
+                    >
+                      {selectedCount} of {group.packages.length} selected
+                      {atLimit ? ' · Selection limit' : ''}
                     </Text>
                   </View>
                 </Pressable>
                 <Switch
-                  accessibilityLabel={`Select All in ${group.name}`}
+                  accessibilityLabel={`Select all in ${group.name}`}
                   accessibilityHint={`${selectedCount} of ${group.packages.length} selected`}
                   value={checked}
                   disabled={disabled || atLimit}
                   onValueChange={enabled => choose(group.packages, enabled)}
                   trackColor={{ true: theme.accentFill, false: theme.track }}
-                  thumbColor={checked ? theme.onAccent : theme.surface}
+                  thumbColor={checked ? theme.onAccent : theme.muted}
                 />
               </View>
               {open && (
@@ -172,7 +177,7 @@ export function AppSelection({
         ))}
         {others.length === 0 && visibleGroups.length === 0 && (
           <View style={styles.empty}>
-            <Body muted>No Matching Apps or Groups</Body>
+            <Body muted>No matching apps or groups</Body>
           </View>
         )}
       </Card>

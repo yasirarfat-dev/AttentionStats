@@ -200,7 +200,10 @@ interface AttentionDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun insertUsage(value: List<AppUsageEvent>)
     @Query("SELECT * FROM AppUsageEvent WHERE atMs >= :start AND atMs < :end ORDER BY atMs, id LIMIT 100001")
     suspend fun usageEvents(start: Long, end: Long): List<AppUsageEvent>
-    @Upsert suspend fun putTimer(value: ReelsTimer)
+    /** Extends the running stretch in place; an insert only happens for a new stretch (no constraint-error log noise). */
+    @Query("UPDATE ReelsTimer SET endMs = :endMs, durationMs = :durationMs WHERE id = :id")
+    suspend fun extendTimer(id: String, endMs: Long, durationMs: Long): Int
+    @Insert suspend fun insertTimer(value: ReelsTimer)
     @Query("SELECT * FROM ReelsTimer WHERE startMs < :end AND endMs > :start ORDER BY startMs LIMIT 100001")
     suspend fun timers(start: Long, end: Long): List<ReelsTimer>
     @Query("SELECT appId, COUNT(*) AS count FROM Exposure WHERE occurredAtMs >= :start AND occurredAtMs < :end AND revisit = 0 GROUP BY appId")
@@ -222,7 +225,9 @@ interface AttentionDao {
     suspend fun dwellTotals(start: Long, end: Long): List<AppCount>
     @Query("SELECT appId, COUNT(*) AS count FROM Exposure WHERE occurredAtMs >= :start AND occurredAtMs < :end AND revisit = 1 GROUP BY appId")
     suspend fun revisitCounts(start: Long, end: Long): List<AppCount>
-    @Query("SELECT CAST(strftime('%H', occurredAtMs / 1000, 'unixepoch', 'localtime') AS INTEGER) AS category, COUNT(*) AS count FROM Exposure WHERE occurredAtMs >= :start AND occurredAtMs < :end AND revisit = 0 GROUP BY category")
+    // Hours since the local day start (passed in). GROUP BY 1, not the alias: Exposure has its own
+    // `category` column, which SQLite would group by instead (that put almost every row in hour 0).
+    @Query("SELECT CAST((occurredAtMs - :start) / 3600000 AS INTEGER) AS category, COUNT(*) AS count FROM Exposure WHERE occurredAtMs >= :start AND occurredAtMs < :end AND revisit = 0 GROUP BY 1")
     suspend fun hourly(start: Long, end: Long): List<HourTotal>
     @Upsert suspend fun putBlocker(value: ReelsBlockConfiguration)
     @Query("UPDATE ReelsBlockConfiguration SET enabled = 0") suspend fun disableBlockers()

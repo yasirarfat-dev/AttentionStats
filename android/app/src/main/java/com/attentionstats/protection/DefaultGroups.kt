@@ -23,9 +23,9 @@ internal object DefaultGroups {
             "com.google.android.apps.maps", "com.sec.android.app.popupcalculator", "com.google.android.calculator",
             "com.android.calculator2", "com.google.android.contacts", "com.samsung.android.app.contacts")
         val essentials = apps.map { it.packageName }.filter { it in essentialPackages }.toSet()
-        return listOf(Triple("reels", "Reels Apps", reels), Triple("social", "Social Apps", social),
-            Triple("distracting", "Distracting Apps", social + games), Triple("games", "Games", games),
-            Triple("productive", "Productive Apps", productive), Triple("essentials", "Essentials", essentials))
+        return listOf(Triple("reels", "Reels apps", reels), Triple("social", "Social apps", social),
+            Triple("distracting", "Distracting apps", social + games), Triple("games", "Games", games),
+            Triple("productive", "Productive apps", productive), Triple("essentials", "Essentials", essentials))
             .filter { it.third.isNotEmpty() }.map { (id, name, members) -> AppGroup("default-$id", name, members.sorted().take(100).toSet()) }
     }
 }

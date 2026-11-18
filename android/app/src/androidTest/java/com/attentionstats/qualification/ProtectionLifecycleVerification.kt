@@ -81,7 +81,7 @@ internal object ProtectionLifecycleVerification {
                         val release = CountDownLatch(1).also { gate = it }
                         ProtectionLock.worker.execute { blocked.countDown(); check(release.await(25, TimeUnit.SECONDS)) }
                         expect(blocked.await(5, TimeUnit.SECONDS), "Worker did not enter isolated gate")
-                        main { check(views().filterIsInstance<TextView>().single { it.isClickable && it.text.toString().equals("Authorize this action", true) }.performClick()) }
+                        main { check(views().filterIsInstance<TextView>().single { it.isClickable && it.text.toString().equals("Approve", true) }.performClick()) }
                     }
                     when (departure) {
                         "Back" -> instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)

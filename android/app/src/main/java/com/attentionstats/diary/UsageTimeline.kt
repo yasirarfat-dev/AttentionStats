@@ -59,7 +59,9 @@ internal object UsageTimeline {
                 1 -> if (interactive && unlocked && event.app.isNotBlank()) {
                     if (active?.app != event.app) { close(event.at); active = event }
                 }
-                2, 23 -> if (active?.app == event.app) close(event.at)
+                // Only a pause ends foreground time. A stop always follows its own pause and often
+                // arrives after another Activity of the same app has resumed (in-app navigation).
+                2 -> if (active?.app == event.app) close(event.at)
                 15 -> interactive = true
                 16 -> { close(event.at); interactive = false }
                 17 -> { close(event.at); unlocked = false }

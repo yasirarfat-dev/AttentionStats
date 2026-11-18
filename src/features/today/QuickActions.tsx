@@ -52,8 +52,8 @@ export function QuickActions({
       <Pressable
         ref={trigger}
         accessibilityRole="button"
-        accessibilityLabel="Quick Actions"
-        accessibilityHint="Open Focus, Breaks and Video Limits"
+        accessibilityLabel="Quick actions"
+        accessibilityHint="Open focus, breaks and video limits"
         accessibilityState={{ expanded: visible }}
         style={styles.trigger}
         onPress={() => setVisible(true)}
@@ -107,14 +107,15 @@ export function QuickActions({
                 }}
               >
                 <Text
+                  textBreakStrategy="balanced"
                   ref={heading}
                   accessibilityRole="header"
                   style={styles.title}
                 >
-                  Quick Actions
+                  Quick actions
                 </Text>
                 <InfoButton
-                  label="Quick Actions"
+                  label="Quick actions"
                   expanded={help}
                   onPress={() => setHelp(!help)}
                 />
@@ -127,7 +128,7 @@ export function QuickActions({
                 </Body>
               )}
               <Button
-                label="Focus Now"
+                label="Focus now"
                 onPress={() => {
                   close(false);
                   setChooser(true);
