@@ -1,14 +1,14 @@
 # Attention Stats privacy policy
 
-Last updated: 18 November 2026 · App: **Attention Stats** (`attention.stats`), version 1.0.0 and development continuation · Contact: **consciousbiobot@gmail.com**
+Last updated: 18 November 2026 · App: **Attention Stats** (`attention.stats`), for Android · Contact: **consciousbiobot@gmail.com**
 
 Attention Stats is a free, open-source digital wellbeing app created by Yasir Arfat ([yasirarfat.com](https://yasirarfat.com)) and published on Google Play by Convenience Labs. Its [source code](https://github.com/yasirarfat-dev/AttentionStats) is public, so anyone can verify everything below.
 
 ## The short version
 
-- **Private local storage, Android-managed backup.** No developer account, server, telemetry, advertising or automatic crash reporting. The app has no Internet permission. When available and explicitly chosen, manual export writes a file to your selected destination; that provider may upload it under its own policy. Automatic Android backup starts enabled when you open this development version unless you already saved a choice. Turn it off in Settings → Backup & restore. Android backup must also be enabled on your phone.
+- **Private local storage, Android-managed backup.** No developer account, server, telemetry, advertising or automatic crash reporting. The app has no Internet permission. When available and explicitly chosen, manual export writes a file to your selected destination; that provider may upload it under its own policy. Automatic Android backup starts enabled the first time you open the app unless you already saved a choice. Turn it off in Settings → Backup & restore. Android backup must also be enabled on your phone.
 - **We never receive your history automatically.** Local history is encrypted. You can disable Android backup and control manual external archives and support messages.
-- **You are in control.** Features are optional. When optional Protection Lock is configured, in-app changes and history deletion require parental authorization. Android permission settings, clear storage and uninstall remain available.
+- **You are in control.** Features are optional. When optional Protection Lock is configured, protected in-app changes you choose, allowances and history erase require parent authorization. Android permission settings, clear storage and uninstall remain available.
 
 ## What the app uses, and why
 
@@ -19,11 +19,11 @@ When you turn it on, Attention Stats uses Android's Accessibility service **only
 - recognise when a short-video player (Reels, Shorts, TikTok, Spotlight) or a video in a feed is on screen; and
 - distinguish settled video/photo encounters and returns. An encounter does not establish a watch. One carousel post is one encounter.
 
-The labels are turned into an irreversible fingerprint in memory and then discarded. The app **does not save, record or send** what you watch, captions, names, messages, what you type, passwords, screenshots, audio or video. Optional numeric playback measurement, initially off, records advancing player time, three-second watches and observed completions where exposed; missing signals remain unknown. Text posts and social-action counts are not measured in this build.
+The labels are turned into an irreversible fingerprint in memory and then discarded. The app **does not save, record or send** what you watch, captions, names, messages, what you type, passwords, screenshots, audio or video. Numeric playback-time measurement is not offered for new activation in this version. If an earlier build had it switched on, Settings keeps a switch to turn it off; while on, it records advancing player time, three-second watches and observed completions only where exposed, and missing signals remain unknown. Text posts and social-action counts are not measured in this build.
 
-Optional app schedules check only foreground package ownership for apps or groups you choose, never their screen content. A cover offers immediate recovery and a five-minute allowance; system navigation, Settings, launcher, keyboard and emergency/dialer access are excluded. Android may stop the service, so blocking is best effort.
+Optional app schedules check only foreground package ownership for apps or groups you choose, never their screen content. A cover keeps Attention Stats, Android Settings and Home reachable and offers a five-minute allowance (which can require the parent PIN when Protection Lock is set up); system navigation, Settings, launcher, keyboard and emergency/dialer access are excluded. Android may stop the service, so blocking is best effort.
 
-The accessibility service also draws the optional floating counter, and, **only if you turn these features on**, it shows mindful-break screens, presses Back to leave a short-video player you chose to block, or swipes to the next video (auto-scroll). It never likes, comments, follows, messages or buys anything.
+The accessibility service also draws the optional floating counter, and, **only if you turn these features on**, it shows mindful-break screens, pauses the video just before a break screen with a single tap, on a visible Pause control or, in TikTok and YouTube, on the video itself, and only counts it as paused when playback progress stops (it never taps again and never presses Play; when pausing cannot be confirmed it only shows a reminder), presses Back to leave a short-video player you chose to block, or swipes to the next video (auto-scroll), including, if you separately allow it, past a page the app itself labels as an ad. It never likes, comments, follows, messages or buys anything.
 
 ### Usage access (optional screen time)
 
@@ -48,7 +48,7 @@ Restored files are kept in private staging for review before replacement; tracki
 
 ## Sharing
 
-We do not automatically receive, sell or share your activity history. Enabled activity is recorded locally; manual exports go to your chosen storage and automatic backups go to your Android backup provider. No advertising or developer analytics SDK receives it. If you tap a link (for example to this policy, GitHub or Google Play), your browser or that service handles it under its own policy.
+We do not automatically receive, sell or share your activity history. Enabled activity is recorded locally; manual exports go to your chosen storage and automatic backups go to your Android backup provider. No advertising or developer analytics SDK receives it. If you tap a link (for example to this policy, GitHub, Google Play or the app's listing on VibeCodedProjects at vibedprojects.com), your browser or that service handles it under its own policy.
 
 If you contact us or open a GitHub issue, we receive only what you choose to send. The in-app "Report a problem" form pre-fills your phone model, Android version and app versions so we can fix detection; it never includes your history. You can edit it before sending.
 
@@ -57,7 +57,13 @@ If you contact us or open a GitHub issue, we receive only what you choose to sen
 - Turn automatic backup off or on in Settings → Backup & restore. Existing provider copies may remain.
 - Turn counting on or off per app, pause everything, or hide the counter at any time.
 - Turn off the accessibility service or usage access in Android settings at any time.
-- **Settings → Delete all history** removes local counts, timers, events and settings and disables future automatic backups. Uninstalling or clearing storage also removes local data; external backup copies may remain.
+- **Settings → Erase history** removes local counts, timers, events and settings, turns counting off and disables future automatic backups. Protection Lock stays configured; manage it in Protect. Uninstalling or clearing storage also removes local data; external backup copies may remain.
+
+## Optional Protection Lock
+
+Protect → Protection Lock offers an optional parental PIN and biometric shortcut, off until configured. PIN and three recovery-phrase verifiers and retry state stay in private no-backup storage protected by Android Keystore. We do not receive these secrets. Android performs strong biometric authentication (for example fingerprint); the app receives the authentication result and uses an authorized cryptographic operation, without accessing biometric templates. Eligible biometrics already enrolled on the device can authorize actions, so only enable the shortcut when those enrollments belong to the parent.
+
+Lock credentials and biometric keys are excluded from exports and Android backup. Set up the lock again on a new installation. In-app history erase preserves Protection Lock; turn the lock off separately in Protect. The phone lock-screen PIN is not accepted as the biometric fallback. Android settings, clear storage, uninstall and emergency access remain available; this is not tamper-proof device management.
 
 ## Children
 
@@ -68,9 +74,3 @@ Attention Stats is intended for people aged 13 and over and is not directed at c
 If the app's data handling ever changes, we will update this policy and ask for your agreement in the app before anything new is used.
 
 Questions: **consciousbiobot@gmail.com** · [Data deletion](DATA-DELETION.md) · [Support](SUPPORT.md)
-
-## Optional Protection Lock
-
-The development candidate adds an optional parental PIN and biometric shortcut in Protect, off until configured. PIN and three recovery-phrase verifiers and retry state stay in private no-backup storage protected by Android Keystore. We do not receive these secrets. Android performs fingerprint/face authentication; the app receives the authentication result and uses an authorized cryptographic operation, without accessing biometric templates. Eligible biometrics already enrolled on the device can authorize actions, so only enable the shortcut when those enrollments belong to the parent.
-
-Lock credentials and biometric keys are excluded from exports and Android backup. Set up the lock again on a new installation. In-app history erase preserves Protection Lock; turn the lock off separately in Protect. The phone lock-screen PIN is not accepted as the biometric fallback. Android settings, clear storage, uninstall and emergency access remain available; this is not tamper-proof device management.

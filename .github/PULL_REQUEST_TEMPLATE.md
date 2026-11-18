@@ -1,6 +1,6 @@
 ## Problem and resulting behavior
 
-Describe the trigger and concrete result. Link AS task/capability IDs and relevant specs.
+Describe the change and its user-visible result. Link related issues and ADRs.
 
 ## Validation
 
@@ -8,7 +8,7 @@ Commands, synthetic scenarios and actual outcomes. Separate passing, failing, bl
 
 ## Documentation and boundaries
 
-- [ ] Specs/contracts/models, tracker, state and dated log match this change.
+- [ ] Affected docs (FEATURES, DETECTION, ARCHITECTURE, PRIVACY, STATUS, DECISIONS) match this change.
 - [ ] New direct packages use pnpm and latest resolution, with exact versions/licenses/compatibility and lockfile.
 - [ ] Consent, coverage, deletion, emergency access and failed-restore behavior remain accurate.
 - [ ] No secrets, private reference material, real history, account screenshots or device identifiers.

@@ -1,98 +1,108 @@
 # Architecture
 
-**Status:** Mobile architecture accepted; pure analytics slice and experimental mobile composition/bootstrap source exist; runtime integration unaccepted. Updated 2026-10-29.
-**Responsibility:** Owns subsystem boundaries, runtime lifecycle, data flow and future adapters.
-**Related specifications:** [Contracts](NATIVE-CONTRACTS.md), [Models](DATA-MODELS.md), [Structure](FILE-STRUCTURE.md), [Dependencies](DEPENDENCIES.md), [Security](SECURITY.md).
-**Unresolved feasibility:** F-02–F-04, F-07 and F-08 in [Decisions](DECISIONS.md); service strategy, full toolchain and product encryption integration remain unqualified; isolated store build/phone evidence is scoped below.
+## Overview
 
-## Runtime boundaries
+Attention Stats is a React Native 0.88 (New Architecture, TypeScript) app with a Kotlin native layer. Kotlin owns everything that must keep working without the UI: the accessibility service, detection, counting, rules, overlays, storage and backup. React Native renders the screens and talks to Kotlin through three TurboModules. There is no server and no network code; release builds have no `INTERNET` permission.
 
-AS-043 integrates the narrow preview into the existing React Native application. Main screens, navigation, consent, privacy and settings are TypeScript under `src/features`; Kotlin owns Android accessibility, serialized counting/storage, Keystore wrapping and the TurboModule. Only the small cross-app accessibility HUD is native Android UI. `native/reels-core` remains a pure domain module with no Android/storage/React imports; `android/app` supplies adapters and the sole encrypted Room composition root. The `preview` build uses debug-matched native dependencies/signing but bundles JS/Hermes and explicitly disables dev support, so it runs without Metro. This does not replace React Native with Kotlin screens or admit an unqualified social adapter.
-
-Supported product targets are mobile: Android first, future iOS through native adapters. React Native renders mobile components; do not introduce React Native Web, a website/PWA/desktop runtime, an embedded copy of the browser study, or browser-extension scaffolding. AS-033 is a completed non-shipping design reference. A potential Chrome extension is deferred beyond mobile completion and would require a separate design/task decision (ADR-024).
-
-| Layer | Responsibility | Forbidden ownership |
+| Layer | Location | Role |
 |---|---|---|
-| React Native Community CLI / TypeScript / New Architecture | Screens, input validation, accessible charts, read-model cache and navigation | Behavioral-history persistence, background collection timers, authoritative enforcement |
-| Typed platform adapter | Capability discovery, requests, result/error mapping, change invalidation | Fabricating unsupported platform behavior |
-| Kotlin collectors | Usage/event queries, narrow accessibility detectors, optional notification listener, consent gates and health | Storing full accessibility trees or bypassing user configuration |
-| Native domain services | Session reduction, aggregates, deterministic rule evaluation, local insights and transactional mutation | Autonomous actions based on predictions |
-| Room-backed local SQLite | One authoritative behavioral/configuration store, consent revisions, cursors, derived data and job state | A competing JS history store |
-| Backup/crypto service | Consistent snapshots, authenticated encryption, staging, validated restore, transport abstraction | Publishing plaintext or importing directly into the live store |
-| MMKV | Small non-sensitive interface preferences such as theme and chart layout | Rules, consent, history, recovery keys or provider tokens |
+| UI | `src/` | React Native screens, one folder per feature |
+| Bridge | `android/app/.../bridge/`, `src/platform/specs/` | TurboModules `NativeBootstrap`, `NativeDiary`, `NativeReels` |
+| Android app | `android/app/src/main/java/com/attentionstats/` | Service, overlays, storage, backup, widgets, protection lock |
+| `reels-core` | `native/reels-core/` | Pure Kotlin: per-app adapters, encounter tracker, playback evidence |
+| `protection-core` | `native/protection-core/` | Pure Kotlin: groups, time windows, focus sessions, intervention rules |
+| `analytics-core` | `native/analytics-core/` | Pure Kotlin calculation library (interval union, civil-day splitting, rollups); linked into the build and unit-tested, not yet called by app code |
 
-Room is a SQLite abstraction, not encryption by itself. At-rest encrypted database integration needs a maintained compatible driver and audit under AS-006. Device storage protections alone must not be advertised as app-level database encryption. See [Room documentation](https://developer.android.com/jetpack/androidx/releases/room).
+The pure modules have no Android imports and run on the JVM. Their Gradle wrappers live in `android/<module>/` and point at the `native/` sources. `tools/check_architecture.py` (part of `pnpm lint`) enforces package paths, import boundaries, isolated per-app adapters, gesture code confined to one dispatcher, and feature public APIs in `src/`.
 
-ADR-031 selects [Room 3/SQLCipherDriver and Tink archive prototypes](CRYPTO-ARCHIVE-DESIGN.md). The separate [storage qualification APK](../native/storage-qualification/README.md) and [archive-envelope APK](../native/archive-qualification/README.md) build and pass synthetic API-36 phone checks; both are excluded from product settings/dependencies and admit no production capability. The architecture checker rejects fixture wiring in product Gradle settings/dependencies or Android source. The independent Node envelope reader is a test oracle only; manual segment cryptography must never enter product code. Native infrastructure owns Keystore wrapping, driver/key lifetime, non-destructive corruption handling, immutable ciphertext input and encrypted staging. Portable logical records never expose a live DB or keys to JS. Full authentication and staged validation precede revision-bound generation activation; filesystem/pool/crash behavior remains unqualified.
+## File structure
 
-## Domain-oriented modular design
-
-ADR-041 and [Adding social-app support](SOCIAL-ADAPTERS.md) make the incremental boundary concrete: `detectors/social/<service>` owns versioned predicates, `detectors/accessibility` owns Android acquisition, and the registry composes implementations. Adapters receive structural values and cannot access Android nodes, storage, UI or actions. Counting, consent, writes and presentation remain shared. AS-048 now supplies a four-source enum/bridge/catalog with Instagram, Facebook, YouTube and TikTok candidates; admission remains independently qualified by installed version and route. Reddit and regional variants remain future work.
-
-Use a **modular monolith on the device** with domain-driven boundaries. The enterprise-style requirement means clear ownership, stable interfaces, testability and disciplined change; it does not require a backend, microservices or a distributed system. Domain language and invariants live with their domain. Do not scatter business rules through screens or create one global services/utils folder.
-
-Mobile TypeScript application source belongs in root `src/`: `app/` is the composition/navigation root; `features/` contains onboarding, usage, social, interactions, network, diary, insights, protection, privacy, backup and settings; `platform/` owns typed native adapters; `ui/` owns source-agnostic design primitives; `shared/` contains only small genuinely shared types/formatting. Each substantial feature exposes a deliberate `index.ts` public API and gains `screens/`, `components/`, `application/`, `domain/`, `data/`, `hooks/` and tests when needed. Do not generate empty folders or wrappers merely to imitate a template. Feature screens cannot import another feature's private internals.
-
-Native bounded contexts: source collection and detector adapters; consent/coverage; usage/session reduction; social exposures; interaction evidence; network statistics; diary/query/aggregation; retention/deletion; protection; backup/crypto; and health. Pure domain calculations depend on immutable values and supplied time, not Android Context, React, Room, permission requests or service lifecycle. Repository/source/clock/dispatcher ports are domain-specific; implementations live in infrastructure. Constructor injection at the native composition root keeps dependencies explicit; choose a DI framework only if demonstrated need justifies a latest dependency. Do not duplicate rule/counter logic across native, JS and HUD.
-
-After AS-004, Gradle modules should enforce useful boundaries: application/composition and bridge; pure analytics domain; storage infrastructure; collectors/detectors; protection; backup. Exact module names/build layout are decided from the tested latest Android toolchain. Avoid a separate module per class. Room DAOs/schema stay internal to storage, which implements narrow repository ports; one physical authoritative history/configuration store remains. Collectors submit normalized writes through the coordinator, not feature-specific databases.
-
-Current [Kotlin slice](../native/analytics-core/README.md) is organized under `native/analytics-core/src/main/kotlin/org/attentionstats/analytics/` with time, activity, observation, network and summary packages. Tests use `src/test/kotlin`. It has no store, Android component or JS coupling. This is source organization for AS-035, not a second app or a permanent alternative build system. The experimental `android/analytics-core` Gradle module now references those same source/test directories without duplication; native build acceptance is still gated by F-03. Preserve its package boundaries and tested semantics.
-
-AS-003's [collection prototype](../native/collection-prototype/README.md) lives separately under `native/collection-prototype` with a pure reconciliation package and injected source/clock/commit ports. `android/collection-prototype` references that source for JVM verification; the app does not depend on it. The architecture checker enforces the pure import/package boundary and absence of an app dependency. Only tests implement an in-memory coordinator; it is neither another history store nor production AS-009/AS-010 wiring.
-
-Bounded proposal planning, a serial retry ledger, per-range receipt acceptance/recovery and completed-pass correction proposals live in that same pure package. They have no scheduler or source effects. Planning exclusions do not advance history; a shared budget bounds density splitting and qualified backoff. Receipt recovery uses only accepted queried/excluded intervals and exact scope matching. Pure acceptance returns a candidate snapshot; a test-only coordinator simulates atomic facts/receipts/health assignment, admits slice-local position and refuses stale tickets. No global cursor bridges exclusions. A fresh bounded overlap pass transfers no receipts, preserves facts/health and increments revision; simulated atomic installation compares the prior scope/revision. Changed-scope replacement is test-only and requires independently rebuilt consent, without migrating receipts. Durable receipts, scope migration, production correction policy and crash recovery remain AS-009/AS-010 design work. Neither ledger can interrupt a blocking query or replace atomic commit fences.
-
-Dependency direction: app composition → feature application/presentation → domain/ports; infrastructure implements ports; bridge maps typed requests/read models to services. Feature presentation may share `ui` primitives, not native internals. Source-specific code cannot call UI, predictions cannot command protection, and backup transports cannot reach live DAOs. Future iOS implements the platform contract with its own permitted sources and storage, with honest unsupported states.
-
-Boundary checks, strict types, native compilation, unit/property/scenario tests, schema/contract checks, immutable revisions, migrations, cancellation/backpressure, bounded queries, error taxonomies, least-privilege controls and reproducible locked builds are required. [Conventions](CONVENTIONS.md) and [Testing](TESTING.md) define executable checks and completion evidence. A pattern is adopted to solve an actual problem; speculative abstractions must not obscure the data path.
-
-Every implemented screen and behavior must be exercised on this machine's authorized debug phone or a dedicated emulator before it is accepted. Desktop/browser screenshots do not meet that condition. Record build/commit, route/state, test environment, steps, outcome and remaining gaps; API-sensitive collectors also need real physical-device evidence. AS-035's synthetic ART execution, if passing, validates calculations only and cannot approve UI, sensors, accessibility or lifecycle behavior.
-
-AS-044 keeps optional scrolling in a separate `autoscroll` module: a pure playback-loop decision, memory-only session controller, app-specific numeric progress resolver and one isolated gesture dispatcher. Counting adapters/reducers cannot dispatch actions. The service revalidates source consent, window/page/epoch, grant, lock and visible Stop before dispatch; late/cancelled work is fenced by the session revision. Allow/Start/Stop do not mutate statistics or storage. [Auto-scroll specification](AUTOSCROLL-SPEC.md) defines the experimental qualification boundary.
+```text
+src/
+  app/            App shell, navigation, tab bar
+  features/       today, insights, diary, protection, settings, sources, onboarding
+                  (each exports a public index.ts; no cross-feature private imports)
+  platform/       typed native module specs and response parsers
+  ui/             shared components, theme, charts, formatting
+android/
+  app/src/main/java/com/attentionstats/
+    reels/        ReelsAccessibilityService, ReelsCoordinator, counter HUD, break/block overlays
+    detection/    SnapshotReader (the only code touching live accessibility nodes)
+    diary/        DiaryEngine (Today/Insights queries), UsageTimeline (Usage Access)
+    protection/   schedules owner, Protection Lock credentials/biometrics, pause dispatcher
+    autoscroll/   session, completion gate, gesture dispatcher
+    storage/      Room database, SQLCipher driver, key envelope
+    backup/       archive envelope, logical archive, Android backup agent, restore staging
+    widget/       five widget providers and configuration
+    appearance/   theme palette, app icons
+    bridge/       TurboModule implementations
+  app/schemas/    exported Room schemas 1-9 (migration tests rely on them)
+  app/src/hostTest, androidTest   JVM and instrumented tests
+native/           pure Kotlin modules (see above) with tests and detection fixtures
+tools/            build, release, checks and fixture tools (see CONTRIBUTING)
+policies/         public privacy, deletion and support pages
+design/brand/     icon source used by tools/make_brand_assets.py
+licenses/         third-party license texts shipped with the app
+```
 
 ## Data flow
 
-```mermaid
-flowchart TD
-    OS[Public Android signals] --> G[Source and consent gates]
-    G --> C[Kotlin collectors and adapters]
-    C --> R[Normalization and session reducers]
-    R --> DB[(Room / local SQLite)]
-    DB --> A[Aggregates and local insights]
-    A --> UI[Typed adapter and React Native UI]
-    DB --> P[Deterministic user-rule engine]
-    P --> E[Tested intervention renderer]
-    UI --> CMD[Validated native commands]
-    CMD --> DB
-    DB --> B[Consistent encrypted snapshot]
-    B --> S[User-selected transport]
-```
+1. Android delivers accessibility events for the seven supported package names only. `SnapshotReader` copies the foreground window into a value-only snapshot.
+2. The app's adapter turns the snapshot into a frame; `EncounterTracker` decides whether it is a new encounter or a revisit ([DETECTION](DETECTION.md)).
+3. `ReelsCoordinator` serialises all writes on one queue: encounters, surface episodes and timers go to the encrypted database; the unlock-session counter lives in memory.
+4. The same coordinator evaluates break and block rules and asks the service to draw the counter, break screen or cover as `TYPE_ACCESSIBILITY_OVERLAY` windows.
+5. With Usage Access on, `UsageTimeline` reads Android usage events (package, timestamp, event kind) from the consent time onward to build app time and opens.
+6. React Native reads snapshots and history pages as JSON over the bridge. JS never holds the authoritative state.
 
-Queries are bounded and off the UI thread. JS cache subscribes to revision invalidations and re-queries; change events carry IDs/revisions, never bulk sensitive history. Native transactions commit configuration, ingestion cursors and revision atomically. Public interfaces use epoch milliseconds and explicit units; platform objects and database handles never cross the bridge.
+Whole-app protection rules read only the foreground package. Short-video rules require a recognised player.
 
-## Native lifecycle
+## Native contract
 
-Collection belongs to native components selected for each source. Accessibility and notification services are system-bound, not arbitrary always-on tasks. Usage queries need a tested combination of permitted scheduling and user-visible operation. WorkManager is for deferrable reconciliation/backup work, not continuous real-time detection. A foreground service is an option only if its purpose/type and start conditions qualify; do not mislabel it to keep a process alive.
+All bridge calls are asynchronous and return JSON strings validated by parsers in `src/platform/`. Mutations carry an `expectedRevision`; a stale revision is rejected so two screens cannot overwrite each other. Consent changes carry the current notice revision (6). Key calls:
 
-[AS-003 research](COLLECTION-FEASIBILITY.md) defines the staged experiment: self-package test harness first, then consented bounded reconciliation and independently qualified live paths. No scheduler/FGS type is selected or installed. Query freshness does not prove metric coverage or timely enforcement; unavailable historical event families remain capability-specific gaps. Production ingestion still depends on the AS-009/AS-010 store and consent coordinator.
+| Module | Calls |
+|---|---|
+| `NativeReels` | `getSnapshot`, `configure`/`configureAll` (source consent), `setPaused`, `setOverlay`, `deleteHistory`, `configureAutoScroll`, `stopAutoScroll`, `openAccessibilitySettings` |
+| `NativeDiary` | `getSnapshot(days)`, `getHistoryPage(endDay)`, `getAppSchedules`/`saveAppSchedules`, `stopFocus`, `getProtectableApps`, `getAppIcons`, appearance get/set, `openBackup`, `openProtectionLock`, settings shortcuts |
+| `NativeBootstrap` | `getBootstrapStatus` |
 
-Its test-only instrumentation measures synchronous query return time separately from exhausted iteration/copy time and injects cooperative cancellation at three read boundaries. These measurements include application checks and establish no OS response-allocation limit, service CPU budget, cross-thread cancellation latency or interruptible Binder call. No measurement path is wired into the application or bridge.
+Protection Lock, backup/restore and widget configuration run in their own non-exported native activities; secrets never cross the bridge.
 
-The changed harness passes on the physical API-36 phone with validated aggregates and temporary test package cleanup; [recorded measurements](COLLECTION-FEASIBILITY.md#self-package-timing-and-cancellation-protocol) qualify only this small self-package fixture. Production consent, execution and storage boundaries remain unimplemented.
+## Storage and encryption
 
-On user enablement: verify grant → commit consent/config revision → start permitted components → establish coverage. On app UI startup: read native status, reconcile bounded history, then subscribe. On JS death: native collection and rules continue when Android permits. On native process death: persisted cursors/configuration allow idempotent reconciliation; uncertain intervals remain gaps. On force-stop: no promise of automatic restart; show the gap when the app next runs.
+- **Database:** Room 3 over SQLCipher (`net.zetetic:sqlcipher-android`) through `OwnedCipherDriver`. A random 32-byte key per database generation is wrapped with an installation-specific Android Keystore AES-256-GCM key (`LocalKeyEnvelope`) and stored in no-backup app storage. A missing or invalid key fails closed: no plaintext fallback and no silent reset.
+- **Durability:** WAL mode; the primary writer uses `synchronous=FULL` and foreign keys are enforced on every pooled connection (ADR-107). The corruption handler preserves files instead of deleting them.
+- **Preferences:** small device-local settings (appearance, widgets, backup choice, detection salt) in private SharedPreferences, excluded from backup.
+- **Main tables (schema 9):** `Exposure` (one encounter: time, app, route, category, media kind, dwell, revisit, app version, item key, unlock session), `SurfaceEpisode`, `ReelsTimer`, `AppUsageEvent`, `InterventionEvent`, `ConsentRecord`, `CoverageInterval`, `SourceConfiguration`, `DiaryConfiguration`, `ReelsBlockConfiguration`, `ProtectionConfiguration`, `LiveOverlayConfiguration`, `StoreMetadata`, `FactOrigin`.
+- **Retention:** history is kept until the person erases it (ADR-005). Erase removes all history and consent records in one transaction.
 
-On reboot, use permitted boot handling to re-evaluate schedules and request allowed work after user unlock. Do not access credential-encrypted history before unlock; no sensitive direct-boot store is planned. Background launch and foreground-service restrictions vary by target/API and service type. See [Android start restrictions](https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start). OEM battery rules, restricted mode, listener disconnection and revocation require visible health states and recovery guidance. No permanent wake lock, hidden service or automatic battery exemption.
+## Database evolution
 
-## Mutations and consistency
+- Schemas 1–9 are exported to `android/app/schemas/`. Migrations are automatic Room migrations tested with populated fixtures from every earlier schema.
+- 1.1.0 (schema 9) is the production baseline (ADR-108). Every later release must migrate it, including skipped versions, preserving IDs, origins, choices and keys.
+- Opening a database from a newer, unknown schema fails without deleting anything. A failed migration rolls back and can be retried.
+- Never use destructive migration fallbacks. Add a new schema version with a migration and a populated-fixture test; record material changes as an ADR.
 
-One serialized write coordinator owns consent/configuration changes, ingestion, deletion, migrations and restore barriers. Reads use consistent snapshots and cancellable jobs. Every configuration mutation includes expected revision and command ID. Rule engine consumes a revisioned snapshot; UI previews are advisory until native validation commits them. Source enablement, historical deletion and restore carry ingestion fences to prevent overlap replay from resurrecting removed records.
+## Backup and restore
 
-Deletions invalidate aggregates/models and backup freshness. Restore takes an exclusive mutation barrier only after the archive has been fully validated in staging; pause new writes safely, transactionally swap/rebind, reconcile generations, and explicitly resume user-selected sources. A failed validation never acquires a destructive path. Do not replace an open WAL database file casually.
+| | Manual export | Android-managed backup |
+|---|---|---|
+| Trigger | Person chooses a destination in the file picker | Android, roughly nightly when eligible |
+| Default | On demand | On unless a saved choice says off (ADR-079) |
+| Contents | Logical archive of history, choices and per-fact origins | One file: `files/system-backup/history.attentionbackup` |
+| Excluded | Live database, keys, preferences, grants, Protection Lock | Same; device-to-device transfer excluded entirely |
+| Requirements | — | Android 9+, secure screen lock, client-side-encrypted transport |
 
-## Platform and network boundaries
+- **Format:** logical version 2 / schema 9, Tink streaming AES-GCM-HKDF framing (profile 3). The wrapping credential is SHA-256 of the public package name, so anyone holding a file can read or modify it (ADR-073). Privacy relies on where the file is stored.
+- **Limits:** 20 MiB plaintext and 100,000 records; larger exports are refused rather than truncated.
+- **Restore:** the file is authenticated before parsing, validated into a separately keyed encrypted staging database, previewed, then committed as a full replacement in one transaction. Failure before commit leaves live data untouched. After restore, counting, playback measurement and protection are off until re-enabled. Restore is replacement, not merge.
+- Backup rules: `res/xml/backup_rules.xml` and `res/xml/data_extraction_rules.xml`; `tools/check_backup_policy.py` guards them.
 
-The platform adapter exposes supported, degraded, denied, disabled and unavailable separately. Shared UI/domain concepts do not assume Android permission names or event fidelity. iOS must implement its own native backing store and equivalent domain semantics, or return unsupported; it cannot use MMKV as a second behavioral store.
+## Dependencies
 
-There is no application backend, product account or analytics pipeline. Default builds should have no application-initiated network traffic. Future approved backup transport, if any, sits behind explicit opt-in and provider credentials; system document providers may communicate independently. Model and category logic are bundled and local. [Privacy](PRIVACY.md) owns data movement and [Security](SECURITY.md) owns verification.
+- pnpm only; each direct dependency is pinned to an exact version resolved at its latest stable release, with the frozen lockfile used for builds (ADR-010). `pnpm-workspace.yaml` keeps strict peers and disabled install scripts.
+- `tools/mobile-scaffold.json` records the reviewed direct packages, patch hash and native pins; `python tools/check_mobile.py` verifies the manifest and lockfile against it. Update it in the same change as any dependency update.
+- Native libraries are pinned in `android/gradle/libs.versions.toml` (Room 3, SQLCipher, Tink, AndroidX Biometric, coroutines, desugaring). Gradle dependency lockfiles are committed; refresh them only with `tools/android_build.py --write-locks` in a reviewed change.
+- `tools/kotlin-toolchain.json` pins the standalone Kotlin compiler and R8 (URL, size, SHA-256) used by the host test runners.
+- No analytics, crash-reporting, advertising or networking SDKs. Record license changes in `licenses/` and NOTICE.
+- If the latest version of something cannot be used, record the blocker in the change and in [DECISIONS](DECISIONS.md) if it is lasting.

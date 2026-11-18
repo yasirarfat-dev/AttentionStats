@@ -1,57 +1,75 @@
 # Attention Stats
 
-**See where your attention goes. Counted on your phone, never collected.**
+**See where your attention goes. Counted on your phone, never sent to us.**
 
-Attention Stats is a free, open-source digital wellbeing app for Android. It counts the short videos you watch (Instagram Reels, Facebook Reels, YouTube Shorts, TikTok and Snapchat Spotlight), shows how long you spend in every app, and offers gentle tools you choose: mindful breaks, daily limits and per-app blocks.
+Attention Stats is a free, open-source digital wellbeing app for Android. It counts the short videos you scroll through (Instagram Reels, Facebook Reels, YouTube Shorts, TikTok and Snapchat Spotlight), shows how long you spend in every app, and offers gentle tools you choose: mindful breaks, limits, app schedules, focus sessions and an optional parent lock.
 
-No account. No servers. No ads. No analytics. The app does not even request the Internet permission. Everything stays encrypted on your phone, and every line is here for you to read.
+No account. No servers. No ads. No analytics. The app does not even have the Internet permission.
 
-## What it does
+[Get it on Google Play](https://play.google.com/store/apps/details?id=attention.stats) · Current version 1.1.0 · [Privacy policy](policies/PRIVACY.md) · [Support](policies/SUPPORT.md)
+
+## Features
 
 | | |
 |---|---|
-| **Counts every short video** | Reels, Shorts, TikToks and Spotlight, however you reach them: the dedicated tab, a video tapped in Home, Explore, a profile, a shared link, plus inline videos in Instagram and Facebook feeds. Each video counts once; going back to one is a revisit, not a new count. Ads and photos are tallied separately. |
+| **Counts short videos** | Reels, Shorts, TikToks and Spotlight: the dedicated players from any entry, plus videos and photos in Instagram and Facebook feeds. Each video counts once per unlock; going back to one is a revisit. Ads and photos are tallied separately. |
 | **Live counter** | A small, see-through count on top of short videos: this unlock and today. A ring fills toward your next break. Drag it anywhere; tap for details. |
-| **Screen time** | Time and opens per app (with Usage Access), time spent in short videos, an hour-by-hour rhythm and 7/30-day trends. |
-| **Mindful breaks** | After the number of videos or minutes you choose, a calm full-screen pause with a breathing animation. "Keep watching" unlocks after a few seconds; "I'm done" takes you home. |
-| **Blocks you choose** | Per app: off, a daily limit, or always. A block leaves the short-video player and pauses playback; the rest of the app keeps working. |
-| **Home-screen widget** | Today's count and where it came from, at a glance. |
+| **Screen time** | Time and opens per app (with Usage Access), time on short-video screens, an hourly rhythm, and Week / Month / All Time history with a day calendar and per-app history. |
+| **Mindful breaks** | After the number of videos or minutes you choose, a calm full-screen pause. The video is paused first where the app allows it, with a guided breathing exercise. |
+| **Blocks you choose** | Per app: off, a daily limit, or always. App groups, recurring time slots, focus sessions (5–180 minutes) and Allow Only. Android Settings, Home and emergency calls always stay available. |
+| **Protection Lock** | Optional parent PIN or pattern, with recovery phrases and optional fingerprint, for the changes you choose to protect. Stays on this phone; never backed up. Not tamper-proof. |
+| **Backup & restore** | Android-managed backup (on unless you turn it off) and manual export/restore through Android's file picker. |
+| **Widgets & themes** | Five home-screen widgets and light, dark and custom colour themes. |
+| **Auto-scroll (experimental)** | Optional: moves to the next video when the current one finishes, where the app exposes playback progress. |
 
-## How detection works (and why it keeps working after app updates)
+## Supported apps and limits
 
-Social apps change constantly, so Attention Stats does not depend on exact app versions. Each app has a small adapter (`native/reels-core/src/main/kotlin/org/attentionstats/detection/social/`) that:
+| App | What is counted |
+|---|---|
+| Instagram | Reels from any entry; videos and photos in Home and profile feeds |
+| Facebook | Reels tab and Reels opened from Home; feed videos and photos |
+| YouTube | Shorts from any entry |
+| TikTok | The video feed from any entry, including photo posts (main, regional and Lite apps) |
+| Snapchat | Spotlight |
 
-1. prefers stable view IDs where an app exposes them (for example Instagram's clips pager or YouTube's Shorts recycler), and
-2. falls back to geometry every short-video viewer shares: a full-screen vertical pager with a contiguous action rail on the right.
+Counts are estimates of what appeared on screen, not proof you watched it. Support varies with app version and language; an app update can break recognition until we ship a fix. Text posts, likes and comments are not measured. Stories, messages and other screens are ignored. See [known issues](docs/STATUS.md#known-issues).
 
-The focused item's on-screen metadata is turned into an in-memory fingerprint to tell one video from the next; raw text is never stored. Detection is tested on the JVM against **real screen layouts** captured from phones and sanitized of all personal content (`native/reels-core/src/test/resources/fixtures`). If an app update breaks something, one `uiautomator dump` plus `tools/sanitize_fixture.py` turns it into a regression test. See the [adapter guide](docs/SOCIAL-ADAPTERS.md).
+## Privacy in plain words
 
-## Privacy by construction
+- The accessibility service looks at the screen only in the five supported apps, only while they are open, and only in memory. Captions and names are turned into a one-way fingerprint and thrown away. Nothing you watch, type or say is saved or sent.
+- Schedules and focus sessions check only which app is open, never its content.
+- Your history (counts, times, choices) is stored in an encrypted database on your phone.
+- It leaves your phone only through Android backup (which you can turn off) or a file you export yourself. Backup files can be read by anyone who has them, so keep them private.
+- Every line of code is here to read. Full details: [privacy policy](policies/PRIVACY.md) and [technical privacy notes](docs/PRIVACY.md).
 
-- Accessibility reads only the five supported apps, only while they are on screen, and only in memory.
-- Stored: counts, times, categories and your choices, in an SQLCipher database keyed by the Android Keystore, excluded from cloud backup.
-- No Internet permission, no third-party SDKs that receive data, no crash uploads.
-- Read the plain-language [privacy policy](policies/PRIVACY.md).
+## Build from source
 
-## Build it
-
-Requirements: Node 26 + pnpm, JDK 17, Android SDK (see [development setup](docs/DEVELOPMENT.md)).
+Requirements: Node 26 with pnpm 12 (pinned in `package.json`), JDK 17, Python 3.11+, and an Android SDK with platform 37, Build Tools 37.0.0, NDK 30.0.16248370 and CMake 4.1.2.
 
 ```powershell
-pnpm install
-pnpm typecheck; pnpm lint; pnpm test                     # TypeScript, architecture boundaries, unit tests
-python tools/android_build.py :reels-core:verifyReels      # encounter rules + real-layout detection fixtures
-python tools/android_build.py :app:assemblePreview         # installable preview APK
+pnpm install --frozen-lockfile --ignore-scripts
+pnpm typecheck; pnpm lint; pnpm test
+python tools/android_build.py :reels-core:verifyReels      # detection tests on real screen layouts
+python tools/android_build.py :app:assemblePreview         # installable preview APK (com.attentionstats.debug)
 ```
 
-Project layout: `src/` (React Native UI, one folder per feature), `android/app` (Kotlin accessibility service, overlays, encrypted storage), `native/reels-core` (pure Kotlin counting and detection, unit-tested), `native/analytics-core` (pure rollups).
+The preview APK is written to `android/app/build/outputs/apk/preview/`. See [CONTRIBUTING](CONTRIBUTING.md) for setup details, checks and how to add a test from a missed screen.
 
-## Contribute
+## Documentation
 
-Bug reports from real phones are the most valuable contribution: if counting misses something, use **Settings → Report a problem** in the app (it attaches your phone model and app versions, never your history). Code, translations and new app adapters are welcome; see the [contributor guide](CONTRIBUTING.md). An iPhone port is open for contributors ([guide](docs/IOS-CONTRIBUTION-GUIDE.md)).
+| Document | Contents |
+|---|---|
+| [Features](docs/FEATURES.md) | What every screen and tool does |
+| [Detection](docs/DETECTION.md) | How counting works per app, metric definitions, limits |
+| [Architecture](docs/ARCHITECTURE.md) | Modules, data flow, storage, encryption, backup |
+| [Privacy (technical)](docs/PRIVACY.md) | Data inventory, permissions, retention |
+| [Status](docs/STATUS.md) | Current release, what is verified, known issues, roadmap |
+| [Decisions](docs/DECISIONS.md) | Decision log (ADRs) |
+| [Release](docs/RELEASE.md) | Release process and Play Console text |
+| [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) | How to help; how to report a vulnerability |
 
-Security reports: [SECURITY.md](SECURITY.md). Product vision: [VISION](docs/VISION.md) and [feature vision](docs/FEATURE-VISION.md). Current status: [STATE](docs/STATE.md).
+## Contributing
 
-Created by **[Yasir Arfat](https://yasirarfat.com)** and published on Google Play by Convenience Labs ([Google Play listing](https://play.google.com/store/apps/details?id=attention.stats): currently in closed testing, so the page opens for enrolled testers until public launch).
+The most valuable contribution is a report from a real phone: if counting misses something, use **Settings → Report a problem** in the app (it includes your phone model and app versions, never your history). Code, translations and adapter fixes are welcome; see [CONTRIBUTING](CONTRIBUTING.md).
 
-Licensed under [Apache-2.0](LICENSE). Copyright 2026 Attention Stats contributors.
+Created by **[Yasir Arfat](https://yasirarfat.com)** and published on Google Play by Convenience Labs. Licensed under [GPL-3.0-only](LICENSE): anyone may use, study, change and share the code, and every copy or derivative must stay under GPL-3.0-only with its full source available. The license grants no rights to the Attention Stats name or icon; forks need their own. Third-party notices in [NOTICE](NOTICE). Copyright 2026 Attention Stats contributors.

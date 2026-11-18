@@ -6,11 +6,11 @@ labels: bug
 assignees: ''
 ---
 
-Use synthetic examples only. Do not attach personal usage history, real-account screenshots, accessibility dumps, device identifiers or secrets. Security vulnerabilities follow SECURITY.md and private reporting.
+Use synthetic examples only. Do not attach personal usage history, real-account screenshots, unsanitised accessibility dumps, device identifiers or secrets. Security vulnerabilities follow SECURITY.md and private reporting.
 
 ## Affected behavior
 
-Commit/release, AS task or capability ID, relevant Android API/OEM class, target app version/locale if necessary. This repository currently has no app release.
+Attention Stats version (Settings → Report a problem fills this in), Android version and phone maker, and the version and language of the affected app.
 
 ## Reproduction
 
@@ -21,4 +21,4 @@ Commit/release, AS task or capability ID, relevant Android API/OEM class, target
 
 ## Evidence and limitations
 
-Relevant redacted reason codes, synthetic fixture, coverage gaps and checks run. Describe unsupported behavior accurately; no private captures.
+A sanitised layout made with tools/sanitize_fixture.py (see CONTRIBUTING.md) is the most useful evidence for counting problems. Describe unsupported behavior accurately; no private captures.

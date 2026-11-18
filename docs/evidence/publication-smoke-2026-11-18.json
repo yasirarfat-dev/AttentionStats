@@ -1,0 +1,341 @@
+{
+  "date": "2026-11-18",
+  "tasks": [
+    "AS-013",
+    "AS-014",
+    "AS-018",
+    "AS-034",
+    "AS-037",
+    "AS-041",
+    "AS-044",
+    "AS-059"
+  ],
+  "sourceBase": "92d22f1",
+  "status": "Bounded physical publication smoke pass plus per-source counting matrix on the unchanged installed preview; all five sources count settled items with idle-zero; defects: Facebook Reels revisit double count, TikTok and YouTube photo/image posts counted as videos, re-count of the on-screen item after an accessibility-service reconnect, Instagram app-time under-recording; auto-scroll and widget not run; publication not cleared",
+  "productSha256": "6a75b08093e18ecc7c9d196f3d8974cd0a93d59d5690ccb73cb26787e85ed746",
+  "package": "com.attentionstats.debug",
+  "versionName": "1.0.0-reels-preview",
+  "versionCode": 10,
+  "physicalApi": 36,
+  "artifactProvenance": "Installed base APK pulled on 18/11/26, hashed and deleted; it matches recorded preview 6a75b08 (publication-preview-audit.json, restore-ingress.json). git diff a25ebd4..92d22f1 changes no file under src/, android/app/src/main/, native/, app.json, package.json or index.js, so the installed product is current for HEAD product source. No test APK installed; no build or install by this pass.",
+  "textScale": "100% (font_scale 1.0, unchanged)",
+  "sourceApps": {
+    "TikTok": "47.7.3",
+    "Instagram": "455.0.0.51.72",
+    "Facebook": "587.0.0.39.55",
+    "YouTube": "21.40.165",
+    "Snapchat": "14.32.0.54"
+  },
+  "priorityChange": "Mid-pass the maintainer redirected effort from the screen tour to a per-source counting reliability matrix. A later rate-limit interruption (about 08:06 to 11:21 on 18/11/26) ended phone work after TikTok; the coordinator then directed wrap-up.",
+  "checks": [
+    {
+      "id": "baseline-service",
+      "result": "PASS",
+      "detail": "Only this app's accessibility service is enabled and Android reports it bound at start and end. All five sources show Ready in Settings; Pause All Counting off; Count Ads As Videos on."
+    },
+    {
+      "id": "today-render",
+      "result": "PASS with defects",
+      "detail": "Today hero, Viewing Details, Reels by Apps, Your Day and Screen Time render without crash, clipping or error banner at start. Defects D1-D3 below."
+    },
+    {
+      "id": "insights-week-month-alltime",
+      "result": "PASS with defect",
+      "detail": "Week, Month and All Time load; app breakdown expands; By Day chips, Day Insights, Previous/Next, Day by Video App and Hourly Encounters render; By App list, app detail and a daily-row jump back to By Day with that date selected all work. Defect D4 (Month end date in the future)."
+    },
+    {
+      "id": "protect-settings-glance",
+      "result": "PASS",
+      "detail": "Protect (Focus, groups) and Settings (counting sources, permissions, backup, privacy policy, source code, erase entry, appearance) render without crash. The Protect editors, appearance draft, backup page and erase first stage were not opened after the priority change."
+    },
+    {
+      "id": "tiktok-counting",
+      "result": "PARTIAL",
+      "swipes": 11,
+      "observedSettledItems": {
+        "video": 11,
+        "photoCarousel": 1,
+        "ad": 0
+      },
+      "hudSessionDelta": 12,
+      "savedTodayDelta": {
+        "videos": 13,
+        "photos": 0,
+        "ads": 0,
+        "videoSurfaceTime": "+4m",
+        "appTime": "+5m",
+        "opens": 1
+      },
+      "detail": "Initial item plus each forward swipe advances the HUD session and Videos by exactly one. A TikTok post labelled Photo (dotted carousel) is counted under Videos, with Photos unchanged (D5). The saved Today delta is one higher than the 12 observed settled items and the HUD session (D6). App opens/time do increment for the opened source."
+    },
+    {
+      "id": "tiktok-idle-zero",
+      "result": "PASS",
+      "detail": "30 s on a settled viewer without swiping: HUD session and day values unchanged."
+    },
+    {
+      "id": "tiktok-revisit",
+      "result": "PASS",
+      "detail": "Swiping back one item and forward again leaves the HUD session and day values unchanged."
+    },
+    {
+      "id": "hud-live-expand-collapse",
+      "result": "PASS",
+      "detail": "Compact HUD updates on every settled item; tapping the HUD expands it to show the Session/Today Videos/Photos/Ads breakdown with Autoscroll, open, pause and hide controls; a header tap collapses it. No HUD preference was changed. With the HUD expanded, three upward swipes on the TikTok photo post did not advance the feed. Cause not isolated, so this is an observation only."
+    },
+    {
+      "id": "tiktok-autoscroll",
+      "result": "NOT RUN",
+      "detail": "On this live store the auto-scroll notice has not been accepted, so the HUD Autoscroll tap opens the app's Settings (ReelsAccessibilityService openConvenience branch) and auto-scroll never started. Accepting the notice would be a persistent consent change to the real store, so it was not made. Earlier TikTok arrival evidence stays in media-counting-autoscroll.json."
+    },
+    {
+      "id": "other-sources",
+      "result": "SEE countingMatrix",
+      "detail": "Run in phase 2 (11:28 to 11:50 on 18/11/26); Instagram Reels tab not run because the maintainer's saved rule covers it."
+    },
+    {
+      "id": "widget",
+      "result": "NOT RUN",
+      "detail": "Deprioritized by the maintainer redirect."
+    },
+    {
+      "id": "logcat",
+      "result": "PASS with findings",
+      "detail": "The retained device buffer covers 10:00:54 to 11:21 only; the 07:50 to 10:00 session portion had rolled out. No FATAL EXCEPTION, AndroidRuntime crash or ANR for the app. No URLs, captions, handles or item text are logged by the app process. Finding L1 below."
+    }
+  ],
+  "defects": [
+    {
+      "id": "D1",
+      "severity": "medium",
+      "surface": "Today hero and Reels by Apps; Insights Day Insights",
+      "summary": "Recorded short-video surface time exceeds recorded whole-app time for the same source and day. The help text says Reels Apps (whole-app time) includes non-video screens, which implies surface time can never exceed it.",
+      "repro": "Open Today after viewing Facebook or Instagram feeds: On Screen exceeds both Reels Apps and Screen Time; one source showed minutes in videos and 1s in app time. The same inversion appears for a previous day in Insights Day Insights (Video Surface Time greater than Video App Time) and for Facebook over the week (surface time about 2x recorded app time). ANALYTICS-SPEC says app time may be incomplete, but Today's help copy does not disclose that."
+    },
+    {
+      "id": "D2",
+      "severity": "low",
+      "surface": "Today Screen Time list",
+      "summary": "Pluralization: shows '1 opens' (visible text and accessibility label).",
+      "repro": "Any app with exactly one observed open today."
+    },
+    {
+      "id": "D3",
+      "severity": "low",
+      "surface": "Today Reels by Apps detail line",
+      "summary": "Each detail chip ends with a spaced period ('33m in Reels .  30 ads .  20 photos .'), which leaves a dangling separator after the last item (TodayScreen.tsx sourceDetails).",
+      "repro": "Any source with surface time, ads or photos today."
+    },
+    {
+      "id": "D4",
+      "severity": "low-medium",
+      "surface": "Insights Month",
+      "summary": "On an install younger than 30 days, Month defaults to install day plus 29 days, so the shown range ends 02/12/26 (in the future). UX-SPEC describes Month as the last 30 days including today.",
+      "repro": "Insights > Month on a store installed 03/11/26 shows 03/11/2026 - 02/12/2026 (DiaryEngine selectedStart=max(installed, today-29), selectedEnd=start+29). Every new production user would see this for their first 30 days."
+    },
+    {
+      "id": "D5",
+      "severity": "medium",
+      "surface": "TikTok counting classification",
+      "summary": "A TikTok photo post (labelled Photo, dotted carousel) is counted as a video encounter, not a photo, on TikTok 47.7.3.",
+      "repro": "TikTok For You: swipe to a Photo-labelled post; the expanded HUD Videos session/day values increment and Photos stays unchanged; Today TikTok photos stay 0.",
+      "rootCause": "native/reels-core TikTokAdapter: PHOTO requires a label matching ^(photo(s)?|image(s)?)( N of M)?$ AND bounds.width > screen.width/2. The actual label node is android.widget.TextView, resource-id com.zhiliaoapp.musically:id/tv_label, text 'Photo', content-desc '', bounds [326,1096][385,1130] (59 px wide on a 720 px screen), so it fails the width test and the page falls through to REEL. The same post's long_press_layout carries content-desc 'Video'.",
+      "fixtures": [
+        "native/reels-core/src/test/resources/fixtures/tiktok/photo_post.xml",
+        "native/reels-core/src/test/resources/fixtures/tiktok/video_47_7_3.xml (paused ordinary video; negative control)"
+      ]
+    },
+    {
+      "id": "D6",
+      "severity": "medium",
+      "surface": "TikTok saved count",
+      "summary": "An accessibility-service reconnect re-counts the item already on screen. The service is suppressed and rebound (onDestroy resets the session); on rebind the current page is treated as a new encounter. This explains the earlier unexplained TikTok +1.",
+      "repro": "Reproduced at 11:33:19 to 11:33:36 on 18/11/26: on a settled, already-counted TikTok item with no swipe, one 'uiautomator dump' (UiAutomation registers with flags 0x0 and suppresses other services; HUD removed, then re-added about 10 s later) moves the HUD day value +1 and resets the session to 1. In the first session a dump at 07:58 on item 1 likewise moved Videos/Today 91 -> 92 with session staying 1. A clean 5-swipe repro without dumps or HUD taps matched exactly (+6/+6). In production the same path applies to any service rebind (process restart, toggling, other UiAutomation tools)."
+    },
+    {
+      "id": "D7",
+      "severity": "low (test artefact)",
+      "surface": "Today / Settings counting health",
+      "summary": "The transient 'Counting is disconnected' banner and 'Accessibility, Disconnected' row were caused by this pass's own uiautomator dumps. They suppress this accessibility service, setting serviceConnected false until rebind (logcat: UiAutomationManager registering flags=0x0; HUD removeView/addView). The UI reported the real temporary state correctly; this is not a product defect.",
+      "repro": "Run 'uiautomator dump' while the app is open: the reconnect warning shows until the service rebinds (about 10 s, longer while dumps repeat)."
+    },
+    {
+      "id": "D8",
+      "severity": "high",
+      "surface": "Facebook Reels revisit continuity",
+      "summary": "Swiping back to the immediately previous, already-counted reel counts it again.",
+      "repro": "Facebook 587.0.0.39.55 Reels: after 10 forward swipes and 30 s idle on a lead-form ad that had ended (Replay shown), one swipe down at about 11:42:59 on 18/11/26 returns to the previous video (counted at 11:42:24); HUD session 11 -> 12, day +1; saved Facebook videos include the extra one. The next forward swipe back to the ad does not count."
+    },
+    {
+      "id": "D9",
+      "severity": "medium",
+      "surface": "YouTube Shorts classification",
+      "summary": "An image 'Post' carousel (1/10 indicator, Post badge) shown inside the Shorts pager is counted as a short video, not a photo.",
+      "repro": "YouTube 21.40.165 Shorts: swipe until a Post-badged image carousel appears; HUD session +1 and saved YouTube videos +1, photos unchanged."
+    },
+    {
+      "id": "D10",
+      "severity": "low",
+      "surface": "HUD Autoscroll button without accepted notice",
+      "summary": "Tapping Autoscroll in the expanded HUD before the auto-scroll notice is accepted leaves the source for the top of Attention Stats Settings without pointing at the relevant section. Observed once; not further qualified."
+    }
+  ],
+  "logFindings": [
+    {
+      "id": "L1",
+      "severity": "low",
+      "summary": "About 140 E-level 'SQLiteQuery: UNIQUE constraint failed: ReelsTimer.id' lines per minute while a source is viewed (1,176 in about 11 active minutes), plus 16 for DiaryConfiguration.id. Room @Upsert (AttentionDatabase.putTimer) inserts first and updates on conflict, and Android logs each caught failure. Statements are parameterized; no private values are logged. This is log noise and also evidence of a high timer write rate relevant to resource gates. Phase 2 (11:28 to 11:50) adds 788 more such lines; no FATAL/ANR; the app process id stayed the same across both phases."
+    }
+  ],
+  "observations": [
+    "The HUD day total (top pill) counts estimated viewer pages across Videos, Photos and Ads and is not the Today hero short-video total; the expanded Videos/Today row tracks the Today hero.",
+    "During the unattended interval another actor used the phone: real source use, an app Protection Lock page and HUD activity appear in logs and totals. Analysis therefore uses only HUD in-session deltas and the TikTok-only Today delta.",
+    "Instagram app-time under-recording is source-specific: during about 4 min of Instagram use app time rose only from 1-2 s to 1 m while video surface time rose about 2 m. TikTok, YouTube, Snapchat and the Facebook visit accrued app time >= video time in-session.",
+    "Every Today read by this pass used uiautomator dumps on the app's own screens; reads were followed by a 10-15 s wait so the service had rebound before the next source entry. The phase-1 TikTok photo-hunt counts (after 11:30) include dump-induced re-counts and are excluded from analysis."
+  ],
+  "preservation": {
+    "liveHistoryErasedOrReplaced": false,
+    "savedFocusRulesOrChoicesChanged": false,
+    "autoScrollNoticeAccepted": false,
+    "hudPreferencesChanged": false,
+    "fontScale": "1.0 at start and end",
+    "accessibilitySelection": "unchanged; only this app's service; bound at end",
+    "displaySizeDensityAnimation": "unchanged",
+    "changedDuringUnattendedInterval": "At wrap-up, adb reverse mappings were empty (three existed at start) and auto-rotate was on (off at start). This pass changed neither; the app pid and install time were unchanged (no reboot or reinstall), consistent with an adb reconnect and another actor. They were left as found rather than overwriting another actor's state.",
+    "privateCapturesDeleted": true,
+    "deviceTempFilesRemoved": true,
+    "finalScreen": "Today",
+    "phase2": "Font 1.0, accessibility selection, display, animation, stay-on and timeout match; auto-rotate on and empty reverse mappings left as found at the start of phase 2. No rule, allowance, focus, consent or HUD preference changed; the Instagram Reels cover was dismissed with Okay. Device temp dumps removed; private captures and raw dumps deleted; service bound; final screen Today."
+  },
+  "limits": [
+    "Single short TikTok session; no ad was encountered, so ad classification is untested here.",
+    "Auto-scroll not run (requires a consent change on the live store); widget not checked; Protect editors, appearance draft, backup page and erase first stage not opened after the priority change.",
+    "Logcat covers only 10:00:54 to 11:21 on 18/11/26; the earlier part of this session had rolled out of the device buffer.",
+    "Phone exclusivity was lost during the interruption; findings from that interval (D6, D7) are not attributed to a confirmed cause.",
+    "One short session per source on one device/locale; single revisit and idle trial each; ads seen only on Instagram, Facebook and YouTube.",
+    "Instagram Reels tab not exercised because of the maintainer's saved rule.",
+    "Item classification is the agent's visual judgement from screencaps; private captures were reviewed and deleted."
+  ],
+  "matrixMethod": "Phase 2, 11:28 to 11:50 on 18/11/26. Each source was entered from its launcher; 10 forward swipes with about 2.6 s dwell and a screencap per settled item; 30 s idle; one swipe back (revisit) and one forward. Settled items were classified visually by the agent. HUD values were read from the screencaps, and saved per-type deltas from the Today Reels by Apps accessibility labels before and after. No uiautomator dump ran while a source viewer was in use during matrix sessions (see D6).",
+  "countingMatrix": [
+    {
+      "source": "TikTok For You (repro, no HUD taps)",
+      "version": "47.7.3",
+      "forwardSwipes": 5,
+      "observed": {
+        "video": 6,
+        "photo": 0,
+        "ad": 0
+      },
+      "hudSessionDelta": 6,
+      "savedDelta": {
+        "videos": 6,
+        "ads": 0,
+        "photos": 0
+      },
+      "idleZero": true,
+      "revisitNoDoubleCount": true,
+      "hudLive": true,
+      "time": "video 4m->5m, app 5m->6m (video <= app)",
+      "result": "PASS; the earlier +1 did not recur without a service reconnect"
+    },
+    {
+      "source": "Instagram Home feed",
+      "version": "455.0.0.51.72",
+      "forwardSwipes": 5,
+      "observed": {
+        "video": 5,
+        "photo": 1,
+        "ad": 2,
+        "adNote": "one carousel ad and one image ad"
+      },
+      "hudSessionDelta": 4,
+      "savedDelta": {
+        "videos": 5,
+        "ads": 1,
+        "photos": 2
+      },
+      "idleZero": true,
+      "revisitNoDoubleCount": true,
+      "hudLive": true,
+      "time": "cumulative video 21m vs app 1m; this visit app about +1m vs video about +2m (D1)",
+      "result": "PASS with ambiguity: no excess count. One ad is missing from the ads tally (likely the trailing image ad settled just before exit); the photos +2 matches one ordinary photo plus one image-ad photo facet. The HUD settled late on two tall feed items; a video scrolled past was first counted on the back swipe, which is a first settle, not a double count."
+    },
+    {
+      "source": "Instagram Reels tab",
+      "version": "455.0.0.51.72",
+      "result": "NOT RUN: the maintainer's saved Attention Stats rule covers Instagram Reels ('Instagram Reels are off'); dismissed with Okay; 'Allow 5 minutes' was not used, to avoid changing protection state. The block cover itself rendered correctly."
+    },
+    {
+      "source": "Facebook Reels",
+      "version": "587.0.0.39.55",
+      "forwardSwipes": 10,
+      "observed": {
+        "video": 8,
+        "photo": 0,
+        "ad": 3
+      },
+      "hudSessionDelta": 12,
+      "savedDelta": {
+        "videos": 9,
+        "ads": 3,
+        "photos": 1
+      },
+      "idleZero": true,
+      "revisitNoDoubleCount": false,
+      "hudLive": true,
+      "time": "this visit video +1m, app +2m; cumulative still video 1h 0m vs app 23m",
+      "result": "FAIL (D8): 11 settled items counted once each; the back swipe to the already-counted previous reel adds +1 (video). Photos +1 corresponds to an image ad's photo facet."
+    },
+    {
+      "source": "YouTube Shorts",
+      "version": "21.40.165",
+      "forwardSwipes": 10,
+      "observed": {
+        "video": 6,
+        "photo": 1,
+        "ad": 2,
+        "photoNote": "image 'Post' carousel 1/10 in the Shorts feed"
+      },
+      "hudSessionDelta": 9,
+      "savedDelta": {
+        "videos": 7,
+        "ads": 2,
+        "photos": 0
+      },
+      "idleZero": true,
+      "revisitNoDoubleCount": true,
+      "hudLive": true,
+      "time": "video 1m, app 1m",
+      "result": "FAIL (D9): the image Post carousel is counted as a video. Two swipes that did not advance (same item) correctly added nothing."
+    },
+    {
+      "source": "Snapchat Spotlight",
+      "version": "14.32.0.54",
+      "forwardSwipes": 10,
+      "observed": {
+        "video": 11,
+        "photo": 0,
+        "ad": 0
+      },
+      "hudSessionDelta": 11,
+      "savedDelta": {
+        "videos": 11,
+        "ads": 0,
+        "photos": 0
+      },
+      "idleZero": true,
+      "revisitNoDoubleCount": true,
+      "hudLive": true,
+      "time": "video 1m, app 1m",
+      "result": "PASS (exact match)"
+    }
+  ],
+  "fixturesAdded": {
+    "files": [
+      "native/reels-core/src/test/resources/fixtures/tiktok/photo_post.xml",
+      "native/reels-core/src/test/resources/fixtures/tiktok/video_47_7_3.xml (paused ordinary video; negative control)"
+    ],
+    "method": "Raw uiautomator dumps -> python tools/sanitize_fixture.py -> an extra pass that replaces engagement counters with neutral synthetic values and re-keys all syn tokens with a random salt (discarded), so short labels such as handles or counts cannot be recovered by hashing. Reviewed: no captions, usernames, handles, hashtags or identity-linked counts remain; only generic UI labels, 'Photo', 'Video' and synthetic tokens. No FixtureTests expectation added (reserved for the adapter owner)."
+  }
+}

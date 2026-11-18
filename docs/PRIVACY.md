@@ -1,106 +1,63 @@
-# Privacy specification
+# Privacy and permissions (technical)
 
-> **Current behavior (1.0.0):** [ADR-066](DECISIONS.md#version-independent-detection-interventions-and-mvp-10--adr-066--2026-10-30) supersedes version-pinned detectors, per-app notices 3–5, structure-check diagnostics and the five-tab preview described below where they conflict. See [State](STATE.md) and the public [privacy policy](../policies/PRIVACY.md).
+The engineering view of what the app reads, stores and transfers. The plain-language policy for users is [policies/PRIVACY.md](../policies/PRIVACY.md); both must stay consistent, and any change to data handling needs an ADR, an updated in-app disclosure and updated Play declarations.
 
-**Status:** Product privacy commitments accepted; implementation unverified. Updated 2026-10-29.
-**Responsibility:** Owns data inventory, consent, local processing, external transfers and public claims.
-**Related specifications:** [Permissions](PERMISSIONS.md), [Security](SECURITY.md), [Storage](STORAGE-AND-RETENTION.md), [Backup](BACKUP-RESTORE.md), [Release](RELEASE.md).
-**Unresolved feasibility:** F-01, F-04–F-06 and F-08 in [Decisions](DECISIONS.md); implementation and policy review must prove these commitments before release.
+## Invariants
 
-
-Current source increment (ADR-046): the selected Facebook viewer candidate now uses the same seven exact interface-label matches during observation under revised source notice 3. Matching transiently inspects accessibility descriptions and immediately discards nonmatches; no raw description is retained. Instagram still uses layout identifiers only. A fresh affirmative notice is required after upgrading. The temporary diagnostic remains separately selected and may save only bounded fixed tokens and structural metadata. Facebook category separation and Home-feed counts remain unqualified.
-
-The revised temporary development check additionally recognizes exact Like, Comment and Share controls and fixed Home/Reels/Video tab-position labels. It retains only their fixed tokens and up to three ancestor layouts, within the existing 16-match and 32-KiB limits (interface revision 2). These extra labels are diagnostic-only and never become observation signals without separate qualification. A fresh diagnostic notice describes the fields before each trial.
-
-## Current backup choice (ADR-073/ADR-079, 2026-11-07)
-
-The maintainer authorizes automatic-by-default Android-managed backup on first foreground entry, preserving saved opt-outs, superseding blanket OS-backup exclusion only for one bounded logical snapshot. Live databases, keys/wrappers, grants, preferences and all other files remain excluded. Android chooses the configured provider/account and upload timing; the custom agent requires API 28+, secure screen lock and client-side-encrypted transport and rejects device transfer. A delivered archive stays in private no-backup quarantine until reviewed. Foreground entry initializes an unset backup choice to on and requests Android scheduling when prerequisites are met. Installation and pre-launch restore alone do not initialize it. The switch remains available; local erase persists off. Pending recovery blocks new snapshots until review/discard.
-
-Exports use a public app-package credential, with no password for users to remember. Anyone with a file can decrypt or modify it; destination/account security is the privacy boundary. Do not advertise these files as secret encrypted archives. Direct Drive API/OAuth integration remains blocked; Android transport is separate. Local erase disables future system backups and removes pending restores but cannot erase external copies.
-
-
-## Public promise
-
-Planned release message: **“No data sent to us. Your history stays on your device. Open source.”** Pair this with a nearby explanation: tracking stores the data you enable locally; manual exports or Android-managed backup can move history to the selected file destination or the account configured in Android Settings. Do not advertise “collects no data,” “zero data collection,” or “never leaves your phone” without this distinction. Open source supports inspection; it is not proof that an untested binary has no network traffic.
-
-The experimental installed counter and its scoped encryption/phone evidence are recorded in State; the full product and independent security/accuracy review remain incomplete. The [user privacy policy](../policies/PRIVACY.md) describes the current candidate separately from this future catalog. ADR-043 prepares a closed test, not a live rollout. Store declarations describe the exact release artifact, including third-party code, independently of how a store defines off-device collection. Do not claim full product encryption, tracking accuracy or verified egress from design intent.
-
-No application backend, mandatory product account, advertising SDK, remote analytics, session replay, remote inference, automatic crash uploads or automatic diagnostic uploads. Categorization, predictions and optional topic analysis run on device. The developer receives neither optional encrypted backup data nor provider-visible metadata. A person can independently send a support report, but the app must never send one automatically; support instructions must exclude personal history and secrets.
+- No server, account, telemetry, advertising, analytics or crash upload. Release builds have no `INTERNET` permission.
+- Every source is off until the person agrees in the app (ADR-004). An Android grant alone enables nothing.
+- Screen labels are processed in memory and discarded. No captions, names, messages, typed text, screenshots, audio or video are stored or sent.
+- Data leaves the phone only through Android-managed backup (on by default, can be turned off) or a file the person exports.
+- Never describe the app as "collecting no data": it records local history (ADR-013).
 
 ## Data inventory
 
-ADR-045 adds an explicitly user-authorized exception for the separately affirmed development diagnostic on Facebook only. It transiently inspects visible noneditable/nonpassword nodes' accessibility descriptions, comparing at most 64 characters with the exact English interface labels Reels, Video, Home, Close, Comments, Search and Back. At most 16 matched fixed tokens plus class/bounds/selected/clickable states enter the temporary file (interface revision 1). Unmatched values are discarded without conversion, hashing, logging or persistence. No node text or raw descriptions, captions, names or messages are retained. This replaces the diagnostic's earlier blanket no-description-read claim; at that diagnostic-only stage production observation excluded descriptions and source notice 2 was unchanged; ADR-046 above supersedes that production scope under notice 3. A fresh revised diagnostic choice precedes acquisition. That diagnostic authorization alone did not enable Facebook counting or production label matching; see the subsequent ADR-046 source increment above.
-
-ADR-041's separately selected temporary development check additionally discloses static media/control IDs and numeric viewport/anchor geometry, with at most 16 anchors and three ancestor layouts each. Scan-local slots associate layouts in one snapshot and never become content IDs or history records. No recursive raw tree, text/descriptions, screenshots or input is retained. The revised notice requires a fresh affirmative diagnostic choice; expired checks do not authorize it. This does not broaden source notice 2 or enable Home-feed recording. See [diagnostic limits](SOCIAL-ADAPTERS.md#turning-a-report-into-a-fixture).
-
-The subsequent association revision additionally discloses scroll-source bounds, sequence and relative timing, limited to 16 events received no more than two seconds before scan start. Scan markers flag intervening delivered scroll events without claiming an atomic platform snapshot. Package/window/consent scope changes clear this temporary buffer; window IDs, absolute clocks and consent epochs are not exported. A revised affirmative temporary choice precedes live acquisition. These fields stay outside the encrypted exposure history and do not establish post identity or enable a new source/metric.
-
-AS-043's historical notice-2 preview inventory was narrower than the planned catalog: per-app source choices, disclosure decisions, pause/HUD configuration, exposure counts/timestamps, layout categories, visits and coverage in encrypted local storage. ADR-034 separates video layouts, photo/carousel pages, recognized image ads and unclassified pages; totals include ads. These are layout estimates, not content inspection or complete ad recognition. Normal-feed posts remain unavailable. Room v2 preserves old rows as unclassified; disclosure revision 2 requires a fresh affirmative source choice before collecting the changed categories. Its passive accessibility adapter reads only bounded selected-package resource IDs, class/role and numeric page/scroll positions; it never reads node text/descriptions, images, messages, input values or content fingerprints. No content/topic control is implemented. An independent affirmative developer-only choice temporarily retains a bounded flat structural diagnostic in private no-backup storage, for up to ten minutes; stopping, expiry, deletion or a fresh process removes it. The developer may read this one file during the local qualification; no automatic upload. User consent and detector qualification are separate gates. See [permissions](PERMISSIONS.md) and [current status](STATE.md).
-
-| Data class | Why / default | Storage and recipients | Control |
+| Data | Where | Backed up / exported | Retention |
 |---|---|---|---|
-| App/package metadata and usage episodes | History; disabled until usage opt-in | Local authoritative DB; no developer recipient | App/source filters, exclusions, pause, retention, selective delete |
-| Screen/keyguard activity | Device summary; separate source choices, off | Local; no identity or unlock credential | Independent toggle, gaps and delete |
-| Surface/exposure events | Selected short-video observation, off | Local counts/revisions; no video content by default | Per adapter, consent and coverage |
-| Coarse primary activities and item/interaction evidence | Optional detailed diary, off per family | Local minimized contexts, exposure/action type/time/evidence; no message/typed content or other-person identity | Per adapter/activity/action opt-in, exclusion, pause, retention/delete |
-| Per-app network byte statistics | Optional OS RX/TX history, separately off | Local app/install-epoch/transport/bucket bytes; no SIM ID, endpoints, packets or content | Independent source/app/transport scope, coverage, pause, retention/delete |
-| Retained multi-resolution summaries | Only after explicit compaction choice | Local summary facts/coverage/provenance after chosen detail removal; no reconstructed content | Tier/zone/loss preview, selective deletion at retained resolution, summary export scope |
-| Future user-selected activity archive imports | Unimplemented optional supported-file research | Native allowlisted parsing only; imported provenance separate, no raw archive in app history | Explicit file/field/date preview, cancel/delete; no account/token scraping |
-| Notification metadata | Behavior associations, off | Local package/times/lifecycle; no body/title content | Listener opt-in, app filter, revoke/delete |
-| Supported titles/domains/URLs | Optional history, off | Separate local table; sanitized and excluded on sensitive contexts | Separate title/URL consent, detail, shorter retention, delete |
-| Categories, insights, topics and predictions | Local interpretation; topics/predictions separately off | Local derived records; no training upload | Correct mapping, disable/reset, source deletion cascades |
-| Rules, schedules, overrides and focus sessions | Chosen protection | Local DB; reason text optional, no remote accountability recipient | Per rule behavior, pause, emergency bypass, delete/reset |
-| UI preferences | Theme, motion, layout | MMKV; non-sensitive only | Settings/reset; exclude from undocumented OS transfers |
-| Keys and optional provider tokens | Encryption / approved backup only | Native secure storage; never exported as plaintext | Key reset, provider disconnect and recovery guidance |
-| Archives and provider metadata | Manual portability or default-on Android-managed recovery, with opt-out | Ciphertext at chosen destination; provider sees account, size, name/time, transfer/IP metadata as applicable | Scope, destination, cancellation and external deletion guidance |
-| Health and diagnostics | Local troubleshooting | Bounded local reason codes and timings; no raw node text/history/identifiers | Inspect and clear; synthetic reports only in public repository |
+| Encounters: time, app, route (viewer/feed), category, media kind, dwell, revisit flag, app version, detection method, device-local item key, unlock-session ordinal | Encrypted database | Yes | Until erased |
+| Surface episodes and video-surface timers | Encrypted database | Yes | Until erased |
+| Usage events: package, timestamp, event kind (from consent time onward) | Encrypted database | Yes | Until erased |
+| Break and block events with the choice made | Encrypted database | Yes | Until erased |
+| Consent records, source/diary/block/protection configuration, coverage intervals | Encrypted database | Yes | Until erased (protection configuration survives erase) |
+| Per-fact origin IDs | Encrypted database | Yes | Until erased |
+| Optional playback facts (legacy; hidden for new users) | Encrypted database | Yes | Until erased |
+| Appearance, widget, backup-choice and detection-salt preferences | Private SharedPreferences | No | Until uninstall or clear storage |
+| Database key wrapper and Keystore keys | No-backup storage / Android Keystore | No | Until uninstall |
+| Protection Lock PIN/pattern/recovery verifiers, retry state, biometric key | No-backup storage / Android Keystore | No | Until the lock is turned off |
+| Live counter, unlock-session counts, item fingerprints, auto-scroll state | Memory only | No | Until screen-off or service stop |
 
-## Consent lifecycle and exclusions
+The device-local item key lets a later view of the same item be recognised as a revisit. It is derived with a device-local secret and cannot be compared across devices or reversed into content.
 
-Disclose each source in context before opening Android grant settings. Explain what is inspected, what is retained, purpose, limitations, optional transfer and how to revoke. Accessibility gets its own affirmative disclosure, not a checkbox bundled with onboarding or a privacy-policy link. A system grant does not activate tracking. New fields/purposes require a new notice revision and explicit consent; updates cannot expand collection silently.
+## Permissions and Android access
 
-Titles, URLs and topic processing require separate choices. No credential fields, typed text, private messages, OTPs, payment/authentication surfaces, screenshots, audio, clipboard or whole accessibility trees. An unknown sensitive/private context fails closed for content capture. Consent/filter checks apply before reading optional payloads and again before persistence.
+| Access | Why | Notes |
+|---|---|---|
+| AccessibilityService (`BIND_ACCESSIBILITY_SERVICE`) | Recognise supported short-video screens; draw the counter, breaks and covers; Back for blocks; one Pause tap before a break; optional auto-scroll swipes | Static package filter: the seven supported packages. `canRetrieveWindowContent`, `flagReportViewIds`, `flagIncludeNotImportantViews`, `canPerformGestures=true`, `isAccessibilityTool=false`. At runtime the filter widens to apps in the person's schedules/focus and adds interactive-window retrieval, reading only the foreground package for those apps |
+| `PACKAGE_USAGE_STATS` (Usage Access) | Optional app time and opens | Special access granted in Android Settings after a separate in-app consent |
+| Package visibility (`<queries>`) | Name/icon of supported apps; launcher, Home and dialer for app lists and cover exclusions | Seven explicit packages plus MAIN/LAUNCHER, MAIN/HOME and DIAL intents. No `QUERY_ALL_PACKAGES` |
+| `USE_BIOMETRIC` / `USE_FINGERPRINT` | Optional Protection Lock unlock | Normal permissions merged from AndroidX Biometric; the app receives only the authentication result |
+| Storage Access Framework | Manual export/restore | Per-document grants from the system picker; no broad storage permission |
+| Overlays | Counter, breaks, covers | Accessibility overlay windows; no `SYSTEM_ALERT_WINDOW` |
+| Android backup | Disaster recovery | Custom agent; one logical file; client-side-encrypted transport required; device transfer excluded |
+| Battery optimisation | Guidance only | Shows status and opens Android's app settings; no exemption request |
 
-“Maximum detail” under [Analytics](ANALYTICS-SPEC.md) expands the selectable metric catalog, not these exclusions. A source/grant cannot silently enable interaction monitoring, coarse messaging-context detection, network statistics or topics. Each new family explains inspected versus retained fields. Safe structural context duration is different from message capture and is unavailable if the adapter cannot prove the distinction. Open-source distribution never substitutes for consent or validates a hidden collection technique.
+Not requested: Internet, notifications, notification listener, foreground service, boot receiver, exact alarms, location, camera, microphone, contacts, SMS, call logs, photos/media, all-files access, device admin, VPN, screen capture. Debug builds add `INTERNET` for the Metro dev server only.
 
-The permission dashboard shows enabled sources, fields, applications, detail levels, coverage, last successful observation and active transfers. Revocation stops new collection, discards in-flight payloads and opens a gap; it does not automatically delete old history. Offer deletion separately. A timed pause expires visibly; automatic resume is disclosed when the pause is created.
+Adding any new permission or data family is a design decision: ADR, in-app disclosure, both privacy documents, Data safety answers and (for accessibility) the Play declaration and reviewer video.
 
-## Transfers and OS behavior
+## Consent and revocation
 
-Portable encrypted exports are independent of cloud backup. A system picker may hand a file to a provider that uploads it; tell the person which destination was chosen and that the provider can see metadata. Encryption does not hide file size, account, time or network origin. The app cannot revoke copies after export. Backups can contain sensitive history even if encrypted; use scope preview and disclose the current public-package credential, which provides no secrecy against a file holder.
+- Each source has its own consent with a notice revision (currently 6). Raising the revision requires fresh consent.
+- Usage Access, auto-scroll and Skip Ads each have their own disclosure. Auto-scroll consent lasts only for the current service session.
+- Revoking an Android grant stops new data immediately; existing history stays until erased. The app rechecks real grant state on return from Settings and never marks a permission granted because an intent opened.
+- After a restore, counting and protection are off until re-enabled; imported consent never grants current permissions.
 
-Automatic personal Google-account backup is desired, but direct Drive integration is **unverified and blocked pending policy clarification**. It must not be described as working or implemented through a silently substituted transport. No product sign-in is required for local use. Android-managed backup is enabled by default on foreground entry under ADR-079, with saved opt-outs preserved; all other OS backup and device transfer are explicitly excluded as specified in [Backup](BACKUP-RESTORE.md); OEM behavior must be tested.
+## Deletion
 
-## Privacy acceptance
+- **Settings → Erase history** removes all counts, timers, usage events, intervention events and consent records, turns counting and automatic backup off and removes pending restores. Protection Lock is kept and managed separately.
+- Clearing storage or uninstalling removes everything local, including keys.
+- Exported files and backup-provider copies are outside the app's control. See [policies/DATA-DELETION.md](../policies/DATA-DELETION.md).
 
-S-01–S-06 in [Testing](TESTING.md) require egress inspection across first run, denied/granted permissions, offline use and opt-in transports; dependency review; sensitive-log/temporary-file checks; deletion/derivative checks; and cloud/device-transfer tests. Inspect merged manifests and actual release artifacts, not just source intent. Release notes must describe verified behavior and limitations. Publish truthful privacy language and capability coverage before distributing a binary.
+## Release checks
 
-AS-048 adds YouTube Shorts and the main TikTok package as independent source candidates. Their registration adds disabled/no-consent configuration only; each source requires its own disclosure and enablement. Structural developer qualification does not enable a supported production detector or read those sources’ node text or descriptions.
-
-## Transient TikTok matching under ADR-049
-
-The user expressly authorizes the developer to choose effective on-device mechanisms after the content-matching tradeoff is explained. TikTok 47.5.3 source notice 4 separately discloses reading only visible, noneditable/nonpassword `title`/`desc` fields as text, with description fallback. Processing is local collection even though no raw field is retained. All other sources keep notice 3. Existing TikTok notice-3 enablement is insufficient; a fresh affirmative notice precedes acquisition.
-
-The acquisition-owned helper streams at most 4096 UTF-16 code units per field into a freshly keyed HMAC-SHA256 comparison. Fixed field framing/order avoids order/concatenation ambiguity. Only keyed digests, a random in-memory key and the previous comparison state survive the scan; no raw-value conversion, log, database, diagnostic or bridge token is permitted. Duplicate, blank, oversized, editable, invisible, foreign-package, missing-caption and incomplete scans withhold identity. Keys/comparison state reset on app/window/consent epoch changes, outside-app/keyguard and service teardown; an invalidated collector cannot commit. Only a monotonically increasing encounter ordinal enters the existing numeric page/count path. Tokens are not durable content identities. Repeated/missing captions can undercount; caption changes can misidentify transitions. Playback, completion, distinct counts and full target accuracy remain unavailable until independently qualified.
-
-## Optional auto-scroll session
-
-The separately selected AS-044 convenience feature reads numeric playback progress only for enabled, version-qualified viewers after affirmative Allow. Progress and the playback-loop decision remain in memory; no progress, automation content identity or raw descriptions enter normal history, diagnostics, bridge responses or uploads. Start and a visible Stop are separate from allowing controls. The only automatic action is a bounded upward swipe after qualified loop evidence; there are no automatic likes, messages, follows or shares. Leaving/locking, source pause/revocation, hiding the display, unknown progress or service restart stops future actions. No account, telemetry or developer recipient is introduced. See [Auto-scroll](AUTOSCROLL-SPEC.md) for current candidates and limits.
-
-The operator-only development playback investigation reads at most 192 nodes in selected enabled apps. It retains bounded numeric ranges, exact numeric player-time matches, layout IDs/classes/bounds and already-allowlisted fixed interface tokens locally for qualification. Unmatched text is discarded, and captions, raw descriptions, messages, images and target screenshots are not retained. This is separate from product encounter history and never uploaded automatically.
-
-The explicitly authorized operator metadata investigation reads only numeric duration/playback state from a selected foreground source using a temporary instrumentation shell identity. It never grants notification access or controls playback. The numeric-only player-control investigation may traverse hidden nodes for the known player IDs, within 192 nodes, but does not read text/descriptions or promote hidden values into production detection. No screenshot capability or image reader is added.
-
-Instagram/Facebook Home scope requires renewed source notice 5. Counts may include separately identified Home-video encounters. A bounded set of layout bounds and scope-local layout-node keys supports transient continuity; keys are never serialized, persisted or uploaded. Facebook adds exact Reel and selected Home tab-position interface matches. Instagram normal observation still does not read node text/descriptions. TikTok notice 4 and YouTube notice 3 remain independent. No screenshot implementation is added; the separately authorized progress-bar prototype remains pending.
-
-AS-050 adds a separate off-by-default all-app time choice and Usage Access grant. After affirmative consent, only accessible-profile package names, event timestamps and admitted numeric activity/screen/keyguard transitions are retained in encrypted local history. No activity names or app content are recorded. Durable consent epochs, observed grant-loss boundaries and deletion fences prevent pre-consent or observed-disabled-gap backfill. Native query history is partial and limited by Android retention. Existing enabled accessibility sources also save bounded consecutive-sample surface occupancy; no additional provider fields are read. Optional separately enabled reminders use committed encounter and measured-time thresholds and have immediate dismissal. The all-usage deletion confirmation explicitly removes counts, app events and timers, turns both collectors/reminders off and preserves only minimal configuration/store metadata. No developer transfer, new image capture or telemetry is introduced. Public policy and native onboarding disclose local recording rather than claiming no collection.
-
-ADR-059/ADR-060 add no observed provider fields. A separately enabled rule covers validated dedicated viewers with our own overlay, pauses counting/time while covered and offers immediate bypass. It does not stop media/audio or act on provider controls. Screen-off/User-present state bounds an in-memory cross-app counter; no durable unlock history is invented. Raw recognized-ad counts remain stored under existing source consent, independently of the reversible headline inclusion choice. No new grant, content capture, upload or payment flow.
-
-ADR-062 derives observed app opens from already consented numeric usage events, without adding acquired fields or raw-event identity. It suppresses consecutive same-package activity transitions and preserves partial-coverage limitations; it is not an exact launch log. The usage notice describes foreground time and observed entries. ADR-054 now has a separately authorized instrumentation-only pixel prototype: a frame can exist transiently in memory, only a bounded playback-line strip is inspected, and the bitmap is recycled without encoding, saving or upload. Numeric progress/timing/resource diagnostics are separate from behavioral history. This does not add a production screenshot capability or qualify the production capture cost. The earlier pending-prototype statements describe the historical increment.
-
-
-The experimental voluntary focus feature (ADR-082/AS-015) stores selected package targets, session identity, start/deadline/elapsed times and boot epoch in existing encrypted local protection configuration. This is user-selected rule configuration, not a record of attention or target content. It adds no permission, provider connection, diagnostic upload or free-text intention. It can accompany protection configuration in an explicitly selected archive/Android-managed snapshot, but replacement clears active focus before any rule evaluation. No imported focus is silently activated.
-
-
-History troubleshooting exposes only a fixed local failure-stage code through the error card’s information button. Native rejection messages/codes outside the allowlist, JSON, parser issues and history fields are discarded from errors. There is no diagnostic history, automatic logging, upload or new acquisition. The person may independently include the displayed code in a problem report.
+Before each release compare the merged release manifest, accessibility service XML and backup rules with this page, the public policy, the Data safety form and the accessibility declaration (`tools/audit_current_release.py` checks the manifest and compiled backup rules).

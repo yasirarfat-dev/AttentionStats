@@ -1,136 +1,187 @@
-# Release and distribution
+# Release
 
-**Current scope and checks (18/11/26):** Facebook auto-scroll is nonblocking under ADR-110; earlier Facebook-based hold statements below are historical. The maintainer directs verification first and explicitly withholds the production build until requested. Uploaded baseline remains 1.0.0/code10; no next code is reserved. [Current publishing checkpoint](PUBLISHING-PHASE.md), [preview package inspection](evidence/publication-preview-audit.json) and [native lifecycle evidence](evidence/protection-lifecycle.json) narrow particular gates; seven-day resources, broader recovery/accessibility/compatibility and signed-candidate/Console gates remain open.
+How a release is built, checked and published, plus the Google Play Console text. The four `text` blocks below are read by `tools/release_candidate.py` (title, short description, full description, release notes, in that order) and checked against Play's length limits; keep exactly four.
 
-Official guidance rechecked 18/11/26: mobile submissions require API36+ ([target policy](https://support.google.com/googleplay/android-developer/answer/11926878?hl=en-en)); this project and decoded preview target37. Non-tool accessibility use still needs affirmative in-app disclosure/consent, declaration review and a video demonstrating consent and refusal ([accessibility guidance](https://support.google.com/googleplay/android-developer/answer/10964491?hl=en)). Data safety must reflect actual off-device transport and SDK behavior; do not assume the external-backup exception applies when constructing local history backups ([Data safety guidance](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en)). [Review record](evidence/publication-policy-review.json) lists candidate-specific follow-ups without claiming Console or policy approval.
+## Release rules
 
-**Status:** Maintainer confirms uploaded beta 1.0.0 / 10; broader Console details have not been independently inspected. Production readiness remains on hold. Updated 2026-11-15.
-**Responsibility:** Defines public repository publishing, Android distribution, signing and release gates.
-**Related specifications:** [Testing](TESTING.md), [Security](SECURITY.md), [Dependencies](DEPENDENCIES.md), [Contributing](CONTRIBUTING.md), [State](STATE.md).
-**Unresolved feasibility:** F-01–F-04 and F-08 in [Decisions](DECISIONS.md); exact Console artifact/source mapping, review status and broader qualification remain to be verified separately from the publication report.
+- Maintainers own the application ID (`attention.stats`), signing keys, Play Console and rollout decisions. Contributors never commit keystores, passwords or signed artifacts.
+- Never reuse or decrease a `versionCode`. Check Play Console for the highest used code before choosing the next one.
+- A merge to `main` needs the maintainer's explicit agreement to the concrete candidate (ADR-068).
+- From 1.1.0 every release must migrate earlier production data (ADR-108).
+- Listing, Data safety, accessibility declaration and privacy policy must describe the exact uploaded build.
+- If a detector breaks after an app update, ship a reviewed fix; never change collection remotely.
 
-## Current production-access update (2026-11-15)
+## Signing
 
-The maintainer reports Google Play production access is granted and requests the next version today, after resolving release failures. Earlier eligibility/application preparation below is historical. Console versions, warnings, declarations and artifact provenance still require verification; no production candidate has been submitted by this continuation. Account access does not close the release gates or authorize an unreviewed main merge. The maintainer subsequently clarifies the order: verify all implemented features and rendered UI surfaces first, then build for release/publication; only initial closed-test 1.0.0 has been published. Follow the [latest phone-release checkpoint](PUBLISHING-PHASE.md) and incomplete [surface ledger](evidence/publishing-surface-review.json).
+Play App Signing holds the app-signing key; a separate upload key signs the bundle (ADR-064).
 
-## Production-access continuation (2026-11-12)
+1. Once per maintainer: `python tools/release_signing.py provision` creates the upload key and a protected configuration outside the repository (default under the user's `AppReleases/AttentionStats/private/signing`, or `ATTENTION_RELEASE_ROOT`). It refuses to overwrite an existing key. Keep an independent encrypted backup of the key.
+2. The build reads credentials through `--signing-config <path-to-upload-signing.json>`, which `tools/android_build.py` accepts only with release tasks. Without it, release builds are unsigned inspection builds.
 
-**Active execution plan (14/11/26):** [Next Google Play publishing phase](PUBLISHING-PHASE.md) organizes verification and polish of implemented features into small checkpointed batches before the next Play release. New features follow publication; existing readiness gates and the concrete-candidate merge agreement still apply.
+## Build and audit
 
-The maintainer confirms the uploaded closed-test version is **1.0.0 / versionCode 10**, and expects the test period to end on November 13. This confirms the reported version, not artifact/source mapping, continuous tester eligibility, Console warnings or approval. The source on `develop` contains subsequent changes which are not established as distributed to those testers.
+From a clean tree on the release commit, with `versionCode`/`versionName` set in `android/app/build.gradle`:
 
-[Google's testing guidance](https://support.google.com/googleplay/android-developer/answer/14151465?hl=en), rechecked November 12, requires eligible new personal accounts to have at least 12 testers continuously opted in for the preceding 14 days when applying. The application asks about engagement, feedback, improvements and readiness; review usually takes seven days or less but can take longer. Eligibility to apply, access approval and release rollout are separate milestones. Continue closed testing while resolving issues; do not present develop-only device trials as feedback on an uploaded beta update.
+```powershell
+pnpm install --frozen-lockfile --ignore-scripts
+python tools/check_mobile.py --installed
+pnpm typecheck; pnpm lint; pnpm format:check; pnpm test
+python tools/android_build.py :reels-core:verifyReels :protection-core:verifyProtection :analytics-core:verifyAnalytics
+python -m unittest discover -s tools/tests
 
-The current readiness decision remains **hold** against the nine gates below. Recent scoped source, HUD, queue-pressure and key-loss checks reduce particular uncertainties; they do not close intermittent auto-scroll confirmation loss, framework fresh-install recovery, minimum-device qualification, accessibility or resource/soak gates. Keep the existing **4–8 focused engineering week** allowance as a low-confidence planning estimate for the current Android scope, with test/review waiting possibly extending elapsed time. No completion percentage or full-vision date is justified by current task states.
+# Unsigned inspection build and static audit
+python tools/android_build.py :app:assembleRelease :app:bundleRelease :app:lintRelease --arch arm64-v8a --workers 2
+python tools/audit_current_release.py --apk android/app/build/outputs/apk/release/app-release-unsigned.apk `
+  --aab android/app/build/outputs/bundle/release/app-release.aab --version-name 1.1.0 --version-code 11
 
-| Work package to finish | Concrete next deliverable |
+# Signed build and signed audit
+python tools/android_build.py :app:bundleRelease :app:assembleRelease --signing-config <upload-signing.json>
+python tools/verify_signed_release.py --profile current --certificate <upload-cert> `
+  --version-name 1.1.0 --version-code 11 --archive <new-folder-outside-repo>
+```
+
+The audits check package and version, merged manifest permissions and exported components, compiled backup rules, matching native libraries and 16 KB page alignment. They are static checks; they do not replace testing the build on a phone.
+
+`python tools/release_candidate.py prepare` copies this file, the policies and the store text into the external release folder; `archive` stores an unsigned candidate there. Release folders are never inside the repository.
+
+## Before upload
+
+- [ ] Host checks above pass; release lint has no errors.
+- [ ] Install the release build over the previous production version: history, choices and keys survive.
+- [ ] Spot-check counting on each supported app, a break, a block cover and its escape routes, and Protection Lock.
+- [ ] Listing, Data safety answers, accessibility declaration and reviewer video match the build.
+- [ ] Release notes updated; [STATUS](STATUS.md) updated.
+- [ ] Maintainer agreement to merge `develop` into `main`; tag the release commit.
+
+## Google Play Console
+
+Package **attention.stats**, release 1.1.0 (11). The closed test was 1.0.0 (10); production access has been granted.
+
+### App details
+
+| Field | Value |
 |---|---|
-| Source and convenience reliability | Reproduce the traced arrival failure; complete supported source/route and pause/seek/manual-input negative matrix; explicitly retain unavailable sources |
-| Protection and lifecycle | Permission/service/process/lock trials, five-minute reset and time-trigger checks, overlaps/allowances and safe exits |
-| Recovery and preservation | Isolated actual framework fresh-install recovery, maximum-history restore and interruption/low-space preservation; never reinstall the real-history debug package |
-| Usability and compatibility | Core TalkBack/large-type/RTL/theme journeys, widget configuration, minimum API and declared additional devices/locales |
-| Resource and security evidence | Bounded long-history measurements, seven-day resource comparison, candidate manifest/egress/log/dependency and deletion audits |
-| Candidate and application | Source/artifact/signature mapping, truthful declarations/reviewer video, tester feedback summary and reviewed signed build |
+| App name | Attention Stats |
+| Package | attention.stats |
+| Default language | English (United States) |
+| App or game | App |
+| Free or paid | Free (no in-app purchases, no ads) |
+| Category | Productivity (alternative: Health & Fitness) |
+| Tags | Digital wellbeing, Productivity, Self-improvement |
+| Email | consciousbiobot@gmail.com |
+| Developer account | Convenience Labs |
+| Website | https://yasirarfat.com (creator's site; the source link is in the description) |
+| Privacy policy | https://github.com/yasirarfat-dev/AttentionStats/blob/main/policies/PRIVACY.md |
 
-The [Console preparation draft](../release/PLAY-CONSOLE.md) now removes universal-route and no-transmission claims, describes Android-managed backup and external-copy deletion limits, and leaves final Data safety answers pending review. Lack of Internet permission does not establish absence of OS/provider transfers. These edits update repository preparation only; Console, public `main` policy URLs and the private release archive are not changed by a develop push.
+### Store listing
 
-Recommended next display version is **1.1.0** for the accumulated features; **1.0.1** fits a smaller fixes-only candidate. This is a recommendation, not a version reservation or source change. [Android versioning](https://developer.android.com/studio/publish/versioning) requires a higher internal versionCode for successive releases and prohibits reusing an uploaded code; 11 is a candidate only after confirming no higher/used code in Console. Version naming does not qualify an untested binary. A concrete candidate still needs maintainer agreement before main merge, and signing/upload/rollout remain separate actions.
+Title (≤ 30):
 
-Current develop backup exception (ADR-073/ADR-079/AS-058): `allowBackup=true` is paired with an automatic-by-default protected-transport agent that preserves saved opt-outs, and a one-file include list; live databases/keys/preferences and device transfer remain excluded. Qualify the merged manifest/resources and actual recovery before release. The default 0.1.0 `tools/release_candidate.py` profile still guards the historical all-backup-disabled candidate. A separate current profile and `tools/audit_current_release.py` now audit explicit expected versions, current package visibility/components and compiled APK/AAB backup rules. Static inspection never establishes actual framework recovery or complete release acceptance. No release upload or main merge is authorized by the current checks.
+```text
+Attention Stats
+```
 
-## Current unsigned inspection (2026-11-15)
+Short description (≤ 80):
 
-A fresh ARM64 unsigned APK/AAB pair passes the current static audit: production identity and non-debuggable manifest, compiled cloud/transfer rules, accessibility metadata, matching assets/DEX/native libraries and 16-KiB native alignment. All 27 selected release/audit/signature/backup-policy host checks pass. Exact hashes and limitations are in [inspection evidence](evidence/publishing-release-inspection.json). This retains source version 1.0.0/code10 for inspection only; it is not an upload candidate or signed/release-runtime acceptance.
+```text
+Count Reels, Shorts & TikToks. Breaks and blocks you choose. Private, no ads.
+```
 
-## Current public policy review (2026-11-14)
+Full description (≤ 4000):
 
-[Accessibility guidance](https://support.google.com/googleplay/android-developer/answer/10964491?hl=en) still requires narrow, understandable actions, a declaration/review and separate prominent disclosure for apps that are not accessibility tools; its deterministic automation allowance is not this candidate’s approval. [Personal-account testing guidance](https://support.google.com/googleplay/android-developer/answer/14151465?hl=en-en) still specifies 12 continuously opted-in testers for 14 days for eligible new personal accounts; actual account category, eligibility and Console records remain uninspected.
+```text
+How many short videos did you scroll through today?
 
-[Data safety guidance](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en) makes the external-backup exception conditional, including that the app never accesses the data. This app constructs a logical history copy, so do not assume that exception automatically covers it. Final answers require review of the actual uploaded implementation and transport behavior; no final form or approval is inferred.
+Attention Stats estimates short-video encounters on supported screens in Instagram, Facebook, YouTube Shorts, TikTok and Snapchat Spotlight, and shows local activity summaries. Choose your own breaks and limits. Free, open source, no ads, and no developer account or telemetry.
 
-Maintainer November 14 scope decision: keep auto-scroll in the release and continue qualification with publication held. No capability exclusion, merge or binary publication is authorized by this decision.
+COUNTS ON SUPPORTED SCREENS
+• Recognises supported short-video players and some Instagram and Facebook feed layouts
+• Support varies with app version, language and screen; missed or misclassified items are possible
+• Returning to a recognised item within an unlock session is treated as a revisit
+• An encounter counts a visible item; it does not prove that you watched it
+• Ads and photos are counted separately, and you choose whether ads count
 
-## Readiness assessment (2026-11-07)
+A LIVE COUNTER THAT STAYS OUT OF THE WAY
+• A small, see-through counter shows this unlock and today
+• A ring fills as you get closer to your break
+• Drag it anywhere, tap it for details, hide it for a visit
 
-The current Android beta is functional within its recorded scope; it is **not cleared for a fully qualified production release**. Readiness requires a declared supported scope, passing applicable scenarios on the concrete candidate, and maintainer acceptance. No amount of unit-test passing establishes universal device/source reliability or guarantees defect-free software. This assessment uses repository evidence, not a new Play-policy or Console inspection.
+SEE YOUR HISTORY CLEARLY
+• Today: short-video encounters and time on short-video screens per app, with each app's logo
+• Screen time and observed app opens when you allow Usage Access
+• Week, Month or All Time insights, a calendar for any day, per-app history and hourly rhythm
+• Perspective: what your scrolling time could have been, from pages of a book to kilometres of walking, and how far your thumb has scrolled
+• Home-screen widgets in several layouts, each configurable
 
-The tracker contains 61 tasks: six implemented, 43 experimental, eleven planned and one blocked. These are task states, **not a completion percentage**: old scaffold rows retain broad qualification gates while later milestones implement useful overlapping subsets. Conversely, a published beta does not close those gates. Do not estimate remaining effort by subtracting six from 61.
+GENTLE TOOLS YOU CHOOSE
+• Mindful breaks: a lively full-screen break with real-life choices (walk, read, call a friend) after the number of videos or minutes you pick; the video is paused first where the app allows it
+• Per-app limits: a daily short-video limit, or always leave Reels or Shorts in a chosen app
+• App groups and time slots: cover chosen apps during recurring periods, or allow only the apps you pick
+• Focus sessions from 5 minutes to 3 hours
+• Covers keep Android Settings, Home and emergency calls available and offer a five-minute allowance
+• Optional Protection Lock: one parent key (a PIN or a pattern that works only in this app), with fingerprint if your child's is not saved on the phone, for the changes you choose to protect, allowances and erasing history
 
-| Remaining release gate | Owners | Required closing evidence |
-|---|---|---|
-| Detector/counting fidelity | AS-013/AS-048/AS-054/AS-055 | Declared app/version/locale/route matrix; independently observed settled items versus saved counts, ads/photos/revisits/negative contexts, explicit unsupported playback metrics. |
-| Protection and safe escape | AS-015–AS-017/AS-053/AS-060/AS-061 | Live selective and whole-app rules, overlaps/allowances, time-trigger/reset, delayed/repeated actions, safe navigation and pause/fallback behavior. Historical unexplained reminder failure remains separately tracked. |
-| Data preservation and recovery | AS-006/AS-009/AS-019/AS-020/AS-058 | Upgrade/migration, interruption/low-space/key-loss preservation, actual fresh-install recovery on an isolated installation, corrupt/cancelled replacement and maximum logical-history restore. Envelope readback and transport handoff alone are insufficient. |
-| Lifecycle and time correctness | AS-003/AS-010/AS-011/AS-014 | Applicable L-01–L-07 on declared supported devices: process death, restart, lock, revoked permission, offline use, clock/zone/day boundaries and honest gaps. |
-| History, coverage and bounded resources | AS-011/AS-014/AS-037/AS-038 | Correct totals/unknown coverage, bounded queries and declared long-history dataset; measured cold/warm latency, memory/storage and seven-day battery/CPU baseline comparison (L-08). |
-| Accessibility and visual polish | AS-018/AS-045/AS-056/AS-057/AS-059 | Core journeys with TalkBack, large type, light/dark themes, reduced motion, RTL, keyboard/insets and relevant loading/empty/error/partial states on a real phone; widget configuration included. |
-| Privacy and security | AS-006/AS-007/AS-021 | Applicable S-01–S-06: merged component/permission/backup audit, release egress/log inspection, deletion/no-resurrection, malicious input/resource bounds, dependency/license/vulnerability review. Public-package files must not be described as secret encrypted archives. |
-| Device compatibility and build maintenance | AS-002/AS-004/AS-018/AS-022 | Minimum supported API plus declared OEM/API/locale matrix and release-binary execution; disposition of existing AGP/Kotlin/CMake warnings. The current API-36 phone cannot qualify older APIs. |
-| Release provenance and distribution | AS-022/AS-046 | Exact source/artifact/signature mapping, current signed candidate and declarations, verified Console testing/review state, current official policy review and recovery/release notes; explicit maintainer agreement before main merge. |
+PRIVATE BY DESIGN
+• No developer account, servers, ads or telemetry
+• Local history is encrypted on your device; erase it any time
+• The app has no Internet permission. Android backup and your chosen file provider can still transfer data
+• Android-managed backup starts on unless you saved an off choice; turn it off in Settings → Backup & restore
+• The parent key, backup phrases and biometric keys stay on this device and are never backed up
+• Backup files use a public app key, which provides no secrecy to anyone holding the file. Protect external copies
+• 100% open source under GPL-3.0, so anyone can check: github.com/yasirarfat-dev/AttentionStats
 
-Recommended sequence: close selective protection and reminder timing first; prove isolated recovery/data-preservation next; complete the declared source/device matrix and accessibility/lifecycle checks; then review the exact signed release candidate. Fixes may reopen affected checks. No remote workflow, merge, signing or publication follows automatically from this plan.
+HOW IT WORKS
+With your consent, Attention Stats uses Android's Accessibility service to recognise supported short-video screens and distinguish items. Labels are processed in memory and discarded; local records keep encounter facts, not captions, names, messages or typed input. User-chosen protection can cover selected apps or leave a blocked player with Back. Optional session auto-scroll swipes only when its supported playback or photo signal qualifies; it may remain unavailable. Usage Access (optional) adds screen time per app.
 
-For planning only, reserve roughly **4–8 focused engineering weeks** for the current Android beta's remaining qualification, fixes and polish, assuming the required devices and Console evidence are available and no major detector/storage redesign emerges. This is a low-confidence effort allowance, not measured velocity or a delivery promise; elapsed tester/review/soak time can extend it. Re-estimate after the protection and recovery gates expose actual defects. A single chat session cannot clear the multi-device, seven-day resource and distribution gates.
+Attention Stats is not a medical app and does not diagnose anything. It simply helps you see your habits and choose your own limits.
+```
 
-The broader product vision adds unfinished diary/budget/focus behavior and optional notifications, richer interactions/network analytics, retention/import, predictions, actual synchronization and later iOS. Those are additional development milestones with independent feasibility gates, not final QA of today's beta. Direct Drive API remains blocked under F-05. No credible full-vision completion date is established yet; scope and feasibility must be resolved before scheduling it.
+Graphics (kept in the external release folder under `store/en-US/`): `icon-512.png`, `feature-graphic-1024x500.png` and phone screenshots. Generate icons with `tools/make_brand_assets.py`.
 
-## Beta release and development branches
+### App content
 
-The maintainer reports that closed beta is published (2026-11-03). Source currently declares versionName **1.0.0**, versionCode **10**, package **attention.stats**. Do not infer the uploaded artifact checksum, source commit, tester start dates, production eligibility or policy approval from that report. Earlier preparation details below are historical; consult actual Console records before selecting a new version code or changing store claims.
+| Section | Answer |
+|---|---|
+| App access | All functionality is available without special access (no login) |
+| Ads | No ads |
+| Content rating | Category "Utility, Productivity, Communication or Other"; no violence, sexual content, gambling, user-generated content sharing or location sharing; expected Everyone / PEGI 3 |
+| Target audience | 13–15, 16–17 and 18+ (not designed for children under 13) |
+| News / government / financial | No / No / None |
+| Health | Not a health or medical app (wellbeing habits only) |
 
-Under ADR-067/ADR-068, `main` is the beta release line; `develop` starts at source commit `1fc538221adfa3e66c1d94bdb9a0258509dc188c`. Use small task branches from `develop` when useful and integrate reviewed, locally checked changes there. A merge to `main` requires both the maintainer's explicit agreement to the concrete candidate and the agent's readiness assessment after applicable phone, data-preservation and release checks. Passing tests or standing push authorization is insufficient. Branching does not configure GitHub protection rules or establish the source of the already uploaded binary. No new tag is assigned to that binary without artifact/source evidence.
+### Data safety
 
-Urgent beta fixes may branch from `main`; propagate the reviewed fix into `develop` so it is retained. Preserve history, avoid force pushes, and use forward fixes where schema changes prevent safe binary rollback. All workflows remain manual only; merging/pushing does not authorize a workflow run, signing, upload or rollout.
+- **Collection, sharing and encryption in transit:** answer for the exact uploaded build. Android-managed backup and file-picker providers can transfer history even though the app has no Internet permission; check the applicable exceptions in [Google's Data safety guidance](https://support.google.com/googleplay/android-developer/answer/10787469) and record the final answers in the Console.
+- **Deletion:** in-app **Settings → Erase history** removes local history and turns off future app backups. Uninstalling removes local data. Neither deletes exported files or provider-held backup copies. See the [deletion policy](../policies/DATA-DELETION.md).
 
-## Historical closed-test preparation
+### Sensitive permissions and APIs
 
-ADR-043 sets the production package exactly **attention.stats**, versionName 0.1.0 / initial versionCode 1, subject to Console uniqueness. Keep the `com.attentionstats` source namespace and existing `com.attentionstats.debug` development identity/history; neither changes the Play package. Release snapshot contract 3 hides development-only structure controls and native code rejects those sessions.
+**Accessibility API** (AccessibilityService, `isAccessibilityTool = false`), permission declaration form:
 
-ADR-064 reserves versionCode 2 for the resumed signed 0.1.0 candidate; code 1's unsigned investigation archive remains immutable. Check actual Console use before uploading any version code.
+- Core functionality: *Counting short videos (Reels, Shorts, TikTok, Spotlight) the user watches and showing a live counter, user-chosen break reminders and user-chosen blocks of short-video players.*
+- Description:
 
-[Play Console information](../release/PLAY-CONSOLE.md) supplies listing text, app-content declarations, reviewer steps, assets, signing/tester/rollout fields and current blockers. Public user-facing [privacy](../policies/PRIVACY.md), [support](../policies/SUPPORT.md), [local deletion](../policies/DATA-DELETION.md) and [testing](../policies/CLOSED-TEST.md) documents are separate from internal specifications. The app links the policy. Publishing these GitHub documents is within the user's instruction; no GitHub Pages or automatic pipeline is needed. Signed-out URL accessibility must be verified after publication.
+```plain
+Attention Stats is a digital wellbeing app. With affirmative in-app consent, its AccessibilityService reads foreground screen structure and labels in Instagram, Facebook, YouTube, TikTok and Snapchat to estimate short-video encounters and time on those screens. Labels are processed in memory and discarded; only encounter facts are stored locally. It draws the optional counter and user-configured break reminders; just before a break screen the user enabled, it may pause the video with one tap, on the source app's visible Pause control or, in TikTok and YouTube, on the video itself after confirming from playback progress that it is playing; the pause counts only when progress stops (never a second tap, never Play), otherwise it only shows the reminder. User-chosen blocks can press Back to leave a short-video player. For app/group time slots and focus sessions the person sets up (including Allow Only), it checks foreground package ownership only and shows a cover; system navigation, Settings, launcher, keyboard and emergency/dialer stay available and a five-minute allowance is offered (an optional parent key can be required). Separately allowed auto-scroll uses a visible Start/Stop control and a deterministic qualifying playback/photo signal for one upward swipe; an additional separate choice swipes past pages that carry the source app's own Sponsored/Ad label, without opening ads; unavailable signals suspend actions. It never likes, comments, follows or messages. The app has no Internet permission or developer telemetry; Android-managed backup and user-selected file providers may transfer logical history under disclosed backup choices.
+```
 
-Code/builds remain in this repository. The separate local archive is the maintainer's private release folder (outside the repository), with `PLAY-CONSOLE.md` at its root and versioned `releases/<versionName>+<versionCode>/{android,metadata,notes}`, plus store, policies, testing and private/signing folders. Keep credentials and personal tester/feedback material outside Git. Never overwrite an archived release or represent an unsigned investigation bundle as uploadable.
+- Reviewer video: show the in-app disclosure, enabling the service in Android Settings, the counter on a supported app, a break and its exit, a schedule cover with its allowance, and auto-scroll Start/Stop. Use synthetic history and no private content. Any change in accessibility behavior needs an updated declaration and video ([policy](https://support.google.com/googleplay/android-developer/answer/10964491)).
 
-Closed testing can begin before the broad roadmap is complete only with a working, accurately described scoped candidate and applicable source/privacy/security/policy checks. ADR-066 and State supersede the earlier Facebook/Home availability restriction for the documented MVP subset. Recheck [Google's testing guidance](https://support.google.com/googleplay/android-developer/answer/14151465) and the actual account's Console requirements when assessing production eligibility; no current policy review was performed for this branch setup. Documents, sideloads and internal tests do not establish a Play test period. No production-approval date is promised.
+**Usage access** (`PACKAGE_USAGE_STATS`): optional screen time, granted by the user in system settings after an in-app explanation.
 
-## Documentation publication
+**`USE_BIOMETRIC` / `USE_FINGERPRINT`** (normal permissions from AndroidX Biometric): optional Protection Lock unlock; the app receives only an authentication result, never biometric data.
 
-The designated public repository is [yasirarfat-dev/AttentionStats](https://github.com/yasirarfat-dev/AttentionStats). The user explicitly authorized public publication of this foundation. Review all files, run documentation checks and whitespace validation, inspect the staged tree for secrets/private material, commit and push without application scaffolding. Verify repository visibility and the remote commit; record actual evidence in the dated log. Do not claim a binary release or publish invented badges/download links.
+### Release
 
-GitHub documentation CI uses read-only repository permission, Python and no release credentials. Under ADR-030 all CI/CD workflows are manual only (`workflow_dispatch`); publishing a commit or opening/updating a pull request starts no pipeline. Run appropriate local checks before publication; a remote run requires an explicit user request. Public issue/PR templates require synthetic reports. Private vulnerability reporting should be enabled when repository administration permits. Documentation “implemented” means the documents/checks exist; it does not change any application capability's status.
+| Field | Value |
+|---|---|
+| Track | Production |
+| App signing | Play App Signing; upload with the local upload key |
+| Bundle | `attention-stats-1.1.0-11.aab` from the external release folder |
+| Release name | 1.1.0 (11) |
 
-## Android release ownership
+Release notes (≤ 500):
 
-The maintainer authorized conventional Play App Signing on 2026-10-30: Google should generate/hold the delivery app-signing key, with a separate local upload key used for the AAB. `python tools/release_signing.py provision` refuses existing key material and keeps it outside the repository; its Windows current-user DPAPI password file is not a portable backup. Key readback and protection/rejection safeguards pass. Independent maintainer-controlled encrypted recovery backup, Console enrollment and exact signed-artifact/runtime checks remain distinct gates. To build with the external configuration, pass `--signing-config <external-upload-signing.json>` to `tools/android_build.py` with release tasks only. Without explicit credentials, release inspection builds remain unsigned. Secrets never appear as command-line password values or enter Git.
-
-Release maintainers own permanent application ID/namespace, package signing, Play Console credentials, store declarations and rollout decisions. Contributors may build debug artifacts using local debug signing, but must never commit keystores/passwords or release signatures. Generate release credentials outside the repository with encrypted maintainer-controlled backup and access recovery. A signing key is not the archive recovery key or device DB key.
-
-Select and document Play App Signing and upload-key responsibilities before publishing to a store. Record certificate fingerprints only if needed as public distribution metadata; no private key paths/secrets in logs. Every artifact has versionName/versionCode, source commit, exact locked dependency/toolchain manifest, license notices and checksum. Never reuse or decrement Android version codes.
-
-## Binary release gates
-
-**2026-11-15 latest assessment: HOLD.** Isolated synthetic history navigation/calendar/races passes 123 actual RN checks plus two independent cleanup checks; fresh unsigned APK/AAB static inspection and 27 host release guards pass separately. These close only their artifact-scoped rows. Comprehensive implemented-feature/surface review remains incomplete; the first legacy Settings-help runner fails before named checks, without a diagnosed product defect. The maintainer takes the phone after state verification/test removal. Original cold-history cause, process death and broader source/auto-scroll, accessibility, lifecycle/data/recovery/security/resources/compatibility and distribution gates remain open. No release candidate or publication approval. Resume the [latest handoff](PUBLISHING-PHASE.md).
-
-**2026-11-14 assessment: HOLD.** Fresh P5 mixed-item testing passes one Facebook standalone-ad swipe followed by one numerical video-end swipe, each with native and independent arrival and actual HUD Stop. The three-arrival/180-second target remains unmet because the next reel has no usable progress; another current-item trial has no numerical signal, and a bounded numerical trial never reaches the end. Earlier zero-confirmation failures remain historical, superseded only within the scoped later passes. No timer fallback or broader continuous-source claim. [Sequential results](evidence/publication-sequence.json), [handoff](IMPLEMENTATION_LOG/2026-11-14.md). The remaining recovery, lifecycle, accessibility, resources, security, compatibility and distribution gates remain open; no merge/publication approval is inferred.
-
-**2026-11-13 assessment: hold the next merge/publication candidate.** The maintainer reports Facebook auto-scroll still failing; current-artifact physical investigation finds no readable numeric playback signal in 150 qualified viewer samples and no selected-source media session in a separate 30-sample probe. No fix or actual end/arrival/Stop acceptance is established. Existing source schedules are preserved when the live trial refuses its precondition. See [investigation evidence](evidence/publication-readiness.json) and the [complete feature/verification checklist](FEATURE-VERIFICATION.md). A build can succeed while this release gate remains open. Do not relabel historical baseline/source passes as current candidate readiness. A changed release scope requires an explicit decision and truthful unavailable behavior; it is not inferred from these negative probes.
-
-1. Select candidate from passing code/review and accurate tracker/specs. Re-resolve latest only in a reviewed update task; release builds consume the reviewed lockfile.
-2. Build signed release AAB/APK reproducibly from clean state using frozen-lockfile and pinned native toolchain. Record any reproducibility limitation, including signing timestamps. Inspect merged manifest, exported components, permissions, backup exclusions and dependency notices.
-3. Pass relevant [acceptance scenarios](TESTING.md), including real-device lifecycle, enforcement escape routes, crypto/restore failure, egress/log checks and OS cloud/device transfer exclusions. Unsupported detectors remain disabled with declared ranges.
-4. Recheck current Play rules for target API, accessibility, package visibility, foreground services, permission disclosures, privacy and Data safety. Rules change; use current primary documentation rather than hardcoded target deadlines. The product must not claim accessibility-tool eligibility or autonomous actions.
-5. Publish an accurate public privacy notice and release notes describing data stored locally, optional transfers, coverage, known gaps, experimental detectors and rollback/recovery. Marketing follows [Privacy](PRIVACY.md), not “collects no data.” Direct Drive backup remains unavailable while F-05 is blocked.
-6. Maintainer reviews the concrete candidate and store forms, signs off, and starts internal/closed testing before staged public rollout. Monitor voluntary synthetic feedback; no remote telemetry pipeline. Do not infer policy approval from another application's listing.
-
-## Recovery and updates
-
-Schema changes need tested migration paths and a pre-update encrypted-export option where appropriate. Never force a destructive reset to recover from migration failure. Rollback may be limited by schema/signing/version constraints; document a forward-fix strategy and archival compatibility. If a detector breaks after a target app update, mark its support unavailable and ship a reviewed fix; no remote silent data-collection expansion.
-
-Security incidents follow [reporting policy](../SECURITY.md). Withdraw unsafe release links, disable an affected feature in the next reviewed release when necessary, preserve user history where possible and state affected versions. No over-the-air executable code, hidden policy bypass or automatic diagnostic upload is part of release operations.
-
-
-November 14 concluding development checkpoint: one source-qualified standalone Facebook ad now passes actual HUD Start/automatic different-page confirmation/Stop, with exact artifact and native payload comparison in [continuation evidence](evidence/facebook-appearance-widget-continuation.json). This removes the earlier zero-confirmation result only for that bounded trial; repeated Facebook end scrolling, unknown-progress/overlay behavior, genuine provider controls and broader release gates remain open. Appearance/widget delivery is separate from scroll acceptance. No main merge, signing, binary publication or remote workflow follows this checkpoint.
-
-
-November 14 day/icon concluding checkpoint remains HOLD: installed P8 has scoped UI/native evidence, but fresh cold Insights shows history unavailable and the final two JS refinements await build/render acceptance. Facebook current trials stop before Start on the settled-viewer precondition; no earlier repeated-end gate is cleared. Emulator/other-device work is explicitly deferred until product completion, with zero accepted size profiles. No merge, version/signing/Console or binary publication clearance. [Exact scope and cleanup](evidence/day-insights-continuation.json).
+```text
+First public release. Counts short videos on Instagram, Facebook, YouTube Shorts, TikTok and Snapchat. New: lively break screens with real-life choices, Perspective (what your scrolling time could have been), Week/Month/All Time insights, app groups, time slots, focus sessions, Allow Only, a parent key with fingerprint, backup and restore, widgets and themes. Auto-scroll now supports YouTube Shorts and can skip ads. No ads, account or telemetry.
+```

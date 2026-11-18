@@ -10,7 +10,7 @@ Use original text and synthetic examples. Do not include private reference mater
 
 ## User need and behavior
 
-Describe the problem, proposed action and affected capability/AS task.
+Describe the problem and the proposed behavior.
 
 ## Feasibility and privacy
 
@@ -18,4 +18,4 @@ Source/API, required access, local data, user controls, platform/accuracy limits
 
 ## Acceptance
 
-Synthetic scenario, expected outcome and unsupported/failure behavior. Proposals are reviewed through docs/QUEUE.md; they are not automatic product commitments.
+Synthetic scenario, expected outcome and unsupported/failure behavior. Proposals are not automatic product commitments; accepted ones are recorded in docs/DECISIONS.md and docs/STATUS.md.

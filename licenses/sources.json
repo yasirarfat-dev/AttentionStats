@@ -1,0 +1,1260 @@
+{
+  "maven": [
+    {
+      "name": "androidx.activity:activity-ktx",
+      "version": "1.8.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/activity#1.8.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/activity/activity-ktx/1.8.1/activity-ktx-1.8.1.pom",
+      "sha256": "1ee72f3f15b81f052ff7432a5a89803e28a2708f7a5c39077a32d12d86bfe7f2"
+    },
+    {
+      "name": "androidx.activity:activity",
+      "version": "1.8.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/activity#1.8.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/activity/activity/1.8.1/activity-1.8.1.pom",
+      "sha256": "c0ccbb0f6bd3f3a4fe338811dd8aee19b4919f4197613ee801bf33dd6dd702d7"
+    },
+    {
+      "name": "androidx.annotation:annotation-experimental",
+      "version": "1.5.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/annotation#1.5.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/annotation/annotation-experimental/1.5.0/annotation-experimental-1.5.0.pom",
+      "sha256": "7a94595399931c25a49f9af93daa4e977dc2d375458e4e74bb8d35ebcb51848d"
+    },
+    {
+      "name": "androidx.annotation:annotation-jvm",
+      "version": "1.9.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/annotation#1.9.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/annotation/annotation-jvm/1.9.1/annotation-jvm-1.9.1.pom",
+      "sha256": "89b99c218d60019316b50aab79816707bc21696c896a030e1b1ae038961bcb8e"
+    },
+    {
+      "name": "androidx.annotation:annotation",
+      "version": "1.9.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/annotation#1.9.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/annotation/annotation/1.9.1/annotation-1.9.1.pom",
+      "sha256": "c733881c2e17d5f7c8661cc02a9159cb160b7b2094a27d593916c87d3e250636"
+    },
+    {
+      "name": "androidx.appcompat:appcompat-resources",
+      "version": "1.7.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/appcompat#1.7.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/appcompat/appcompat-resources/1.7.1/appcompat-resources-1.7.1.pom",
+      "sha256": "2faf922e8c3d706f29d862b3fbb3aa1347705c21c6eae18586d2bb1f7366ea01"
+    },
+    {
+      "name": "androidx.appcompat:appcompat",
+      "version": "1.7.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/appcompat#1.7.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/appcompat/appcompat/1.7.1/appcompat-1.7.1.pom",
+      "sha256": "1f79910cc20de198acf3867b1e93f9ed59ddb643585b2e9c28ee55518af1bc00"
+    },
+    {
+      "name": "androidx.arch.core:core-common",
+      "version": "2.2.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/arch-core#2.2.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/arch/core/core-common/2.2.0/core-common-2.2.0.pom",
+      "sha256": "1e17d4af8d6425be2a69f8af4d654a87e0456259a9eef1542869bcb023547e28"
+    },
+    {
+      "name": "androidx.arch.core:core-runtime",
+      "version": "2.2.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/arch-core#2.2.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/arch/core/core-runtime/2.2.0/core-runtime-2.2.0.pom",
+      "sha256": "0f953706598140d9d8735cdd5aeb1fa35933f4e2f31c0bf3eb81a053a4c8c1a5"
+    },
+    {
+      "name": "androidx.autofill:autofill",
+      "version": "1.3.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/autofill#1.3.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/autofill/autofill/1.3.0/autofill-1.3.0.pom",
+      "sha256": "6292a3975ee2bbe04b958197acee6a1da0ff6d0cddbad6abbf9f4adbafb8eac9"
+    },
+    {
+      "name": "androidx.biometric:biometric",
+      "version": "1.1.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/biometric#1.1.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/biometric/biometric/1.1.0/biometric-1.1.0.pom",
+      "sha256": "aeb69e76988f43b06c84fca25efab2e418bb98b5aabcd03fa7913bd3ed1bcaa9"
+    },
+    {
+      "name": "androidx.cardview:cardview",
+      "version": "1.0.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/tools/extras/support-library.html",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/cardview/cardview/1.0.0/cardview-1.0.0.pom",
+      "sha256": "e64ef4e08b58358fe27b599e6fe80a1b153db014c644beee630ab271061c3e6c"
+    },
+    {
+      "name": "androidx.collection:collection-jvm",
+      "version": "1.5.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/collection#1.5.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/collection/collection-jvm/1.5.0/collection-jvm-1.5.0.pom",
+      "sha256": "11c415864d3402f61d426e67210158dce1b04680412526a994f1823ecd3cb388"
+    },
+    {
+      "name": "androidx.collection:collection-ktx",
+      "version": "1.5.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/collection#1.5.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/collection/collection-ktx/1.5.0/collection-ktx-1.5.0.pom",
+      "sha256": "983f8d0630d072d5bfcd166a498ac7213f3a44a98c09051004ce96429d867cea"
+    },
+    {
+      "name": "androidx.collection:collection",
+      "version": "1.5.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/collection#1.5.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/collection/collection/1.5.0/collection-1.5.0.pom",
+      "sha256": "2d65c8d0b36d4b4faadc44aff9bade23d871d7159eedf2b3f02d802b34b77a57"
+    },
+    {
+      "name": "androidx.concurrent:concurrent-futures",
+      "version": "1.1.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/topic/libraries/architecture/index.html",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/concurrent/concurrent-futures/1.1.0/concurrent-futures-1.1.0.pom",
+      "sha256": "748a34eb5d13d19d187adecaea82667fded5f1b0b98a655e13ed2e4a8b3d8ae6"
+    },
+    {
+      "name": "androidx.constraintlayout:constraintlayout-core",
+      "version": "1.0.0",
+      "license": "Apache-2.0",
+      "url": "https://tools.android.com",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/constraintlayout/constraintlayout-core/1.0.0/constraintlayout-core-1.0.0.pom",
+      "sha256": "93e01622e90b5879bb950fedb5c417c8024555fdc779481bcee21a3b5977cb8c"
+    },
+    {
+      "name": "androidx.constraintlayout:constraintlayout",
+      "version": "2.1.0",
+      "license": "Apache-2.0",
+      "url": "https://tools.android.com",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/constraintlayout/constraintlayout/2.1.0/constraintlayout-2.1.0.pom",
+      "sha256": "25104af5ae91efe5fe6c9178eee35f6b02e31349505738cceb4df2df8385b585"
+    },
+    {
+      "name": "androidx.coordinatorlayout:coordinatorlayout",
+      "version": "1.2.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/coordinatorlayout#1.2.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/coordinatorlayout/coordinatorlayout/1.2.0/coordinatorlayout-1.2.0.pom",
+      "sha256": "0d1848e15e289c05937aaa36bf4c62659936bcddc95ce59edf386f8646fcbd22"
+    },
+    {
+      "name": "androidx.core:core-ktx",
+      "version": "1.18.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/core#1.18.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/core/core-ktx/1.18.0/core-ktx-1.18.0.pom",
+      "sha256": "3a5e0009e06517627756b9203d9a8f055fda87b215a17b775bae568697854196"
+    },
+    {
+      "name": "androidx.core:core-viewtree",
+      "version": "1.0.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/core#1.0.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/core/core-viewtree/1.0.0/core-viewtree-1.0.0.pom",
+      "sha256": "d4f2ed1176fa8c5612b80f74c952a8799142a9ed36022a1a238fde5b140580d9"
+    },
+    {
+      "name": "androidx.core:core",
+      "version": "1.18.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/core#1.18.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/core/core/1.18.0/core-1.18.0.pom",
+      "sha256": "57d644ebb37d309ad959d740157d8e8424e273b9c672842e4f4c758edc6d30e7"
+    },
+    {
+      "name": "androidx.cursoradapter:cursoradapter",
+      "version": "1.0.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/tools/extras/support-library.html",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/cursoradapter/cursoradapter/1.0.0/cursoradapter-1.0.0.pom",
+      "sha256": "62d95c89850af21030b19f14d5f7ecd6d8bcc9a3014c59002ec99624caac8100"
+    },
+    {
+      "name": "androidx.customview:customview",
+      "version": "1.1.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/customview/customview/1.1.0/customview-1.1.0.pom",
+      "sha256": "c814d435f73e9e6d169886d0eb96b5c5361feb48449fbbb315c908c03c588c94"
+    },
+    {
+      "name": "androidx.drawerlayout:drawerlayout",
+      "version": "1.1.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/drawerlayout/drawerlayout/1.1.1/drawerlayout-1.1.1.pom",
+      "sha256": "c12fa903ba53005962a72405f37896608718f41673fc4a62312e4536132f6f45"
+    },
+    {
+      "name": "androidx.dynamicanimation:dynamicanimation",
+      "version": "1.1.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/dynamicanimation#1.1.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/dynamicanimation/dynamicanimation/1.1.0/dynamicanimation-1.1.0.pom",
+      "sha256": "caecb7b379585d8e4070ebafae3974a137c6689de8077f9165935b3605784a93"
+    },
+    {
+      "name": "androidx.emoji2:emoji2-views-helper",
+      "version": "1.3.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/emoji2#1.3.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/emoji2/emoji2-views-helper/1.3.0/emoji2-views-helper-1.3.0.pom",
+      "sha256": "2673b0f5859d4361a4e9a30457852a6745d0c3c85b5e0412070483f3963ef526"
+    },
+    {
+      "name": "androidx.emoji2:emoji2",
+      "version": "1.3.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/emoji2#1.3.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/emoji2/emoji2/1.3.0/emoji2-1.3.0.pom",
+      "sha256": "14ebbea8234f013211965fdd08b42ee907ce0075af321018c8c2865c2e5db0eb"
+    },
+    {
+      "name": "androidx.fragment:fragment-ktx",
+      "version": "1.8.9",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/fragment#1.8.9",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/fragment/fragment-ktx/1.8.9/fragment-ktx-1.8.9.pom",
+      "sha256": "3f49efd6a604e2990d4baa332079c1f6b539891ea03026f1d673ca5dcf7f034f"
+    },
+    {
+      "name": "androidx.fragment:fragment",
+      "version": "1.8.9",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/fragment#1.8.9",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/fragment/fragment/1.8.9/fragment-1.8.9.pom",
+      "sha256": "8135a58b3ec9379c8afb4acce863f35e7654fddf1c602191f8d3feec13afed36"
+    },
+    {
+      "name": "androidx.graphics:graphics-shapes-android",
+      "version": "1.0.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/graphics#1.0.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/graphics/graphics-shapes-android/1.0.1/graphics-shapes-android-1.0.1.pom",
+      "sha256": "81de7bcc8549084d104d5af33b120f93e10d45424a15a454cfa1f24304aa4d11"
+    },
+    {
+      "name": "androidx.graphics:graphics-shapes",
+      "version": "1.0.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/graphics#1.0.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/graphics/graphics-shapes/1.0.1/graphics-shapes-1.0.1.pom",
+      "sha256": "76b50ce664fa44a4b16542081e088991cf316ae6e723aa4cd01a62719f1a8a27"
+    },
+    {
+      "name": "androidx.interpolator:interpolator",
+      "version": "1.0.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/tools/extras/support-library.html",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/interpolator/interpolator/1.0.0/interpolator-1.0.0.pom",
+      "sha256": "0ddc07cc39699f48ecd9ec894b5830c0f09e22e82959294edf37217224c88b7b"
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-common",
+      "version": "2.6.2",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-common/2.6.2/lifecycle-common-2.6.2.pom",
+      "sha256": "57304cdac4da289a6ecdd0738e16b1d8858f1ef8e9fabe2d65a963719fd81dba"
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-livedata-core-ktx",
+      "version": "2.6.2",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-livedata-core-ktx/2.6.2/lifecycle-livedata-core-ktx-2.6.2.pom",
+      "sha256": "4c44c39dfe366934081f62f27cd975fc514d1f03985f59a218e842674aa2825b"
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-livedata-core",
+      "version": "2.6.2",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-livedata-core/2.6.2/lifecycle-livedata-core-2.6.2.pom",
+      "sha256": "1faf8ebf53f28b2f0ae2c2095371ae67d0ca16ac328fce7f163609a43214b5a4"
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-livedata",
+      "version": "2.6.2",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-livedata/2.6.2/lifecycle-livedata-2.6.2.pom",
+      "sha256": "d7c9e019cf68779387481877878f6c499d1786b85f2c0480e9264dd5097c51c0"
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-process",
+      "version": "2.6.2",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-process/2.6.2/lifecycle-process-2.6.2.pom",
+      "sha256": "1f14396ec764b44d37c143adacee01e5b68cb5f35a21bcd9cdebd7c83ea7d2e9"
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-runtime-ktx",
+      "version": "2.6.2",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-runtime-ktx/2.6.2/lifecycle-runtime-ktx-2.6.2.pom",
+      "sha256": "69c6ca9ff9fc9c6940bd55ef91c5b7b57deabab686d2c64a5af85152f29904cd"
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-runtime",
+      "version": "2.6.2",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-runtime/2.6.2/lifecycle-runtime-2.6.2.pom",
+      "sha256": "8175255546e2a5f510865f84ace680660954730240b1905d9175b4345beda977"
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-viewmodel-ktx",
+      "version": "2.6.2",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-ktx/2.6.2/lifecycle-viewmodel-ktx-2.6.2.pom",
+      "sha256": "1d336fbf91471fc497afdf9d875989261d08b564d021eaf275944865f526dcef"
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-viewmodel-savedstate",
+      "version": "2.6.2",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel-savedstate/2.6.2/lifecycle-viewmodel-savedstate-2.6.2.pom",
+      "sha256": "7fc854440644cf52c35894d58d946b208e42769e8517d71a5efcba17865432de"
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-viewmodel",
+      "version": "2.6.2",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/lifecycle#2.6.2",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-viewmodel/2.6.2/lifecycle-viewmodel-2.6.2.pom",
+      "sha256": "a9fb0b39a8360beef7bdc8f3953d4d78f3d85304fc80adac3c8eaf530d758050"
+    },
+    {
+      "name": "androidx.loader:loader",
+      "version": "1.0.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/tools/extras/support-library.html",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/loader/loader/1.0.0/loader-1.0.0.pom",
+      "sha256": "c978d550808b47434aa49a63164110a50b55b0bcc6160a93a2e37d5110df8c5e"
+    },
+    {
+      "name": "androidx.profileinstaller:profileinstaller",
+      "version": "1.3.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/profileinstaller#1.3.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/profileinstaller/profileinstaller/1.3.1/profileinstaller-1.3.1.pom",
+      "sha256": "08263eb70a814a7cb26d11d3a83825f84c29f3e4b59f9134724e0e02e2bbd768"
+    },
+    {
+      "name": "androidx.recyclerview:recyclerview",
+      "version": "1.2.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/recyclerview#1.2.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/recyclerview/recyclerview/1.2.1/recyclerview-1.2.1.pom",
+      "sha256": "db162fcfc032cb737ba07faf2d1936c9ee362b74e0c38f31ccd2c6a2ccd79090"
+    },
+    {
+      "name": "androidx.resourceinspection:resourceinspection-annotation",
+      "version": "1.0.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/resourceinspection#1.0.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/resourceinspection/resourceinspection-annotation/1.0.1/resourceinspection-annotation-1.0.1.pom",
+      "sha256": "b8eb4938ed95d7fcdaa2712ebca363e46a0f9228b8be7f23154def56846815dc"
+    },
+    {
+      "name": "androidx.room3:room3-common-jvm",
+      "version": "3.0.3",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/room3#3.0.3",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-common-jvm/3.0.3/room3-common-jvm-3.0.3.pom",
+      "sha256": "a7f1c26321e0d281024d306f85490fe8379ca058af5cd5b9393b006f24ebb6cd"
+    },
+    {
+      "name": "androidx.room3:room3-common",
+      "version": "3.0.3",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/room3#3.0.3",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-common/3.0.3/room3-common-3.0.3.pom",
+      "sha256": "430e202bbea872b34a0816483ba478c181453d518caede50f40ed3492c59f587"
+    },
+    {
+      "name": "androidx.room3:room3-runtime-android",
+      "version": "3.0.3",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/room3#3.0.3",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-runtime-android/3.0.3/room3-runtime-android-3.0.3.pom",
+      "sha256": "e4af85879dce32a76707f16ce85291415efb18e5088eef696e1d57696e10c3fa"
+    },
+    {
+      "name": "androidx.room3:room3-runtime",
+      "version": "3.0.3",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/room3#3.0.3",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/room3/room3-runtime/3.0.3/room3-runtime-3.0.3.pom",
+      "sha256": "0cb1b4a7600426506ffa200486b39f4f92ba584620cd33123552ca2b225fea73"
+    },
+    {
+      "name": "androidx.savedstate:savedstate-ktx",
+      "version": "1.2.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/savedstate#1.2.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/savedstate/savedstate-ktx/1.2.1/savedstate-ktx-1.2.1.pom",
+      "sha256": "d09553211f6703b19aefd608d6007c77132d27a281556a8e689d92764ec27d3b"
+    },
+    {
+      "name": "androidx.savedstate:savedstate",
+      "version": "1.2.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/savedstate#1.2.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/savedstate/savedstate/1.2.1/savedstate-1.2.1.pom",
+      "sha256": "0d33bc285df1e12f22780f1624a6f0b38ea2a6181b0955ec6641caf620c50cbf"
+    },
+    {
+      "name": "androidx.sqlite:sqlite-android",
+      "version": "2.7.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/sqlite#2.7.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/sqlite/sqlite-android/2.7.1/sqlite-android-2.7.1.pom",
+      "sha256": "6d0e5b3cca61a59f6ad7f4d0409e8dfd076c9c010a7c83a0133056c3c47653f6"
+    },
+    {
+      "name": "androidx.sqlite:sqlite-async-android",
+      "version": "2.7.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/sqlite#2.7.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/sqlite/sqlite-async-android/2.7.1/sqlite-async-android-2.7.1.pom",
+      "sha256": "7b854cfbe68c71d79735ed63abb4536fb5791b3b821214e4549c92a47d75dad0"
+    },
+    {
+      "name": "androidx.sqlite:sqlite-async",
+      "version": "2.7.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/sqlite#2.7.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/sqlite/sqlite-async/2.7.1/sqlite-async-2.7.1.pom",
+      "sha256": "1604699ad01b64b6d8c96003dccad4696ea16f263ebfd684288eccec150402e5"
+    },
+    {
+      "name": "androidx.sqlite:sqlite-framework-android",
+      "version": "2.7.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/sqlite#2.7.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/sqlite/sqlite-framework-android/2.7.1/sqlite-framework-android-2.7.1.pom",
+      "sha256": "00b3cd5addb918b81513f692af1f7e1e5ff931a62e8f143a6ce4188599b5df5c"
+    },
+    {
+      "name": "androidx.sqlite:sqlite-framework",
+      "version": "2.7.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/sqlite#2.7.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/sqlite/sqlite-framework/2.7.1/sqlite-framework-2.7.1.pom",
+      "sha256": "96b3069ffef5beae1617d813e68f3733efb32650d90b8d8ba35cee51fe591a56"
+    },
+    {
+      "name": "androidx.sqlite:sqlite",
+      "version": "2.7.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/sqlite#2.7.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/sqlite/sqlite/2.7.1/sqlite-2.7.1.pom",
+      "sha256": "67945c1ed0bb9531c634287592c6a3bf4449635e60bb3ed3a3453fc612ad3065"
+    },
+    {
+      "name": "androidx.startup:startup-runtime",
+      "version": "1.1.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/startup#1.1.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/startup/startup-runtime/1.1.1/startup-runtime-1.1.1.pom",
+      "sha256": "f4114b5c6859bb1bc3caf281cb6d6f25998fa7f7292c64ceaea74a93210e746b"
+    },
+    {
+      "name": "androidx.swiperefreshlayout:swiperefreshlayout",
+      "version": "1.1.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/swiperefreshlayout/swiperefreshlayout/1.1.0/swiperefreshlayout-1.1.0.pom",
+      "sha256": "0b8c55ce6910155a283ba98a6d094be6e0ef5e70a7371cd9fe9f71bf8ffd24ad"
+    },
+    {
+      "name": "androidx.tracing:tracing",
+      "version": "1.2.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/tracing#1.2.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/tracing/tracing/1.2.0/tracing-1.2.0.pom",
+      "sha256": "f34bec4eb58871d31002901377108aaa1ebfe77fa6d882b8b86200b158e26ea1"
+    },
+    {
+      "name": "androidx.transition:transition-ktx",
+      "version": "1.7.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/transition#1.7.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/transition/transition-ktx/1.7.0/transition-ktx-1.7.0.pom",
+      "sha256": "3b5cff7ada381c9925e2afe10fb38ac67b4debaf02f5ce16b7a025d98bbfd541"
+    },
+    {
+      "name": "androidx.transition:transition",
+      "version": "1.7.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/transition#1.7.0",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/transition/transition/1.7.0/transition-1.7.0.pom",
+      "sha256": "3fde268efe79514602c138adb2c73fa8d7032fce124925f01baf2e0c1dde2878"
+    },
+    {
+      "name": "androidx.vectordrawable:vectordrawable-animated",
+      "version": "1.1.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/vectordrawable/vectordrawable-animated/1.1.0/vectordrawable-animated-1.1.0.pom",
+      "sha256": "276a20116b705fb75b9003ee9496c56f6fd3b32375fb232472811eba60a040bd"
+    },
+    {
+      "name": "androidx.vectordrawable:vectordrawable",
+      "version": "1.1.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/vectordrawable/vectordrawable/1.1.0/vectordrawable-1.1.0.pom",
+      "sha256": "5b0e2d5b2179e54804785cbc21ce5f473b5e1ddd55a57da482e94dcd39492bb2"
+    },
+    {
+      "name": "androidx.versionedparcelable:versionedparcelable",
+      "version": "1.1.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/tools/extras/support-library.html",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/versionedparcelable/versionedparcelable/1.1.1/versionedparcelable-1.1.1.pom",
+      "sha256": "5f51e65873ca612de3838fa90d2ee95b8d040efd31b9c390a19bf94d615cdb2f"
+    },
+    {
+      "name": "androidx.viewpager2:viewpager2",
+      "version": "1.0.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/viewpager2/viewpager2/1.0.0/viewpager2-1.0.0.pom",
+      "sha256": "4063bca7fe94fe65c98f4168f97ae10e02da0248598ad3ac21c432c7f608a17a"
+    },
+    {
+      "name": "androidx.viewpager:viewpager",
+      "version": "1.0.0",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/tools/extras/support-library.html",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/viewpager/viewpager/1.0.0/viewpager-1.0.0.pom",
+      "sha256": "1f72f836339d03c6eb013f65075e76ca87075a577578eb4f95f74a3a5d253128"
+    },
+    {
+      "name": "androidx.window:window-core-android",
+      "version": "1.5.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/window#1.5.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/window/window-core-android/1.5.1/window-core-android-1.5.1.pom",
+      "sha256": "462ae4100a7bc2a0f1ff61f615091fc330d6e67aa0341747270c3d714c90e0cd"
+    },
+    {
+      "name": "androidx.window:window-core",
+      "version": "1.5.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/window#1.5.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/window/window-core/1.5.1/window-core-1.5.1.pom",
+      "sha256": "2548b2304530681d715d636d5eec3f7cda29ffaa8e7b003ac97ba90b79f3d40d"
+    },
+    {
+      "name": "androidx.window:window",
+      "version": "1.5.1",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx/releases/window#1.5.1",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/window/window/1.5.1/window-1.5.1.pom",
+      "sha256": "0a28fe17feed5c0175fbfbd6722ce78c575a1eeac09d858f08e49353f34707e0"
+    },
+    {
+      "name": "com.facebook.fbjni:fbjni",
+      "version": "0.7.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/facebookincubator/fbjni",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fbjni/fbjni/0.7.0/fbjni-0.7.0.pom",
+      "sha256": "48b53b5dd4f70f3988e2bad97aa7bf5f9271369045cc0776ebe9e760d9703f04"
+    },
+    {
+      "name": "com.facebook.fresco:drawee",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/drawee/3.7.0/drawee-3.7.0.pom",
+      "sha256": "f0bcb53c6f9e02227cf2a579bd5fd836346d686db6da125f8eba2309aaf0d0d5"
+    },
+    {
+      "name": "com.facebook.fresco:fbcore",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/fbcore/3.7.0/fbcore-3.7.0.pom",
+      "sha256": "21c44042fd7177a57c5e68cd2df706fb2fc20c847f8c2d9bb4f96b13df9f0330"
+    },
+    {
+      "name": "com.facebook.fresco:fresco",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/fresco/3.7.0/fresco-3.7.0.pom",
+      "sha256": "f8525de9690c06547eef517d5bfa3f2f2fc4ef1347fba897011b0618c0a8e45a"
+    },
+    {
+      "name": "com.facebook.fresco:imagepipeline-base",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/imagepipeline-base/3.7.0/imagepipeline-base-3.7.0.pom",
+      "sha256": "4eb31527850ba44d6c0375d2fa4fdb0ee207a877f1fe7c542dc90ae9b45ecf92"
+    },
+    {
+      "name": "com.facebook.fresco:imagepipeline-native",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/imagepipeline-native/3.7.0/imagepipeline-native-3.7.0.pom",
+      "sha256": "f3b72e40ac4762a5fa05ad4eb6999f1c1188268356f90f52a939f8fe27aa4c39"
+    },
+    {
+      "name": "com.facebook.fresco:imagepipeline-okhttp3",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/imagepipeline-okhttp3/3.7.0/imagepipeline-okhttp3-3.7.0.pom",
+      "sha256": "ab4f5d5e0f3dadbc1b1713dd0582dfc633aa38fc6033916dfc04ab3c6dfa9a28"
+    },
+    {
+      "name": "com.facebook.fresco:imagepipeline",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/imagepipeline/3.7.0/imagepipeline-3.7.0.pom",
+      "sha256": "1ab93430424e5bee474adad5ca5389f03ce76553650bd06ca026ef75d8ebe00a"
+    },
+    {
+      "name": "com.facebook.fresco:memory-type-ashmem",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/memory-type-ashmem/3.7.0/memory-type-ashmem-3.7.0.pom",
+      "sha256": "9f1a80b7fb4596a340bedc372e4d2f3600f335d7cd1581e825c15050669b867b"
+    },
+    {
+      "name": "com.facebook.fresco:memory-type-java",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/memory-type-java/3.7.0/memory-type-java-3.7.0.pom",
+      "sha256": "0c01412e17618e9bef52e075323c9ed5afd1e07e3eef8d418e052471da6f1030"
+    },
+    {
+      "name": "com.facebook.fresco:memory-type-native",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/memory-type-native/3.7.0/memory-type-native-3.7.0.pom",
+      "sha256": "ed67332ae71b53725cc91a6177c42308d6daf616ab4cfa4561f3d37e8c28f68b"
+    },
+    {
+      "name": "com.facebook.fresco:middleware",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/middleware/3.7.0/middleware-3.7.0.pom",
+      "sha256": "07d68d03712849f95144f29aba3d417c6b2a840e4330b272b5290a633fbfb91f"
+    },
+    {
+      "name": "com.facebook.fresco:nativeimagefilters",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/nativeimagefilters/3.7.0/nativeimagefilters-3.7.0.pom",
+      "sha256": "a47aae2ed3028db4585b0021f7cbed5c7edc014d6ba2164ad10ec7a5410d17e4"
+    },
+    {
+      "name": "com.facebook.fresco:nativeimagetranscoder",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/nativeimagetranscoder/3.7.0/nativeimagetranscoder-3.7.0.pom",
+      "sha256": "eb28e13dbfd8bfa02430eb7f514f23d07506120d53dec6f8fd12971aaea8476e"
+    },
+    {
+      "name": "com.facebook.fresco:soloader",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/soloader/3.7.0/soloader-3.7.0.pom",
+      "sha256": "aa95f751e40c4def4ef0e96a72e7aa54b093ca7f296d1c2ce5032b07db503c7a"
+    },
+    {
+      "name": "com.facebook.fresco:ui-common",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/ui-common/3.7.0/ui-common-3.7.0.pom",
+      "sha256": "8e4718ef94ff1c630ae4ea04a1a9e1245e57827750197b2649d0797b8f824171"
+    },
+    {
+      "name": "com.facebook.fresco:ui-core",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/ui-core/3.7.0/ui-core-3.7.0.pom",
+      "sha256": "440a276d95ed01ad3479f27663b97b1958e5496cff1563659890f234d32dfc60"
+    },
+    {
+      "name": "com.facebook.fresco:urimod",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/urimod/3.7.0/urimod-3.7.0.pom",
+      "sha256": "62890d96e5d670448c0526e64ed661a6a976773c18bc2176fe1d88a74737d205"
+    },
+    {
+      "name": "com.facebook.fresco:vito-source",
+      "version": "3.7.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/fresco",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/fresco/vito-source/3.7.0/vito-source-3.7.0.pom",
+      "sha256": "a4961f07ade7b3a5b2e45f695db92ddbbce76003712636a6b336bc58059a8216"
+    },
+    {
+      "name": "com.facebook.hermes:hermes-android",
+      "version": "260318099.0.4",
+      "license": "MIT",
+      "url": "https://github.com/facebook/hermes/tree/static_h",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/hermes/hermes-android/260318099.0.4/hermes-android-260318099.0.4.pom",
+      "sha256": "c39d29eff39e3504336379cdc8c456c94d5c79024cb6a9cc257c6dd7d4ffa4e3"
+    },
+    {
+      "name": "com.facebook.infer.annotation:infer-annotation",
+      "version": "0.18.0",
+      "license": "MIT",
+      "url": "https://fbinfer.com/",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/infer/annotation/infer-annotation/0.18.0/infer-annotation-0.18.0.pom",
+      "sha256": "d449ebd0489a1a00d03e4fc782b5345a0062f62519e1f1dd6bdb62d710e345bd"
+    },
+    {
+      "name": "com.facebook.react:react-android",
+      "version": "0.88.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/react-native",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/react/react-android/0.88.0/react-android-0.88.0.pom",
+      "sha256": "52d86bd9bd99c2806226003af545415562bc1c929e7bcc3a327648d635b6eec1"
+    },
+    {
+      "name": "com.facebook.soloader:annotation",
+      "version": "0.12.1",
+      "license": "Apache-2.0",
+      "url": "https://github.com/facebook/soloader",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/soloader/annotation/0.12.1/annotation-0.12.1.pom",
+      "sha256": "d7737ae5a34b9bd3a846b656191ad0be50b7a9480c990668882a56234e8428e6"
+    },
+    {
+      "name": "com.facebook.soloader:nativeloader",
+      "version": "0.12.1",
+      "license": "Apache-2.0",
+      "url": "https://github.com/facebook/soloader",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/soloader/nativeloader/0.12.1/nativeloader-0.12.1.pom",
+      "sha256": "de05d0217cb91cb552c8d04816aab408ad56eecc171d12bc2de6832b9ac2b8dc"
+    },
+    {
+      "name": "com.facebook.soloader:soloader",
+      "version": "0.12.1",
+      "license": "Apache-2.0",
+      "url": "https://github.com/facebook/soloader",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/soloader/soloader/0.12.1/soloader-0.12.1.pom",
+      "sha256": "2f99e4f764d3c25099faa8d8c24d1e5a37ec250ef395467a5f2e7317b99b6e9e"
+    },
+    {
+      "name": "com.facebook.yoga:proguard-annotations",
+      "version": "1.19.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/yoga",
+      "source": "https://repo.maven.apache.org/maven2/com/facebook/yoga/proguard-annotations/1.19.0/proguard-annotations-1.19.0.pom",
+      "sha256": "9baf87787eac54aee385e374c2d688a45190493afa5da6459202f5ab23ab4966"
+    },
+    {
+      "name": "com.google.android.material:material",
+      "version": "1.13.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/material-components/material-components-android",
+      "source": "https://dl.google.com/dl/android/maven2/com/google/android/material/material/1.13.0/material-1.13.0.pom",
+      "sha256": "9c1f3c4600295cc5d7f6d6886aea16d497f13f9af4675442ad271e7c2febf772"
+    },
+    {
+      "name": "com.google.code.findbugs:jsr305",
+      "version": "3.0.2",
+      "license": "Apache-2.0",
+      "url": "https://findbugs.sourceforge.net/",
+      "source": "https://repo.maven.apache.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.pom",
+      "sha256": "19889dbdf1b254b2601a5ee645b8147a974644882297684c798afe5d63d78dfe"
+    },
+    {
+      "name": "com.google.code.gson:gson",
+      "version": "2.13.2",
+      "license": "Apache-2.0",
+      "url": "https://github.com/google/gson",
+      "source": "https://repo.maven.apache.org/maven2/com/google/code/gson/gson/2.13.2/gson-2.13.2.pom",
+      "sha256": "3aa06aa7c0f9af092961a42d09578e4324be146348a0ee6ed47857f7c2677b76"
+    },
+    {
+      "name": "com.google.crypto.tink:tink-android",
+      "version": "1.24.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/tink-crypto/tink-java",
+      "source": "https://repo.maven.apache.org/maven2/com/google/crypto/tink/tink-android/1.24.0/tink-android-1.24.0.pom",
+      "sha256": "ccaabd3e92984057efbe19ed02db93affbfa2770111a36b82eb9893b72093546"
+    },
+    {
+      "name": "com.google.errorprone:error_prone_annotations",
+      "version": "2.41.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/google/error-prone",
+      "source": "https://repo.maven.apache.org/maven2/com/google/errorprone/error_prone_annotations/2.41.0/error_prone_annotations-2.41.0.pom",
+      "sha256": "a151df1e2e0b48618d8b06a180748a29b3abb39b1b2396f6a1c879a727488c6e"
+    },
+    {
+      "name": "com.google.guava:listenablefuture",
+      "version": "1.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/google/guava",
+      "source": "https://repo.maven.apache.org/maven2/com/google/guava/listenablefuture/1.0/listenablefuture-1.0.pom",
+      "sha256": "53873caf26bc1ed8a567ea6c939ab2aaa3f47a5e32d5cade95ddf5080d23238a"
+    },
+    {
+      "name": "com.parse.bolts:bolts-tasks",
+      "version": "1.4.0",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/BoltsFramework/Bolts-Android",
+      "source": "https://repo.maven.apache.org/maven2/com/parse/bolts/bolts-tasks/1.4.0/bolts-tasks-1.4.0.pom",
+      "sha256": "8cb007861162c1b9e50dd8ec07b7ce7affea8fe76e07ac408ced81cdcb8312e0"
+    },
+    {
+      "name": "com.squareup.okhttp3:okhttp-urlconnection",
+      "version": "4.9.2",
+      "license": "Apache-2.0",
+      "url": "https://square.github.io/okhttp/",
+      "source": "https://repo.maven.apache.org/maven2/com/squareup/okhttp3/okhttp-urlconnection/4.9.2/okhttp-urlconnection-4.9.2.pom",
+      "sha256": "5019b2b05877af6c4e0976ec2ef0656ce61760549f153f6ef6902159b2db36c4"
+    },
+    {
+      "name": "com.squareup.okhttp3:okhttp",
+      "version": "4.9.2",
+      "license": "Apache-2.0",
+      "url": "https://square.github.io/okhttp/",
+      "source": "https://repo.maven.apache.org/maven2/com/squareup/okhttp3/okhttp/4.9.2/okhttp-4.9.2.pom",
+      "sha256": "72a233eae8a5b5a0d7dd626798c6f004dfd2baef216f1396e8217d9cb876e26e"
+    },
+    {
+      "name": "com.squareup.okio:okio",
+      "version": "2.9.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/square/okio/",
+      "source": "https://repo.maven.apache.org/maven2/com/squareup/okio/okio/2.9.0/okio-2.9.0.pom",
+      "sha256": "f2e1385b004bd7bf008545c3405b967035f1264254ae8a26fb53f29e1c5df7f6"
+    },
+    {
+      "name": "io.github.zhongwuzw:annotation",
+      "version": "2.4.1",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/zhongwuzw/MMKV",
+      "source": "https://repo.maven.apache.org/maven2/io/github/zhongwuzw/annotation/2.4.1/annotation-2.4.1.pom",
+      "sha256": "fb85a81c3f48a96208395b35174484a766b4b184b8be7825d91f18d1a5e062dc"
+    },
+    {
+      "name": "io.github.zhongwuzw:mmkv",
+      "version": "2.4.1",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/zhongwuzw/MMKV",
+      "source": "https://repo.maven.apache.org/maven2/io/github/zhongwuzw/mmkv/2.4.1/mmkv-2.4.1.pom",
+      "sha256": "d3655547b0350adaf84bac80dc9fd0ed6afba29ba450f705996ac00afef40e37"
+    },
+    {
+      "name": "javax.inject:javax.inject",
+      "version": "1",
+      "license": "Apache-2.0",
+      "url": "https://github.com/javax-inject/javax-inject",
+      "source": "https://repo.maven.apache.org/maven2/javax/inject/javax.inject/1/javax.inject-1.pom",
+      "sha256": "943e12b100627804638fa285805a0ab788a680266531e650921ebfe4621a8bfa"
+    },
+    {
+      "name": "net.zetetic:sqlcipher-android",
+      "version": "4.20.0",
+      "license": "BSD-3-Clause",
+      "url": "https://www.zetetic.net/sqlcipher",
+      "source": "https://repo.maven.apache.org/maven2/net/zetetic/sqlcipher-android/4.20.0/sqlcipher-android-4.20.0.pom",
+      "sha256": "9d882f462c6fb4063b1c3bfb3df913c5929bf8cf73d7f6787f341672f23c1549"
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-annotations-jvm",
+      "version": "1.3.72",
+      "license": "Apache-2.0",
+      "url": "https://kotlinlang.org/",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-annotations-jvm/1.3.72/kotlin-annotations-jvm-1.3.72.pom",
+      "sha256": "58d42ef0c4a8b216fd4c9716d18368000df64d094f74ee6488165af0bb817457"
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-common",
+      "version": "2.4.21",
+      "license": "Apache-2.0",
+      "url": "https://kotlinlang.org/",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-common/2.4.21/kotlin-stdlib-common-2.4.21.pom",
+      "sha256": "60202e87f3805501876594c34ada636b7d337a462516edc138428a6ce1296c15"
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
+      "version": "1.8.22",
+      "license": "Apache-2.0",
+      "url": "https://kotlinlang.org/",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.8.22/kotlin-stdlib-jdk7-1.8.22.pom",
+      "sha256": "4f958aa993d5984f8f5ebed4146562a5f3a9f695b6049c9f287381379cadab33"
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+      "version": "1.8.22",
+      "license": "Apache-2.0",
+      "url": "https://kotlinlang.org/",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.8.22/kotlin-stdlib-jdk8-1.8.22.pom",
+      "sha256": "928f2187217476313cb816d48070bc7654aa3b9a5ae81d3fc5f8c279cc8f8d9e"
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib",
+      "version": "2.4.21",
+      "license": "Apache-2.0",
+      "url": "https://kotlinlang.org/",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/2.4.21/kotlin-stdlib-2.4.21.pom",
+      "sha256": "b92b23ec9c444b2578b9852447565efc72c24b3ea77b4c3bf4e644f685eeef07"
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
+      "version": "1.11.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/Kotlin/kotlinx.coroutines",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-android/1.11.0/kotlinx-coroutines-android-1.11.0.pom",
+      "sha256": "224567420d3e0ed5fef40f789fded45dfd51b162319e28d77d3c9a8dec4821b8"
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm",
+      "version": "1.11.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/Kotlin/kotlinx.coroutines",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core-jvm/1.11.0/kotlinx-coroutines-core-jvm-1.11.0.pom",
+      "sha256": "dd54b97aa3fab91fc24f5df2916c22be9429a339d2f45b7ff092332f6c19dc39"
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+      "version": "1.11.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/Kotlin/kotlinx.coroutines",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core/1.11.0/kotlinx-coroutines-core-1.11.0.pom",
+      "sha256": "41b6e78c1b0d11bc99de795390df9e4ece64dc113f482d6e308f1b7a421c1d30"
+    },
+    {
+      "name": "org.jetbrains:annotations",
+      "version": "23.0.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/JetBrains/java-annotations",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/annotations/23.0.0/annotations-23.0.0.pom",
+      "sha256": "c9490f655132328df2cfbcfdf743f53fc3916d6c1d10437175a6ca6e3a67771c"
+    },
+    {
+      "name": "org.jspecify:jspecify",
+      "version": "1.0.0",
+      "license": "Apache-2.0",
+      "url": "https://jspecify.org/",
+      "source": "https://repo.maven.apache.org/maven2/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.pom",
+      "sha256": "cdab929a3b95211f43d2090c5e2d0dfe8465960e378bc32b35841dab324433a6"
+    }
+  ],
+  "bundled": [
+    {
+      "name": "Boost",
+      "version": "1.83.0",
+      "license": "BSL-1.0",
+      "url": "https://www.boost.org",
+      "source": "node_modules/react-native/gradle/libs.versions.toml",
+      "versionKey": "boost"
+    },
+    {
+      "name": "double-conversion",
+      "version": "1.1.6",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/google/double-conversion",
+      "source": "node_modules/react-native/gradle/libs.versions.toml",
+      "versionKey": "doubleconversion"
+    },
+    {
+      "name": "fast_float",
+      "version": "8.0.0",
+      "license": "MIT",
+      "url": "https://github.com/fastfloat/fast_float",
+      "source": "node_modules/react-native/gradle/libs.versions.toml",
+      "versionKey": "fastFloat"
+    },
+    {
+      "name": "fmt",
+      "version": "12.1.0",
+      "license": "MIT",
+      "url": "https://github.com/fmtlib/fmt",
+      "source": "node_modules/react-native/gradle/libs.versions.toml",
+      "versionKey": "fmt"
+    },
+    {
+      "name": "Folly",
+      "version": "2024.11.18.00",
+      "license": "Apache-2.0",
+      "url": "https://github.com/facebook/folly",
+      "source": "node_modules/react-native/gradle/libs.versions.toml",
+      "versionKey": "folly"
+    },
+    {
+      "name": "glog",
+      "version": "0.3.5",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/google/glog",
+      "source": "node_modules/react-native/gradle/libs.versions.toml",
+      "versionKey": "glog"
+    },
+    {
+      "name": "Yoga",
+      "version": "0.88.0",
+      "license": "MIT",
+      "url": "https://github.com/facebook/yoga",
+      "source": "node_modules/react-native/ReactCommon/yoga"
+    },
+    {
+      "name": "com.android.tools:desugar_jdk_libs",
+      "version": "2.1.5",
+      "license": "GPL-2.0-only WITH Classpath-exception-2.0",
+      "url": "https://github.com/google/desugar_jdk_libs",
+      "source": "android/gradle/libs.versions.toml"
+    },
+    {
+      "name": "Protocol Buffers (shaded in Tink)",
+      "version": "4.33.6",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/protocolbuffers/protobuf",
+      "source": "com.google.crypto.tink:tink-android:1.24.0!com/google/crypto/tink/shaded/protobuf/RuntimeVersion.class (OSS_MAJOR=4, OSS_MINOR=33, OSS_PATCH=6)"
+    },
+    {
+      "name": "SQLCipher core",
+      "version": "4.20.0",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/sqlcipher/sqlcipher",
+      "source": "https://www.zetetic.net/blog/2026/10/27/sqlcipher-4.20.0-release/"
+    },
+    {
+      "name": "Android SQLite bindings (SQLCipher)",
+      "version": "4.20.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/sqlcipher/sqlcipher-android",
+      "source": "https://github.com/sqlcipher/sqlcipher-android/tree/v4.20.0/sqlcipher/src/main"
+    },
+    {
+      "name": "SQLite (SQLCipher baseline)",
+      "version": "3.54.1",
+      "license": "LicenseRef-Public-Domain",
+      "url": "https://www.sqlite.org",
+      "source": "https://www.zetetic.net/blog/2026/10/27/sqlcipher-4.20.0-release/"
+    },
+    {
+      "name": "LibTomCrypt",
+      "version": "1.18.2",
+      "license": "LicenseRef-Public-Domain",
+      "url": "https://www.libtom.net/LibTomCrypt/",
+      "source": "https://www.zetetic.net/blog/2026/10/27/sqlcipher-4.20.0-release/"
+    },
+    {
+      "name": "libjpeg-turbo",
+      "version": "2.1.5.1",
+      "license": "BSD-3-Clause AND IJG AND Zlib",
+      "url": "https://libjpeg-turbo.org",
+      "source": "com.facebook.fresco:nativeimagetranscoder:3.7.0 (embedded binary version string)"
+    },
+    {
+      "name": "LLVM libc++ and compiler runtime",
+      "version": "NDK 30.0.16248370",
+      "license": "Apache-2.0 WITH LLVM-exception",
+      "url": "https://libcxx.llvm.org",
+      "source": "android/build.gradle (ndkVersion); Android NDK NOTICE.toolchain"
+    },
+    {
+      "name": "LLVM support (Hermes LLVH)",
+      "version": "bundled with Hermes 260318099.0.4",
+      "license": "Apache-2.0 WITH LLVM-exception AND NCSA",
+      "url": "https://github.com/facebook/hermes/tree/static_h/external/llvh",
+      "source": "https://github.com/facebook/hermes/tree/static_h/external"
+    },
+    {
+      "name": "dtoa (Hermes)",
+      "version": "bundled with Hermes 260318099.0.4",
+      "license": "dtoa",
+      "url": "https://netlib.org/fp/",
+      "source": "https://github.com/facebook/hermes/tree/static_h/external"
+    },
+    {
+      "name": "fdlibm (Hermes)",
+      "version": "bundled with Hermes 260318099.0.4",
+      "license": "SunPro",
+      "url": "https://netlib.org/fdlibm/",
+      "source": "https://github.com/facebook/hermes/tree/static_h/external"
+    },
+    {
+      "name": "Dragonbox (Hermes)",
+      "version": "bundled with Hermes 260318099.0.4",
+      "license": "BSL-1.0",
+      "url": "https://github.com/jk-jeon/dragonbox",
+      "source": "https://github.com/facebook/hermes/tree/static_h/external"
+    },
+    {
+      "name": "OpenSSL AES (MMKV)",
+      "version": "1.1.0i",
+      "license": "OpenSSL",
+      "url": "https://www.openssl.org",
+      "source": "https://github.com/Tencent/MMKV/blob/v2.4.1/LICENSE.TXT"
+    },
+    {
+      "name": "zlib (MMKV)",
+      "version": "1.2.11",
+      "license": "Zlib",
+      "url": "https://zlib.net",
+      "source": "https://github.com/Tencent/MMKV/blob/v2.4.1/LICENSE.TXT"
+    },
+    {
+      "name": "MultiprocessSharedPreferences (MMKV)",
+      "version": "1.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/seven456/MultiprocessSharedPreferences",
+      "source": "https://github.com/Tencent/MMKV/blob/v2.4.1/LICENSE.TXT"
+    },
+    {
+      "name": "Public Suffix List (OkHttp)",
+      "version": "bundled with OkHttp 4.9.2",
+      "license": "MPL-2.0",
+      "url": "https://publicsuffix.org",
+      "source": "com.squareup.okhttp3:okhttp:4.9.2!okhttp3/internal/publicsuffix/publicsuffixes.gz"
+    },
+    {
+      "name": "Lucide icons (7 adapted: footprints, book-open, glass-water, person-standing, phone, sun, lightbulb)",
+      "version": "adapted 2026-11",
+      "license": "ISC",
+      "url": "https://lucide.dev",
+      "source": "android/app/src/main/res/drawable/ic_real_*.xml"
+    }
+  ],
+  "npmNotices": {
+    "metro-runtime": "Copyright (c) Meta Platforms, Inc. and affiliates.",
+    "react-native-unistyles": "Copyright (c) 2026 Jacek Pudysz",
+    "react-native-nitro-modules": "Copyright (c) 2024 Marc Rousavy",
+    "react-native-mmkv": "Copyright (c) 2024 Marc Rousavy",
+    "@react-native/js-polyfills": "Copyright (c) Meta Platforms, Inc. and affiliates.",
+    "@react-native/normalize-colors": "Copyright (c) Meta Platforms, Inc. and affiliates.",
+    "@react-native/asset-utils": "Copyright (c) Meta Platforms, Inc. and affiliates.",
+    "@react-native/virtualized-lists": "Copyright (c) Meta Platforms, Inc. and affiliates."
+  },
+  "licenseTexts": {
+    "MIT": [
+      "licenses/react-native-template.txt"
+    ],
+    "Apache-2.0": [
+      "licenses/tink.txt"
+    ],
+    "BSD-3-Clause": [
+      "licenses/BSD-3-Clause.txt"
+    ],
+    "BSL-1.0": [
+      "licenses/upstream/boost.txt"
+    ],
+    "GPL-2.0-only WITH Classpath-exception-2.0": [
+      "licenses/desugar-jdk-libs.txt"
+    ],
+    "Apache-2.0 WITH LLVM-exception": [
+      "licenses/upstream/ndk-libcxx.txt"
+    ],
+    "OpenSSL": [
+      "licenses/OpenSSL.txt"
+    ],
+    "Zlib": [
+      "licenses/Zlib.txt"
+    ],
+    "LicenseRef-Public-Domain": [
+      "licenses/public-domain.txt"
+    ],
+    "dtoa": [
+      "licenses/upstream/dtoa.txt"
+    ],
+    "SunPro": [
+      "licenses/SunPro.txt"
+    ],
+    "BSD-3-Clause AND IJG AND Zlib": [
+      "licenses/upstream/libjpeg-turbo.txt",
+      "licenses/upstream/libjpeg-ijg.txt",
+      "licenses/Zlib.txt"
+    ],
+    "Apache-2.0 WITH LLVM-exception AND NCSA": [
+      "licenses/upstream/llvm.txt"
+    ],
+    "MPL-2.0": [
+      "licenses/MPL-2.0.txt"
+    ],
+    "ISC": [
+      "licenses/lucide.txt"
+    ]
+  },
+  "notices": {
+    "AndroidX and Android SQLite bindings": "Copyright (C) The Android Open Source Project\nLicensed under the Apache License, Version 2.0.\nThe SQLCipher Android binding incorporates Android Open Source Project SQLite code.",
+    "React Native, Hermes, Yoga, Fresco, fbjni and SoLoader": "Copyright (c) Meta Platforms, Inc. and affiliates.",
+    "SQLCipher": "Copyright (c) 2008-2023, ZETETIC LLC\nAll rights reserved.",
+    "Tink": "Copyright Google LLC\nLicensed under the Apache License, Version 2.0.",
+    "libjpeg-turbo": "This software is based in part on the work of the Independent JPEG Group.",
+    "MMKV": "Tencent is pleased to support the open source community by making MMKV available.\nCopyright (C) 2018 THL A29 Limited, a Tencent company. All rights reserved.\nThis product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (http://www.openssl.org/)\nThis product includes cryptographic software written by Eric Young (eay@cryptsoft.com).\nThis product includes software written by Tim Hudson (tjh@cryptsoft.com).\nThe below software in this distribution may have been modified by THL A29 Limited (Tencent Modifications). All Tencent Modifications are Copyright (C) 2018 THL A29 Limited.\nMultiprocessSharedPreferences v1.0: Copyright (C) 2014 seven456@gmail.com\nzlib v1.2.11: Copyright (C) 1995-2017 Jean-loup Gailly and Mark Adler",
+    "OkHttp public suffix database (upstream NOTICE)": "Note that publicsuffixes.gz is compiled from The Public Suffix List:\nhttps://publicsuffix.org/list/public_suffix_list.dat\n\nIt is subject to the terms of the Mozilla Public License, v. 2.0:\nhttps://mozilla.org/MPL/2.0/\n",
+    "bolts": "BSD License\n\nFor Bolts software\n\nCopyright (c) 2013-present, Facebook, Inc. All rights reserved.",
+    "glog": "Copyright (c) 2008, Google Inc.\nAll rights reserved.\nCopyright (c) 2003-2008, Jouni Malinen and contributors. All rights reserved.",
+    "double-conversion": "Copyright 2006-2011, the V8 project authors. All rights reserved.",
+    "fast-float": "Copyright (c) 2021 The fast_float authors",
+    "fmt": "Copyright (c) 2012 - present, Victor Zverovich and {fmt} contributors\n\n--- Optional exception to the license ---\nAs an exception, if, as a result of your compiling your source code, portions\nof this Software are embedded into a machine-executable object form of such\nsource code, you may redistribute such embedded portions in such object form\nwithout including the above copyright and permission notices.\n",
+    "fresco": "Copyright (c) Meta Platforms, Inc. and affiliates.",
+    "Protocol Buffers": "Copyright 2008 Google Inc. All rights reserved.\nCode generated by the Protocol Buffer compiler is owned by the owner of the input file used when generating it.",
+    "Boost.Context assembly": "Copyright Edward Nevill + Oliver Kowalke 2015",
+    "OpenJDK desugaring": "                      ADDITIONAL INFORMATION ABOUT LICENSING\n\nCertain files distributed by Oracle America, Inc. and/or its affiliates are\nsubject to the following clarification and special exception to the GPLv2,\nbased on the GNU Project exception for its Classpath libraries, known as the\nGNU Classpath Exception.\n\nNote that Oracle includes multiple, independent programs in this software\npackage.  Some of those programs are provided under licenses deemed\nincompatible with the GPLv2 by the Free Software Foundation and others.\nFor example, the package includes programs licensed under the Apache\nLicense, Version 2.0 and may include FreeType. Such programs are licensed\nto you under their original licenses.\n\nOracle facilitates your further distribution of this package by adding the\nClasspath Exception to the necessary parts of its GPLv2 code, which permits\nyou to use that code in combination with other independent modules not\nlicensed under the GPLv2. However, note that this would not permit you to\ncommingle code under an incompatible license with Oracle's GPLv2 licensed\ncode by, for example, cutting and pasting such code into a file also\ncontaining Oracle's GPLv2 licensed code and then distributing the result.\n\nAdditionally, if you were to remove the Classpath Exception from any of the\nfiles to which it applies and distribute the result, you would likely be\nrequired to license some or all of the other code in that distribution under\nthe GPLv2 as well, and since the GPLv2 is incompatible with the license terms\nof some items included in the distribution by Oracle, removing the Classpath\nException could therefore effectively compromise your ability to further\ndistribute the package.\n\nFailing to distribute notices associated with some files may also create\nunexpected legal consequences.\n\nProceed with caution and we recommend that you obtain the advice of a lawyer\nskilled in open source matters before removing the Classpath Exception or\nmaking modifications to this package which may subsequently be redistributed\nand/or involve the use of third party software.\n\nVersioned upstream source: https://github.com/google/desugar_jdk_libs/tree/2.1.5\n",
+    "Public Suffix List source availability": "The corresponding source rules shipped in OkHttp 4.9.2 are included in licenses/public-suffix-list.dat and viewable offline under Public Suffix List source in Open-source licenses.\nThe rules were extracted from the distributed publicsuffixes.gz, with exception markers restored; no rule semantics were changed.",
+    "SQLCipher core": "Copyright (c) 2025, ZETETIC LLC\nAll rights reserved.",
+    "Lucide": "Copyright (c) Lucide Contributors 2022; portions Copyright (c) Cole Bemis 2013-2022 (Feather).\nLicensed under the ISC License."
+  },
+  "documents": {
+    "Public Suffix List source": [
+      "licenses/public-suffix-list.dat"
+    ]
+  },
+  "dependencyInputs": {
+    "android/analytics-core/build.gradle.kts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "android/app/build.gradle": "2b8f4c4bdf0b3f08e8cdd7c2ecc540fb02cefd27f56efbef6d2637e5c664c63a",
+    "android/build.gradle": "c67cbf5a596e868a205b7d3862e5bae13c38e2d6020187c23225b53d0099090e",
+    "android/gradle.properties": "d53124e116683c38bfa1b9931878432b972d7e4623973fcfd9b79f05a7ccb45f",
+    "android/gradle/libs.versions.toml": "3cbdad51e968173dbf03b8d91eb1891a60e5ea05bbdf560778e0f3d21d922d04",
+    "android/protection-core/build.gradle.kts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "android/reels-core/build.gradle.kts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "node_modules/react-native-gesture-handler/android/build.gradle": "822b1d984d6f56acd681dde080f281f69661a8d494a72812a7842248f55e0f79",
+    "node_modules/react-native-mmkv/android/build.gradle": "5e5e7300b329a6ee159a0c64269a8c066f356fb9382ec22c2020726da6868c70",
+    "node_modules/react-native-nitro-modules/android/build.gradle": "d54fdb0b6de8d1c6ad97cdf60044737b77695ffaeccb234f2817554fe8b53ea7",
+    "node_modules/react-native-reanimated/android/build.gradle.kts": "a678c7fc1ed9c5a417d9ddfca52d4caee5c0042152d8b2501781f1e8767c8ad7",
+    "node_modules/react-native-safe-area-context/android/build.gradle": "e8ced7a5ff5ee09d85e361b1db0c9ef50ee438a91d38e242bc1e3c498d2d7843",
+    "node_modules/react-native-screens/android/build.gradle": "fd326046edd3c2696d236ee18ec796f203be938be30b9cebd2b22353c83622bf",
+    "node_modules/react-native-svg/android/build.gradle": "323c0f746493030f8382d73eb7d2ede7abdfdbe9c7fc4227516526194432eb75",
+    "node_modules/react-native-unistyles/android/build.gradle": "a57adb9c0c6f555244e37b8287cc680e02352f06b73c52ffd38ded192a63e998",
+    "node_modules/react-native-worklets/android/build.gradle.kts": "5d8274411213aa81b429ab1947e7b7fe764cab0e396396d8f3bee96e293cb244",
+    "node_modules/react-native/gradle/libs.versions.toml": "2d8189b893ec8179a8f27b0ecb2b946799d72bb7ad5c3d8584c18edd7483e933"
+  }
+}

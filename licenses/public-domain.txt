@@ -1,0 +1,9 @@
+SQLite
+
+The authors of SQLite have dedicated the code to the public domain.
+https://www.sqlite.org/copyright.html
+
+LibTomCrypt
+
+LibTomCrypt is public domain. As should all quality software be.
+Tom St Denis
