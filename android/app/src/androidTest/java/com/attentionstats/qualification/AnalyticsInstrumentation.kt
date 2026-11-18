@@ -46,6 +46,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var archiveCapacity = false
     private var archiveCleanup = false
     private var backupSnapshot = false
+    private var restoreIngress = false
     private var protectionCredentials = false
     private var protectionRoutes = false
     private var protectionLifecycle = false
@@ -146,6 +147,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         archiveCapacity = arguments?.getString("archiveCapacity") == "true"
         archiveCleanup = arguments?.getString("archiveCleanup") == "true"
         backupSnapshot = arguments?.getString("backupSnapshot") == "true"
+        restoreIngress = arguments?.getString("restoreIngress") == "true"
         protectionCredentials = arguments?.getString("protectionCredentials") == "true"
         protectionRoutes = arguments?.getString("protectionRoutes") == "true"
         protectionLifecycle = arguments?.getString("protectionLifecycle") == "true"
@@ -369,6 +371,10 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             if (backupSnapshot) {
                 result.putString("stream", BackupSnapshotVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (restoreIngress) {
+                result.putString("stream", RestoreIngressVerification.run(this))
                 finish(Activity.RESULT_OK, result); return
             }
             if (archiveCapacity) {
