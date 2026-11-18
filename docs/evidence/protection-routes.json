@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-18",
+  "tasks": [
+    "AS-063",
+    "AS-015",
+    "AS-017",
+    "AS-018"
+  ],
+  "sourceBase": "08de7c5fdc249efead02f8c48c52442d1b3bc62a",
+  "status": "experimental; individual-source authorization bypass repaired and isolated actual-coordinator routes verified; publication not cleared",
+  "regression": {
+    "productSha256": "2b8efb5277693b2e0de69f1dc3c57b67237b8f1c308641ee546f44e3476c594b",
+    "diagnosticSha256": "052e292e89ce2ae11735ed19b149d9747e2447d8f0a31cc0fb0ffa67040070d8",
+    "coordinatorCanonicalLfSha256": "c579c6d9c2e891fbdfe14ea90ebfacb876f87d7145a27f1a9dc01d3c1f6999ee",
+    "testCanonicalLfSha256": "ef03e407d5541d22f9673ac31f15e693bb37d06c7c44ae9f22091104db8749da",
+    "rawSha256": "51b05680aa5bcc9e974ba2a4c512e618f94de0bd46d911e90c4cb320dcc3da0e",
+    "rawCode": 0,
+    "finding": "Actual individual-source entry point fails the required native challenge check. Its direct enqueue and pre-authorization observation invalidation bypass Protection Lock. The regression fixture already reuses an injectable private credential owner; the source gate itself is unchanged from sourceBase."
+  },
+  "final": {
+    "productSha256": "6a75b08093e18ecc7c9d196f3d8974cd0a93d59d5690ccb73cb26787e85ed746",
+    "diagnosticSha256": "a4ea286ec6996decca5a864b92b7f78fed4bea75283e8c988849e5bbc39de707",
+    "rawSha256": "2ce3b01c12fd5f1cf803969d405b4cb9e53324ec5575c7d1970acfb48c67c636",
+    "rawCode": -1,
+    "checks": 68,
+    "physicalApi": 36,
+    "abi": "arm64-v8a",
+    "versionName": "1.0.0-reels-preview",
+    "versionCode": 10
+  },
+  "sourceCanonicalLfSha256": {
+    "android/app/src/main/java/com/attentionstats/reels/ReelsCoordinator.kt": "32f96b92067911b7f39a2603625cbd277d142a1b167f42e376202889a61f1623",
+    "android/app/src/androidTest/java/com/attentionstats/qualification/ProtectionRoutesVerification.kt": "fcce91620e9f7e0095e2e4322f29194cc7ecccd2269866809aa52d32d6954897",
+    "android/app/src/androidTest/java/com/attentionstats/qualification/AnalyticsInstrumentation.kt": "a45649843f0fdafc8df0e9f3a1dae27a25d0232f03c3a37e61f9edfd92ead73c"
+  },
+  "verified": [
+    "Actual production coordinator entry points with isolated credentials and SQLCipher/Room history; production singleton never replaced",
+    "Native challenges and Cancel for individual source, all sources, pause, diary limits, groups/slots, early focus end, history erase, restore replacement, short-video allowance and whole-app allowance",
+    "All ten cancellations leave isolated metadata, source choices, diary preferences, protection configuration and observation epoch unchanged; no success callback or allowance callback runs",
+    "Correct native PIN authorizes one individual-source change, persists it and advances configuration revision and observation epoch once",
+    "Live credential state unchanged; UUID-owned files and both Keystore aliases removed, isolated coroutine scope stopped and database closed"
+  ],
+  "repair": "Individual-source changes now use the shared native guarded queue. Observation invalidation moves after authorization. The coordinator reuses one private credential owner for request and execution; diagnostic reflection substitutes only its isolated instance, without a production testing API.",
+  "preservation": {
+    "settingsDisplayReversePreserved": true,
+    "actualServiceBound": true,
+    "ownedDiagnosticRemoved": true,
+    "finalScreen": "Today",
+    "liveHistoryErasedOrReplaced": false,
+    "liveProtectionLockEnabledByTest": false
+  },
+  "checks": {
+    "architecture": "pass",
+    "backupPolicy": "pass",
+    "previewDiagnosticLint": "pass; 3m14s, 536 tasks, 43 executed; lint zero errors and 164 warnings; no suppressions added",
+    "regressionBuild": "pass; 2m27s, 357 tasks, 39 executed; subsequent physical regression fails as retained above"
+  },
+  "limits": [
+    "Only coordinator routes and private store effects are qualified here; real cover/allowance timing, every UI affordance, lifecycle, enrollment changes, locale and full security/accessibility acceptance remain separate",
+    "Earlier fingerprint and credential suites retain their original artifact scopes; no new fingerprint, live erase/restore, phone clock or source consent change is claimed",
+    "No production build, signing, main merge, remote workflow dispatch or Play operation"
+  ]
+}

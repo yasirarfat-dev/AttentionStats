@@ -167,6 +167,7 @@
     "liveProtectionLock": "not enabled by qualification; user configures secrets privately"
   },
   "limits": [
+    "18/11/26 follow-up discovers the individual-source configure path missed the initial gate; that broad source-gating claim is corrected and superseded by protection-routes.json regression/repair evidence. Earlier credential/challenge/fingerprint passes retain their exact original scope.",
     "Credentials/recovery tests and the standalone fingerprint cryptographic probe retain their earlier exact artifacts; final authorization/UI/entry/full-biometric trials identify the final artifact separately",
     "Actual biometric enrollment changes, reboot/clock/process-death/corrupt-storage lifecycle matrix, every real rule/bypass route and full security/accessibility/locale/device qualification are not completed",
     "Expired execution is injected with a past native deadline; no device clock change or 120-second elapsed-time trial is claimed",

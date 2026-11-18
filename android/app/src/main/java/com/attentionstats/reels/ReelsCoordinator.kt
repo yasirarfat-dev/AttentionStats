@@ -46,6 +46,7 @@ import java.util.concurrent.atomic.AtomicLong
  * IO queue, so the accessibility service, the UI bridge and storage never race.
  */
 internal class ReelsCoordinator private constructor(private val context: Context) {
+    private val protectionCredentials = com.attentionstats.protection.ProtectionCredentials(context)
     private val diary = com.attentionstats.diary.DiaryEngine(context)
     internal val schedules = com.attentionstats.protection.ScheduleOwner(context)
     private val archives = com.attentionstats.backup.ArchiveOwner(context)
@@ -196,9 +197,9 @@ internal class ReelsCoordinator private constructor(private val context: Context
     }
 
     private fun guardedEnqueue(label: String, failure: (String) -> Unit = {}, operation: suspend () -> Unit) {
-        com.attentionstats.protection.ProtectionLock.request(context, label, failure) { authorization, expires ->
+        com.attentionstats.protection.ProtectionLock.request(context, label, failure, protectionCredentials) { authorization, expires ->
             enqueue(failure) {
-                com.attentionstats.protection.ProtectionLock.execute(context, authorization, expires, operation)
+                com.attentionstats.protection.ProtectionLock.execute(protectionCredentials, authorization, expires, operation)
             }
         }
     }
@@ -473,8 +474,8 @@ internal class ReelsCoordinator private constructor(private val context: Context
     fun configure(appKey: String, enabled: Boolean, expected: String,
         success: (String) -> Unit, failure: (String) -> Unit) {
         val app = ReelApp.byKey(appKey) ?: run { failure("INVALID_ARGUMENT"); return }
-        invalidate() // Fence old observations before the user-requested mutation enters the queue.
-        enqueue(failure) {
+        guardedEnqueue("Change tracking for ${app.displayName}", failure) enqueue@{
+            invalidate() // Only an authorized change may fence current observations.
             val history = opened()
             if (!checkRevision(history, expected)) { failure("REVISION_CONFLICT"); return@enqueue }
             val now = System.currentTimeMillis()

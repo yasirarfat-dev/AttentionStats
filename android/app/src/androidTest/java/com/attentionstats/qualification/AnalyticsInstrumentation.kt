@@ -47,6 +47,7 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var archiveCleanup = false
     private var backupSnapshot = false
     private var protectionCredentials = false
+    private var protectionRoutes = false
     private var protectionBiometric = false
     private var protectionLockUi = false
     private var protectionAuthorization = false
@@ -145,6 +146,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         archiveCleanup = arguments?.getString("archiveCleanup") == "true"
         backupSnapshot = arguments?.getString("backupSnapshot") == "true"
         protectionCredentials = arguments?.getString("protectionCredentials") == "true"
+        protectionRoutes = arguments?.getString("protectionRoutes") == "true"
         protectionBiometric = arguments?.getString("protectionBiometric") == "true"
         protectionLockUi = arguments?.getString("protectionLockUi") == "true"
         protectionAuthorization = arguments?.getString("protectionAuthorization") == "true"
@@ -337,6 +339,10 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             if (protectionBiometricAuthorization) {
                 result.putString("stream", ProtectionAuthorizationVerification.run(this, biometric = true))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (protectionRoutes) {
+                result.putString("stream", ProtectionRoutesVerification.run(this))
                 finish(Activity.RESULT_OK, result); return
             }
             if (protectionAuthorization) {
