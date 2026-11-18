@@ -175,6 +175,7 @@ dependencies {
     implementation project(':reels-core')
     implementation project(':protection-core')
     implementation libs.tink
+    implementation libs.biometric
     implementation(libs.room.runtime)
     implementation(libs.sqlite)
     implementation(libs.sqlcipher)

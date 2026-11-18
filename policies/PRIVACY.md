@@ -1,6 +1,6 @@
 # Attention Stats privacy policy
 
-Last updated: 7 November 2026 · App: **Attention Stats** (`attention.stats`), version 1.0.0 and development continuation · Contact: **consciousbiobot@gmail.com**
+Last updated: 18 November 2026 · App: **Attention Stats** (`attention.stats`), version 1.0.0 and development continuation · Contact: **consciousbiobot@gmail.com**
 
 Attention Stats is a free, open-source digital wellbeing app created by Yasir Arfat ([yasirarfat.com](https://yasirarfat.com)) and published on Google Play by Convenience Labs. Its [source code](https://github.com/yasirarfat-dev/AttentionStats) is public, so anyone can verify everything below.
 
@@ -8,7 +8,7 @@ Attention Stats is a free, open-source digital wellbeing app created by Yasir Ar
 
 - **Private local storage, Android-managed backup.** No developer account, server, telemetry, advertising or automatic crash reporting. The app has no Internet permission. When available and explicitly chosen, manual export writes a file to your selected destination; that provider may upload it under its own policy. Automatic Android backup starts enabled when you open this development version unless you already saved a choice. Turn it off in Settings → Backup & restore. Android backup must also be enabled on your phone.
 - **We never receive your history automatically.** Local history is encrypted. You can disable Android backup and control manual external archives and support messages.
-- **You are in control.** Every feature is optional, and you can pause counting or delete everything at any time.
+- **You are in control.** Features are optional. When optional Protection Lock is configured, in-app changes and history deletion require parental authorization. Android permission settings, clear storage and uninstall remain available.
 
 ## What the app uses, and why
 
@@ -68,3 +68,9 @@ Attention Stats is intended for people aged 13 and over and is not directed at c
 If the app's data handling ever changes, we will update this policy and ask for your agreement in the app before anything new is used.
 
 Questions: **consciousbiobot@gmail.com** · [Data deletion](DATA-DELETION.md) · [Support](SUPPORT.md)
+
+## Optional Protection Lock
+
+The development candidate adds an optional parental PIN and biometric shortcut in Protect, off until configured. PIN and three recovery-phrase verifiers and retry state stay in private no-backup storage protected by Android Keystore. We do not receive these secrets. Android performs fingerprint/face authentication; the app receives the authentication result and uses an authorized cryptographic operation, without accessing biometric templates. Eligible biometrics already enrolled on the device can authorize actions, so only enable the shortcut when those enrollments belong to the parent.
+
+Lock credentials and biometric keys are excluded from exports and Android backup. Set up the lock again on a new installation. In-app history erase preserves Protection Lock; turn the lock off separately in Protect. The phone lock-screen PIN is not accepted as the biometric fallback. Android settings, clear storage, uninstall and emergency access remain available; this is not tamper-proof device management.

@@ -159,6 +159,13 @@ class DiaryModule(private val context: ReactApplicationContext) : NativeDiarySpe
             } catch (_: Exception) { failure(promise, "APPS_UNAVAILABLE") }
         }.start()
     }
+    override fun openProtectionLock(promise: Promise) {
+        try {
+            context.startActivity(Intent(context, com.attentionstats.protection.ProtectionLockActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            promise.resolve(true)
+        } catch (_: RuntimeException) { promise.resolve(false) }
+    }
     override fun openBackup(promise: Promise) {
         try {
             context.startActivity(Intent(context, com.attentionstats.backup.BackupActivity::class.java)

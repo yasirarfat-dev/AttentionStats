@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-17",
+  "artifact": "androidx.biometric:biometric:1.1.0",
+  "source": "Google Maven and AndroidX official release notes",
+  "latestStable": "1.1.0",
+  "latestIncludingPrerelease": "1.4.0-beta01",
+  "license": [
+    "The Apache Software License, Version 2.0"
+  ],
+  "pomSha256": "aeb69e76988f43b06c84fca25efab2e418bb98b5aabcd03fa7913bd3ed1bcaa9",
+  "officialReleases": "https://developer.android.com/jetpack/androidx/releases/biometric",
+  "choice": "Direct Kotlin integration with native action authorization; no Expo or npm biometric wrapper",
+  "compatibility": "Preview/debug native build and API36 ART qualification pass; optional PIN setup requires API26+. App minSdk24 unchanged. Release dependency graph resolved without producing a release binary; minAPI/runtime/release acceptance remain separate.",
+  "scope": "Dependency choice only; no fingerprint verification or release acceptance inferred"
+}

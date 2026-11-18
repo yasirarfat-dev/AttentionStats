@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { AppState } from 'react-native';
+import { Alert, AppState } from 'react-native';
+import NativeDiary from '../../platform/specs/NativeDiary';
 import { FocusChooser } from './FocusChooser';
 import { FocusClock } from './FocusClock';
 import { daysLabel, slotLabel } from './schedulePresentation';
@@ -70,7 +71,7 @@ export function ProtectScreen({
         <Card
           tone="soft"
           title="Active Focus"
-          info="The timer is native-authoritative. Blocking is best effort; system navigation and emergency recovery remain available. End Focus Now stops this voluntary session immediately."
+          info="The timer is native-authoritative. Blocking is best effort; system navigation and emergency recovery remain available. Ending early requires parent authorization when Protection Lock is on."
         >
           <FocusClock
             remainingMs={active.remainingMs}
@@ -141,6 +142,20 @@ export function ProtectScreen({
           icon="block"
           title="Short-video blocks"
           onPress={() => onTool('Blocks')}
+        />
+      </Card>
+      <Card
+        title="Protection Lock"
+        info="Optional parental authorization for ordinary unlocks and protection changes. Set a separate PIN and recovery phrases, then optionally enable biometric convenience. System recovery remains available."
+        padded={false}
+      >
+        <Row
+          icon="lock"
+          title="Parental PIN & biometrics"
+          onPress={async () => {
+            if (!(await NativeDiary?.openProtectionLock()))
+              Alert.alert('Protection Lock unavailable', 'Please try again.');
+          }}
         />
       </Card>
       <FocusChooser

@@ -153,6 +153,10 @@ internal class NativePage(private val activity: Activity) {
         group = null
         content.addView(view, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(heightDp)).apply { bottomMargin = dp(14) })
     }
+    fun flexible(view: View) {
+        group = null
+        content.addView(view, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { bottomMargin = dp(14) })
+    }
     fun refresh() {
         val palette = AppearanceOwner.palette(activity)
         root.setBackgroundColor(palette.canvas)

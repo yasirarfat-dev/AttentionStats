@@ -170,7 +170,7 @@ internal object InformationUiVerification {
             SystemClock.sleep(2_000)
             // This review starts with a direct Settings route. A selected tab's
             // accessible node need not expose the same actionable label as an unselected tab.
-            if (mode == "deletion" && path == "settings") return
+            if ((mode == "deletion" && path == "settings") || (mode == "protection-entry" && path == "protect")) return
             click(when (path) { "insights" -> "Insights"; "settings" -> "Settings"; "protect" -> "Protect"; else -> "Today" })
         }
         var primaryFailure: Throwable? = null
@@ -473,6 +473,23 @@ internal object InformationUiVerification {
                     click("Back to schedules"); click("By App Groups"); click("+ Create app group")
                     help("Installed Apps", "Choose one app or build a group")
                     click("Back to schedules")
+                }
+                "protection-entry" -> {
+                    open("protect")
+                    help("Protection Lock", "Optional parental authorization")
+                    find("Parental PIN & biometrics") { true }; checks++
+                    val capture = java.io.File(context.cacheDir, "protection-lock-entry.png")
+                    check(!capture.exists())
+                    val beforeCapture = checkNotNull(ownRoot()); SnapshotReader.recycle(beforeCapture)
+                    val bitmap = checkNotNull(automation.takeScreenshot())
+                    try {
+                        val afterCapture = checkNotNull(ownRoot()); SnapshotReader.recycle(afterCapture)
+                        capture.outputStream().use { check(bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)) }
+                    } finally { bitmap.recycle() }
+                    click("Parental PIN & biometrics")
+                    find("Protection Lock is off", true) { true }; checks++
+                    click("Done")
+                    find("Parental PIN & biometrics") { true }; checks++
                 }
                 "deletion" -> {
                     // A failed earlier owned review can leave its RN modal mounted across deep links.

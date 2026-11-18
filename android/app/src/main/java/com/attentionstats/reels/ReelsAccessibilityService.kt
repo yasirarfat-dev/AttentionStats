@@ -324,7 +324,7 @@ class ReelsAccessibilityService : AccessibilityService() {
             "This app is covered by your focus session or a blocking period. End focus or change schedules in Attention Stats, or allow a short visit.",
             0, "Open Attention Stats", "Allow 5 minutes",
             { scheduledPackage = null; removeSchedule(); open("attentionstats://protect") },
-            { coordinator.schedules.allow(target, SystemClock.elapsedRealtime()); scheduledPackage = null; removeSchedule(); schedule(0) })
+            { coordinator.allowScheduled(target) { scheduledPackage = null; removeSchedule(); schedule(0) } })
         val params = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
         if (Build.VERSION.SDK_INT >= 30) {
@@ -390,7 +390,7 @@ class ReelsAccessibilityService : AccessibilityService() {
                     decide("left"); blockActedAt = 0; removeIntervention()
                     if (wanted == "schedule") performGlobalAction(GLOBAL_ACTION_BACK)
                 },
-                { decide("allowed"); coordinator.allowFor(current, 5); removeIntervention(); schedule(0) })
+                { coordinator.allowFor(current, 5) { decide("allowed"); removeIntervention(); schedule(0) } })
         }
         // Not focusable: system Back/Home/Recents always reach Android, so the screen never traps anyone.
         val params = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,

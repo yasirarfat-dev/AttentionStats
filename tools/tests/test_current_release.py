@@ -49,6 +49,12 @@ class CurrentReleaseTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             audit(MANIFEST)
 
+    def test_current_biometric_permissions_are_narrow(self):
+        biometric = CURRENT.replace('</manifest>', '<uses-permission android:name="android.permission.USE_BIOMETRIC"/><uses-permission android:name="android.permission.USE_FINGERPRINT"/></manifest>')
+        self.assertIn('android.permission.USE_BIOMETRIC', audit(biometric)['permissions'])
+        with self.assertRaises(ValueError):
+            audit(biometric.replace('android.permission.USE_FINGERPRINT', 'android.permission.CAMERA'))
+
     def test_changed_expected_version_is_explicit(self):
         with self.assertRaises(ValueError):
             release.audit_manifest(CURRENT, 11, version_name="1.1.0", profile="current")

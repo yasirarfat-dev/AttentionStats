@@ -6,6 +6,7 @@ sqlcipher = "4.20.0"
 ksp = "2.3.12"
 coroutines = "1.11.0"
 tink = "1.24.0"
+biometric = "1.1.0"
 
 [libraries]
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar-jdk-libs" }
@@ -15,3 +16,4 @@ sqlite = { module = "androidx.sqlite:sqlite", version.ref = "sqlite" }
 sqlcipher = { module = "net.zetetic:sqlcipher-android", version.ref = "sqlcipher" }
 coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 tink = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
+biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }

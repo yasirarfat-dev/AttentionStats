@@ -215,3 +215,7 @@ Widget display JSON version 2 is bounded to 4,096 characters and exact keys: ver
 
 
 Publishing synthetic-history qualification extends only the internal debug instrumentation seam: an installed process-memory responder may route validated range requests to an isolated synthetic store and hold responses for ordering tests. Release builds ignore it; there is no JS/intent setter, new bridge operation, altered contract version, persisted cache or real-history replacement. Fixture installation/cleanup and executor/store ownership belong to instrumentation. Production range execution and failure diagnostics remain unchanged when no responder is installed.
+
+## Protection Lock bridge (AS-063, ADR-111)
+
+`NativeDiary.openProtectionLock(): Promise<boolean>` only opens the non-exported native page from Protect. It neither enables the lock nor returns credentials, biometric material or a reusable unlocked flag. Native code gates actual protected mutations, retaining existing configuration-revision checks after authorization. Error codes include AUTH_BUSY, AUTH_CANCELLED, AUTH_EXPIRED, AUTH_STALE and PROTECTION_LOCK_UNAVAILABLE; a challenge failure must preserve data and must not be reported as history-store corruption. Waiting requests are single-use and expire after 120 seconds; the native deadline also travels with the continuation and is rechecked inside the execution mutex after queueing; process death loses them. No external intent/deep link can supply an authorization.

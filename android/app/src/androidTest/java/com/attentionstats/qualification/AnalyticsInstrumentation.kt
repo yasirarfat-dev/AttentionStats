@@ -46,6 +46,11 @@ class AnalyticsInstrumentation : Instrumentation() {
     private var archiveCapacity = false
     private var archiveCleanup = false
     private var backupSnapshot = false
+    private var protectionCredentials = false
+    private var protectionBiometric = false
+    private var protectionLockUi = false
+    private var protectionAuthorization = false
+    private var protectionBiometricAuthorization = false
     private var historicalMigrations = false
     private var databaseDurability = false
     private var migrationRecovery = false
@@ -101,7 +106,7 @@ class AnalyticsInstrumentation : Instrumentation() {
         numericAuditRefresh = arguments?.getString("numericAuditRefresh") == "true"
         numericAuditExpanded = arguments?.getString("numericAuditExpanded") == "true"
         visualProgressAudit = arguments?.getString("visualProgressAudit")?.takeIf { it in setOf("tiktok", "youtube") }
-        informationUi = arguments?.getString("informationUi")?.takeIf { it in setOf("today", "insights", "settings", "protect", "native", "editors", "editor-keyboard", "editor-review", "editor-clock", "editor-group", "deletion", "tour", "today-layout", "today-count-only", "appearance-draft", "appearance-themes", "playback-details", "playback-consent", "counting-health") }
+        informationUi = arguments?.getString("informationUi")?.takeIf { it in setOf("today", "insights", "settings", "protect", "native", "editors", "editor-keyboard", "editor-review", "editor-clock", "editor-group", "deletion", "tour", "today-layout", "today-count-only", "appearance-draft", "appearance-themes", "playback-details", "playback-consent", "counting-health", "protection-entry") }
         numericMediaProbe = arguments?.getString("numericMediaProbe")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollContinuous = arguments?.getString("autoScrollContinuous")?.takeIf { org.attentionstats.reels.ReelApp.byKey(it) != null }
         autoScrollTransitions = arguments?.getString("autoScrollTransitions")?.toIntOrNull()?.takeIf { it in 1..20 } ?: 3
@@ -139,6 +144,11 @@ class AnalyticsInstrumentation : Instrumentation() {
         archiveCapacity = arguments?.getString("archiveCapacity") == "true"
         archiveCleanup = arguments?.getString("archiveCleanup") == "true"
         backupSnapshot = arguments?.getString("backupSnapshot") == "true"
+        protectionCredentials = arguments?.getString("protectionCredentials") == "true"
+        protectionBiometric = arguments?.getString("protectionBiometric") == "true"
+        protectionLockUi = arguments?.getString("protectionLockUi") == "true"
+        protectionAuthorization = arguments?.getString("protectionAuthorization") == "true"
+        protectionBiometricAuthorization = arguments?.getString("protectionBiometricAuthorization") == "true"
         historicalMigrations = arguments?.getString("historicalMigrations") == "true"
         databaseDurability = arguments?.getString("databaseDurability") == "true"
         migrationRecovery = arguments?.getString("migrationRecovery") == "true"
@@ -323,6 +333,26 @@ class AnalyticsInstrumentation : Instrumentation() {
             }
             if (archiveCleanup) {
                 result.putString("stream", ArchiveCleanupVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (protectionBiometricAuthorization) {
+                result.putString("stream", ProtectionAuthorizationVerification.run(this, biometric = true))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (protectionAuthorization) {
+                result.putString("stream", ProtectionAuthorizationVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (protectionLockUi) {
+                result.putString("stream", ProtectionLockUiVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (protectionBiometric) {
+                result.putString("stream", ProtectionBiometricVerification.run(this))
+                finish(Activity.RESULT_OK, result); return
+            }
+            if (protectionCredentials) {
+                result.putString("stream", ProtectionCredentialsVerification.run(this))
                 finish(Activity.RESULT_OK, result); return
             }
             if (backupSnapshot) {

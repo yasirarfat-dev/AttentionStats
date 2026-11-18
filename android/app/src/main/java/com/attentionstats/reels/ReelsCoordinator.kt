@@ -146,6 +146,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
     private fun enqueue(onError: (String) -> Unit = {}, operation: suspend () -> Unit) {
         if (!jobs.trySend {
             try { operation() }
+            catch (denied: com.attentionstats.protection.ProtectionCredentials.Denied) { onError(denied.reason) }
             catch (_: ObservationInvalidated) { /* A privacy/source fence rolls back this observation. */ }
             catch (_: com.attentionstats.diary.DiaryInterrupted) { onError("INTERRUPTED") }
             catch (_: Exception) {
@@ -194,6 +195,14 @@ internal class ReelsCoordinator private constructor(private val context: Context
         acquisitionSettings.incrementAndGet()
     }
 
+    private fun guardedEnqueue(label: String, failure: (String) -> Unit = {}, operation: suspend () -> Unit) {
+        com.attentionstats.protection.ProtectionLock.request(context, label, failure) { authorization, expires ->
+            enqueue(failure) {
+                com.attentionstats.protection.ProtectionLock.execute(context, authorization, expires, operation)
+            }
+        }
+    }
+
     private fun revision(generation: String, value: Long) = "$generation:$value"
     private suspend fun checkRevision(history: HistoryStore, expected: String): Boolean {
         val metadata = checkNotNull(history.database.data().metadata())
@@ -235,8 +244,8 @@ internal class ReelsCoordinator private constructor(private val context: Context
     fun cancelArchive() = enqueue { archives.clear() }
     fun restoreArchive(token: String, cancelled: java.util.concurrent.atomic.AtomicBoolean,
         success: () -> Unit, failure: (String) -> Unit) {
-        invalidate()
-        enqueue(failure) {
+        guardedEnqueue("Replace local history from a backup", failure) enqueue@{
+            invalidate()
             val staged = archives.pending
             if (staged == null || staged.token != token) { failure("STALE_PREVIEW"); return@enqueue }
             var committed = false
@@ -279,7 +288,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
             finally { archives.clear() }
         }
     }
-    fun saveSchedules(document: String, expected: Long, success: () -> Unit, failure: (String) -> Unit) = enqueue(failure) {
+    fun saveSchedules(document: String, expected: Long, success: () -> Unit, failure: (String) -> Unit) = guardedEnqueue("Change groups or time slots", failure) enqueue@{
         val history = opened()
         val valid = try { com.attentionstats.protection.ScheduleOwner.decode(document).also { it.validate(schedules.excluded) }; true }
             catch (_: Exception) { false }
@@ -290,7 +299,7 @@ internal class ReelsCoordinator private constructor(private val context: Context
     }
 
     fun changeFocus(packages: Set<String>?, minutes: Int, expected: Long, stopId: String?,
-        success: () -> Unit, failure: (String) -> Unit, allowOnly: Boolean = false) = enqueue(failure) {
+        success: () -> Unit, failure: (String) -> Unit, allowOnly: Boolean = false) = guardedEnqueue(if (packages == null) "End focus early" else "Start or change focus", failure) enqueue@{
         val history = opened()
         if (packages != null && !(grantEnabled() && serviceConnected)) { failure("ACCESS_UNAVAILABLE"); return@enqueue }
         try {
@@ -314,8 +323,8 @@ internal class ReelsCoordinator private constructor(private val context: Context
     }
     fun configureDiary(action: String, enabled: Boolean, count: Int, minutes: Int, expected: Long,
         success: (String) -> Unit, failure: (String) -> Unit) {
-        diary.fence.incrementAndGet() // Fence queued requests as well as the active OS query.
-        enqueue(failure) {
+        guardedEnqueue("Change limits, reminders or tracking choices", failure) enqueue@{
+            diary.fence.incrementAndGet() // Only an authorized change can fence current work.
             val history = opened()
             if (!diary.configure(history, action, enabled, count, minutes, expected)) {
                 failure("REVISION_CONFLICT"); return@enqueue
@@ -351,8 +360,21 @@ internal class ReelsCoordinator private constructor(private val context: Context
             else -> null
         }
     }
-    fun allowFor(app: ReelApp, minutes: Int) {
-        allowances[app] = SystemClock.elapsedRealtime() + minutes * 60_000L
+    fun allowFor(app: ReelApp, minutes: Int, onAllowed: () -> Unit = {}) {
+        val expected = schedules.revision
+        guardedEnqueue("Allow a short visit to ${app.displayName}") {
+            if (schedules.revision != expected) return@guardedEnqueue
+            allowances[app] = SystemClock.elapsedRealtime() + minutes.coerceIn(1, 5) * 60_000L
+            main.post(onAllowed)
+        }
+    }
+    fun allowScheduled(packageName: String, onAllowed: () -> Unit) {
+        val expected = schedules.revision
+        guardedEnqueue("Allow a five-minute visit to this app") {
+            if (schedules.revision != expected) return@guardedEnqueue
+            schedules.allow(packageName, SystemClock.elapsedRealtime())
+            main.post(onAllowed)
+        }
     }
     fun blockingAvailable(app: ReelApp) = allowed(app) && grantEnabled() && serviceConnected
     fun blockChoices(): Set<ReelApp> = diary.blockedApps
@@ -547,8 +569,11 @@ internal class ReelsCoordinator private constructor(private val context: Context
 
     private fun mutate(expected: String, success: (String) -> Unit, failure: (String) -> Unit,
         resetObservation: Boolean = true, block: suspend (HistoryStore) -> Unit) {
-        if (resetObservation) invalidate()
-        enqueue(failure) {
+        val submit: ((suspend () -> Unit) -> Unit) = if (resetObservation) {
+            { operation -> guardedEnqueue("Change source choices, pause or erase history", failure, operation) }
+        } else { { operation -> enqueue(failure, operation) } }
+        submit enqueue@{
+            if (resetObservation) invalidate()
             val history = opened()
             if (!checkRevision(history, expected)) { failure("REVISION_CONFLICT"); return@enqueue }
             history.database.withWriteTransaction {

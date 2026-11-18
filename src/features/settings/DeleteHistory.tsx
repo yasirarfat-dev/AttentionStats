@@ -72,7 +72,8 @@ export function useDeleteHistory({
             <Body muted>
               Erasing turns off automatic backups and removes pending restores.
               Copies already held by your backup provider or exported elsewhere
-              may remain.
+              may remain. Protection Lock stays configured; manage it in
+              Protect.
             </Body>
             <Button
               label="Keep my history"

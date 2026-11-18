@@ -74,9 +74,11 @@ def audit_manifest(text, version_code=1, *, version_name="0.1.0", profile="legac
          app.get(ANDROID + "dataExtractionRules") is not None, "Missing backup exclusions")
     need(manifest.find("instrumentation") is None, "Test instrumentation in release")
     permissions = sorted(x.get(ANDROID + "name") for x in manifest.findall("uses-permission"))
+    allowed_permissions = {PACKAGE + ".DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "android.permission.PACKAGE_USAGE_STATS"}
+    if profile == "current":
+        allowed_permissions |= {"android.permission.USE_BIOMETRIC", "android.permission.USE_FINGERPRINT"}
     need("android.permission.PACKAGE_USAGE_STATS" in permissions and
-         set(permissions) <= {PACKAGE + ".DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
-                              "android.permission.PACKAGE_USAGE_STATS"},
+         set(permissions) <= allowed_permissions,
          "Unexpected permission in release")
     queries = manifest.find("queries")
     packages = {"com.instagram.android", "com.facebook.katana", "com.google.android.youtube", "com.zhiliaoapp.musically"}

@@ -93,3 +93,5 @@ ADR-096 retains routes and functional controls while grouping routine explanatio
 
 
 ADR-102 repairs the current three-step welcome tour: every step transition resets its scroll offset; step-three Back and Android Back on steps two/three return to the previous step. They do not invoke onboarding completion, enable collection or change permissions. Normal/large-text runtime results remain scoped in the [publishing surface ledger](evidence/publishing-surface-review.json).
+
+AS-063 / ADR-111 places Protection Lock in Protect, below existing protection tools. The row opens a non-exported Kotlin page through NativeDiary; credential and biometric challenges remain native. Opening it never enables restrictions. Cancel/Back leaves without granting an action; leaving a challenge retires it. No external deep-link authorization or new main tab is added.

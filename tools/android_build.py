@@ -21,7 +21,7 @@ def main() -> int:
         ":collection-prototype:verifyReconciliation",
         ":reels-core:verifyReels",
         ":protection-core:verifyProtection",
-        "help", "dependencies",
+        "help", "dependencies", ":app:dependencies",
     ])
     local_sdk = ROOT / ".cache/as-004/sdk"
     default_sdk = local_sdk if local_sdk.is_dir() else os.environ.get("ANDROID_HOME", local_sdk)
