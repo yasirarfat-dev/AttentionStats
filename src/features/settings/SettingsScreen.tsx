@@ -153,7 +153,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
   function suggestIdea() {
     Alert.alert(
       'Suggest an idea',
-      'What would make Attention Stats more useful for you?\n\nShare your idea on VibeCodedProjects (vibedprojects.com), a friendly home for vibe-coded apps and the people who use them. You can also open a GitHub issue or send an email.',
+      'What would make Attention Stats more useful for you?\n\nShare your idea on VibeCodedProjects (vibedprojects.com) platform. You can also open a GitHub issue or send an email.',
       [
         { text: 'Project page', onPress: () => Linking.openURL(IDEAS) },
         {

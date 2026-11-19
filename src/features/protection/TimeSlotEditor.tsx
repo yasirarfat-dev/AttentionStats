@@ -26,19 +26,16 @@ import {
 
 import { AppSelection } from './AppSelection';
 import { clockDraft, toMinute, type ClockDraft } from './scheduleTime';
-import { useEditorKeyboard } from './useEditorKeyboard';
 function ClockInput({
   label,
   value,
   onChange,
   disabled,
-  onFieldFocus,
 }: {
   label: string;
   value: ClockDraft;
   onChange: (value: ClockDraft) => void;
   disabled: boolean;
-  onFieldFocus: () => void;
 }) {
   const { theme } = useUnistyles();
   return (
@@ -49,7 +46,6 @@ function ClockInput({
       <View style={styles.row}>
         <TextInput
           accessibilityLabel={`${label} hour`}
-          onFocus={onFieldFocus}
           value={value.hour}
           editable={!disabled}
           onChangeText={hour => onChange({ ...value, hour })}
@@ -64,7 +60,6 @@ function ClockInput({
         </Text>
         <TextInput
           accessibilityLabel={`${label} minute`}
-          onFocus={onFieldFocus}
           value={value.minute}
           editable={!disabled}
           onChangeText={minute => onChange({ ...value, minute })}
@@ -111,7 +106,6 @@ export function TimeSlotEditor({
   const initialSelected = groups.find(
     group => group.id === (initial?.groupId ?? initialGroup),
   );
-  const { scrollRef, onFieldFocus } = useEditorKeyboard();
   const [packages, setPackages] = useState<string[]>(
     initialSelected?.packages ?? [],
   );
@@ -178,7 +172,6 @@ export function TimeSlotEditor({
   };
   return (
     <Screen
-      scrollRef={scrollRef}
       title={initial ? 'Edit time slot' : 'A little time away'}
       subtitle="Make room for what matters"
       back={{ label: 'Back to schedules', onPress: onBack, disabled: busy }}
@@ -197,7 +190,6 @@ export function TimeSlotEditor({
         }}
       />
       <AppSelection
-        onFieldFocus={onFieldFocus}
         groups={groups}
         apps={apps}
         selected={packages}
@@ -209,7 +201,6 @@ export function TimeSlotEditor({
           <SectionTitle>Save selection as</SectionTitle>
           <TextInput
             accessibilityLabel="Selection group name"
-            onFocus={onFieldFocus}
             value={customName}
             onChangeText={setCustomName}
             maxLength={60}
@@ -306,14 +297,12 @@ export function TimeSlotEditor({
       {!allDay && (
         <>
           <ClockInput
-            onFieldFocus={onFieldFocus}
             label="From"
             value={start}
             onChange={setStart}
             disabled={busy}
           />
           <ClockInput
-            onFieldFocus={onFieldFocus}
             label="Until"
             value={end}
             onChange={setEnd}
@@ -324,7 +313,7 @@ export function TimeSlotEditor({
       <Card
         tone="soft"
         title="Review time slot"
-        info="New slots save Off so you can review them before enabling. A five-minute allowance and essential recovery controls remain available. Overnight days refer to the date the slot starts."
+        info="New slots save Off so you can review them before enabling. A 5 to 15 minute allowance and essential recovery controls remain available. Overnight days refer to the date the slot starts."
       >
         <Title>{valid ? slotLabel(slot) : 'Check your time slot'}</Title>
         <Body>

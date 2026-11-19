@@ -882,7 +882,7 @@
     "url": "https://github.com/facebook/hermes/tree/static_h/external/llvh"
   },
   {
-    "name": "Lucide icons (7 adapted: footprints, book-open, glass-water, person-standing, phone, sun, lightbulb)",
+    "name": "Lucide icons (8 adapted: footprints, book-open, glass-water, person-standing, phone, sun, lightbulb, fingerprint)",
     "version": "adapted 2026-11",
     "license": "ISC",
     "url": "https://lucide.dev"

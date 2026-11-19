@@ -33,7 +33,9 @@ object ParentSecretRules {
     const val PIN_MAX = 12
     const val PHRASE_MIN = 3
     const val PHRASE_MAX = 128
+    /** Most backup phrases kept; only the first is required (ADR-120). */
     const val PHRASE_COUNT = 3
+    const val PHRASE_MIN_COUNT = 1
     const val PATTERN_MIN = 4
     const val PATTERN_CELLS = 9
     /** DEVICE_CREDENTIAL alone needs API 30; on older releases it only combines with other authenticators. */
@@ -116,17 +118,40 @@ object ParentSecretRules {
         } finally { digits.fill('\u0000') }
     }
 
+    /** Whether a set of 1..[PHRASE_COUNT] backup phrases has an acceptable size. */
+    fun validPhraseCount(count: Int) = count in PHRASE_MIN_COUNT..PHRASE_COUNT
+
     /**
-     * Which proofs may authorize each security change. Biometrics and the phone credential never can, so
-     * they cannot widen unlock methods or replace parent secrets (sabotage protection).
+     * Stored phrases for an enabled lock. An app PIN or pattern always has at least one backup phrase; phone
+     * fingerprint mode may have none (ADR-121), because a one-touch setup was wanted and a parent can still reset
+     * it with the phone's own screen lock, which anyone adding a fingerprint already had to know.
      */
-    fun acceptsForChange(action: String, authority: ParentAuthority): Boolean = when (action) {
-        "reset" -> authority == ParentAuthority.PHRASE
-        "methods", "biometric-on", "biometric-off" -> authority.knowledge
-        "pin", "pattern", "remove-pin", "remove-pattern", "disable", "phrases" ->
-            authority == ParentAuthority.PIN || authority == ParentAuthority.PATTERN
-        else -> false
-    }
+    fun validStoredPhraseCount(count: Int, keyless: Boolean) = count in (if (keyless) 0 else PHRASE_MIN_COUNT)..PHRASE_COUNT
+
+    /**
+     * Which proofs may authorize each security change. With a parent key, biometrics and the phone credential
+     * never can, so they cannot widen unlock methods or replace parent secrets (sabotage protection).
+     *
+     * [keyless] is fingerprint-only mode (ADR-120): the parent chose the phone's fingerprint instead of an app
+     * key, so a key-bound strong fingerprint (invalidated whenever anyone enrolls a new fingerprint) is the
+     * parent's proof. Face and the phone credential still never authorize changes; a phrase still resets.
+     */
+    fun acceptsForChange(action: String, authority: ParentAuthority, keyless: Boolean = false, phrases: Int = 1): Boolean =
+        if (keyless) when (action) {
+            "reset" -> authority == ParentAuthority.PHRASE
+            // Re-arm fingerprint approval after an enrollment change: a backup phrase, or with none saved the
+            // phone's screen lock (ADR-121).
+            "fingerprint-reset" -> authority == ParentAuthority.PHRASE || (phrases == 0 && authority == ParentAuthority.DEVICE_CREDENTIAL)
+            "methods" -> authority == ParentAuthority.STRONG_BIOMETRIC || authority == ParentAuthority.PHRASE
+            "pin", "pattern", "disable", "phrases" -> authority == ParentAuthority.STRONG_BIOMETRIC
+            else -> false
+        } else when (action) {
+            "reset" -> authority == ParentAuthority.PHRASE
+            "methods", "biometric-on", "biometric-off" -> authority.knowledge
+            "pin", "pattern", "remove-pin", "remove-pattern", "disable", "phrases", "fingerprint-only" ->
+                authority == ParentAuthority.PIN || authority == ParentAuthority.PATTERN
+            else -> false
+        }
 
     /** Whether replacing a secret should reset convenience methods: recovery, or replacing an existing kind. */
     fun clearsMethods(action: String, replacedExisting: Boolean) = action == "reset" || (action in setOf("pin", "pattern") && replacedExisting)

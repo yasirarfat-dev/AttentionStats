@@ -88,13 +88,13 @@ internal object SelectiveScheduleVerification {
         }
         fun waitCover() {
             val until = SystemClock.elapsedRealtime() + 10_000
-            while (!button("Allow 5 minutes") && SystemClock.elapsedRealtime() < until) SystemClock.sleep(200)
-            check(button("Short videos are on a pause") && button("Allow 5 minutes")) { "selective cover missing" }
+            while (!button("Allow 5 min") && SystemClock.elapsedRealtime() < until) SystemClock.sleep(200)
+            check(button("Short videos are on a pause") && button("Allow 5 min")) { "selective cover missing" }
         }
         fun absentFor(duration: Long) {
             val until = SystemClock.elapsedRealtime() + duration
             while (SystemClock.elapsedRealtime() < until) {
-                check(!button("Allow 5 minutes")) { "selective cover remained or reappeared" }
+                check(!button("Allow 5 min")) { "selective cover remained or reappeared" }
                 SystemClock.sleep(200)
             }
         }
@@ -124,7 +124,7 @@ internal object SelectiveScheduleVerification {
         } }) { "existing source schedules preserved" }
         val first = frame()
         check(first.surface == Surface.REELS && first.route == ReelRoute.VIEWER) { "admitted dedicated viewer required" }
-        check(!button("Allow 5 minutes")) { "existing cover preserved" }
+        check(!button("Allow 5 min")) { "existing cover preserved" }
         val root = checkNotNull(sourceRoot())
         val pkg = try { checkNotNull(root.packageName).toString() } finally { SnapshotReader.recycle(root) }
         val group = AppGroup(UUID.randomUUID().toString(), "Selective schedule verification", setOf(pkg))
@@ -146,7 +146,7 @@ internal object SelectiveScheduleVerification {
             check(outside.surface != Surface.REELS || outside.route != ReelRoute.VIEWER) { "Back did not leave viewer" }
             absentFor(2_000)
             reenterViewer()
-            check(button("Allow 5 minutes", true))
+            check(button("Allow 5 min", true)) // ADR-122: one step, 5 minutes by default
             grantedAllowance = true
             absentFor(4_000)
             val allowed = frame()

@@ -34,16 +34,52 @@ internal class NativePage(private val activity: Activity) {
         root.setOnApplyWindowInsetsListener { _, insets ->
             if (Build.VERSION.SDK_INT >= 30) {
                 val bars = insets.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout())
-                root.setPadding(0, bars.top, 0, 0)
-                content.setPadding(dp(18) + bars.left, dp(16), dp(18) + bars.right, dp(32) + bars.bottom)
+                // Edge-to-edge windows are no longer resized for the keyboard, so its inset pads the page too:
+                // the scroll view ends at the top of the keyboard and the focused field is lifted into view.
+                // The scroll view itself must end at the keyboard (a margin, not padding): ScrollView ignores its
+                // own padding when deciding what is visible, so only a real size change keeps the focused field shown.
+                val keyboard = insets.getInsets(WindowInsets.Type.ime()).bottom.takeIf { it > bars.bottom } ?: 0
+                val params = root.layoutParams as? ViewGroup.MarginLayoutParams
+                val opened = keyboard > 0 && params != null && params.bottomMargin != keyboard
+                // Both bars pad the clipped scroll view, so content never shows through either of them.
+                root.setPadding(0, bars.top, 0, if (keyboard > 0) 0 else bars.bottom)
+                content.setPadding(dp(18) + bars.left, dp(16), dp(18) + bars.right, dp(32))
+                if (params != null && params.bottomMargin != keyboard) { params.bottomMargin = keyboard; root.layoutParams = params }
+                if (opened) root.post { root.post { revealFocused() } }
             } else {
-                root.setPadding(0, insets.systemWindowInsetTop, 0, 0)
-                content.setPadding(dp(18), dp(16), dp(18), dp(32) + insets.systemWindowInsetBottom)
+                root.setPadding(0, insets.systemWindowInsetTop, 0, insets.systemWindowInsetBottom)
+                content.setPadding(dp(18), dp(16), dp(18), dp(32))
             }
             insets
         }
         activity.setContentView(root)
         refresh()
+    }
+    /** Scrolls the focused field above the keyboard, with room below it for its error line and the next button. */
+    private fun revealFocused() {
+        val focused = activity.currentFocus ?: return
+        if (!focused.isAttachedToWindow) return
+        var parent = focused.parent
+        while (parent is View && parent !== root) parent = parent.parent
+        if (parent !== root) return
+        // Taller than the viewport? ScrollView then aligns the top, so the field itself always stays in view.
+        focused.requestRectangleOnScreen(android.graphics.Rect(0, -dp(12), focused.width, focused.height + dp(104)), false)
+    }
+    /** Compact back control above the title, matching the app's sub-pages: a chevron and the destination. */
+    fun back(destination: String, action: () -> Unit) {
+        group = null
+        val link = TextView(activity).apply {
+            text = "‹  $destination"; textSize = 16f; gravity = Gravity.CENTER_VERTICAL; minHeight = dp(48)
+            setPadding(dp(2), 0, dp(14), 0); typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            contentDescription = if (destination == "Back") destination else "Back to $destination"; isClickable = true; isFocusable = true; setOnClickListener { action() }
+            accessibilityDelegate = object : View.AccessibilityDelegate() {
+                override fun onInitializeAccessibilityNodeInfo(host: View, info: android.view.accessibility.AccessibilityNodeInfo) {
+                    super.onInitializeAccessibilityNodeInfo(host, info); info.className = "android.widget.Button"
+                }
+            }
+        }
+        content.addView(link, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { bottomMargin = dp(2) })
+        bind { link.setTextColor(it.accent) }
     }
     private fun shape(fill: Int, border: Int, radius: Int = 24) = GradientDrawable().apply {
         cornerRadius = dp(radius).toFloat(); setColor(fill); setStroke(dp(1), border)

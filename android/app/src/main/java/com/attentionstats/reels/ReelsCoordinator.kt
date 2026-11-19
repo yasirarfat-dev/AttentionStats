@@ -363,17 +363,19 @@ internal class ReelsCoordinator private constructor(private val context: Context
     }
     fun allowFor(app: ReelApp, minutes: Int, onAllowed: () -> Unit = {}) {
         val expected = schedules.revision
-        guardedEnqueue("Allow a short visit to ${app.displayName}") {
+        val granted = minutes.coerceIn(1, 15)
+        guardedEnqueue("Allow $granted more minutes on ${app.displayName}") {
             if (schedules.revision != expected) return@guardedEnqueue
-            allowances[app] = SystemClock.elapsedRealtime() + minutes.coerceIn(1, 5) * 60_000L
+            allowances[app] = SystemClock.elapsedRealtime() + granted * 60_000L
             main.post(onAllowed)
         }
     }
-    fun allowScheduled(packageName: String, onAllowed: () -> Unit) {
+    fun allowScheduled(packageName: String, minutes: Int, onAllowed: () -> Unit) {
         val expected = schedules.revision
-        guardedEnqueue("Allow a five-minute visit to this app") {
+        val granted = minutes.coerceIn(1, 15)
+        guardedEnqueue("Allow $granted more minutes in this app") {
             if (schedules.revision != expected) return@guardedEnqueue
-            schedules.allow(packageName, SystemClock.elapsedRealtime())
+            schedules.allow(packageName, SystemClock.elapsedRealtime(), granted)
             main.post(onAllowed)
         }
     }

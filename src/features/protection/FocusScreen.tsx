@@ -112,7 +112,7 @@ export function FocusScreen({
           <Card
             tone="soft"
             title="Active focus"
-            info="The selected app rule lasts until this session ends. You can end early or allow a five-minute visit from the cover. Ending focus leaves other schedules and video limits unchanged. Closing this screen does not end the session."
+            info="The selected app rule lasts until this session ends. You can end early or allow a short visit (5, 10 or 15 minutes) from the cover. Ending focus leaves other schedules and video limits unchanged. Closing this screen does not end the session."
           >
             <FocusClock
               remainingMs={active.remainingMs}
@@ -137,7 +137,7 @@ export function FocusScreen({
           <Card
             tone="soft"
             title="Review focus"
-            info="Existing schedules and limits still apply. Settings, emergency access and system navigation remain available. You can end at any time or allow a five-minute visit. Blocking depends on Accessibility; closing this screen does not end the session."
+            info="Existing schedules and limits still apply. Settings, emergency access and system navigation remain available. You can end at any time or allow a short visit (5, 10 or 15 minutes). Blocking depends on Accessibility; closing this screen does not end the session."
           >
             <Title>{review.minutes} minutes for yourself</Title>
             <Body>{review.allowOnly ? 'Allow only' : 'Block apps'}</Body>

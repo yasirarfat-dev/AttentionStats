@@ -77,6 +77,38 @@ fun main() {
     expect(rules.acceptsForChange("disable", ParentAuthority.PATTERN) && !rules.acceptsForChange("disable", ParentAuthority.PHRASE), "disable needs PIN or pattern")
     expect(rules.acceptsForChange("phrases", ParentAuthority.PIN) && !rules.acceptsForChange("phrases", ParentAuthority.PHRASE), "phrase rotation needs PIN or pattern")
     expect(!rules.acceptsForChange("unknown", ParentAuthority.PIN), "unknown action rejected")
+    expect(rules.acceptsForChange("fingerprint-only", ParentAuthority.PIN) && !rules.acceptsForChange("fingerprint-only", ParentAuthority.STRONG_BIOMETRIC),
+        "dropping the parent key needs the parent key")
+
+    // Fingerprint-only mode (no parent key): a key-bound strong fingerprint is the parent's proof.
+    for (action in listOf("pin", "pattern", "disable", "phrases", "methods"))
+        expect(rules.acceptsForChange(action, ParentAuthority.STRONG_BIOMETRIC, keyless = true), "keyless $action accepts fingerprint")
+    for (action in actions + "fingerprint-only") for (authority in listOf(ParentAuthority.WEAK_BIOMETRIC, ParentAuthority.DEVICE_CREDENTIAL))
+        expect(!rules.acceptsForChange(action, authority, keyless = true), "keyless $action rejects $authority")
+    expect(rules.acceptsForChange("reset", ParentAuthority.PHRASE, keyless = true) &&
+        !rules.acceptsForChange("reset", ParentAuthority.STRONG_BIOMETRIC, keyless = true), "keyless reset needs a phrase")
+    expect(!rules.acceptsForChange("disable", ParentAuthority.PHRASE, keyless = true), "a phrase cannot turn keyless protection off")
+    expect(!rules.acceptsForChange("pin", ParentAuthority.PIN, keyless = true), "keyless has no PIN to prove")
+    expect(!rules.acceptsForChange("biometric-off", ParentAuthority.STRONG_BIOMETRIC, keyless = true), "keyless fingerprint cannot be switched off")
+
+    // Backup phrases: one required, up to three.
+    expect(!rules.validPhraseCount(0) && rules.validPhraseCount(1) && rules.validPhraseCount(3) && !rules.validPhraseCount(4), "1 to 3 phrases")
+    expect(rules.phraseProblems(listOf(chars("only one")), listOf(chars("only one"))).all { it == null }, "a single phrase is a valid set")
+    // Stored phrases (ADR-121): an app key keeps at least one; phone fingerprint mode may keep none.
+    expect(!rules.validStoredPhraseCount(0, keyless = false) && rules.validStoredPhraseCount(1, keyless = false), "an app key needs a phrase")
+    expect(rules.validStoredPhraseCount(0, keyless = true) && rules.validStoredPhraseCount(3, keyless = true) &&
+        !rules.validStoredPhraseCount(4, keyless = true), "fingerprint mode keeps 0 to 3 phrases")
+
+    // Re-arming fingerprint approval: a phrase, or the phone's screen lock only while no phrase is saved.
+    expect(rules.acceptsForChange("fingerprint-reset", ParentAuthority.PHRASE, keyless = true), "phrase re-arms fingerprint")
+    expect(rules.acceptsForChange("fingerprint-reset", ParentAuthority.DEVICE_CREDENTIAL, keyless = true, phrases = 0), "screen lock re-arms without phrases")
+    expect(!rules.acceptsForChange("fingerprint-reset", ParentAuthority.DEVICE_CREDENTIAL, keyless = true, phrases = 1), "a saved phrase is then required")
+    for (authority in listOf(ParentAuthority.STRONG_BIOMETRIC, ParentAuthority.WEAK_BIOMETRIC, ParentAuthority.PIN))
+        expect(!rules.acceptsForChange("fingerprint-reset", authority, keyless = true, phrases = 0), "fingerprint-reset rejects $authority")
+    expect(!rules.acceptsForChange("fingerprint-reset", ParentAuthority.PHRASE), "fingerprint-reset only exists without an app key")
+    for (action in actions) expect(!rules.acceptsForChange(action, ParentAuthority.DEVICE_CREDENTIAL, keyless = true, phrases = 0),
+        "screen lock never authorizes keyless $action")
+
     expect(rules.clearsMethods("reset", false) && rules.clearsMethods("pin", true) && !rules.clearsMethods("pattern", false) &&
         !rules.clearsMethods("remove-pin", true), "secret replacement clears methods; additions do not")
 

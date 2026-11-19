@@ -183,7 +183,7 @@ export function ProtectionToolScreen({
         <>
           <Card
             title="Short-video blocks"
-            info="Daily limits count videos. Blocking leaves the player; other app screens stay available. A five-minute allowance remains available. Saved time slots apply separately, targeting whole apps or short videos independently of Off / Limit / Always."
+            info="Daily limits count videos. Blocking leaves the player; other app screens stay available. A 5 to 15 minute allowance remains available. Saved time slots apply separately, targeting whole apps or short videos independently of Off / Limit / Always."
           >
             {reelsSourceKeys
               .filter(key => installed.has(key) || modeOf(key) !== 'off')

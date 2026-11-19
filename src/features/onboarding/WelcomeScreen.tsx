@@ -14,7 +14,7 @@ import { reelsSources, reelsSourceKeys } from '../../platform';
 import NativeDiary from '../../platform/specs/NativeDiary';
 import { Icon, type IconName } from '../../ui/Icon';
 import { AppIcon } from '../../ui/Charts';
-import { Body, Button, Caption, Card, Pill } from '../../ui/Kit';
+import { Body, Button, Card, Pill } from '../../ui/Kit';
 import { sourceIcon, useAppIcons, useDiary } from '../diary';
 import { countingReady, useReels } from '../sources';
 
@@ -105,6 +105,37 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
     onDone();
   }
 
+  // The actions stay pinned above the navigation bar on every height; only the content scrolls.
+  const footer =
+    step === 0 ? (
+      <>
+        <Button label="Continue" onPress={() => setStep(1)} />
+        <Button
+          label="Read the source code"
+          variant="text"
+          icon="code"
+          onPress={() => Linking.openURL(SOURCE_URL)}
+        />
+      </>
+    ) : step === 1 ? (
+      <>
+        <Button label="Set it up" onPress={() => setStep(2)} />
+        <Button label="Back" variant="text" onPress={() => setStep(0)} />
+      </>
+    ) : (
+      <>
+        <Button
+          label={countingReady(reels.snapshot) ? 'Start' : 'Finish later'}
+          variant={countingReady(reels.snapshot) ? 'filled' : 'tonal'}
+          onPress={finish}
+        />
+        <Text style={styles.footnote}>
+          You can change any of this in Settings.
+        </Text>
+        <Button label="Back" variant="text" onPress={() => setStep(1)} />
+      </>
+    );
+
   return (
     <View style={styles.scroll}>
       <ScrollView
@@ -112,7 +143,7 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
         style={styles.scroll}
         contentContainerStyle={[
           styles.page,
-          { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 16 },
+          { paddingTop: insets.top + 12, paddingBottom: 16 },
         ]}
       >
         <View
@@ -173,15 +204,6 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
                 </View>
               ))}
             </Card>
-            <View style={styles.footer}>
-              <Button label="Continue" onPress={() => setStep(1)} />
-              <Button
-                label="Read the source code"
-                variant="text"
-                icon="code"
-                onPress={() => Linking.openURL(SOURCE_URL)}
-              />
-            </View>
           </View>
         )}
 
@@ -239,10 +261,6 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
                 controls.
               </Body>
             </Card>
-            <View style={styles.footer}>
-              <Button label="Set it up" onPress={() => setStep(2)} />
-              <Button label="Back" variant="text" onPress={() => setStep(0)} />
-            </View>
           </View>
         )}
 
@@ -324,16 +342,6 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
                     }
               }
             />
-
-            <View style={styles.footer}>
-              <Button
-                label={countingReady(reels.snapshot) ? 'Start' : 'Finish later'}
-                variant={countingReady(reels.snapshot) ? 'filled' : 'tonal'}
-                onPress={finish}
-              />
-              <Caption>You can change any of this in Settings.</Caption>
-              <Button label="Back" variant="text" onPress={() => setStep(1)} />
-            </View>
           </View>
         )}
       </ScrollView>
@@ -341,6 +349,9 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
         pointerEvents="none"
         style={[styles.statusShade, { height: insets.top }]}
       />
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 8 }]}>
+        {footer}
+      </View>
     </View>
   );
 }
@@ -453,7 +464,21 @@ const styles = StyleSheet.create(theme => ({
     marginTop: 2,
   },
   flex: { flex: 1 },
-  footer: { marginTop: 'auto', paddingTop: 8, gap: 6, alignItems: 'stretch' },
+  footnote: {
+    color: theme.muted,
+    fontSize: 13,
+    textAlign: 'center',
+    paddingTop: 4,
+  },
+  footer: {
+    paddingTop: 10,
+    paddingHorizontal: 20,
+    gap: 4,
+    alignItems: 'stretch',
+    backgroundColor: theme.canvas,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.track,
+  },
   disclosureTitle: { color: theme.text, fontSize: 16, fontWeight: '700' },
   stepHead: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   stepNumber: {

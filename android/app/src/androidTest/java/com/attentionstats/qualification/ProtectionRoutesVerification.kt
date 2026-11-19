@@ -127,7 +127,7 @@ internal object ProtectionRoutesVerification {
                 "history erase" to { owner.deleteHistory(revision, ok, bad) },
                 "restore replacement" to { owner.restoreArchive("synthetic", java.util.concurrent.atomic.AtomicBoolean(false), { successes.incrementAndGet() }, bad) },
                 "short-video allowance" to { owner.allowFor(ReelApp.INSTAGRAM, 5) { successes.incrementAndGet() } },
-                "whole-app allowance" to { owner.allowScheduled("org.example.synthetic") { successes.incrementAndGet() } }
+                "whole-app allowance" to { owner.allowScheduled("org.example.synthetic", 5) { successes.incrementAndGet() } }
             )
             routes.forEach { (label, operation) ->
                 challenge(label, operation = operation)

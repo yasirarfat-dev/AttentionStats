@@ -1146,7 +1146,7 @@
       "source": "com.squareup.okhttp3:okhttp:4.9.2!okhttp3/internal/publicsuffix/publicsuffixes.gz"
     },
     {
-      "name": "Lucide icons (7 adapted: footprints, book-open, glass-water, person-standing, phone, sun, lightbulb)",
+      "name": "Lucide icons (8 adapted: footprints, book-open, glass-water, person-standing, phone, sun, lightbulb, fingerprint)",
       "version": "adapted 2026-11",
       "license": "ISC",
       "url": "https://lucide.dev",

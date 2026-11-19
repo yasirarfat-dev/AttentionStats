@@ -104,7 +104,7 @@ export function ProtectScreen({
             key={group.id}
             icon="layers"
             title={group.name}
-            detail={`${group.packages.length} apps`}
+            detail={`${group.packages.length} ${group.packages.length === 1 ? 'app' : 'apps'}`}
             onPress={() => onSchedules('groups')}
           />
         ))}
@@ -148,13 +148,13 @@ export function ProtectScreen({
       </Card>
       <Card
         title="Protection Lock"
-        info="Optional. A parent approves extra time and protection changes with a parent key (a PIN or pattern that only works in this app), and optionally a fingerprint if a child's is not saved on this phone. Backup phrases reset a forgotten key. Android Settings stay available."
+        info="Optional. A parent approves extra time and protection changes in one of two ways: the phone's fingerprint (one touch, if a child's fingerprint is not saved on this phone) or an app PIN or pattern that works only in this app. Android Settings stay available."
         padded={false}
       >
         <Row
           icon="lock"
           title="Parent approval"
-          detail="Parent key, fingerprint and backup phrases"
+          detail="Phone fingerprint or app PIN"
           onPress={async () => {
             if (!(await NativeDiary?.openProtectionLock()))
               Alert.alert('Protection Lock unavailable', 'Please try again.');

@@ -23,12 +23,6 @@ jest.mock('../../ui/Kit', () => ({
   Title: 'Title',
 }));
 jest.mock('./AppSelection', () => ({ AppSelection: 'AppSelection' }));
-jest.mock('./useEditorKeyboard', () => ({
-  useEditorKeyboard: () => ({
-    scrollRef: { current: null },
-    onFieldFocus: jest.fn(),
-  }),
-}));
 jest.mock('../../ui/Screen', () => ({ Screen: 'Screen' }));
 
 const social: AppGroup = {

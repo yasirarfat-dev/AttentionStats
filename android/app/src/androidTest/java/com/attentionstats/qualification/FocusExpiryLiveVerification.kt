@@ -77,7 +77,7 @@ internal object FocusExpiryLiveVerification {
                         while (queue.isNotEmpty() && visited++ < 120) {
                             val node = queue.removeFirst()
                             try {
-                                if (node.isVisibleToUser && node.text?.toString() == "Allow 5 minutes") return true
+                                if (node.isVisibleToUser && node.text?.toString() == "Allow 5 min") return true
                                 for (index in 0 until node.childCount) node.getChild(index)?.let { queue.add(it) }
                             } finally { if (node !== root) SnapshotReader.recycle(node) }
                         }

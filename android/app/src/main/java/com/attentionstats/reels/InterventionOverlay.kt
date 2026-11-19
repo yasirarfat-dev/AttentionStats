@@ -14,6 +14,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
@@ -45,6 +46,11 @@ internal class InterventionOverlay(
     private val stats: Stats? = null,
     /** A "Do something real" choice: leaves for Home. Defaults to the primary action. */
     private val onChoice: () -> Unit = onPrimary,
+    /**
+     * Covers that grant time: the secondary action becomes one "− Allow 5 min +" control (ADR-122). Minus, plus or a
+     * sideways swipe on the button change the minutes in steps of 5 (5 to 15); tapping the button allows them.
+     */
+    private val onAllow: ((Int) -> Unit)? = null,
 ) : FrameLayout(context) {
     enum class Mode { BREAK, BLOCK }
     data class Stats(val sessionVideos: Long, val todayVideos: Long, val sessionMinutes: Int)
@@ -68,7 +74,16 @@ internal class InterventionOverlay(
     private val ink = Color.WHITE
     private val inkSoft = ColorUtils.setAlphaComponent(Color.WHITE, 214)
     private val density = resources.displayMetrics.density
-    private fun dp(value: Int) = (value * density).toInt()
+    /**
+     * Fit to the window like viewport units: every size below is multiplied by [scale], chosen (with [trim],
+     * how many optional lines are left out) so the whole screen and its buttons fit without scrolling.
+     */
+    private var scale = 1f
+    private var trim = 0
+    private var fitted = 0L
+    private fun dp(value: Int) = (value * density * scale).toInt()
+    /** Unscaled, for outer margins and minimum touch targets. */
+    private fun px(value: Int) = (value * density).toInt()
     private fun motion() = AppearanceOwner.motion(context)
     private val handler = Handler(Looper.getMainLooper())
     private val animators = mutableListOf<ValueAnimator>()
@@ -85,7 +100,10 @@ internal class InterventionOverlay(
     private val column = LinearLayout(context)
     private val scroll = ScrollView(context)
     private val drift = DriftingBackground(context)
-    private val secondary: Button
+    private lateinit var secondary: Button
+    private var allowMinutes = ALLOW_STEP
+    private var fewer: Button? = null
+    private var more: Button? = null
     private var hero: TextView? = null
     private val session = org.attentionstats.protection.InterventionSession(if (compact) 0 else waitSeconds * 1000L)
     private var finished = false
@@ -96,7 +114,6 @@ internal class InterventionOverlay(
         isFocusable = true
         column.orientation = LinearLayout.VERTICAL
         column.gravity = Gravity.CENTER
-        column.setPadding(dp(20), dp(if (compact) 20 else 22), dp(20), dp(if (compact) 20 else 24))
         scroll.isFillViewport = true
         scroll.isClickable = true
         scroll.addView(column, FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
@@ -111,7 +128,7 @@ internal class InterventionOverlay(
             card.addView(drift, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
             card.addView(scroll, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER))
             addView(card, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER).apply {
-                val side = dp(18); marginStart = side; marginEnd = side; topMargin = dp(16); bottomMargin = dp(16)
+                val side = px(18); marginStart = side; marginEnd = side; topMargin = px(16); bottomMargin = px(16)
             })
         } else {
             setBackgroundColor(scene.top)
@@ -119,6 +136,16 @@ internal class InterventionOverlay(
             addView(scroll, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER))
         }
 
+        build()
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+    }
+
+    /** (Re)creates the content at the current [scale] and [trim]; the orb, scene and session carry over. */
+    private fun build() {
+        column.removeAllViews()
+        (orb.parent as? android.view.ViewGroup)?.removeView(orb)
+        hero = null
+        column.setPadding(dp(20), dp(if (compact) 20 else 22), dp(20), dp(if (compact) 20 else 24))
         if (mode == Mode.BREAK) {
             // A smaller orb on shorter screens keeps both actions in view without scrolling.
             val heightDp = resources.displayMetrics.heightPixels / resources.displayMetrics.density
@@ -131,7 +158,7 @@ internal class InterventionOverlay(
             orbFrame.addView(guide, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER))
             orbFrame.contentDescription = "Breathing guide: breathe in for 4 seconds, hold for 2, breathe out for 6."
             column.addView(orbFrame, wrap(0))
-            column.addView(text("Follow the circle for three slow breaths", 14f, inkSoft), wrap(4))
+            if (trim < 3) column.addView(text("Follow the circle for three slow breaths", 14f, inkSoft), wrap(4))
         } else if (!compact) {
             val orbFrame = FrameLayout(context).apply { minimumHeight = dp(180) }
             orbFrame.addView(orb, LayoutParams(dp(180), dp(180), Gravity.CENTER))
@@ -153,7 +180,7 @@ internal class InterventionOverlay(
             accessibilityLiveRegion = ACCESSIBILITY_LIVE_REGION_POLITE
         }, wrap(14))
         column.addView(text(detail, 17f, inkSoft), wrap(10))
-        if (!compact) stats?.let { value ->
+        if (!compact && trim < 2) stats?.let { value ->
             Perspective.distance(value.todayVideos)?.let {
                 pill(it.text.replace("thumb scrolling · ", "thumb scrolling today," + System.lineSeparator()))
             }
@@ -163,13 +190,87 @@ internal class InterventionOverlay(
             }
         }
         if (!compact) addChoices()
-        if (!compact) column.addView(text(template.prompt, 15f, inkSoft), wrap(16))
+        if (!compact && trim < 1) column.addView(text(template.prompt, 15f, inkSoft), wrap(16))
         column.addView(button(primaryLabel, primary = true, action = ::choosePrimary), wrap(if (compact) 16 else 24))
-        secondary = button(secondaryLabel, primary = false) {
-            if (session.choose(elapsedRealtime(), waitRequired = true)) { finish(); onSecondary() }
+        val allow = onAllow
+        if (allow == null) {
+            fewer = null; more = null
+            secondary = button(secondaryLabel, primary = false) {
+                if (session.choose(elapsedRealtime(), waitRequired = true)) { finish(); onSecondary() }
+            }
+            column.addView(secondary, wrap(12))
+        } else column.addView(allowControl(allow), wrap(12))
+    }
+
+    /** One row: minus, the allow button that carries the minutes, plus. Never a second step. */
+    @android.annotation.SuppressLint("ClickableViewAccessibility") // Taps still reach performClick; ± are the accessible path.
+    private fun allowControl(allow: (Int) -> Unit) = LinearLayout(context).apply {
+        orientation = LinearLayout.HORIZONTAL
+        isBaselineAligned = false // The larger − and + glyphs would otherwise push the middle pill down.
+        // One fixed height for all three, with round ends, so no edge is clipped by the row.
+        val side = maxOf(px(48), dp(56))
+        fun round(view: Button) = view.apply {
+            minHeight = side; minimumHeight = side; setPadding(dp(8), 0, dp(8), 0)
+            (background as? GradientDrawable)?.cornerRadius = side / 2f
         }
-        column.addView(secondary, wrap(12))
-        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+        fun step(delta: Int) {
+            val next = (allowMinutes + delta).coerceIn(ALLOW_STEP, ALLOW_MAX)
+            if (next == allowMinutes) return
+            allowMinutes = next; tick(schedule = false) // The button is a polite live region: the new minutes are read out.
+        }
+        fewer = button("−", primary = false) { step(-ALLOW_STEP) }.apply { contentDescription = "Fewer minutes"; textSize = 22f * scale.coerceAtLeast(.85f) }
+        more = button("+", primary = false) { step(ALLOW_STEP) }.apply { contentDescription = "More minutes"; textSize = 22f * scale.coerceAtLeast(.85f) }
+        secondary = button(allowText(), primary = false) {
+            if (session.choose(elapsedRealtime(), waitRequired = true)) { finish(); allow(allowMinutes) }
+        }
+        secondary.accessibilityLiveRegion = ACCESSIBILITY_LIVE_REGION_POLITE
+        // A sideways swipe on the button changes the minutes too; a tap still allows them.
+        var downX = 0f; var downY = 0f
+        secondary.setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> { downX = event.x; downY = event.y; false }
+                MotionEvent.ACTION_UP -> {
+                    val dx = event.x - downX
+                    if (kotlin.math.abs(dx) > px(36) && kotlin.math.abs(dx) > 1.5f * kotlin.math.abs(event.y - downY)) {
+                        val cancel = MotionEvent.obtain(event).apply { action = MotionEvent.ACTION_CANCEL }
+                        try { view.onTouchEvent(cancel) } finally { cancel.recycle() }
+                        step(if (dx > 0) ALLOW_STEP else -ALLOW_STEP); true
+                    } else false
+                }
+                else -> false
+            }
+        }
+        listOf(fewer!!, secondary, more!!).forEach(::round)
+        addView(fewer, LinearLayout.LayoutParams(side, side))
+        addView(secondary, LinearLayout.LayoutParams(0, side, 1f).apply { marginStart = dp(8); marginEnd = dp(8) })
+        addView(more, LinearLayout.LayoutParams(side, side))
+    }
+    private fun allowText() = "Allow $allowMinutes min"
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        val key = (w.toLong() shl 32) or h.toLong()
+        if (w > 0 && h > 0 && key != fitted) { fitted = key; post { fit(w, h) } }
+    }
+
+    /**
+     * Leaves out optional lines first (the closing prompt, the comparison pills, the small helper lines), then
+     * shrinks every size in steps until the content fits the window. Scrolling stays only as a last resort.
+     */
+    private fun fit(w: Int, h: Int) {
+        if (finished || celebrating || !isAttachedToWindow) return
+        val width = if (mode == Mode.BREAK) w - px(36) else w
+        val height = if (mode == Mode.BREAK) h - px(32) else h
+        // trim 4 keeps one row of real-life choices, trim 5 leaves them out; the two actions always stay.
+        val steps = listOf(0 to 1f, 1 to 1f, 2 to 1f, 3 to 1f, 3 to .92f, 3 to .85f, 4 to .85f, 4 to .78f, 4 to .72f,
+            5 to .72f, 5 to .66f, 5 to .6f)
+        for ((t, s) in steps) {
+            trim = t; scale = s
+            build(); tick(schedule = false)
+            column.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+            if (column.measuredHeight <= height) break
+        }
+        scroll.scrollTo(0, 0)
     }
 
     private fun formatCount(value: Long) = NumberFormat.getIntegerInstance().format(value)
@@ -187,9 +288,10 @@ internal class InterventionOverlay(
     }
 
     private fun addChoices() {
+        if (trim >= 5) return
         column.addView(text("Do something real", 18f, ink, bold = true), wrap(16))
         val count = choices.getLong("count", 0)
-        if (count >= 1) column.addView(text("You've chosen real life ${formatCount(count)} times", 13f, inkSoft), wrap(6))
+        if (count >= 1 && trim < 3) column.addView(text("You've chosen real life ${formatCount(count)} times", 13f, inkSoft), wrap(6))
         val labels = listOf("Walk", "Read", "Drink water", "Stretch", "Call someone", "Step outside")
         val names = listOf("walk", "read", "drink water", "stretch", "call someone", "step outside")
         val icons = listOf(com.attentionstats.R.drawable.ic_real_walk, com.attentionstats.R.drawable.ic_real_read,
@@ -198,12 +300,12 @@ internal class InterventionOverlay(
         val responses = listOf("Ten minutes outside clears the head.", "One chapter. Your mind will thank you.",
             "Water first. Then the next good thing.", "Loosen the shoulders, straighten the back.",
             "A real voice beats a hundred videos.", "Fresh air and daylight reset your focus.")
-        for (rowIndex in 0..1) {
+        for (rowIndex in 0..(if (trim >= 4) 0 else 1)) {
             val row = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
             for (col in 0..2) {
                 val index = rowIndex * 3 + col
                 row.addView(button(labels[index], primary = false) { celebrate(responses[index]) }.apply {
-                    textSize = 14f
+                    textSize = 14f * scale
                     contentDescription = "Choose ${names[index]}, leaves short videos"
                     // A Lucide line icon above the label, tinted like the text.
                     val icon = context.getDrawable(icons[index])?.mutate()?.apply {
@@ -306,7 +408,7 @@ internal class InterventionOverlay(
      */
     private fun text(value: String, size: Float, color: Int, bold: Boolean = false) = TextView(context).apply {
         text = if (value.length <= 160) value.replace(Regex("([.?!]) (?=[A-Z0-9])"), "$1\n") else value
-        textSize = size; setTextColor(color); gravity = Gravity.CENTER
+        textSize = size * scale; setTextColor(color); gravity = Gravity.CENTER
         breakStrategy = android.graphics.text.LineBreaker.BREAK_STRATEGY_BALANCED
         hyphenationFrequency = android.text.Layout.HYPHENATION_FREQUENCY_NONE
         if (bold) typeface = Typeface.create("sans-serif", Typeface.BOLD)
@@ -314,11 +416,12 @@ internal class InterventionOverlay(
     }
 
     private fun button(label: String, primary: Boolean, action: () -> Unit) = Button(context).apply {
-        text = label; textSize = 16f; gravity = Gravity.CENTER
+        text = label; textSize = 16f * scale.coerceAtLeast(.85f); gravity = Gravity.CENTER
         breakStrategy = android.graphics.text.LineBreaker.BREAK_STRATEGY_BALANCED
         isAllCaps = false
-        minHeight = dp(54)
-        minimumHeight = dp(54)
+        // Touch targets never shrink below 44 dp, however short the screen.
+        minHeight = maxOf(px(44), dp(54))
+        minimumHeight = maxOf(px(44), dp(54))
         minWidth = 0
         minimumWidth = 0
         setPadding(dp(10), dp(12), dp(10), dp(12))
@@ -331,10 +434,14 @@ internal class InterventionOverlay(
         setOnClickListener { action() }
     }
 
-    private fun tick() {
+    private fun tick(schedule: Boolean = true) {
         if (finished) return
         val remaining = session.remainingSeconds(elapsedRealtime())
-        secondary.text = if (remaining > 0) "$secondaryLabel · $remaining" else secondaryLabel
+        val label = if (onAllow != null) allowText() else secondaryLabel
+        secondary.text = if (remaining > 0) "$label · $remaining" else label
+        secondary.contentDescription = if (onAllow != null) "Allow $allowMinutes more minutes" else null
+        fewer?.apply { isEnabled = allowMinutes > ALLOW_STEP; alpha = if (isEnabled) 1f else .4f }
+        more?.apply { isEnabled = allowMinutes < ALLOW_MAX; alpha = if (isEnabled) 1f else .4f }
         secondary.alpha = if (remaining > 0) .45f else 1f
         secondary.isEnabled = remaining <= 0
         // Also stop a caller's entrance animator if reduced motion changes while visible.
@@ -343,7 +450,7 @@ internal class InterventionOverlay(
             alpha = 1f
             if (celebrating) { choosePrimary(); return }
         }
-        handler.postDelayed({ tick() }, 250)
+        if (schedule) handler.postDelayed({ tick() }, 250)
     }
 
     fun finish() {
@@ -455,5 +562,10 @@ internal class InterventionOverlay(
             ring.strokeWidth = max * 0.01f + 1
             canvas.drawCircle(cx, cy, radius * 0.72f, ring)
         }
+    }
+
+    private companion object {
+        const val ALLOW_STEP = 5
+        const val ALLOW_MAX = 15
     }
 }

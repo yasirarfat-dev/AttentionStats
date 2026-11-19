@@ -42,7 +42,7 @@ internal object LiveScheduleVerification {
                 { success = true; done.countDown() }, { done.countDown() })
             check(done.await(15, TimeUnit.SECONDS) && success) { "schedule save failed" }
         }
-        fun allowedButton(click: Boolean, label: String = "Allow 5 minutes"): Boolean {
+        fun allowedButton(click: Boolean, label: String = "Allow 5 min"): Boolean {
             for (window in automation.windows) {
                 if (window.type != AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY) continue
                 val root = window.root ?: continue
@@ -303,7 +303,7 @@ internal object LiveScheduleVerification {
                 check(schedules.plan.focus == savedFocus)
                 return "PASS: actual five-minute Calculator allowance expiry with overlapping schedules; cover absent until boundary and returned after ${returnAfter}ms; target content unread; existing focus preserved; only owned rules removed"
             }
-            if (focusOnly) return "PASS: actual calculator-only focus cover and Allow 5 minutes; own overlay controls only, target content unread"
+            if (focusOnly) return "PASS: actual calculator-only focus cover and Allow 5 min; own overlay controls only, target content unread"
             return "PASS: installed non-social app covered by all-day group rule; immediate allowance removes cover and preserves app access; task-owned rule removed"
         } catch (failure: Throwable) {
             primaryFailure = failure

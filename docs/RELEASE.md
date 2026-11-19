@@ -118,15 +118,15 @@ GENTLE TOOLS YOU CHOOSE
 • Per-app limits: a daily short-video limit, or always leave Reels or Shorts in a chosen app
 • App groups and time slots: cover chosen apps during recurring periods, or allow only the apps you pick
 • Focus sessions from 5 minutes to 3 hours
-• Covers keep Android Settings, Home and emergency calls available and offer a five-minute allowance
-• Optional Protection Lock: one parent key (a PIN or a pattern that works only in this app), with fingerprint if your child's is not saved on the phone, for the changes you choose to protect, allowances and erasing history
+• Covers keep Android Settings, Home and emergency calls available and offer a 5, 10 or 15 minute allowance
+• Optional Protection Lock: approve with the phone's fingerprint (one touch, if your child's is not saved on the phone) or an app PIN or pattern, for the changes you choose to protect, allowances and erasing history
 
 PRIVATE BY DESIGN
 • No developer account, servers, ads or telemetry
 • Local history is encrypted on your device; erase it any time
 • The app has no Internet permission. Android backup and your chosen file provider can still transfer data
 • Android-managed backup starts on unless you saved an off choice; turn it off in Settings → Backup & restore
-• The parent key, backup phrases and biometric keys stay on this device and are never backed up
+• App PINs, patterns, backup phrases and biometric keys stay on this device and are never backed up
 • Backup files use a public app key, which provides no secrecy to anyone holding the file. Protect external copies
 • 100% open source under GPL-3.0, so anyone can check: github.com/yasirarfat-dev/AttentionStats
 
@@ -162,7 +162,7 @@ Graphics (kept in the external release folder under `store/en-US/`): `icon-512.p
 - Description:
 
 ```plain
-Attention Stats is a digital wellbeing app. With affirmative in-app consent, its AccessibilityService reads foreground screen structure and labels in Instagram, Facebook, YouTube, TikTok and Snapchat to estimate short-video encounters and time on those screens. Labels are processed in memory and discarded; only encounter facts are stored locally. It draws the optional counter and user-configured break reminders; just before a break screen the user enabled, it may pause the video with one tap, on the source app's visible Pause control or, in TikTok and YouTube, on the video itself after confirming from playback progress that it is playing; the pause counts only when progress stops (never a second tap, never Play), otherwise it only shows the reminder. User-chosen blocks can press Back to leave a short-video player. For app/group time slots and focus sessions the person sets up (including Allow Only), it checks foreground package ownership only and shows a cover; system navigation, Settings, launcher, keyboard and emergency/dialer stay available and a five-minute allowance is offered (an optional parent key can be required). Separately allowed auto-scroll uses a visible Start/Stop control and a deterministic qualifying playback/photo signal for one upward swipe; an additional separate choice swipes past pages that carry the source app's own Sponsored/Ad label, without opening ads; unavailable signals suspend actions. It never likes, comments, follows or messages. The app has no Internet permission or developer telemetry; Android-managed backup and user-selected file providers may transfer logical history under disclosed backup choices.
+Attention Stats is a digital wellbeing app. With affirmative in-app consent, its AccessibilityService reads foreground screen structure and labels in Instagram, Facebook, YouTube, TikTok and Snapchat to estimate short-video encounters and time on those screens. Labels are processed in memory and discarded; only encounter facts are stored locally. It draws the optional counter and user-configured break reminders; just before a break screen the user enabled, it may pause the video with one tap, on the source app's visible Pause control or, in TikTok and YouTube, on the video itself after confirming from playback progress that it is playing; the pause counts only when progress stops (never a second tap, never Play), otherwise it only shows the reminder. User-chosen blocks can press Back to leave a short-video player. For app/group time slots and focus sessions the person sets up (including Allow Only), it checks foreground package ownership only and shows a cover; system navigation, Settings, launcher, keyboard and emergency/dialer stay available and a 5, 10 or 15 minute allowance is offered (an optional parent key can be required). Separately allowed auto-scroll uses a visible Start/Stop control and a deterministic qualifying playback/photo signal for one upward swipe; an additional separate choice swipes past pages that carry the source app's own Sponsored/Ad label, without opening ads; unavailable signals suspend actions. It never likes, comments, follows or messages. The app has no Internet permission or developer telemetry; Android-managed backup and user-selected file providers may transfer logical history under disclosed backup choices.
 ```
 
 - Reviewer video: show the in-app disclosure, enabling the service in Android Settings, the counter on a supported app, a break and its exit, a schedule cover with its allowance, and auto-scroll Start/Stop. Use synthetic history and no private content. Any change in accessibility behavior needs an updated declaration and video ([policy](https://support.google.com/googleplay/android-developer/answer/10964491)).

@@ -103,7 +103,7 @@ internal class ScheduleOwner(private val context: Context) {
             listOf(BlockWindow("focus", "focus", 127, 0, 0, true, allDay = true)) else emptyList()
         return timed + plan.matching(packageName, ZonedDateTime.now(), excluded, scope, launchable)
     }
-    fun allow(packageName: String, elapsed: Long) { allowances[packageName] = elapsed + 5 * 60_000 }
+    fun allow(packageName: String, elapsed: Long, minutes: Int = 5) { allowances[packageName] = elapsed + minutes.coerceIn(1, 15) * 60_000L }
     fun reset() { plan = SchedulePlan(); revision = 0; allowances.clear() }
 
     private fun boot() = bootEpoch

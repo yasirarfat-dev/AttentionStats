@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.TextView
+import com.attentionstats.protection.ProtectionBiometric
 import com.attentionstats.protection.ProtectionCredentials
 import com.attentionstats.protection.ProtectionLockActivity
 
@@ -58,6 +59,11 @@ internal object ProtectionLockUiVerification {
                 output.outputStream().use { check(bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)) }
             } finally { bitmap.recycle() }
         }
+        fun tab(label: String) = main {
+            val control = views().single { it.isClickable && it.contentDescription?.toString() == label }
+            expect(control.performClick())
+        }
+        val touch = (48 * context.resources.displayMetrics.density).toInt()
         try {
             waitText("Protection Lock is off")
             instrumentation.waitForIdleSync()
@@ -66,35 +72,37 @@ internal object ProtectionLockUiVerification {
                 expect(activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
                 expect(views().filterIsInstance<EditText>().isEmpty())
             }
-            click("Set up Protection Lock")
-            waitText("Turn on Protection Lock")
+            // Two exclusive ways to approve, shown as tabs (ADR-121).
+            if (ProtectionBiometric(context).available()) {
+                tab("Phone fingerprint")
+                waitText("Turn on with fingerprint")
+                capture("phone-tab")
+            }
+            tab("App PIN")
+            waitText("Create app PIN")
+            capture("app-tab")
+            click("Create app PIN")
+            // Step by step: choose a PIN (one masked field), then confirm it on its own page.
+            waitText("Choose a PIN")
             instrumentation.waitForIdleSync()
             main {
-                val fields = views().filterIsInstance<EditText>()
-                expect(fields.size == 8)
+                val fields = views().filterIsInstance<EditText>().filter { it.isShown }
+                expect(fields.size == 1)
                 expect(fields.all { it.text.isEmpty() })
-                // PIN and its confirmation are masked by default; recovery phrases are visible text.
-                expect(fields.take(2).all { it.transformationMethod is android.text.method.PasswordTransformationMethod })
-                expect(fields.drop(2).none { it.transformationMethod is android.text.method.PasswordTransformationMethod })
-                expect(fields.drop(2).all { it.inputType and android.text.InputType.TYPE_MASK_VARIATION == android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD })
-                expect(fields.map { it.contentDescription.toString() }.distinct().size == 8)
-                expect(fields.all { it.height >= (48 * context.resources.displayMetrics.density).toInt() })
+                expect(fields.all { it.transformationMethod is android.text.method.PasswordTransformationMethod })
+                expect(fields.all { it.height >= touch })
+                expect(views().filterIsInstance<TextView>().any { it.text.toString() == "Step 1 of 3" })
             }
-            capture("setup-top")
+            capture("setup-pin")
             main {
-                val scroll = views().filterIsInstance<android.widget.ScrollView>().single()
-                scroll.scrollTo(0, scroll.getChildAt(0).height)
-            }
-            instrumentation.waitForIdleSync()
-            capture("setup-bottom")
-            main {
-                val cancel = views().filterIsInstance<TextView>().single { it.isClickable && it.text.toString().equals("Cancel", true) }
+                val back = views().filterIsInstance<TextView>().single { it.isClickable && it.text.toString().endsWith("Protection Lock") }
                 val bounds = android.graphics.Rect()
-                expect(cancel.getGlobalVisibleRect(bounds) && bounds.height() >= (48 * context.resources.displayMetrics.density).toInt())
+                expect(back.getGlobalVisibleRect(bounds) && bounds.height() >= touch)
+                expect(back.performClick())
             }
-            click("Cancel"); waitText("Protection Lock is off")
+            waitText("Protection Lock is off")
             expect(ProtectionCredentials(context).state() == original)
-            return "PASS: $checks actual native protection lock UI checks; secure page, blank bounded secret controls, cancel; no activation"
+            return "PASS: $checks actual native protection lock UI checks; secure page, two tabs, blank bounded secret control, back; no activation"
         } finally { main { activity.finish() } }
     }
 }

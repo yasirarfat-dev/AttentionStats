@@ -56,7 +56,7 @@ export function FocusQuickActions({
       <Explanation title={active ? 'Active focus' : 'Focus now'}>
         Review apps, mode and duration before Start. Allow only blocks other
         apps; Block apps blocks your selection. Other rules and emergency
-        recovery remain. End early or allow a five-minute visit.
+        recovery remain. End early or allow a short visit (5, 10 or 15 minutes).
       </Explanation>
       {error && <Body>{error}</Body>}
       {busy && !snapshot && <Body muted>Loading app groups…</Body>}
@@ -105,7 +105,7 @@ export function FocusQuickActions({
                 <CheckRow
                   compact
                   key={choice.kind + choice.id}
-                  title={`${choice.name} · ${choice.packages.length} apps`}
+                  title={`${choice.name} · ${choice.packages.length} ${choice.packages.length === 1 ? 'app' : 'apps'}`}
                   value={selected.includes(choice.kind + choice.id)}
                   disabled={busy}
                   onChange={enabled => {

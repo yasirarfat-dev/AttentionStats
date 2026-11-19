@@ -56,13 +56,23 @@ internal class ProtectionBiometric(private val context: Context,
         }
         KeyGenerator.getInstance("AES", "AndroidKeyStore").apply { init(spec.build()) }.generateKey()
     }
-    fun prompt(activity: FragmentActivity, title: String = "Authorize protection change", complete: (Boolean) -> Unit): BiometricPrompt {
+    /**
+     * [negative] labels the prompt's own dismiss button; [onNegative] runs instead of a failure when it is tapped,
+     * and [onDismiss] when the person simply closes the prompt (Back or tapping outside), which is not a failure.
+     */
+    fun prompt(activity: FragmentActivity, title: String = "Authorize protection change", negative: String = "Use PIN or pattern",
+        onNegative: (() -> Unit)? = null, onDismiss: (() -> Unit)? = null, complete: (Boolean) -> Unit): BiometricPrompt {
         val key = key() ?: throw ProtectionCredentials.Denied("BIOMETRIC_REENABLE_REQUIRED")
         val cipher = Cipher.getInstance("AES/GCM/NoPadding").apply { init(Cipher.ENCRYPT_MODE, key) }
         var delivered = false
         fun finish(success: Boolean) { if (!delivered) { delivered = true; complete(success) } }
         val prompt = BiometricPrompt(activity, Executor { activity.runOnUiThread(it) }, object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) { finish(false) }
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON && onNegative != null && !delivered) { delivered = true; onNegative() }
+                else if ((errorCode == BiometricPrompt.ERROR_USER_CANCELED || errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) &&
+                    onDismiss != null && !delivered) { delivered = true; onDismiss() }
+                else finish(false)
+            }
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 val challenge = ByteArray(32).also { SecureRandom().nextBytes(it) }
                 val success = try {
@@ -73,9 +83,9 @@ internal class ProtectionBiometric(private val context: Context,
             }
         })
         prompt.authenticate(BiometricPrompt.PromptInfo.Builder().setTitle(title)
-            .setSubtitle("Use an enrolled fingerprint")
+            .setSubtitle("Touch the fingerprint sensor")
             .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
-            .setNegativeButtonText("Use PIN or pattern").build(), BiometricPrompt.CryptoObject(cipher))
+            .setNegativeButtonText(negative).build(), BiometricPrompt.CryptoObject(cipher))
         return prompt
     }
 
@@ -85,7 +95,7 @@ internal class ProtectionBiometric(private val context: Context,
      * stale, replayed or late callback cannot authorize anything.
      */
     fun promptBound(activity: FragmentActivity, authority: ParentAuthority, challenges: OneUseChallenges, purpose: String,
-        complete: (Boolean) -> Unit): BiometricPrompt {
+        negative: String = "Use PIN or pattern", complete: (Boolean) -> Unit): BiometricPrompt {
         val allowed = when (authority) {
             ParentAuthority.WEAK_BIOMETRIC -> { check(weakAvailable()); BiometricManager.Authenticators.BIOMETRIC_WEAK }
             ParentAuthority.DEVICE_CREDENTIAL -> { check(deviceAvailable()); BiometricManager.Authenticators.DEVICE_CREDENTIAL }
@@ -108,8 +118,8 @@ internal class ProtectionBiometric(private val context: Context,
                 finish(matches && redeemed)
             }
         })
-        val info = BiometricPrompt.PromptInfo.Builder().setTitle("Authorize protection change").setAllowedAuthenticators(allowed)
-        if (authority == ParentAuthority.WEAK_BIOMETRIC) info.setSubtitle("Use an enrolled face or fingerprint").setNegativeButtonText("Use PIN or pattern")
+        val info = BiometricPrompt.PromptInfo.Builder().setTitle("Parent approval").setAllowedAuthenticators(allowed)
+        if (authority == ParentAuthority.WEAK_BIOMETRIC) info.setSubtitle("Use a parent's face or fingerprint").setNegativeButtonText(negative)
         else info.setSubtitle("Use the phone screen lock")
         try { prompt.authenticate(info.build()) } catch (failure: Exception) { challenges.revoke(challenge); throw failure }
         return prompt

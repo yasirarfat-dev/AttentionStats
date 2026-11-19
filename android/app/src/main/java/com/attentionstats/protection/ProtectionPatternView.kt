@@ -57,7 +57,8 @@ internal class ProtectionPatternView(context: Context, private val palette: Nati
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val available = MeasureSpec.getSize(widthMeasureSpec)
-        val square = min(available, (300 * density).toInt())
+        // At most 300 dp and under a third of the screen height, so the page's buttons stay in view on short phones.
+        val square = minOf(available, (300 * density).toInt(), (resources.displayMetrics.heightPixels * .30f).toInt().coerceAtLeast((200 * density).toInt()))
         setMeasuredDimension(available, square)
     }
 

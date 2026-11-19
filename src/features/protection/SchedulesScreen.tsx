@@ -167,7 +167,7 @@ export function SchedulesScreen({
             {draft.kind === 'enable'
               ? slot?.allowOnly
                 ? 'During this slot, other installed launchable apps will be blocked. Selected apps and essential recovery controls stay available under this rule. Other rules still apply; you can allow 5 minutes or change the rule.'
-                : 'This slot will block the selected apps during these times. You can always allow 5 minutes, use system navigation or change this rule.'
+                : 'This slot will block the selected apps during these times. You can always allow 5, 10 or 15 minutes, use system navigation or change this rule.'
               : draft.kind === 'delete-group'
                 ? 'This also removes all time slots for the group. Your recorded history is preserved.'
                 : 'This removes the time slot. Your recorded history is preserved.'}

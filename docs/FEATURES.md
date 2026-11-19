@@ -58,18 +58,21 @@ An optional floating button drawn by the accessibility service over supported sh
 | Time slots | Recurring weekday periods or all day, for a group or one app, covering the whole app or only its short videos. Overnight slots belong to their start day. New slots save off until activated |
 | Allow Only | During a slot or focus session, every other launchable app is covered |
 | Focus sessions | 5–180 minutes, Block Apps or Allow Only, on a frozen set of apps; End works immediately |
-| Covers | A full-screen cover explains which rule applies and offers a five-minute allowance and "Open Attention Stats". Android Settings, Home, keyboards, the dialer and system UI are never covered |
+| Covers | A full-screen cover explains which rule applies and offers "Open Attention Stats" and one "− Allow 5 min +" control: minus, plus or a sideways swipe change the minutes (5, 10 or 15) and tapping allows them (ADR-122). Covers fit any screen height without scrolling. Android Settings, Home, keyboards, the dialer and system UI are never covered |
 
 Whole-app rules check only which app is in the foreground, never its screen content. Short-video rules apply only on recognised players; an unknown screen releases them rather than blocking the whole app. Overlapping rules show one cover with all reasons.
 
 ## Protection Lock
 
-Optional parental lock (ADR-111, ADR-113, ADR-117), under **Protect → Parent approval**.
+Optional parental lock (ADR-111, ADR-113, ADR-117, ADR-120, ADR-121), under **Protect → Parent approval**.
 
-- Setup is three plain-language steps. Step 1: one **parent key**, either a 4–12 digit PIN or a 3×3 dot pattern (minimum 4 dots), that works only in this app and is not the phone's unlock. Saving a PIN replaces a pattern and the other way round. Step 2: phone unlock shortcuts, guided by one question. Step 3: three backup phrases (3+ characters each) that reset a forgotten key.
+- Two exclusive ways to approve, shown as two tabs like the schedule views: **Phone fingerprint** and **App PIN**. A status card says whether the lock is on and which way approves; a dot marks the tab in use, and the other tab offers to switch.
+- **Phone fingerprint:** "Turn on with fingerprint" opens the system prompt at once, and one touch turns the lock on. A backup phrase is recommended afterwards but optional on Android 11 and later (Android 8–10 asks for one). Any fingerprint saved on the phone approves, so this suits phones where only parents' fingerprints are saved; Android cannot tell an app which finger was used and does not let apps register their own. Adding a fingerprint invalidates the lock's key and pauses approval until a parent resets it: with a backup phrase saved, only the phrase resets it; with none, the phone's screen lock does. Face and the phone's code can be added as extras next to fingerprint (off by default); they never authorize changes.
+- **App PIN:** a 4–12 digit PIN or a 3×3 dot pattern (minimum 4 dots) that works only in this app, set up step by step like a phone's own lock: choose a PIN or pattern, confirm it on its own page, then add one backup phrase (3+ characters; up to two more optional). A final page confirms the lock is on. Changing the PIN or pattern asks for the current one first; "Forgot PIN?" resets it with a backup phrase.
+- Switching is one flow from the other tab: to fingerprint, enter the current PIN or pattern, then touch the sensor (the key is deleted, phrases stay); to an app PIN, choose and confirm it, then touch the sensor (fingerprint stops approving). Locks from earlier builds that hold a key plus phone shortcuts keep working and offer "Stop phone unlock approving".
+- Approval: in fingerprint mode the system prompt opens by itself; in app PIN mode the page asks for the PIN or pattern.
 - The parent chooses which changes are protected: allowances, ending focus, editing or removing rules and groups, turning sources or protection off, erasing history and restoring backups.
-- Shortcuts are chosen by the parent. Setup asks whether the child can unlock the phone with their own fingerprint or face; "Yes, or not sure" (default) keeps every shortcut off, "No, only mine" turns fingerprint on. Strong biometrics (fingerprint) are bound to a Keystore key; face and other weak biometrics off by default (less secure); the phone screen lock off by default (a child who knows it could bypass). Changing them needs the parent key. Android cannot tell an app which enrolled finger was used, so enable biometrics only if the enrolled fingerprints belong to the parent.
-- Credentials are stored only as PBKDF2-SHA256 verifiers on the phone, excluded from backups and exports. Turning the lock off deletes them. Set it up again after reinstalling.
+- Credentials are stored only as PBKDF2-SHA256 verifiers (10,000 rounds, so checks are instant; ADR-122) on the phone, excluded from backups and exports. Turning the lock off deletes them. Set it up again after reinstalling.
 - It is not tamper-proof: Android Settings, clearing storage and uninstalling stay available.
 
 ## Auto-scroll (experimental)

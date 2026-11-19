@@ -331,11 +331,12 @@ class ReelsAccessibilityService : AccessibilityService() {
         if (target == null) return
         val view = InterventionOverlay(this, InterventionOverlay.Mode.BLOCK, "A little time away",
             "This app is covered by your focus session or a blocking period. End focus or change schedules in Attention Stats, or allow a short visit.",
-            0, "Open Attention Stats", "Allow 5 minutes",
+            0, "Open Attention Stats", "Allow more time",
             { scheduledPackage = null; removeSchedule(); open("attentionstats://protect") },
-            { coordinator.allowScheduled(target) { scheduledPackage = null; removeSchedule(); schedule(0) } },
+            {},
             stats = coordinator.liveOverlay?.let { InterventionOverlay.Stats(it.visit, it.today, 0) },
-            onChoice = { performGlobalAction(GLOBAL_ACTION_HOME) })
+            onChoice = { performGlobalAction(GLOBAL_ACTION_HOME) },
+            onAllow = { minutes -> coordinator.allowScheduled(target, minutes) { scheduledPackage = null; removeSchedule(); schedule(0) } })
         val params = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
         fitBetweenBars(params)
@@ -394,14 +395,15 @@ class ReelsAccessibilityService : AccessibilityService() {
                 else if (wanted == "limit") "You chose ${decision?.limit} short videos a day on ${current.displayName}.\n" +
                     "Everything else in the app still works." else
                     "You chose to turn them off.\nEverything else in ${current.displayName} still works.",
-                coordinator.breakSeconds, "Okay", "Allow 5 minutes",
+                coordinator.breakSeconds, "Okay", "Allow more time",
                 {
                     decide("left"); blockActedAt = 0; removeIntervention()
                     if (wanted == "schedule") performGlobalAction(GLOBAL_ACTION_BACK)
                 },
-                { coordinator.allowFor(current, 5) { decide("allowed"); removeIntervention(); schedule(0) } },
+                {},
                 stats = InterventionOverlay.Stats(coordinator.liveOverlay?.visit ?: 0, coordinator.liveOverlay?.today ?: 0, 0),
-                onChoice = { decide("left"); blockActedAt = 0; removeIntervention(); performGlobalAction(GLOBAL_ACTION_HOME) })
+                onChoice = { decide("left"); blockActedAt = 0; removeIntervention(); performGlobalAction(GLOBAL_ACTION_HOME) },
+                onAllow = { minutes -> coordinator.allowFor(current, minutes) { decide("allowed"); removeIntervention(); schedule(0) } })
         }
         // Not focusable: system Back/Home/Recents always reach Android, so the screen never traps anyone.
         val params = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,

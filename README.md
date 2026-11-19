@@ -17,7 +17,7 @@ No account. No servers. No ads. No analytics. The app does not even have the Int
 | **Screen time** | Time and opens per app (with Usage Access), time on short-video screens, an hourly rhythm, and Week / Month / All Time history with a day calendar and per-app history. |
 | **Mindful breaks** | After the number of videos or minutes you choose, a calm full-screen pause. The video is paused first where the app allows it, with a guided breathing exercise. |
 | **Blocks you choose** | Per app: off, a daily limit, or always. App groups, recurring time slots, focus sessions (5–180 minutes) and Allow Only. Android Settings, Home and emergency calls always stay available. |
-| **Protection Lock** | Optional parent PIN or pattern, with recovery phrases and optional fingerprint, for the changes you choose to protect. Stays on this phone; never backed up. Not tamper-proof. |
+| **Protection Lock** | Optional parent approval with the phone's fingerprint or an app PIN or pattern, for the changes you choose to protect. Stays on this phone; never backed up. Not tamper-proof. |
 | **Backup & restore** | Android-managed backup (on unless you turn it off) and manual export/restore through Android's file picker. |
 | **Widgets & themes** | Five home-screen widgets and light, dark and custom colour themes. |
 | **Auto-scroll (experimental)** | Optional: moves to the next video when the current one finishes, where the app exposes playback progress. |
