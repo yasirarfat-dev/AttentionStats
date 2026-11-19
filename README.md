@@ -6,7 +6,7 @@ Attention Stats is a free, open-source digital wellbeing app for Android. It cou
 
 No account. No servers. No ads. No analytics. The app does not even have the Internet permission.
 
-[Get it on Google Play](https://play.google.com/store/apps/details?id=attention.stats) · [Download the APK](https://github.com/yasirarfat-dev/AttentionStats/releases/latest) · Current version 1.1.1 · [Privacy policy](policies/PRIVACY.md) · [Support](policies/SUPPORT.md)
+[Get it on Google Play](https://play.google.com/store/apps/details?id=attention.stats) · [Download the APK](https://github.com/yasirarfat-dev/AttentionStats/releases/latest) · Current version 1.1.0 · [Privacy policy](policies/PRIVACY.md) · [Support](policies/SUPPORT.md)
 
 ## Features
 

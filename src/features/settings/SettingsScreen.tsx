@@ -522,7 +522,7 @@ export function SettingsScreen({ onWelcome }: { onWelcome: () => void }) {
       <View style={styles.footer}>
         <Text textBreakStrategy="balanced" style={styles.brand}>
           Attention Stats{' '}
-          {snapshot?.device.appVersion.replace(/-.*/, '') ?? '1.1.1'}
+          {snapshot?.device.appVersion.replace(/-.*/, '') ?? '1.1.0'}
         </Text>
         <Caption>No developer telemetry, no ads ever, open source</Caption>
         <Text textBreakStrategy="balanced" style={styles.maker}>

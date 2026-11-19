@@ -6,13 +6,13 @@ Current release state, what has been verified, known issues and what comes next.
 
 | | |
 |---|---|
-| Version | **1.1.1** (versionCode 12) "Brainrot Shield", package `attention.stats`; phone preview builds show `1.1.1-brainrot-shield` (ADR-123). 1.1.0 (11) was tagged and put on GitHub but never uploaded to Play; 1.1.1 adds the fitted welcome pages (ADR-124) |
+| Version | **1.1.0** (versionCode 12) "Brainrot Shield", package `attention.stats`; phone preview builds show `1.1.0-brainrot-shield` (ADR-123). Code 12 because an earlier 1.1.0 (11) build without the fitted welcome pages was briefly on GitHub (ADR-124) |
 | Channel | Google Play production (first public release; 1.0.0 was a closed test) and a signed APK on GitHub Releases (ADR-123) |
-| Branches | `main` is the release line and shows the published app; the maintainer works on `main` until 1.1.1 is published, then `develop` resumes for work (ADR-068, ADR-123) |
+| Branches | `main` is the release line and shows the published app; the maintainer works on `main` until 1.1.0 is published, then `develop` resumes for work (ADR-068, ADR-123) |
 | Data baseline | Room schema 9 is the first production schema; later releases must migrate it (ADR-108) |
 | Resource baseline | Seven-day battery/CPU comparison waived for this release (ADR-112); still to do |
 
-## Host checks for 1.1.1
+## Host checks for 1.1.0
 
 All pass on the release source: `pnpm typecheck`, `pnpm lint` (includes architecture, backup-policy and palette guards), `pnpm format:check`, `pnpm test` (Jest), the native verify suites (`:reels-core:verifyReels`, `:protection-core:verifyProtection`, `:analytics-core:verifyAnalytics`), and release lint with 0 errors.
 
