@@ -32,12 +32,12 @@ python -m unittest discover -s tools/tests
 # Unsigned inspection build and static audit
 python tools/android_build.py :app:assembleRelease :app:bundleRelease :app:lintRelease --arch arm64-v8a --workers 2
 python tools/audit_current_release.py --apk android/app/build/outputs/apk/release/app-release-unsigned.apk `
-  --aab android/app/build/outputs/bundle/release/app-release.aab --version-name 1.1.0 --version-code 12
+  --aab android/app/build/outputs/bundle/release/app-release.aab --version-name 1.1.0 --version-code 11
 
 # Signed build and signed audit
 python tools/android_build.py :app:bundleRelease :app:assembleRelease --signing-config <upload-signing.json>
 python tools/verify_signed_release.py --profile current --certificate <upload-cert> `
-  --version-name 1.1.0 --version-code 12 --archive <new-folder-outside-repo>
+  --version-name 1.1.0 --version-code 11 --archive <new-folder-outside-repo>
 ```
 
 The audits check package and version, merged manifest permissions and exported components, compiled backup rules, matching native libraries and 16 KB page alignment. They are static checks; they do not replace testing the build on a phone.
@@ -65,7 +65,7 @@ gh release create v1.1.0 <apk> <SHA256SUMS.txt> --title "Attention Stats 1.1.0 Â
 
 ## Google Play Console
 
-Package **attention.stats**, release 1.1.0 (12), the first public release. The closed test was 1.0.0 (10); versionCode 11 was an earlier 1.1.0 build that was never uploaded to Play (ADR-124). Production access has been granted.
+Package **attention.stats**, release 1.1.0 (11), the first public release. The closed test was 1.0.0 (10); production access has been granted.
 
 ### App details
 
@@ -187,8 +187,8 @@ Attention Stats is a digital wellbeing app. With affirmative in-app consent, its
 |---|---|
 | Track | Production |
 | App signing | Play App Signing; upload with the local upload key |
-| Bundle | `attention-stats-1.1.0-12.aab` from the external release folder |
-| Release name | 1.1.0 (12) Brainrot Shield |
+| Bundle | `attention-stats-1.1.0-11.aab` from the external release folder |
+| Release name | 1.1.0 (11) Brainrot Shield |
 
 Release notes (â‰¤ 500):
 

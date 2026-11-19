@@ -6,7 +6,7 @@ Current release state, what has been verified, known issues and what comes next.
 
 | | |
 |---|---|
-| Version | **1.1.0** (versionCode 12) "Brainrot Shield", package `attention.stats`; phone preview builds show `1.1.0-brainrot-shield` (ADR-123). Code 12 because an earlier 1.1.0 (11) build without the fitted welcome pages was briefly on GitHub (ADR-124) |
+| Version | **1.1.0** (versionCode 11) "Brainrot Shield", package `attention.stats`; phone preview builds show `1.1.0-brainrot-shield` (ADR-123) |
 | Channel | Google Play production (first public release; 1.0.0 was a closed test) and a signed APK on GitHub Releases (ADR-123) |
 | Branches | `main` is the release line and shows the published app; the maintainer works on `main` until 1.1.0 is published, then `develop` resumes for work (ADR-068, ADR-123) |
 | Data baseline | Room schema 9 is the first production schema; later releases must migrate it (ADR-108) |
