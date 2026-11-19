@@ -32,12 +32,12 @@ python -m unittest discover -s tools/tests
 # Unsigned inspection build and static audit
 python tools/android_build.py :app:assembleRelease :app:bundleRelease :app:lintRelease --arch arm64-v8a --workers 2
 python tools/audit_current_release.py --apk android/app/build/outputs/apk/release/app-release-unsigned.apk `
-  --aab android/app/build/outputs/bundle/release/app-release.aab --version-name 1.1.0 --version-code 11
+  --aab android/app/build/outputs/bundle/release/app-release.aab --version-name 1.1.1 --version-code 12
 
 # Signed build and signed audit
 python tools/android_build.py :app:bundleRelease :app:assembleRelease --signing-config <upload-signing.json>
 python tools/verify_signed_release.py --profile current --certificate <upload-cert> `
-  --version-name 1.1.0 --version-code 11 --archive <new-folder-outside-repo>
+  --version-name 1.1.1 --version-code 12 --archive <new-folder-outside-repo>
 ```
 
 The audits check package and version, merged manifest permissions and exported components, compiled backup rules, matching native libraries and 16 KB page alignment. They are static checks; they do not replace testing the build on a phone.
@@ -47,8 +47,8 @@ The audits check package and version, merged manifest permissions and exported c
 Each release is also published on GitHub for people without Google Play (ADR-123). Tag the release commit `v<version>` and attach the upload-signed APK from the signed build, renamed `attention-stats-<version>-<code>-arm64.apk`, with a `SHA256SUMS.txt`. The notes give the release name, what changed, the upload certificate's SHA-256 (`6c7606a45a21074193c0e4d5d40daa13eb7d3f12a59ac555aef3efde8c0d1168`) and this warning: Play installs are signed by Google's app-signing key, so a GitHub install and a Play install cannot update each other; to switch, export a backup, uninstall and restore.
 
 ```powershell
-git tag -a v1.1.0 -m "Attention Stats 1.1.0"; git push origin v1.1.0
-gh release create v1.1.0 <apk> <SHA256SUMS.txt> --title "Attention Stats 1.1.0 · Brainrot Shield" --notes-file <notes.md>
+git tag -a v1.1.1 -m "Attention Stats 1.1.1"; git push origin v1.1.1
+gh release create v1.1.1 <apk> <SHA256SUMS.txt> --title "Attention Stats 1.1.1 · Brainrot Shield" --notes-file <notes.md>
 ```
 
 `python tools/release_candidate.py prepare` copies this file, the policies and the store text into the external release folder; `archive` stores an unsigned candidate there. Release folders are never inside the repository.
@@ -65,7 +65,7 @@ gh release create v1.1.0 <apk> <SHA256SUMS.txt> --title "Attention Stats 1.1.0 �
 
 ## Google Play Console
 
-Package **attention.stats**, release 1.1.0 (11). The closed test was 1.0.0 (10); production access has been granted.
+Package **attention.stats**, release 1.1.1 (12), the first public release. The closed test was 1.0.0 (10); versionCode 11 (1.1.0) was built but never uploaded (ADR-124). Production access has been granted.
 
 ### App details
 
@@ -187,8 +187,8 @@ Attention Stats is a digital wellbeing app. With affirmative in-app consent, its
 |---|---|
 | Track | Production |
 | App signing | Play App Signing; upload with the local upload key |
-| Bundle | `attention-stats-1.1.0-11.aab` from the external release folder |
-| Release name | 1.1.0 (11) Brainrot Shield |
+| Bundle | `attention-stats-1.1.1-12.aab` from the external release folder |
+| Release name | 1.1.1 (12) Brainrot Shield |
 
 Release notes (≤ 500):
 
