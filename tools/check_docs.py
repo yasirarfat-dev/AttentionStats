@@ -14,7 +14,7 @@ REQUIRED = (
     "README.md", "CONTRIBUTING.md", "SECURITY.md", "LICENSE", "NOTICE", "AGENTS.md", "CLAUDE.md",
     "policies/PRIVACY.md", "policies/DATA-DELETION.md", "policies/SUPPORT.md",
     "docs/ARCHITECTURE.md", "docs/DETECTION.md", "docs/FEATURES.md", "docs/PRIVACY.md",
-    "docs/DECISIONS.md", "docs/STATUS.md", "docs/RELEASE.md",
+    "docs/DECISIONS.md", "docs/STATUS.md", "docs/RELEASE.md", "docs/ROADMAP.md",
 )
 # docs/ holds only the documents above; evidence and logs belong in .cache/ (git history keeps old records).
 DOCS_ALLOWED_EXTRA = {"docs/evidence/publication-smoke-2026-11-18.json"}

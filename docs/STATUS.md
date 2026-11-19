@@ -6,9 +6,9 @@ Current release state, what has been verified, known issues and what comes next.
 
 | | |
 |---|---|
-| Version | **1.1.0** (versionCode 11), package `attention.stats` |
-| Channel | Google Play production, publishing 18/11/26 (first public release; 1.0.0 was a closed test) |
-| Branches | `develop` for work; `main` is the release line (merge needs maintainer agreement, ADR-068) |
+| Version | **1.1.0** (versionCode 11) "Brainrot Shield", package `attention.stats`; phone preview builds show `1.1.0-brainrot-shield` (ADR-123) |
+| Channel | Google Play production (first public release; 1.0.0 was a closed test) and a signed APK on GitHub Releases (ADR-123) |
+| Branches | `main` is the release line and shows the published app; the maintainer works on `main` until 1.1.0 is published, then `develop` resumes for work (ADR-068, ADR-123) |
 | Data baseline | Room schema 9 is the first production schema; later releases must migrate it (ADR-108) |
 | Resource baseline | Seven-day battery/CPU comparison waived for this release (ADR-112); still to do |
 
@@ -54,20 +54,6 @@ All pass on the release source: `pnpm typecheck`, `pnpm lint` (includes architec
 - R8 minification is off for release builds.
 - Seven-day battery/CPU baseline (ADR-112).
 
-## Deferred to the next release
+## Next
 
-Maintainer decisions:
-
-- Exact per-video watch time.
-- 3-second, partial and full completion counts (playback measurement is hidden for new users, ADR-109).
-- App Activity screen (camera/microphone/network context) — needs feasibility work; most of it has no public Android API for other apps.
-
-## Roadmap (planned, not built)
-
-- More sources and entry routes, each with fixtures and live checks.
-- Reboot and time-zone qualification for schedules and focus.
-- Selective export scopes and summary-only archives (ADR-026).
-- Per-app network usage, notification metadata and other usage families (ADR-085), each behind its own consent.
-- Future multi-device merge using the recorded fact origins (ADR-050, ADR-074).
-
-Not planned: iOS, web, desktop or browser-extension clients (ADR-024), direct Google Drive backup (F-05), cloud accounts or analytics.
+Planned work, deferred maintainer decisions and what is not planned are in the [Roadmap](ROADMAP.md).

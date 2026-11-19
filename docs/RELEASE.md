@@ -42,6 +42,15 @@ python tools/verify_signed_release.py --profile current --certificate <upload-ce
 
 The audits check package and version, merged manifest permissions and exported components, compiled backup rules, matching native libraries and 16 KB page alignment. They are static checks; they do not replace testing the build on a phone.
 
+## GitHub release
+
+Each release is also published on GitHub for people without Google Play (ADR-123). Tag the release commit `v<version>` and attach the upload-signed APK from the signed build, renamed `attention-stats-<version>-<code>-arm64.apk`, with a `SHA256SUMS.txt`. The notes give the release name, what changed, the upload certificate's SHA-256 (`6c7606a45a21074193c0e4d5d40daa13eb7d3f12a59ac555aef3efde8c0d1168`) and this warning: Play installs are signed by Google's app-signing key, so a GitHub install and a Play install cannot update each other; to switch, export a backup, uninstall and restore.
+
+```powershell
+git tag -a v1.1.0 -m "Attention Stats 1.1.0"; git push origin v1.1.0
+gh release create v1.1.0 <apk> <SHA256SUMS.txt> --title "Attention Stats 1.1.0 · Brainrot Shield" --notes-file <notes.md>
+```
+
 `python tools/release_candidate.py prepare` copies this file, the policies and the store text into the external release folder; `archive` stores an unsigned candidate there. Release folders are never inside the repository.
 
 ## Before upload
@@ -52,6 +61,7 @@ The audits check package and version, merged manifest permissions and exported c
 - [ ] Listing, Data safety answers, accessibility declaration and reviewer video match the build.
 - [ ] Release notes updated; [STATUS](STATUS.md) updated.
 - [ ] Maintainer agreement to merge `develop` into `main`; tag the release commit.
+- [ ] Publish the GitHub release (below).
 
 ## Google Play Console
 
@@ -162,7 +172,7 @@ Graphics (kept in the external release folder under `store/en-US/`): `icon-512.p
 - Description:
 
 ```plain
-Attention Stats is a digital wellbeing app. With affirmative in-app consent, its AccessibilityService reads foreground screen structure and labels in Instagram, Facebook, YouTube, TikTok and Snapchat to estimate short-video encounters and time on those screens. Labels are processed in memory and discarded; only encounter facts are stored locally. It draws the optional counter and user-configured break reminders; just before a break screen the user enabled, it may pause the video with one tap, on the source app's visible Pause control or, in TikTok and YouTube, on the video itself after confirming from playback progress that it is playing; the pause counts only when progress stops (never a second tap, never Play), otherwise it only shows the reminder. User-chosen blocks can press Back to leave a short-video player. For app/group time slots and focus sessions the person sets up (including Allow Only), it checks foreground package ownership only and shows a cover; system navigation, Settings, launcher, keyboard and emergency/dialer stay available and a 5, 10 or 15 minute allowance is offered (an optional parent key can be required). Separately allowed auto-scroll uses a visible Start/Stop control and a deterministic qualifying playback/photo signal for one upward swipe; an additional separate choice swipes past pages that carry the source app's own Sponsored/Ad label, without opening ads; unavailable signals suspend actions. It never likes, comments, follows or messages. The app has no Internet permission or developer telemetry; Android-managed backup and user-selected file providers may transfer logical history under disclosed backup choices.
+Attention Stats is a digital wellbeing app. With affirmative in-app consent, its AccessibilityService reads foreground screen structure and labels in Instagram, Facebook, YouTube, TikTok and Snapchat to estimate short-video encounters and time on those screens. Labels are processed in memory and discarded; only encounter facts are stored locally. It draws the optional counter and user-configured break reminders; just before a break screen the user enabled, it may pause the video with one tap, on the source app's visible Pause control or, in TikTok and YouTube, on the video itself after confirming from playback progress that it is playing; the pause counts only when progress stops (never a second tap, never Play), otherwise it only shows the reminder. User-chosen blocks can press Back to leave a short-video player. For app/group time slots and focus sessions the person sets up (including Allow Only), it checks foreground package ownership only and shows a cover; system navigation, Settings, launcher, keyboard and emergency/dialer stay available and a 5, 10 or 15 minute allowance is offered (an optional Protection Lock approval can be required). Separately allowed auto-scroll uses a visible Start/Stop control and a deterministic qualifying playback/photo signal for one upward swipe; an additional separate choice swipes past pages that carry the source app's own Sponsored/Ad label, without opening ads; unavailable signals suspend actions. It never likes, comments, follows or messages. The app has no Internet permission or developer telemetry; Android-managed backup and user-selected file providers may transfer logical history under disclosed backup choices.
 ```
 
 - Reviewer video: show the in-app disclosure, enabling the service in Android Settings, the counter on a supported app, a break and its exit, a schedule cover with its allowance, and auto-scroll Start/Stop. Use synthetic history and no private content. Any change in accessibility behavior needs an updated declaration and video ([policy](https://support.google.com/googleplay/android-developer/answer/10964491)).
@@ -178,10 +188,10 @@ Attention Stats is a digital wellbeing app. With affirmative in-app consent, its
 | Track | Production |
 | App signing | Play App Signing; upload with the local upload key |
 | Bundle | `attention-stats-1.1.0-11.aab` from the external release folder |
-| Release name | 1.1.0 (11) |
+| Release name | 1.1.0 (11) Brainrot Shield |
 
 Release notes (≤ 500):
 
 ```text
-First public release. Counts short videos on Instagram, Facebook, YouTube Shorts, TikTok and Snapchat. New: lively break screens with real-life choices, Perspective (what your scrolling time could have been), Week/Month/All Time insights, app groups, time slots, focus sessions, Allow Only, a parent key with fingerprint, backup and restore, widgets and themes. Auto-scroll now supports YouTube Shorts and can skip ads. No ads, account or telemetry.
+First public release. Counts short videos on Instagram, Facebook, YouTube Shorts, TikTok and Snapchat. New: lively break screens with real-life choices, Perspective (what your scrolling time could have been), Week/Month/All Time insights, app groups, time slots, focus sessions, Allow Only, Protection Lock with fingerprint or app PIN, backup and restore, widgets and themes. Auto-scroll now supports YouTube Shorts and can skip ads. No ads, account or telemetry.
 ```

@@ -152,7 +152,7 @@ android {
         preview {
             initWith debug
             applicationIdSuffix ".debug"
-            versionNameSuffix "-reels-preview"
+            versionNameSuffix "-brainrot-shield"
             signingConfig signingConfigs.debug
             matchingFallbacks = ['debug']
             debuggable true
